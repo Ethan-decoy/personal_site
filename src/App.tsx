@@ -267,6 +267,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
   const view = aboutView ?? 'personal'
   const [valuesExpanded, setValuesExpanded] = useState(false)
   const [valuesContentOpen, setValuesContentOpen] = useState(false)
+  const [hoveredDimension, setHoveredDimension] = useState<string | null>(null)
 
   const views: { key: AboutView; label: string }[] = [
     { key: 'personal', label: '生活' },
@@ -274,10 +275,9 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
   ]
 
   const values = [
+    { title: '终身学习', desc: '保持好奇，持续迭代。' },
     { title: '诚实', desc: '不为了迎合而说话。' },
     { title: '长期主义', desc: '做能活十年以上的事。' },
-    { title: '隐形', desc: '好的工具让人感受不到。' },
-    { title: '克制', desc: '不为了展示而添加。' },
   ]
 
   const toggleValues = () => {
@@ -298,7 +298,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
         <SectionTitle theme={theme}>关于</SectionTitle>
 
         {/* 视图切换 */}
-        <div className="flex gap-1 mb-16">
+        <div className="flex gap-1 mb-3">
           {views.map((v) => (
             <button
               key={v.key}
@@ -318,67 +318,151 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
       {/* 个人面向 */}
       {view === 'personal' && (
         <div key="personal" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
-          <div className="grid grid-cols-3 gap-12">
-            {/* 左侧：自我介绍 */}
-            <div className="col-span-2 max-w-prose space-y-5" style={{ color: theme.textSec }}>
-              <p className="text-lg leading-relaxed">
-                我是 Ethan，一名研发工程师。相信好的设计是隐形的，好的工具是让人感受不到的。
-              </p>
-              <p className="leading-relaxed">
-                闲暇时，我喜欢研究技术细节、探索设计趋势、以及思考如何让复杂的概念变得简单。
-                这个网站是我实践这些想法的地方。
-              </p>
-              <p className="leading-relaxed">
-                我相信先做人民需要的工程师，再做自己时间的主人。
-              </p>
+          {/* 上区：左侧（配图+生活切片）与右侧（速览+MBTI）并列 */}
+          <div className="flex gap-12">
+            {/* 左侧列 */}
+            <div className="flex-[2]">
+              {/* 配图 */}
+              <div className="mb-8 rounded-2xl overflow-hidden" style={{ border: `1px solid ${theme.borderLight}`, height: '280px' }}>
+                <img
+                  src="/assets/钱学森和袁隆平.png"
+                  alt=""
+                  className="w-full h-full object-cover"
+                  style={{ objectPosition: 'center 30%' }}
+                />
+              </div>
+
+              <h3 className="text-sm font-semibold tracking-wider uppercase mb-5" style={{ color: theme.text }}>
+                生活切片
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { title: '费曼式学习者', desc: '讲给别人听之前，自己先假装讲一遍。' },
+                  { title: 'Google 工程思维', desc: '相信简单可扩展的解决方案，无论写代码还是生活。' },
+                  { title: '模拟竞速', desc: '更好的走线，更快的入弯。' },
+                  { title: '单排 AD', desc: '牢中牢，但是我扛得住。' },
+                  { title: '无产主义', desc: '相信劳动的价值。' },
+                  { title: '城市漫步', desc: '散步是整理思绪的最佳方式。' },
+                ].map((item) => (
+                  <div
+                    key={item.title}
+                    className="p-5 rounded-2xl"
+                    style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.borderLight}` }}
+                  >
+                    <p className="text-sm font-semibold mb-1" style={{ color: theme.text }}>
+                      {item.title}
+                    </p>
+                    <p className="text-sm" style={{ color: theme.textSec }}>
+                      {item.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* 右侧：快速信息 */}
-            <div className="space-y-6" style={{ color: theme.textSec }}>
-              {[
-                { label: '位置', value: '中国' },
-                { label: '语言', value: '中文 / English' },
-                { label: '状态', value: '持续学习中' },
-              ].map((item) => (
-                <div key={item.label}>
-                  <p className="text-xs tracking-wider uppercase mb-1" style={{ color: theme.text }}>{item.label}</p>
-                  <p className="text-sm">{item.value}</p>
+            {/* 右侧列 */}
+            <div className="flex-1">
+              {/* 速览 */}
+              <div className="space-y-6 mb-12" style={{ color: theme.textSec }}>
+                {[
+                  { label: '位置', value: '中国' },
+                  { label: '语言', value: '中文（母语），English（B1）' },
+                  { label: 'MBTI', value: 'INTJ-T' },
+                  { label: '当前', value: '构建并部署个人网站' },
+                ].map((item) => (
+                  <div key={item.label}>
+                    <p className="text-xs tracking-wider uppercase mb-1" style={{ color: theme.text }}>{item.label}</p>
+                    <p className="text-sm">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* MBTI 维度 */}
+              <div className="mb-4">
+                <h3 className="text-sm font-semibold tracking-wider uppercase mb-5" style={{ color: theme.text }}>
+                  MBTI
+                </h3>
+                <div className="space-y-4">
+                  {[
+                    {
+                      key: 'I',
+                      label: '内向', pct: 86, left: '外向', right: '内向', color: '#5A7A82',
+                      desc: '往往更喜欢较少但深入和有意义的社交互动，通常更喜欢安静的环境。',
+                    },
+                    {
+                      key: 'N',
+                      label: '天马行空', pct: 58, left: '天马行空', right: '求真务实', color: '#B8944F',
+                      desc: '将独创性视若珍宝，热衷于探寻那些隐藏在表象之下的深层含义，以及看似遥远却充满希望的可能性。',
+                    },
+                    {
+                      key: 'T',
+                      label: '理性思考', pct: 85, left: '理性思考', right: '情感细腻', color: '#5E8268',
+                      desc: '注重客观性和合理性，通常不考虑情感，只考虑逻辑。往往认为效率比社会和谐更重要。',
+                    },
+                    {
+                      key: 'J',
+                      label: '运筹帷幄', pct: 71, left: '运筹帷幄', right: '随机应变', color: '#7B6B8B',
+                      desc: '将明确性、可预测性以及事情的圆满解决奉为圭臬。',
+                    },
+                    {
+                      key: 'T2',
+                      label: '情绪易波动', pct: 51, left: '自信果断', right: '情绪易波动', color: '#A06060',
+                      desc: '对压力敏感。在情绪上有一种紧迫感，往往以成功为导向，追求完美，渴望进步。',
+                    },
+                  ].map((d) => (
+                    <div
+                      key={d.key}
+                      className="relative cursor-pointer"
+                      onMouseEnter={() => setHoveredDimension(d.key)}
+                      onMouseLeave={() => setHoveredDimension(null)}
+                    >
+                      <p className="text-center text-xs font-medium mb-1.5" style={{ color: hoveredDimension === d.key ? d.color : `${d.color}cc` }}>
+                        {d.pct}% {d.label}
+                      </p>
+                      <div className="relative h-2 rounded-full overflow-hidden" style={{ backgroundColor: theme.border }}>
+                        <div
+                          className="absolute left-0 top-0 h-full rounded-full"
+                          style={{
+                            width: `${d.pct}%`,
+                            backgroundColor: d.color,
+                            filter: hoveredDimension === d.key ? 'none' : 'brightness(0.8)',
+                            transition: 'filter 0.25s ease-out',
+                          }}
+                        />
+                      </div>
+                      <div className="flex justify-between mt-1">
+                        <span className="text-xs" style={{ color: theme.textSec, opacity: 0.5 }}>{d.left}</span>
+                        <span className="text-xs" style={{ color: theme.textSec, opacity: 0.5 }}>{d.right}</span>
+                      </div>
+
+                      {/* 悬浮解释面板 */}
+                      <div
+                        className="absolute left-[calc(100%+20px)] top-0 w-72 rounded-xl p-5 pointer-events-none"
+                        style={{
+                          backgroundColor: theme.bgDeep,
+                          border: `1px solid ${theme.border}`,
+                          boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+                          opacity: hoveredDimension === d.key ? 1 : 0,
+                          transform: hoveredDimension === d.key ? 'translateX(0)' : 'translateX(-8px)',
+                          transition: 'opacity 0.25s ease-out, transform 0.25s ease-out',
+                        }}
+                      >
+                        <p className="text-xs font-medium mb-2" style={{ color: d.color }}>{d.label}</p>
+                        <p className="text-sm leading-relaxed" style={{ color: theme.textSec }}>{d.desc}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            {/* 底部：兴趣标签 */}
-            <div className="col-span-2">
-              <h3 className="text-sm font-semibold tracking-wider uppercase mb-5" style={{ color: theme.text }}>
-                感兴趣
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  '前端工程', '极简设计', '开发者工具', '系统设计',
-                  '知识管理', '写作',
-                ].map((t) => (
-                  <Tag key={t} theme={theme}>{t}</Tag>
-                ))}
+                <p className="text-[10px] mt-4 text-center" style={{ color: theme.textSec, opacity: 0.4 }}>
+                  测试数据更新于半年内 · 未采用大五人格（自填结果误差较大）
+                </p>
               </div>
             </div>
+          </div>
 
-            {/* 底部右侧：技术栈 */}
-            <div className="col-span-1">
-              <h3 className="text-sm font-semibold tracking-wider uppercase mb-5" style={{ color: theme.text }}>
-                技术栈
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  'TypeScript', 'React', 'Vite', 'Tailwind CSS',
-                  'Node.js', 'Git', 'Docker', 'Python',
-                ].map((t) => (
-                  <Tag key={t} theme={theme}>{t}</Tag>
-                ))}
-              </div>
-            </div>
-
-            {/* 价值观 */}
-            <div className="col-span-3">
+          {/* 全宽区：价值观 */}
+          <div className="mt-12">
               <div
                 className="rounded-2xl cursor-pointer select-none transition-all duration-200 ease-out"
                 onClick={toggleValues}
@@ -422,7 +506,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                     maxHeight: valuesContentOpen ? '300px' : '0px',
                   }}
                 >
-                  <div className="grid grid-cols-4 gap-4 px-5 pb-5">
+                  <div className="grid grid-cols-3 gap-4 px-5 pb-5">
                     {values.map((v) => (
                       <div
                         key={v.title}
@@ -445,13 +529,12 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
               </div>
             </div>
 
-            {/* 引用卡片 */}
-            <div className="col-span-3 p-8 rounded-2xl" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.borderLight}` }}>
-              <p className="text-xl font-medium italic leading-relaxed" style={{ color: theme.text }}>
-                "好的设计是尽可能少的设计。"
-              </p>
-              <p className="text-sm mt-4" style={{ color: theme.textSec }}>— Dieter Rams</p>
-            </div>
+          {/* 引用卡片 */}
+          <div className="mt-12 p-8 rounded-2xl" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.borderLight}` }}>
+            <p className="text-xl font-medium italic leading-relaxed" style={{ color: theme.text }}>
+              "好的设计是尽可能少的设计。"
+            </p>
+            <p className="text-sm mt-4" style={{ color: theme.textSec }}>— Dieter Rams</p>
           </div>
         </div>
       )}

@@ -139,7 +139,7 @@ function NavBar({
 function SmileyAvatar({ theme }: { theme: Theme }) {
   return (
     <div
-      className="absolute right-[8%] top-[15%] w-[35vw] h-[35vw] max-w-[420px] max-h-[420px] opacity-[0.12] pointer-events-none"
+      className="w-[320px] h-[320px] opacity-[0.12] pointer-events-none"
       style={{
         WebkitMask: `url(/assets/avatar.svg) center/contain no-repeat`,
         mask: `url(/assets/avatar.svg) center/contain no-repeat`,
@@ -150,20 +150,22 @@ function SmileyAvatar({ theme }: { theme: Theme }) {
   )
 }
 
-function HomePage({ theme }: { theme: Theme }) {
+function HomePage({ theme, onNavigate }: { theme: Theme; onNavigate: (s: Section) => void }) {
+  const [secondLineVisible, setSecondLineVisible] = useState(false)
   return (
     <div className="min-h-screen flex flex-col justify-center relative overflow-hidden">
       <div className="max-w-5xl mx-auto px-8 w-full relative z-10">
 
-        {/* 主标题区域 */}
-        <div className="mb-20 relative">
-          {/* 装饰头像 - 背景 */}
-          <SmileyAvatar theme={theme} />
+        {/* 两列布局：左侧内容 + 右侧头像 */}
+        <div className="grid grid-cols-[1fr_auto] gap-12 items-start">
 
-          {/* 内容 */}
-          <div className="relative z-10">
+          {/* 左侧：文字内容 */}
+          <div className="space-y-10">
             {/* 状态点 */}
-            <div className="flex items-center gap-3 mb-8">
+            <div
+              className="flex items-center gap-3"
+              style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '0ms' }}
+            >
               <span className="relative flex h-2.5 w-2.5">
                 <span
                   className="absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping"
@@ -179,104 +181,387 @@ function HomePage({ theme }: { theme: Theme }) {
               </p>
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.05] mb-8" style={{ color: theme.text }}>
+            {/* 主标题 */}
+            <h1
+              className="text-5xl md:text-6xl font-bold tracking-tight leading-[1.05]"
+              style={{ color: theme.text, animation: 'fade-up 0.6s ease-out both', animationDelay: '100ms' }}
+            >
               我是 Ethan C.<br />
               <span className="font-normal" style={{ color: theme.textSec }}>
-                探索者.
+                R&amp;D / 探索者.
               </span>
             </h1>
 
-            <p className="text-lg leading-relaxed max-w-xl" style={{ color: theme.textSec }}>
-              在这里记录我的探索与思考。
-            </p>
-            <p className="text-lg leading-relaxed max-w-xl mt-4" style={{ color: theme.textSec }}>
-              我相信好的工具应该隐形，让你专注于真正重要的事情。
-            </p>
-          </div>
-        </div>
+            {/* 描述 */}
+            <div
+              className="space-y-3 max-w-md"
+              style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '250ms' }}
+            >
+              <p className="text-lg leading-relaxed" style={{ color: theme.textSec }}>
+                在这里记录我的探索与思考。
+              </p>
+              <p
+                className="text-base leading-relaxed cursor-default select-none"
+                onMouseEnter={() => setSecondLineVisible(true)}
+                onMouseLeave={() => setSecondLineVisible(false)}
+                style={{
+                  color: theme.textSec,
+                  opacity: secondLineVisible ? 0.7 : 0,
+                  transition: 'opacity 0.5s ease-out',
+                }}
+              >
+                我相信好的工具应该隐形，让你专注于真正重要的事情。
+              </p>
+            </div>
 
-        {/* 底部：个人理念 + CTA */}
-        <div className="flex items-end justify-between">
-          <blockquote className="text-sm italic max-w-sm" style={{ color: theme.textSec }}>
-            "先做人民需要的工程师，再做自己时间的主人。"
-          </blockquote>
-          <button
-            className="px-6 py-3 text-sm font-medium text-white rounded-xl transition-all duration-200 ease-out shadow-sm shrink-0"
-            style={{ backgroundColor: theme.accent }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = theme.accentHover
-              e.currentTarget.style.transform = 'translateY(-1px)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = theme.accent
-              e.currentTarget.style.transform = 'translateY(0)'
-            }}
+            {/* 分隔线 */}
+            <div
+              className="h-px w-16"
+              style={{ backgroundColor: theme.border, animation: 'fade-in 0.6s ease-out both', animationDelay: '400ms' }}
+            />
+
+            {/* motto + CTA */}
+            <div
+              className="space-y-6"
+              style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '500ms' }}
+            >
+              <blockquote className="text-sm italic max-w-sm" style={{ color: theme.textSec }}>
+                "先做人民需要的工程师，再做自己时间的主人。"
+              </blockquote>
+              <button
+                className="px-6 py-3 text-sm font-medium text-white rounded-xl transition-all duration-200 ease-out shadow-sm"
+                style={{ backgroundColor: theme.accent }}
+                onClick={() => onNavigate('about')}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = theme.accentHover
+                  e.currentTarget.style.transform = 'translateY(-1px)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = theme.accent
+                  e.currentTarget.style.transform = 'translateY(0)'
+                }}
+              >
+                了解我
+              </button>
+            </div>
+          </div>
+
+          {/* 右侧：装饰头像 */}
+          <div
+            className="hidden md:flex items-center justify-center pt-8"
+            style={{ animation: 'fade-up 0.8s ease-out both', animationDelay: '300ms' }}
           >
-            了解我
-          </button>
+            <SmileyAvatar theme={theme} />
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
+type AboutView = 'personal' | 'work'
+
 /* ==================== About Page ==================== */
 
-function AboutPage({ theme }: { theme: Theme }) {
+function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate: (s: Section, sub?: AboutView) => void; aboutView?: AboutView }) {
+  const view = aboutView ?? 'personal'
+  const [valuesExpanded, setValuesExpanded] = useState(false)
+  const [valuesContentOpen, setValuesContentOpen] = useState(false)
+
+  const views: { key: AboutView; label: string }[] = [
+    { key: 'personal', label: '生活' },
+    { key: 'work', label: '工作' },
+  ]
+
+  const values = [
+    { title: '诚实', desc: '不为了迎合而说话。' },
+    { title: '长期主义', desc: '做能活十年以上的事。' },
+    { title: '隐形', desc: '好的工具让人感受不到。' },
+    { title: '克制', desc: '不为了展示而添加。' },
+  ]
+
+  const toggleValues = () => {
+    if (!valuesExpanded) {
+      setValuesExpanded(true)
+      setTimeout(() => setValuesContentOpen(true), 100)
+    } else {
+      setValuesContentOpen(false)
+      setTimeout(() => setValuesExpanded(false), 300)
+    }
+  }
+
   return (
-    <div className="max-w-5xl mx-auto px-8 py-32 space-y-20">
-      <SectionTitle theme={theme}>关于</SectionTitle>
+    <div className="max-w-5xl mx-auto px-8 py-32">
+      <div
+        style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '0ms' }}
+      >
+        <SectionTitle theme={theme}>关于</SectionTitle>
 
-      {/* 两栏布局 */}
-      <div className="grid grid-cols-3 gap-12">
-        <div className="col-span-2 max-w-prose space-y-5" style={{ color: theme.textSec }}>
-          <p className="text-lg leading-relaxed">
-            我是一名开发者，热衷于前端技术与极简设计的结合。
-            我相信好的工具应该隐形 — 让你专注于真正重要的事情。
-          </p>
-          <p className="leading-relaxed">
-            闲暇时，我喜欢研究技术细节、探索设计趋势、以及思考如何让复杂的概念变得简单。
-            这个网站是我实践这些想法的地方。
-          </p>
+        {/* 视图切换 */}
+        <div className="flex gap-1 mb-16">
+          {views.map((v) => (
+            <button
+              key={v.key}
+              className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ease-out relative"
+              style={{
+                color: view === v.key ? theme.text : theme.textSec,
+                backgroundColor: view === v.key ? theme.accentLight : 'transparent',
+              }}
+              onClick={() => onNavigate('about', v.key)}
+            >
+              {v.label}
+            </button>
+          ))}
         </div>
+      </div>
 
-        {/* 右侧：快速信息 */}
-        <div className="space-y-6" style={{ color: theme.textSec }}>
-          {[
-            { label: '位置', value: '中国' },
-            { label: '语言', value: '中文 / English' },
-            { label: '状态', value: '持续学习中' },
-          ].map((item) => (
-            <div key={item.label}>
-              <p className="text-xs tracking-wider uppercase mb-1" style={{ color: theme.text }}>{item.label}</p>
-              <p className="text-sm">{item.value}</p>
+      {/* 个人面向 */}
+      {view === 'personal' && (
+        <div key="personal" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
+          <div className="grid grid-cols-3 gap-12">
+            {/* 左侧：自我介绍 */}
+            <div className="col-span-2 max-w-prose space-y-5" style={{ color: theme.textSec }}>
+              <p className="text-lg leading-relaxed">
+                我是 Ethan，一名研发工程师。相信好的设计是隐形的，好的工具是让人感受不到的。
+              </p>
+              <p className="leading-relaxed">
+                闲暇时，我喜欢研究技术细节、探索设计趋势、以及思考如何让复杂的概念变得简单。
+                这个网站是我实践这些想法的地方。
+              </p>
+              <p className="leading-relaxed">
+                我相信先做人民需要的工程师，再做自己时间的主人。
+              </p>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* 技术栈 */}
-      <div>
-        <h3 className="text-sm font-semibold tracking-wider uppercase mb-5" style={{ color: theme.text }}>
-          技术栈
-        </h3>
-        <div className="flex flex-wrap gap-2">
-          {[
-            'TypeScript', 'React', 'Vite', 'Tailwind CSS',
-            'Node.js', 'Git', 'Docker', 'Python',
-          ].map((t) => (
-            <Tag key={t} theme={theme}>{t}</Tag>
-          ))}
-        </div>
-      </div>
+            {/* 右侧：快速信息 */}
+            <div className="space-y-6" style={{ color: theme.textSec }}>
+              {[
+                { label: '位置', value: '中国' },
+                { label: '语言', value: '中文 / English' },
+                { label: '状态', value: '持续学习中' },
+              ].map((item) => (
+                <div key={item.label}>
+                  <p className="text-xs tracking-wider uppercase mb-1" style={{ color: theme.text }}>{item.label}</p>
+                  <p className="text-sm">{item.value}</p>
+                </div>
+              ))}
+            </div>
 
-      {/* 理念 */}
-      <div className="p-8 rounded-2xl" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.borderLight}` }}>
-        <p className="text-xl font-medium italic leading-relaxed" style={{ color: theme.text }}>
-          "好的设计是尽可能少的设计。"
-        </p>
-        <p className="text-sm mt-4" style={{ color: theme.textSec }}>— Dieter Rams</p>
-      </div>
+            {/* 底部：兴趣标签 */}
+            <div className="col-span-2">
+              <h3 className="text-sm font-semibold tracking-wider uppercase mb-5" style={{ color: theme.text }}>
+                感兴趣
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  '前端工程', '极简设计', '开发者工具', '系统设计',
+                  '知识管理', '写作',
+                ].map((t) => (
+                  <Tag key={t} theme={theme}>{t}</Tag>
+                ))}
+              </div>
+            </div>
+
+            {/* 底部右侧：技术栈 */}
+            <div className="col-span-1">
+              <h3 className="text-sm font-semibold tracking-wider uppercase mb-5" style={{ color: theme.text }}>
+                技术栈
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  'TypeScript', 'React', 'Vite', 'Tailwind CSS',
+                  'Node.js', 'Git', 'Docker', 'Python',
+                ].map((t) => (
+                  <Tag key={t} theme={theme}>{t}</Tag>
+                ))}
+              </div>
+            </div>
+
+            {/* 价值观 */}
+            <div className="col-span-3">
+              <div
+                className="rounded-2xl cursor-pointer select-none transition-all duration-200 ease-out"
+                onClick={toggleValues}
+                style={{
+                  backgroundColor: theme.bgDeep,
+                  border: `1px solid ${valuesExpanded ? theme.border : theme.borderLight}`,
+                  boxShadow: valuesExpanded ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = theme.border
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = valuesExpanded ? theme.border : theme.borderLight
+                }}
+              >
+                {/* 标题行 */}
+                <div className="flex items-center justify-between px-5 py-4">
+                  <span className="text-sm font-semibold tracking-wider uppercase" style={{ color: theme.text }}>
+                    价值观
+                  </span>
+                  <svg
+                    className="w-4 h-4 transition-transform duration-300 ease-out"
+                    style={{
+                      transform: valuesExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                      color: theme.textSec,
+                    }}
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  >
+                    <path d="M4 6l4 4 4-4" />
+                  </svg>
+                </div>
+
+                {/* 展开内容 */}
+                <div
+                  className="overflow-hidden"
+                  style={{
+                    transition: 'max-height 0.7s ease-out',
+                    maxHeight: valuesContentOpen ? '300px' : '0px',
+                  }}
+                >
+                  <div className="grid grid-cols-4 gap-4 px-5 pb-5">
+                    {values.map((v) => (
+                      <div
+                        key={v.title}
+                        className="p-4 rounded-xl"
+                        style={{
+                          backgroundColor: theme.bgCard || theme.bg,
+                          border: `1px solid ${theme.borderLight}`,
+                        }}
+                      >
+                        <p className="text-sm font-semibold mb-1" style={{ color: theme.text }}>
+                          {v.title}
+                        </p>
+                        <p className="text-sm" style={{ color: theme.textSec }}>
+                          {v.desc}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 引用卡片 */}
+            <div className="col-span-3 p-8 rounded-2xl" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.borderLight}` }}>
+              <p className="text-xl font-medium italic leading-relaxed" style={{ color: theme.text }}>
+                "好的设计是尽可能少的设计。"
+              </p>
+              <p className="text-sm mt-4" style={{ color: theme.textSec }}>— Dieter Rams</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 专业面向 */}
+      {view === 'work' && (
+        <div key="work" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
+          <div className="space-y-16">
+          {/* 简介 */}
+          <div>
+            <h3 className="text-sm font-semibold tracking-wider uppercase mb-5" style={{ color: theme.text }}>
+              简介
+            </h3>
+            <div className="max-w-prose space-y-4" style={{ color: theme.textSec }}>
+              <p className="text-lg leading-relaxed">
+                研发工程师，专注于前端工程与系统设计。热衷于用极简的设计思维解决复杂的技术问题。
+              </p>
+              <p className="leading-relaxed">
+                擅长将复杂概念抽象为简单、优雅的解决方案，并在团队中推动工程规范与最佳实践。
+              </p>
+            </div>
+          </div>
+
+          {/* 经验 */}
+          <div>
+            <h3 className="text-sm font-semibold tracking-wider uppercase mb-5" style={{ color: theme.text }}>
+              经验
+            </h3>
+            <div className="space-y-4">
+              {[
+                {
+                  role: '研发工程师',
+                  company: '某公司',
+                  period: '2024 — 至今',
+                  desc: '负责前端架构与核心功能开发，推动工程规范落地。',
+                },
+              ].map((exp) => (
+                <div
+                  key={exp.role}
+                  className="p-6 rounded-2xl border"
+                  style={{ backgroundColor: theme.bgDeep, borderColor: theme.border }}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="text-base font-semibold" style={{ color: theme.text }}>
+                        {exp.role}
+                      </p>
+                      <p className="text-sm" style={{ color: theme.textSec }}>
+                        {exp.company}
+                      </p>
+                    </div>
+                    <span className="text-xs font-mono" style={{ color: theme.textSec }}>
+                      {exp.period}
+                    </span>
+                  </div>
+                  <p className="text-sm mt-3" style={{ color: theme.textSec }}>
+                    {exp.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 能力矩阵 */}
+          <div>
+            <h3 className="text-sm font-semibold tracking-wider uppercase mb-5" style={{ color: theme.text }}>
+              能力
+            </h3>
+            <div className="grid grid-cols-3 gap-5">
+              {[
+                { label: '前端', items: ['TypeScript', 'React', 'Vite', 'Tailwind CSS'] },
+                { label: '后端', items: ['Node.js', 'Python', '系统设计'] },
+                { label: '工具', items: ['Git', 'Docker', 'CI/CD'] },
+              ].map((cat) => (
+                <div key={cat.label} className="p-5 rounded-2xl" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.borderLight}` }}>
+                  <p className="text-xs tracking-wider uppercase mb-3" style={{ color: theme.text }}>
+                    {cat.label}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {cat.items.map((t) => (
+                      <Tag key={t} theme={theme}>{t}</Tag>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 联系 CTA */}
+          <div className="flex items-center justify-between p-6 rounded-2xl" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}` }}>
+            <p className="text-sm" style={{ color: theme.textSec }}>
+              想要进一步了解我的工作经历？
+            </p>
+            <button
+              className="px-5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ease-out"
+              style={{ color: theme.accent, border: `1px solid ${theme.border}` }}
+              onClick={() => onNavigate('contact')}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = theme.accentLight
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+              }}
+            >
+              联系我
+            </button>
+          </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -330,7 +615,7 @@ function ProjectCard({
   )
 }
 
-function ProjectsPage({ theme }: { theme: Theme }) {
+function ProjectsPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavigate: (s: Section) => void }) {
   const projects = [
     {
       title: 'Kind Teacher Agent',
@@ -366,7 +651,7 @@ function ProjectsPage({ theme }: { theme: Theme }) {
 
 /* ==================== Notes Page ==================== */
 
-function NotesPage({ theme }: { theme: Theme }) {
+function NotesPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavigate: (s: Section) => void }) {
   const noteCategories = [
     {
       category: '前端',
@@ -439,7 +724,7 @@ function NotesPage({ theme }: { theme: Theme }) {
 
 /* ==================== Contact Page ==================== */
 
-function ContactPage({ theme }: { theme: Theme }) {
+function ContactPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavigate: (s: Section) => void }) {
   return (
     <div className="max-w-5xl mx-auto px-8 py-32">
       <SectionTitle theme={theme}>联系</SectionTitle>
@@ -515,7 +800,7 @@ function Footer({ theme }: { theme: Theme }) {
 
 /* ==================== App ==================== */
 
-const sectionMap: Record<Section, React.FC<{ theme: Theme }>> = {
+const sectionMap: Record<Section, React.FC<{ theme: Theme; onNavigate: (s: Section, sub?: AboutView) => void; aboutView?: AboutView }>> = {
   home: HomePage,
   about: AboutPage,
   projects: ProjectsPage,
@@ -533,17 +818,28 @@ const sectionTheme: Record<Section, ThemeKey> = {
 
 function App() {
   const [active, setActive] = useState<Section>('home')
+  const [aboutView, setAboutView] = useState<AboutView>('personal')
   const theme = themes[sectionTheme[active]]
   const Page = sectionMap[active]
 
   useEffect(() => {
-    const hash = window.location.hash.replace('#', '') as Section
-    if (hash && sectionMap[hash]) setActive(hash)
+    const hash = window.location.hash.replace('#', '')
+    if (!hash) return
+    const [section, sub] = hash.split('/') as [Section, AboutView?]
+    if (sectionMap[section]) {
+      setActive(section)
+      if (section === 'about' && sub) setAboutView(sub)
+    }
   }, [])
 
-  const navigate = (s: Section) => {
+  const navigate = (s: Section, sub?: AboutView) => {
     setActive(s)
-    window.history.replaceState(null, '', `#${s}`)
+    if (s === 'about' && sub) {
+      setAboutView(sub)
+      window.history.replaceState(null, '', `#${s}/${sub}`)
+    } else {
+      window.history.replaceState(null, '', `#${s}`)
+    }
     window.scrollTo({ top: 0 })
   }
 
@@ -551,7 +847,10 @@ function App() {
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: theme.bg, color: theme.text }}>
       <NavBar theme={theme} active={active} onNavigate={navigate} />
       <main className="flex-1">
-        <Page theme={theme} />
+        {active === 'about'
+          ? <Page theme={theme} onNavigate={navigate} aboutView={aboutView} />
+          : <Page theme={theme} onNavigate={navigate} />
+        }
       </main>
       <Footer theme={theme} />
     </div>

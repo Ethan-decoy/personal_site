@@ -42,6 +42,19 @@ const themes = {
     border: 'rgba(26, 42, 36, 0.12)',
     borderLight: 'rgba(26, 42, 36, 0.06)',
   },
+  black: {
+    name: '黑',
+    bg: '#F5F0E8',
+    bgDeep: '#EDE7DB',
+    bgCard: '#E8E2D6',
+    text: '#0A0A0A',
+    textSec: '#555555',
+    accent: '#0A0A0A',
+    accentHover: '#222222',
+    accentLight: 'rgba(10, 10, 10, 0.08)',
+    border: 'rgba(10, 10, 10, 0.15)',
+    borderLight: 'rgba(10, 10, 10, 0.06)',
+  },
 }
 
 type ThemeKey = keyof typeof themes
@@ -69,35 +82,6 @@ function Tag({ children, theme }: { children: ReactNode; theme: Theme }) {
     >
       {children}
     </span>
-  )
-}
-
-/* ==================== Theme Switcher ==================== */
-
-function ThemeSwitcher({
-  current,
-  onChange,
-}: {
-  current: ThemeKey
-  onChange: (t: ThemeKey) => void
-}) {
-  const keys = Object.keys(themes) as ThemeKey[]
-  return (
-    <div className="fixed top-6 right-6 z-50 flex gap-1.5 p-1.5 rounded-xl" style={{ backgroundColor: themes[current].bgDeep, border: `1px solid ${themes[current].border}` }}>
-      {keys.map((key) => (
-        <button
-          key={key}
-          className="px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ease-out"
-          style={{
-            backgroundColor: current === key ? themes[key].accent : 'transparent',
-            color: current === key ? '#fff' : themes[key].textSec,
-          }}
-          onClick={() => onChange(key)}
-        >
-          {themes[key].name}
-        </button>
-      ))}
-    </div>
   )
 }
 
@@ -167,12 +151,6 @@ function SmileyAvatar({ theme }: { theme: Theme }) {
 }
 
 function HomePage({ theme }: { theme: Theme }) {
-  const stats = [
-    { num: '3', label: '项目' },
-    { num: '2024', label: '开始探索' },
-    { num: '∞', label: '持续学习中' },
-  ]
-
   return (
     <div className="min-h-screen flex flex-col justify-center relative overflow-hidden">
       <div className="max-w-5xl mx-auto px-8 w-full relative z-10">
@@ -204,41 +182,23 @@ function HomePage({ theme }: { theme: Theme }) {
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.05] mb-8" style={{ color: theme.text }}>
               我是 Ethan C.<br />
               <span className="font-normal" style={{ color: theme.textSec }}>
-                开发者，设计爱好者.
+                探索者.
               </span>
             </h1>
 
-            <p className="text-lg leading-relaxed max-w-md" style={{ color: theme.textSec }}>
-              在这里记录我的项目、思考与成长。
+            <p className="text-lg leading-relaxed max-w-xl" style={{ color: theme.textSec }}>
+              在这里记录我的探索与思考。
+            </p>
+            <p className="text-lg leading-relaxed max-w-xl mt-4" style={{ color: theme.textSec }}>
               我相信好的工具应该隐形，让你专注于真正重要的事情。
             </p>
           </div>
         </div>
 
-        {/* 分隔线 */}
-        <div className="h-px w-full mb-8" style={{ backgroundColor: theme.borderLight }} />
-
-        {/* 数据展示 */}
-        <div className="grid grid-cols-3 gap-8 mb-16">
-          {stats.map((stat) => (
-            <div key={stat.label} className="p-5 rounded-2xl" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.borderLight}` }}>
-              <p className="text-3xl font-bold mb-1 tracking-tight" style={{ color: theme.text }}>
-                {stat.num}
-              </p>
-              <p className="text-xs tracking-wider" style={{ color: theme.textSec }}>
-                {stat.label}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* 底部：金句 + CTA */}
+        {/* 底部：个人理念 + CTA */}
         <div className="flex items-end justify-between">
           <blockquote className="text-sm italic max-w-sm" style={{ color: theme.textSec }}>
-            "好的设计是尽可能少的设计。"
-            <span className="block mt-1 text-xs not-italic" style={{ color: theme.textSec }}>
-              — Dieter Rams
-            </span>
+            "先做人民需要的工程师，再做自己时间的主人。"
           </blockquote>
           <button
             className="px-6 py-3 text-sm font-medium text-white rounded-xl transition-all duration-200 ease-out shadow-sm shrink-0"
@@ -252,7 +212,7 @@ function HomePage({ theme }: { theme: Theme }) {
               e.currentTarget.style.transform = 'translateY(0)'
             }}
           >
-            查看项目 →
+            了解我
           </button>
         </div>
       </div>
@@ -493,7 +453,7 @@ function ContactPage({ theme }: { theme: Theme }) {
 
         <div className="space-y-8">
           {[
-            { label: '邮箱', value: 'hello@example.com', href: 'mailto:hello@example.com' },
+            { label: '邮箱', value: 'scarecrow_0459@proton.me', href: 'mailto:scarecrow_0459@proton.me' },
             { label: 'GitHub', value: 'github.com/Ethan-decoy', href: 'https://github.com/Ethan-decoy' },
           ].map((item) => (
             <div key={item.label}>
@@ -563,10 +523,17 @@ const sectionMap: Record<Section, React.FC<{ theme: Theme }>> = {
   contact: ContactPage,
 }
 
+const sectionTheme: Record<Section, ThemeKey> = {
+  home: 'earth',
+  about: 'earth',
+  projects: 'sage',
+  notes: 'ocean',
+  contact: 'black',
+}
+
 function App() {
-  const [currentTheme, setCurrentTheme] = useState<ThemeKey>('earth')
   const [active, setActive] = useState<Section>('home')
-  const theme = themes[currentTheme]
+  const theme = themes[sectionTheme[active]]
   const Page = sectionMap[active]
 
   useEffect(() => {
@@ -582,7 +549,6 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: theme.bg, color: theme.text }}>
-      <ThemeSwitcher current={currentTheme} onChange={setCurrentTheme} />
       <NavBar theme={theme} active={active} onNavigate={navigate} />
       <main className="flex-1">
         <Page theme={theme} />

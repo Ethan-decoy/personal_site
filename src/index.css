@@ -1,1 +1,27 @@
 @import "tailwindcss";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+
+@theme {
+  --font-sans: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Menlo, Consolas, monospace;
+
+  /* 配色方案 C — 浅棕米白（默认） */
+  --color-bg: #F8F3EA;
+  --color-bg-deep: #F0E8D8;
+  --color-text: #2D2418;
+  --color-text-sec: #7A6B5A;
+  --color-accent: #9B7B5A;
+  --color-accent-hover: #7E6045;
+
+  /* 动效 */
+  --default-transition-duration: 200ms;
+}
+
+body {
+  font-family: var(--font-sans);
+}

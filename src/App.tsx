@@ -789,82 +789,25 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
 
 /* ==================== Projects Page ==================== */
 
-function ProjectCard({
-  title,
-  desc,
-  tags,
-  theme,
-}: {
-  title: string
-  desc: string
-  tags: string[]
-  theme: Theme
-}) {
-  return (
-    <div
-      className="group p-6 rounded-2xl border transition-all duration-200 ease-out cursor-default"
-      style={{
-        backgroundColor: theme.bgDeep,
-        borderColor: theme.border,
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = theme.accent
-        e.currentTarget.style.transform = 'translateY(-2px)'
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = theme.border
-        e.currentTarget.style.transform = 'translateY(0)'
-      }}
-    >
-      {/* 顶部指示点 */}
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-1.5 h-1.5 rounded-full transition-all duration-200" style={{ backgroundColor: theme.accent }} />
-      </div>
-
-      <h3 className="text-lg font-semibold mb-2 tracking-tight" style={{ color: theme.text }}>
-        {title}
-      </h3>
-      <p className="text-sm leading-relaxed mb-5" style={{ color: theme.textSec }}>
-        {desc}
-      </p>
-      <div className="flex gap-2 flex-wrap">
-        {tags.map((t) => (
-          <Tag key={t} theme={theme}>{t}</Tag>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function ProjectsPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavigate: (s: Section) => void }) {
-  const projects = [
-    {
-      title: 'Kind Teacher Agent',
-      desc: '基于 AI 的智能教学助手，帮助学生理解和掌握复杂概念。',
-      tags: ['AI', 'TypeScript', '教育'],
-    },
-    {
-      title: '个人网站',
-      desc: '使用现代前端技术栈构建的个人主页，极简主义设计风格。',
-      tags: ['React', 'Vite', 'Tailwind CSS'],
-    },
-    {
-      title: 'Knowledge Flow',
-      desc: '知识管理工作流工具，帮助整理和沉淀个人知识体系。',
-      tags: ['工具', '知识管理', '自动化'],
-    },
-  ]
-
+function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }) {
   return (
     <div className="max-w-5xl mx-auto px-8 py-32">
       <SectionTitle theme={theme}>项目</SectionTitle>
-      <p className="text-base mb-10 -mt-4" style={{ color: theme.textSec }}>
-        我正在构建和参与的项目
-      </p>
-      <div className="grid grid-cols-3 max-lg:grid-cols-2 max-sm:grid-cols-1 gap-5">
-        {projects.map((p) => (
-          <ProjectCard key={p.title} {...p} theme={theme} />
-        ))}
+      <div
+        className="p-8 rounded-2xl mt-8"
+        style={{
+          animation: 'fade-up 0.6s ease-out both',
+          animationDelay: '150ms',
+          backgroundColor: theme.bgDeep,
+          border: `1px solid ${theme.borderLight}`,
+        }}
+      >
+        <p className="text-base leading-relaxed" style={{ color: theme.textSec }}>
+          我目前还没有公开的开源项目仓库。
+        </p>
+        <p className="text-sm mt-3" style={{ color: theme.textSec, opacity: 0.6 }}>
+          大部分代码工作在公司内部项目中，尚未整理为公开仓库。后续收录后会在此更新。
+        </p>
       </div>
     </div>
   )

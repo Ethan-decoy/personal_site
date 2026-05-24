@@ -803,10 +803,10 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
         }}
       >
         <p className="text-base leading-relaxed" style={{ color: theme.textSec }}>
-          我目前还没有公开的开源项目仓库。
+          目前还没有公开的开源项目仓库。
         </p>
         <p className="text-sm mt-3" style={{ color: theme.textSec, opacity: 0.6 }}>
-          大部分代码工作在公司内部项目中，尚未整理为公开仓库。后续收录后会在此更新。
+          尚未整理为公开仓库，后续收录后会在此更新。
         </p>
       </div>
     </div>
@@ -815,25 +815,36 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
 
 /* ==================== Notes Page ==================== */
 
-function NotesPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavigate: (s: Section) => void }) {
-  const noteCategories = [
+function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }) {
+  const [expandedCats, setExpandedCats] = useState<Record<string, boolean>>({
+    frontend: true,
+  })
+
+  const toggleCat = (key: string) => {
+    setExpandedCats((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const treeData = [
     {
-      category: '前端',
-      notes: [
+      key: 'frontend',
+      title: '前端',
+      children: [
         { title: 'TypeScript 泛型笔记', date: '2026-05-20' },
         { title: 'React Hooks 最佳实践', date: '2026-05-18' },
         { title: 'Tailwind CSS 实用技巧', date: '2026-05-15' },
       ],
     },
     {
-      category: '后端',
-      notes: [
+      key: 'backend',
+      title: '后端',
+      children: [
         { title: 'Node.js 事件循环机制', date: '2026-05-12' },
       ],
     },
     {
-      category: '其他',
-      notes: [
+      key: 'other',
+      title: '其他',
+      children: [
         { title: 'Git 工作流整理', date: '2026-05-10' },
       ],
     },
@@ -842,42 +853,64 @@ function NotesPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavigat
   return (
     <div className="max-w-5xl mx-auto px-8 py-32">
       <SectionTitle theme={theme}>笔记</SectionTitle>
-      <p className="text-base mb-10 -mt-4" style={{ color: theme.textSec }}>
-        个人学习笔记，主要给自己看
-      </p>
-
-      <div className="space-y-12">
-        {noteCategories.map((cat) => (
-          <div key={cat.category}>
-            <h3 className="text-sm font-semibold tracking-wider uppercase mb-4" style={{ color: theme.text }}>
-              {cat.category}
-            </h3>
-            <div className="space-y-2">
-              {cat.notes.map((note) => (
-                <div
-                  key={note.title}
-                  className="flex items-center justify-between py-3 px-4 rounded-xl border transition-all duration-200 ease-out cursor-default"
-                  style={{
-                    backgroundColor: theme.bgDeep,
-                    borderColor: theme.borderLight,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = theme.border
-                    e.currentTarget.style.backgroundColor = theme.bgCard || theme.bgDeep
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = theme.borderLight
-                    e.currentTarget.style.backgroundColor = theme.bgDeep
-                  }}
-                >
-                  <span className="text-sm font-medium" style={{ color: theme.text }}>
-                    {note.title}
-                  </span>
-                  <span className="text-xs font-mono" style={{ color: theme.textSec }}>
-                    {note.date}
-                  </span>
-                </div>
-              ))}
+      <div
+        className="mt-8"
+        style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}
+      >
+        {treeData.map((cat, idx) => (
+          <div key={cat.key} style={{ animationDelay: `${200 + idx * 80}ms` }}>
+            <button
+              className="flex items-center gap-2 w-full py-3 cursor-pointer group"
+              onClick={() => toggleCat(cat.key)}
+            >
+              <svg
+                className="w-3.5 h-3.5 transition-transform duration-200 ease-out"
+                style={{
+                  transform: expandedCats[cat.key] ? 'rotate(90deg)' : 'rotate(0deg)',
+                  color: theme.accent,
+                }}
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <path d="M6 4l4 4-4 4" />
+              </svg>
+              <span className="text-sm font-semibold tracking-wide" style={{ color: theme.text }}>
+                {cat.title}
+              </span>
+              <span className="text-xs ml-2" style={{ color: theme.textSec, opacity: 0.4 }}>
+                {cat.children.length}
+              </span>
+            </button>
+            <div
+              className="overflow-hidden pl-5"
+              style={{
+                transition: 'max-height 0.5s ease-out, opacity 0.4s ease-out',
+                maxHeight: expandedCats[cat.key] ? '300px' : '0px',
+                opacity: expandedCats[cat.key] ? 1 : 0,
+              }}
+            >
+              <div
+                className="ml-2 pb-8"
+                style={{ borderLeft: `1px solid ${theme.border}` }}
+              >
+                {cat.children.map((note) => (
+                  <div
+                    key={note.title}
+                    className="flex items-center justify-between py-2 pl-4 pr-2 cursor-default rounded-md transition-colors duration-200"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = theme.accentLight
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent'
+                    }}
+                  >
+                    <span className="text-sm" style={{ color: theme.textSec }}>{note.title}</span>
+                    <span className="text-xs font-mono" style={{ color: theme.textSec, opacity: 0.4 }}>{note.date}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         ))}

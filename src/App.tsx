@@ -680,10 +680,10 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
             </h3>
             <div className="max-w-prose space-y-4" style={{ color: theme.textSec }}>
               <p className="text-lg leading-relaxed">
-                研发工程师，专注于前端工程与系统设计。热衷于用极简的设计思维解决复杂的技术问题。
+                图像算法工程师，专注于 3D-AOI 工业视觉与点云处理。热衷于将底层算法落地为可靠的工程产品。
               </p>
               <p className="leading-relaxed">
-                擅长将复杂概念抽象为简单、优雅的解决方案，并在团队中推动工程规范与最佳实践。
+                擅长从数学推导到 C++ 实现的全链路开发，并在实际产线中验证算法的稳定性与精度。
               </p>
             </div>
           </div>
@@ -696,10 +696,14 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
             <div className="space-y-4">
               {[
                 {
-                  role: '研发工程师',
-                  company: '某公司',
+                  role: '图像算法工程师',
+                  company: '深圳市振华兴智能',
                   period: '2024 — 至今',
-                  desc: '负责前端架构与核心功能开发，推动工程规范落地。',
+                  details: [
+                    '负责 3D-AOI 工业视觉软件的点云处理模块开发',
+                    '使用 C++/OpenCV/Eigen 实现相位解包裹与点云重建算法',
+                    '基于 Qt Widgets 构建上位机界面',
+                  ],
                 },
               ].map((exp) => (
                 <div
@@ -720,9 +724,13 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                       {exp.period}
                     </span>
                   </div>
-                  <p className="text-sm mt-3" style={{ color: theme.textSec }}>
-                    {exp.desc}
-                  </p>
+                  <ul className="mt-3 space-y-1.5" style={{ color: theme.textSec }}>
+                    {exp.details.map((d) => (
+                      <li key={d} className="text-sm leading-relaxed list-disc list-inside">
+                        {d}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               ))}
             </div>
@@ -735,9 +743,9 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
             </h3>
             <div className="grid grid-cols-3 gap-5">
               {[
-                { label: '前端', items: ['TypeScript', 'React', 'Vite', 'Tailwind CSS'] },
-                { label: '后端', items: ['Node.js', 'Python', '系统设计'] },
-                { label: '工具', items: ['Git', 'Docker', 'CI/CD'] },
+                { label: '算法', items: ['C++', 'OpenCV', 'Eigen', '3D 重建', '相位解包裹'] },
+                { label: '工程', items: ['Qt Widgets', 'Python', '系统设计'] },
+                { label: '工具', items: ['Git'] },
               ].map((cat) => (
                 <div key={cat.label} className="p-5 rounded-2xl" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.borderLight}` }}>
                   <p className="text-xs tracking-wider uppercase mb-3" style={{ color: theme.text }}>
@@ -756,7 +764,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
           {/* 联系 CTA */}
           <div className="flex items-center justify-between p-6 rounded-2xl" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}` }}>
             <p className="text-sm" style={{ color: theme.textSec }}>
-              想要进一步了解我的工作经历？
+              想要进一步了解我的技术栈与项目经验？
             </p>
             <button
               className="px-5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ease-out"
@@ -937,30 +945,60 @@ function NotesPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavigat
 
 /* ==================== Contact Page ==================== */
 
+function TypingText({ text, className, style, delay = 0, cursorColor = '#333' }: { text: string; className?: string; style?: React.CSSProperties; delay?: number; cursorColor?: string }) {
+  const [visible, setVisible] = useState(0)
+  useEffect(() => {
+    const startTimer = setTimeout(() => {
+      let i = 0
+      const timer = setInterval(() => {
+        i++
+        setVisible(i)
+        if (i >= text.length) clearInterval(timer)
+      }, 20)
+      return () => clearInterval(timer)
+    }, delay)
+    return () => clearTimeout(startTimer)
+  }, [text.length, delay])
+  return (
+    <span className={className} style={style}>
+      {text.slice(0, visible)}
+      {visible < text.length && (
+        <span
+          className="inline-block w-2 h-[1.2em] align-text-bottom"
+          style={{ backgroundColor: cursorColor, marginLeft: '1px', animation: 'blink 1s step-end infinite' }}
+        />
+      )}
+    </span>
+  )
+}
+
 function ContactPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavigate: (s: Section) => void }) {
   return (
     <div className="max-w-5xl mx-auto px-8 py-32">
       <SectionTitle theme={theme}>联系</SectionTitle>
 
-      <div className="grid grid-cols-2 gap-12 mt-8">
+      <div
+        className="grid grid-cols-2 gap-12 mt-8"
+        style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}
+      >
         <div className="space-y-5 max-w-md" style={{ color: theme.textSec }}>
-          <p className="text-lg leading-relaxed">
+          <p className="text-base leading-relaxed">
             如果你想聊聊技术、合作想法，或者只是想打个招呼，欢迎联系。
           </p>
         </div>
 
         <div className="space-y-8">
           {[
-            { label: '邮箱', value: 'scarecrow_0459@proton.me', href: 'mailto:scarecrow_0459@proton.me' },
+            { label: '邮箱', value: 'decoy.elevate399@passinbox.com', href: 'mailto:decoy.elevate399@passinbox.com' },
             { label: 'GitHub', value: 'github.com/Ethan-decoy', href: 'https://github.com/Ethan-decoy' },
           ].map((item) => (
             <div key={item.label}>
-              <p className="text-xs font-semibold tracking-wider uppercase mb-2" style={{ color: theme.text }}>
+              <p className="text-xs font-semibold tracking-wider uppercase mb-2" style={{ color: theme.textSec, opacity: 0.5 }}>
                 {item.label}
               </p>
               <a
                 href={item.href}
-                className="text-base font-medium transition-all duration-200 ease-out"
+                className="text-base leading-relaxed transition-all duration-200 ease-out"
                 style={{ color: theme.accent }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = theme.accentHover
@@ -969,7 +1007,7 @@ function ContactPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavig
                   e.currentTarget.style.color = theme.accent
                 }}
               >
-                {item.value}
+                <TypingText text={item.value} cursorColor={theme.accent} />
               </a>
             </div>
           ))}
@@ -981,31 +1019,26 @@ function ContactPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavig
 
 /* ==================== Footer ==================== */
 
-function Footer({ theme }: { theme: Theme }) {
+function Footer({ theme, onNavigate }: { theme: Theme; onNavigate: (s: Section) => void }) {
   return (
     <footer className="max-w-5xl mx-auto px-8 py-8" style={{ borderTop: `1px solid ${theme.borderLight}` }}>
       <div className="flex justify-between items-center">
         <p className="text-xs tracking-wide" style={{ color: theme.textSec }}>
           &copy; 2026 Ethan C.
         </p>
-        <div className="flex gap-6">
-          {['GitHub', '邮箱'].map((l) => (
-            <a
-              key={l}
-              href="#"
-              className="text-xs font-medium transition-all duration-200 ease-out"
-              style={{ color: theme.textSec }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = theme.accent
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = theme.textSec
-              }}
-            >
-              {l}
-            </a>
-          ))}
-        </div>
+        <a
+          className="text-xs font-medium transition-all duration-200 ease-out cursor-pointer"
+          style={{ color: theme.textSec }}
+          onClick={() => onNavigate('contact')}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = theme.accent
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = theme.textSec
+          }}
+        >
+          联系
+        </a>
       </div>
     </footer>
   )
@@ -1065,7 +1098,7 @@ function App() {
           : <Page theme={theme} onNavigate={navigate} />
         }
       </main>
-      <Footer theme={theme} />
+      <Footer theme={theme} onNavigate={navigate} />
     </div>
   )
 }

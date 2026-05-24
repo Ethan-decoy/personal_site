@@ -815,106 +815,91 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
 
 /* ==================== Notes Page ==================== */
 
+import { treeData } from './notes'
+
 function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }) {
-  const [expandedCats, setExpandedCats] = useState<Record<string, boolean>>({
-    frontend: true,
-  })
+  const [expandedCats, setExpandedCats] = useState<Record<string, boolean>>(
+    treeData.length > 0 ? { [treeData[0].key]: true } : {}
+  )
 
   const toggleCat = (key: string) => {
     setExpandedCats((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
-  const treeData = [
-    {
-      key: 'frontend',
-      title: '前端',
-      children: [
-        { title: 'TypeScript 泛型笔记', date: '2026-05-20' },
-        { title: 'React Hooks 最佳实践', date: '2026-05-18' },
-        { title: 'Tailwind CSS 实用技巧', date: '2026-05-15' },
-      ],
-    },
-    {
-      key: 'backend',
-      title: '后端',
-      children: [
-        { title: 'Node.js 事件循环机制', date: '2026-05-12' },
-      ],
-    },
-    {
-      key: 'other',
-      title: '其他',
-      children: [
-        { title: 'Git 工作流整理', date: '2026-05-10' },
-      ],
-    },
-  ]
-
   return (
     <div className="max-w-5xl mx-auto px-8 py-32">
       <SectionTitle theme={theme}>笔记</SectionTitle>
-      <div
-        className="mt-8"
-        style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}
-      >
-        {treeData.map((cat, idx) => (
-          <div key={cat.key} style={{ animationDelay: `${200 + idx * 80}ms` }}>
-            <button
-              className="flex items-center gap-2 w-full py-3 cursor-pointer group"
-              onClick={() => toggleCat(cat.key)}
-            >
-              <svg
-                className="w-3.5 h-3.5 transition-transform duration-200 ease-out"
-                style={{
-                  transform: expandedCats[cat.key] ? 'rotate(90deg)' : 'rotate(0deg)',
-                  color: theme.accent,
-                }}
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
+
+      {treeData.length === 0 ? (
+        <div style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
+          <p className="text-sm mt-8 leading-relaxed" style={{ color: theme.textSec }}>
+            还没有笔记。
+          </p>
+          <p className="text-xs mt-2" style={{ color: theme.textSec, opacity: 0.5 }}>
+            在 src/notes/ 下创建子目录并放入 .md 文件即可自动收录。
+          </p>
+        </div>
+      ) : (
+        <div className="mt-8" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
+          {treeData.map((cat, idx) => (
+            <div key={cat.key} style={{ animationDelay: `${200 + idx * 80}ms` }}>
+              <button
+                className="flex items-center gap-2 w-full py-3 cursor-pointer group"
+                onClick={() => toggleCat(cat.key)}
               >
-                <path d="M6 4l4 4-4 4" />
-              </svg>
-              <span className="text-sm font-semibold tracking-wide" style={{ color: theme.text }}>
-                {cat.title}
-              </span>
-              <span className="text-xs ml-2" style={{ color: theme.textSec, opacity: 0.4 }}>
-                {cat.children.length}
-              </span>
-            </button>
-            <div
-              className="overflow-hidden pl-5"
-              style={{
-                transition: 'max-height 0.5s ease-out, opacity 0.4s ease-out',
-                maxHeight: expandedCats[cat.key] ? '300px' : '0px',
-                opacity: expandedCats[cat.key] ? 1 : 0,
-              }}
-            >
+                <svg
+                  className="w-3.5 h-3.5 transition-transform duration-200 ease-out"
+                  style={{
+                    transform: expandedCats[cat.key] ? 'rotate(90deg)' : 'rotate(0deg)',
+                    color: theme.accent,
+                  }}
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                >
+                  <path d="M6 4l4 4-4 4" />
+                </svg>
+                <span className="text-sm font-semibold tracking-wide" style={{ color: theme.text }}>
+                  {cat.title}
+                </span>
+                <span className="text-xs ml-2" style={{ color: theme.textSec, opacity: 0.4 }}>
+                  {cat.children.length}
+                </span>
+              </button>
               <div
-                className="ml-2 pb-8"
-                style={{ borderLeft: `1px solid ${theme.border}` }}
+                className="overflow-hidden pl-5"
+                style={{
+                  transition: 'max-height 0.5s ease-out, opacity 0.4s ease-out',
+                  maxHeight: expandedCats[cat.key] ? '300px' : '0px',
+                  opacity: expandedCats[cat.key] ? 1 : 0,
+                }}
               >
-                {cat.children.map((note) => (
-                  <div
-                    key={note.title}
-                    className="flex items-center justify-between py-2 pl-4 pr-2 cursor-default rounded-md transition-colors duration-200"
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = theme.accentLight
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent'
-                    }}
-                  >
-                    <span className="text-sm" style={{ color: theme.textSec }}>{note.title}</span>
-                    <span className="text-xs font-mono" style={{ color: theme.textSec, opacity: 0.4 }}>{note.date}</span>
-                  </div>
-                ))}
+                <div
+                  className="ml-2 pb-8"
+                  style={{ borderLeft: `1px solid ${theme.border}` }}
+                >
+                  {cat.children.map((note) => (
+                    <div
+                      key={note.title}
+                      className="flex items-center justify-between py-2 pl-4 pr-2 cursor-default rounded-md transition-colors duration-200"
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = theme.accentLight
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent'
+                      }}
+                    >
+                      <span className="text-sm" style={{ color: theme.textSec }}>{note.title}</span>
+                      <span className="text-xs font-mono" style={{ color: theme.textSec, opacity: 0.4 }}>{note.date}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

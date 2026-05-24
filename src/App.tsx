@@ -267,7 +267,12 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
   const view = aboutView ?? 'personal'
   const [valuesExpanded, setValuesExpanded] = useState(false)
   const [valuesContentOpen, setValuesContentOpen] = useState(false)
+  const [valuesHovered, setValuesHovered] = useState(false)
   const [hoveredDimension, setHoveredDimension] = useState<string | null>(null)
+  const [blindspotsExpanded, setBlindspotsExpanded] = useState(false)
+  const [blindspotsContentOpen, setBlindspotsContentOpen] = useState(false)
+  const [blindspotsHovered, setBlindspotsHovered] = useState(false)
+  const [hoveredRelTrait, setHoveredRelTrait] = useState<string | null>(null)
 
   const views: { key: AboutView; label: string }[] = [
     { key: 'personal', label: '生活' },
@@ -275,9 +280,12 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
   ]
 
   const values = [
+    { title: '追根溯源', desc: '从根本上讲是什么问题导致的？' },
+    { title: '高能效比', desc: '不要浪费彼此的时间。' },
+    { title: '坚韧毅力', desc: '意志会带我杀出重围。' },
+    { title: '追求卓越', desc: '完美主义是把双刃剑。' },
     { title: '终身学习', desc: '保持好奇，持续迭代。' },
-    { title: '诚实', desc: '不为了迎合而说话。' },
-    { title: '长期主义', desc: '做能活十年以上的事。' },
+    { title: '独立自主', desc: '更倾向独立高效地完成任务。' },
   ]
 
   const toggleValues = () => {
@@ -340,8 +348,8 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                   { title: '费曼式学习者', desc: '讲给别人听之前，自己先假装讲一遍。' },
                   { title: 'Google 工程思维', desc: '相信简单可扩展的解决方案，无论写代码还是生活。' },
                   { title: '模拟竞速', desc: '更好的走线，更快的入弯。' },
-                  { title: '单排 AD', desc: '牢中牢，但是我扛得住。' },
-                  { title: '无产主义', desc: '相信劳动的价值。' },
+                  { title: '单排 AD', desc: '牢中牢，但我扛得住。' },
+                  { title: '共产主义', desc: '相信劳动的价值。' },
                   { title: '城市漫步', desc: '散步是整理思绪的最佳方式。' },
                 ].map((item) => (
                   <div
@@ -455,7 +463,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                 </div>
 
                 <p className="text-[10px] mt-4 text-center" style={{ color: theme.textSec, opacity: 0.4 }}>
-                  测试数据更新于半年内 · 未采用大五人格（自填结果误差较大）
+                  连续三年测评均为 INTJ · 未采用大五人格（自测置信度低）
                 </p>
               </div>
             </div>
@@ -468,15 +476,11 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                 onClick={toggleValues}
                 style={{
                   backgroundColor: theme.bgDeep,
-                  border: `1px solid ${valuesExpanded ? theme.border : theme.borderLight}`,
+                  border: `1px solid ${valuesHovered || valuesExpanded ? theme.border : theme.borderLight}`,
                   boxShadow: valuesExpanded ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = theme.border
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = valuesExpanded ? theme.border : theme.borderLight
-                }}
+                onMouseEnter={() => setValuesHovered(true)}
+                onMouseLeave={() => setValuesHovered(false)}
               >
                 {/* 标题行 */}
                 <div className="flex items-center justify-between px-5 py-4">
@@ -529,12 +533,138 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
               </div>
             </div>
 
-          {/* 引用卡片 */}
-          <div className="mt-12 p-8 rounded-2xl" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.borderLight}` }}>
-            <p className="text-xl font-medium italic leading-relaxed" style={{ color: theme.text }}>
-              "好的设计是尽可能少的设计。"
-            </p>
-            <p className="text-sm mt-4" style={{ color: theme.textSec }}>— Dieter Rams</p>
+          {/* 盲区 */}
+          <div className="mt-12">
+            <div
+              className="rounded-2xl cursor-pointer select-none transition-all duration-200 ease-out"
+              onClick={() => {
+                if (!blindspotsExpanded) {
+                  setBlindspotsExpanded(true)
+                  setTimeout(() => setBlindspotsContentOpen(true), 100)
+                } else {
+                  setBlindspotsContentOpen(false)
+                  setTimeout(() => setBlindspotsExpanded(false), 300)
+                }
+              }}
+              style={{
+                backgroundColor: theme.bgDeep,
+                border: `1px solid ${blindspotsHovered || blindspotsExpanded ? theme.border : theme.borderLight}`,
+                boxShadow: blindspotsExpanded ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
+              }}
+              onMouseEnter={() => setBlindspotsHovered(true)}
+              onMouseLeave={() => setBlindspotsHovered(false)}
+            >
+              <div className="flex items-center justify-between px-5 py-4">
+                <span className="text-sm font-semibold tracking-wider uppercase" style={{ color: theme.text }}>
+                  人际关系
+                </span>
+                <svg
+                  className="w-4 h-4 transition-transform duration-300 ease-out"
+                  style={{
+                    transform: blindspotsExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                    color: theme.textSec,
+                  }}
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                >
+                  <path d="M4 6l4 4 4-4" />
+                </svg>
+              </div>
+              <div
+                className="overflow-hidden"
+                style={{
+                  transition: 'max-height 0.7s ease-out',
+                  maxHeight: blindspotsContentOpen ? '600px' : '0px',
+                }}
+              >
+                <div className="grid grid-cols-2 gap-4 px-5 pb-5">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: '#5E8268' }} />
+                      <p className="text-xs tracking-wider uppercase" style={{ color: theme.text }}>
+                        优
+                      </p>
+                    </div>
+                    {[
+                      { title: '冷静', detail: '等会，别急。' },
+                      { title: '深入交流', detail: '很有意义，能再跟我说说吗？' },
+                      { title: '合伙人责任制', detail: '信守承诺。提供坦率、真诚的建议，提供实际的帮助实现共同目标。' },
+                      { title: '激励成长', detail: '无法理解停滞不前。' },
+                    ].map((item) => (
+                      <div
+                        key={item.title}
+                        className="p-4 rounded-xl cursor-default"
+                        style={{
+                          backgroundColor: 'rgba(94, 130, 104, 0.06)',
+                          borderTop: `1px solid ${hoveredRelTrait === item.title ? 'rgba(94, 130, 104, 0.3)' : 'rgba(94, 130, 104, 0.12)'}`,
+                          borderRight: `1px solid ${hoveredRelTrait === item.title ? 'rgba(94, 130, 104, 0.3)' : 'rgba(94, 130, 104, 0.12)'}`,
+                          borderBottom: `1px solid ${hoveredRelTrait === item.title ? 'rgba(94, 130, 104, 0.3)' : 'rgba(94, 130, 104, 0.12)'}`,
+                          borderLeft: `4px solid rgba(94, 130, 104, 0.5)`,
+                          transition: 'border-color 0.2s ease-out',
+                        }}
+                        onMouseEnter={() => setHoveredRelTrait(item.title)}
+                        onMouseLeave={() => setHoveredRelTrait(null)}
+                      >
+                        <p className="text-sm font-semibold" style={{ color: theme.text }}>{item.title}</p>
+                        <div
+                          className="overflow-hidden"
+                          style={{
+                            transition: 'max-height 0.5s ease-out, opacity 0.4s ease-out',
+                            maxHeight: hoveredRelTrait === item.title ? '100px' : '0px',
+                            opacity: hoveredRelTrait === item.title ? 1 : 0,
+                          }}
+                        >
+                          <p className="text-sm leading-relaxed pt-2" style={{ color: theme.textSec }}>{item.detail}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: '#A06060' }} />
+                      <p className="text-xs tracking-wider uppercase" style={{ color: theme.text }}>
+                        劣
+                      </p>
+                    </div>
+                    {[
+                      { title: '情感疏离', detail: '表面功夫的关心会让你觉得温暖吗？' },
+                      { title: '压力与强控', detail: '直接批评，忽视情感，追求按自己方式行事，会无意中压制他人的想法与自发性。' },
+                      { title: '缺乏耐心', detail: '当他人处理事情慢一点或更情绪化时，容易变得急躁并引发紧张。' },
+                      { title: '自我隔离', detail: '当压力大时，会选择独处，他人无法靠近或提供帮助。' },
+                    ].map((item) => (
+                      <div
+                        key={item.title}
+                        className="p-4 rounded-xl cursor-default"
+                        style={{
+                          backgroundColor: 'rgba(160, 96, 96, 0.06)',
+                          borderTop: `1px solid ${hoveredRelTrait === item.title ? 'rgba(160, 96, 96, 0.3)' : 'rgba(160, 96, 96, 0.12)'}`,
+                          borderRight: `1px solid ${hoveredRelTrait === item.title ? 'rgba(160, 96, 96, 0.3)' : 'rgba(160, 96, 96, 0.12)'}`,
+                          borderBottom: `1px solid ${hoveredRelTrait === item.title ? 'rgba(160, 96, 96, 0.3)' : 'rgba(160, 96, 96, 0.12)'}`,
+                          borderLeft: `4px solid rgba(160, 96, 96, 0.5)`,
+                          transition: 'border-color 0.2s ease-out',
+                        }}
+                        onMouseEnter={() => setHoveredRelTrait(item.title)}
+                        onMouseLeave={() => setHoveredRelTrait(null)}
+                      >
+                        <p className="text-sm font-semibold" style={{ color: theme.text }}>{item.title}</p>
+                        <div
+                          className="overflow-hidden"
+                          style={{
+                            transition: 'max-height 0.5s ease-out, opacity 0.4s ease-out',
+                            maxHeight: hoveredRelTrait === item.title ? '100px' : '0px',
+                            opacity: hoveredRelTrait === item.title ? 1 : 0,
+                          }}
+                        >
+                          <p className="text-sm leading-relaxed pt-2" style={{ color: theme.textSec }}>{item.detail}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -743,9 +743,9 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
             </h3>
             <div className="grid grid-cols-3 gap-5">
               {[
-                { label: '算法', items: ['C++', 'OpenCV', 'Eigen', '3D 重建', '相位解包裹'] },
-                { label: '工程', items: ['Qt Widgets', 'Python', '系统设计'] },
-                { label: '工具', items: ['Git'] },
+                { label: '算法', items: ['3D 重建', '相位解包裹', 'OpenCV', 'Eigen'] },
+                { label: '开发', items: ['C++', 'Python', 'Qt Widgets'] },
+                { label: '工程', items: ['Git', '系统设计'] },
               ].map((cat) => (
                 <div key={cat.label} className="p-5 rounded-2xl" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.borderLight}` }}>
                   <p className="text-xs tracking-wider uppercase mb-3" style={{ color: theme.text }}>

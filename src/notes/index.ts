@@ -13,7 +13,7 @@
  * 目录名即为分类名，文件名不用于展示（仅用于排序 fallback）。
  */
 
-const modules = import.meta.glob('./**/*.md', {
+export const modules = import.meta.glob('./**/*.md', {
   eager: true,
   query: '?raw',
   import: 'default',

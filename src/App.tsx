@@ -815,15 +815,68 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
 
 /* ==================== Notes Page ==================== */
 
-import { treeData } from './notes'
+import { treeData, modules } from './notes'
+
+function parseMarkdownBody(raw: string) {
+  const m = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/)
+  return m ? m[2].trim() : raw.trim()
+}
+
+function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) {
+  const paragraphs = content.split('\n\n').filter(Boolean)
+  return (
+    <div className="space-y-3 max-w-2xl">
+      {paragraphs.map((p, i) => {
+        const lines = p.split('\n').map((l) => l.trim())
+        // heading
+        if (lines.length === 1 && lines[0].startsWith('#')) {
+          const text = lines[0].replace(/^#+\s*/, '')
+          return <h3 key={i} className="text-lg font-semibold" style={{ color: theme.text }}>{text}</h3>
+        }
+        // list
+        if (lines[0].startsWith('- ') || lines[0].startsWith('* ')) {
+          return (
+            <ul key={i} className="list-disc list-inside space-y-1" style={{ color: theme.textSec }}>
+              {lines.map((l, j) => (
+                <li key={j} className="text-sm leading-relaxed">{l.replace(/^[-*]\s*/, '')}</li>
+              ))}
+            </ul>
+          )
+        }
+        // bold
+        if (/^\*\*.+\*\*/.test(p)) {
+          const parts = p.split(/\*\*(.+?)\*\*/)
+          return (
+            <p key={i} className="text-sm leading-relaxed" style={{ color: theme.textSec }}>
+              {parts.map((s, j) => j % 2 === 1 ? <strong key={j}>{s}</strong> : s)}
+            </p>
+          )
+        }
+        return <p key={i} className="text-sm leading-relaxed" style={{ color: theme.textSec }}>{p}</p>
+      })}
+    </div>
+  )
+}
 
 function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }) {
   const [expandedCats, setExpandedCats] = useState<Record<string, boolean>>(
     treeData.length > 0 ? { [treeData[0].key]: true } : {}
   )
+  const [selectedNote, setSelectedNote] = useState<{ title: string; date: string; content: string } | null>(null)
 
   const toggleCat = (key: string) => {
+    setSelectedNote(null)
     setExpandedCats((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const openNote = (note: { title: string; date: string; file: string }) => {
+    const raw = modules[note.file]
+    if (!raw) return
+    setSelectedNote({
+      title: note.title,
+      date: note.date,
+      content: parseMarkdownBody(raw),
+    })
   }
 
   return (
@@ -840,64 +893,87 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
           </p>
         </div>
       ) : (
-        <div className="mt-8" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
-          {treeData.map((cat, idx) => (
-            <div key={cat.key} style={{ animationDelay: `${200 + idx * 80}ms` }}>
-              <button
-                className="flex items-center gap-2 w-full py-3 cursor-pointer group"
-                onClick={() => toggleCat(cat.key)}
-              >
-                <svg
-                  className="w-3.5 h-3.5 transition-transform duration-200 ease-out"
-                  style={{
-                    transform: expandedCats[cat.key] ? 'rotate(90deg)' : 'rotate(0deg)',
-                    color: theme.accent,
-                  }}
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
+        <div className="mt-8 flex gap-8" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
+          {/* 侧边栏：分类树 */}
+          <div className="w-44 shrink-0" style={{ color: theme.textSec }}>
+            {treeData.map((cat, idx) => (
+              <div key={cat.key} style={{ animationDelay: `${200 + idx * 80}ms` }}>
+                <button
+                  className="flex items-center gap-2 w-full py-2 text-left cursor-pointer group"
+                  onClick={() => toggleCat(cat.key)}
                 >
-                  <path d="M6 4l4 4-4 4" />
-                </svg>
-                <span className="text-sm font-semibold tracking-wide" style={{ color: theme.text }}>
-                  {cat.title}
-                </span>
-                <span className="text-xs ml-2" style={{ color: theme.textSec, opacity: 0.4 }}>
-                  {cat.children.length}
-                </span>
-              </button>
-              <div
-                className="overflow-hidden pl-5"
-                style={{
-                  transition: 'max-height 0.5s ease-out, opacity 0.4s ease-out',
-                  maxHeight: expandedCats[cat.key] ? '300px' : '0px',
-                  opacity: expandedCats[cat.key] ? 1 : 0,
-                }}
-              >
+                  <svg
+                    className="w-3 h-3 transition-transform duration-200 ease-out shrink-0"
+                    style={{
+                      transform: expandedCats[cat.key] ? 'rotate(90deg)' : 'rotate(0deg)',
+                      color: theme.accent,
+                    }}
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  >
+                    <path d="M6 4l4 4-4 4" />
+                  </svg>
+                  <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: theme.text }}>
+                    {cat.title}
+                  </span>
+                  <span className="text-[10px] ml-auto" style={{ color: theme.textSec, opacity: 0.3 }}>
+                    {cat.children.length}
+                  </span>
+                </button>
                 <div
-                  className="ml-2 pb-8"
-                  style={{ borderLeft: `1px solid ${theme.border}` }}
+                  className="overflow-hidden"
+                  style={{
+                    transition: 'max-height 0.5s ease-out, opacity 0.4s ease-out',
+                    maxHeight: expandedCats[cat.key] ? '400px' : '0px',
+                    opacity: expandedCats[cat.key] ? 1 : 0,
+                  }}
                 >
-                  {cat.children.map((note) => (
-                    <div
-                      key={note.title}
-                      className="flex items-center justify-between py-2 pl-4 pr-2 cursor-default rounded-md transition-colors duration-200"
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = theme.accentLight
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent'
-                      }}
-                    >
-                      <span className="text-sm" style={{ color: theme.textSec }}>{note.title}</span>
-                      <span className="text-xs font-mono" style={{ color: theme.textSec, opacity: 0.4 }}>{note.date}</span>
-                    </div>
-                  ))}
+                  <div className="py-1" style={{ borderLeft: `1px solid ${theme.border}`, marginLeft: '10px' }}>
+                    {cat.children.map((note) => (
+                      <div
+                        key={note.title}
+                        className="py-1.5 pl-3 pr-2 cursor-pointer text-sm transition-colors duration-200 rounded-r"
+                        style={{
+                          backgroundColor: selectedNote?.title === note.title ? theme.accentLight : 'transparent',
+                          color: selectedNote?.title === note.title ? theme.text : theme.textSec,
+                        }}
+                        onClick={() => openNote(note)}
+                        onMouseEnter={(e) => {
+                          if (selectedNote?.title !== note.title) e.currentTarget.style.backgroundColor = theme.accentLight
+                        }}
+                        onMouseLeave={(e) => {
+                          if (selectedNote?.title !== note.title) e.currentTarget.style.backgroundColor = 'transparent'
+                        }}
+                      >
+                        {note.title}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* 主内容：阅读区 */}
+          <div className="flex-1 max-w-[720px]">
+            {selectedNote ? (
+              <div key={selectedNote.title} style={{ animation: 'fade-up 0.5s ease-out both', animationDelay: '0ms' }}>
+                <div className="mb-10 pb-6" style={{ borderBottom: `1px solid ${theme.borderLight}` }}>
+                  <h3 className="text-xl font-bold tracking-tight mb-2" style={{ color: theme.text }}>{selectedNote.title}</h3>
+                  <span className="text-xs font-mono" style={{ color: theme.textSec, opacity: 0.4 }}>{selectedNote.date}</span>
+                </div>
+                <MarkdownPreview content={selectedNote.content} theme={theme} />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-48">
+                <p className="text-sm" style={{ color: theme.textSec, opacity: 0.3 }}>
+                  选择一篇笔记开始阅读
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

@@ -680,7 +680,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
             </h3>
             <div className="max-w-prose space-y-4" style={{ color: theme.textSec }}>
               <p className="text-lg leading-relaxed">
-                图像算法工程师，专注于 3D-AOI 工业视觉与点云处理。热衷于将底层算法落地为可靠的工程产品。
+                图像算法工程师，专注于 3D-AOI 工业视觉与点云处理。
               </p>
               <p className="leading-relaxed">
                 擅长从数学推导到 C++ 实现的全链路开发，并在实际产线中验证算法的稳定性与精度。

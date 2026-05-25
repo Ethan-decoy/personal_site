@@ -908,12 +908,13 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
         return <h3 key={i} className="text-lg font-semibold" style={{ color: theme.text }}>{text}</h3>
       }
       if (lines[0].startsWith('> ')) {
+        // 连续 quote 行：首行为主引用（中文），后续为副引用（英文）
+        const quoteLines = lines.filter((l) => l.startsWith('> '))
         return (
-          <div key={i} className="space-y-1 pl-4 py-1" style={{ borderLeft: `2px solid ${theme.accent}` }}>
-            {lines.filter((l) => l.startsWith('> ')).map((l, j) => (
-              <p key={j} className="text-sm leading-relaxed italic" style={{ color: theme.text }}>
-                {renderInline(l.replace(/^>\s*/, ''), theme.text)}
-              </p>
+          <div key={i} className="note-quote">
+            <p>{renderInline(quoteLines[0].replace(/^>\s*/, ''), theme.text)}</p>
+            {quoteLines.slice(1).map((l, j) => (
+              <span key={j} className="quote-en">{renderInline(l.replace(/^>\s*/, ''), theme.textSec)}</span>
             ))}
           </div>
         )
@@ -1151,8 +1152,8 @@ function ContactPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavig
               </p>
               <a
                 href={item.href}
-                className="text-base leading-relaxed font-mono transition-all duration-200 ease-out"
-                style={{ color: theme.accent }}
+                className="text-base leading-relaxed transition-all duration-200 ease-out"
+                style={{ color: theme.accent, fontFamily: "'JetBrains Mono', 'Fira Code', Menlo, Consolas, monospace" }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = theme.accentHover
                 }}

@@ -1110,31 +1110,37 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
 
             {/* 右侧工具栏：sticky 吸附 */}
             {selectedNote && (
-              <div className="hidden md:flex flex-col items-center gap-3 sticky top-[50vh] ml-16" style={{ width: '32px' }}>
-                <div className="w-1.5 h-48 rounded-full overflow-hidden relative" style={{ backgroundColor: `${theme.accent}18` }}>
-                  <div
-                    className="w-full absolute bottom-0 rounded-full transition-[height] duration-200 ease-out"
-                    style={{
-                      height: `${progress}%`,
-                      background: `linear-gradient(to top, ${theme.accent}, ${theme.accent}cc)`,
-                      boxShadow: `0 0 8px ${theme.accent}33`,
-                    }}
-                  />
+              <div className="hidden md:flex flex-col items-center sticky top-[50vh] ml-24">
+                <div className="flex flex-col-reverse gap-1.5">
+                  {Array.from({ length: 20 }, (_, i) => {
+                    const filled = (i + 1) * 5 <= progress
+                    return (
+                      <div
+                        key={i}
+                        className="w-1.5 h-1.5 rounded-sm transition-all duration-200 ease-out"
+                        style={{
+                          backgroundColor: filled ? theme.accent : `${theme.accent}20`,
+                        }}
+                      />
+                    )
+                  })}
                 </div>
-                <button
-                  aria-label="返回顶部"
-                  onClick={scrollToTop}
-                  className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out shrink-0"
-                  style={{
-                    backgroundColor: theme.bgDeep,
-                    border: `1px solid ${theme.border}`,
-                    opacity: showBackTop ? 1 : 0.25,
-                  }}
-                >
-                  <svg className="w-3 h-3" style={{ color: theme.textSec }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M4 10l4-4 4 4" />
-                  </svg>
-                </button>
+                <div className="mt-12">
+                  <button
+                    aria-label="返回顶部"
+                    onClick={scrollToTop}
+                    className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out"
+                    style={{
+                      backgroundColor: theme.bgDeep,
+                      border: `1px solid ${theme.border}`,
+                      opacity: showBackTop ? 1 : 0.2,
+                    }}
+                  >
+                    <svg className="w-3 h-3" style={{ color: theme.textSec }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M4 10l4-4 4 4" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             )}
           </div>

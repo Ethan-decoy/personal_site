@@ -51,3 +51,12 @@ body {
 ::-webkit-scrollbar {
   display: none;
 }
+
+/* 贡献图格子 hover 效果 */
+.contribution-chart rect {
+  cursor: pointer;
+  transition: opacity 0.15s ease-out;
+}
+.contribution-chart rect:hover {
+  opacity: 0.7;
+}

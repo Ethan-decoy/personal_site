@@ -816,7 +816,7 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
 
       {/* 贡献图 */}
       <div style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '100ms' }}>
-        <GitHubContributions theme={theme} />
+        <GitHubContributions />
       </div>
 
       <div

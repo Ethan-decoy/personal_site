@@ -331,11 +331,13 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
             {/* 左侧列 */}
             <div className="w-full md:flex-[2]">
               {/* 配图 */}
-              <div className="mb-6 md:mb-8 rounded-2xl overflow-hidden" style={{ border: `1px solid ${theme.borderLight}`, aspectRatio: '16/9' }}>
+              <div className="mb-6 md:mb-8 rounded-2xl overflow-hidden" style={{ border: `1px solid ${theme.borderLight}`, aspectRatio: '16/9', backgroundColor: theme.bgDeep }}>
                 <img
-                  src={`${import.meta.env.BASE_URL}assets/钱学森和袁隆平.png`}
+                  src={`${import.meta.env.BASE_URL}assets/qian_xuesen_yuan_longping_style.jpg`}
                   alt=""
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                   style={{ objectPosition: 'center 30%' }}
                 />
               </div>

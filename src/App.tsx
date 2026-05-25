@@ -793,31 +793,16 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
 
 const GITHUB_USERNAME = 'Ethan-decoy'
 
-function GitHubContributions({ theme }: { theme: Theme }) {
+function GitHubContributions() {
   return (
-    <div
-      className="w-full rounded-2xl overflow-hidden"
-      style={{
-        backgroundColor: theme.bgDeep,
-        border: `1px solid ${theme.borderLight}`,
-      }}
-    >
-      <div className="p-5 sm:p-6 pb-2">
-        <p className="text-sm font-medium mb-3" style={{ color: theme.text }}>
-          GitHub 贡献
-        </p>
-        <div className="overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-          <div style={{ transform: 'scale(0.78)', transformOrigin: 'top left', width: '128%' }}>
-            <img
-              src={`https://ghchart.rshah.org/${GITHUB_USERNAME}`}
-              alt="GitHub Contributions"
-              className="block"
-              style={{ minWidth: 'fit-content' }}
-              referrerPolicy="no-referrer"
-            />
-          </div>
-        </div>
-      </div>
+    <div className="overflow-x-auto flex justify-center pb-2 mt-6" style={{ scrollbarWidth: 'none' }}>
+      <img
+        src={`https://ghchart.rshah.org/${GITHUB_USERNAME}`}
+        alt="GitHub Contributions"
+        className="block"
+        style={{ minWidth: 'fit-content' }}
+        referrerPolicy="no-referrer"
+      />
     </div>
   )
 }

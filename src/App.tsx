@@ -844,6 +844,7 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
 import { treeData, modules } from './notes'
 
 function parseMarkdownBody(raw: string) {
+  raw = raw.replace(/\r\n/g, '\n')
   const m = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/)
   return m ? m[2].trim() : raw.trim()
 }
@@ -905,14 +906,16 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
           const text = lines[0].replace(/^#+\s*/, '')
           return <h3 key={i} className="text-lg font-semibold" style={{ color: theme.text }}>{text}</h3>
         }
-        // blockquote
+        // blockquote — each `>` line becomes its own block
         if (lines[0].startsWith('> ')) {
           return (
-            <blockquote key={i} className="pl-4 py-1" style={{ borderLeft: `2px solid ${theme.border}` }}>
-              <p className="text-sm leading-relaxed italic" style={{ color: theme.textSec }}>
-                {renderInline(lines.join(' '), theme.textSec)}
-              </p>
-            </blockquote>
+            <div key={i} className="space-y-1 pl-4 py-1" style={{ borderLeft: `2px solid ${theme.border}` }}>
+              {lines.filter((l) => l.startsWith('> ')).map((l, j) => (
+                <p key={j} className="text-sm leading-relaxed italic" style={{ color: theme.textSec }}>
+                  {renderInline(l.replace(/^>\s*/, ''), theme.textSec)}
+                </p>
+              ))}
+            </div>
           )
         }
         // list

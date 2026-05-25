@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from 'react'
+import { useState, useEffect, useRef, type ReactNode } from 'react'
 
 /* ==================== Themes ==================== */
 
@@ -839,6 +839,63 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
   )
 }
 
+/* ==================== Slider Track ==================== */
+
+const TRACK_HEIGHT = 200
+
+function SliderTrack({ progress, accent, accentLight }: { progress: number; accent: string; accentLight: string }) {
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [dragging, setDragging] = useState(false)
+
+  const scrollToRatio = (ratio: number) => {
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight
+    window.scrollTo({ top: ratio * docHeight, behavior: dragging ? 'auto' : 'smooth' })
+  }
+
+  const handleStart = (clientY: number) => {
+    if (!trackRef.current) return
+    const rect = trackRef.current.getBoundingClientRect()
+    const ratio = Math.max(0, Math.min((clientY - rect.top) / rect.height, 1))
+    scrollToRatio(ratio)
+    setDragging(true)
+  }
+
+  useEffect(() => {
+    if (!dragging) return
+    const onMove = (e: MouseEvent) => {
+      e.preventDefault()
+      handleStart(e.clientY)
+    }
+    const onUp = () => setDragging(false)
+    window.addEventListener('mousemove', onMove, { passive: false })
+    window.addEventListener('mouseup', onUp)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+  }, [dragging])
+
+  const fillHeight = Math.max(progress * TRACK_HEIGHT / 100, 3)
+
+  return (
+    <div
+      ref={trackRef}
+      className="relative w-1.5 cursor-pointer rounded-full"
+      style={{ height: `${TRACK_HEIGHT}px`, backgroundColor: accentLight }}
+      onMouseDown={(e) => handleStart(e.clientY)}
+    >
+      <div
+        className="absolute bottom-0 left-0 right-0 rounded-full"
+        style={{
+          height: `${fillHeight}px`,
+          backgroundColor: accent,
+          transition: dragging ? 'none' : 'height 0.15s ease-out',
+        }}
+      />
+    </div>
+  )
+}
+
 /* ==================== Notes Page ==================== */
 
 import { treeData, modules } from './notes'
@@ -1110,25 +1167,13 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
 
             {/* 右侧工具栏：sticky 吸附 */}
             {selectedNote && (
-              <div className="hidden md:flex flex-col items-center sticky top-[25vh] ml-32">
-                <div className="flex flex-col-reverse gap-[3px]">
-                  {Array.from({ length: 20 }, (_, i) => {
-                    const filled = (i + 1) * 5 <= progress
-                    return (
-                      <div
-                        key={i}
-                        className="transition-all duration-200 ease-out"
-                        style={{
-                          width: '16px',
-                          height: '2px',
-                          borderRadius: '1px',
-                          backgroundColor: filled ? theme.accent : `${theme.accent}18`,
-                        }}
-                      />
-                    )
-                  })}
-                </div>
-                <div className="mt-16">
+              <div className="hidden md:flex flex-col items-center sticky top-[37vh] ml-32">
+                <SliderTrack
+                  progress={progress}
+                  accent={theme.accent}
+                  accentLight={theme.accentLight}
+                />
+                <div className="mt-12">
                   <button
                     aria-label="返回顶部"
                     onClick={scrollToTop}

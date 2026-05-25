@@ -507,7 +507,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                   className="overflow-hidden"
                   style={{
                     transition: 'max-height 0.7s ease-out',
-                    maxHeight: valuesContentOpen ? '300px' : '0px',
+                    maxHeight: valuesContentOpen ? '600px' : '0px',
                   }}
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 px-3 pb-3 sm:px-5 sm:pb-5">

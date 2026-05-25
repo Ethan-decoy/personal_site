@@ -909,10 +909,10 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
       }
       if (lines[0].startsWith('> ')) {
         return (
-          <div key={i} className="space-y-1 pl-4 py-1" style={{ borderLeft: `2px solid ${theme.border}` }}>
+          <div key={i} className="space-y-1 pl-4 py-1" style={{ borderLeft: `2px solid ${theme.accent}` }}>
             {lines.filter((l) => l.startsWith('> ')).map((l, j) => (
-              <p key={j} className="text-sm leading-relaxed italic" style={{ color: theme.textSec }}>
-                {renderInline(l.replace(/^>\s*/, ''), theme.textSec)}
+              <p key={j} className="text-sm leading-relaxed italic" style={{ color: theme.text }}>
+                {renderInline(l.replace(/^>\s*/, ''), theme.text)}
               </p>
             ))}
           </div>

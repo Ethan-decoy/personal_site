@@ -929,8 +929,8 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
         )
       }
       return (
-        <p key={i} className="text-sm leading-relaxed" style={{ color: theme.textSec }}>
-          {renderInline(p, theme.textSec)}
+        <p key={i} className="text-sm leading-relaxed" style={{ color: theme.text }}>
+          {renderInline(p, theme.text)}
         </p>
       )
     })

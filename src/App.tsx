@@ -141,8 +141,8 @@ function SmileyAvatar({ theme }: { theme: Theme }) {
     <div
       className="w-[320px] h-[320px] opacity-[0.12] pointer-events-none"
       style={{
-        WebkitMask: `url(/assets/avatar.svg) center/contain no-repeat`,
-        mask: `url(/assets/avatar.svg) center/contain no-repeat`,
+        WebkitMask: `url(${import.meta.env.BASE_URL}assets/avatar.svg) center/contain no-repeat`,
+        mask: `url(${import.meta.env.BASE_URL}assets/avatar.svg) center/contain no-repeat`,
         backgroundColor: theme.accent,
         transform: 'rotate(6deg)',
       }}
@@ -333,7 +333,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
               {/* 配图 */}
               <div className="mb-8 rounded-2xl overflow-hidden" style={{ border: `1px solid ${theme.borderLight}`, height: '280px' }}>
                 <img
-                  src="/assets/钱学森和袁隆平.png"
+                  src={`${import.meta.env.BASE_URL}assets/钱学森和袁隆平.png`}
                   alt=""
                   className="w-full h-full object-cover"
                   style={{ objectPosition: 'center 30%' }}

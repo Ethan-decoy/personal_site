@@ -1,4 +1,4 @@
-import { useState, useEffect, ReactNode } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 
 /* ==================== Themes ==================== */
 
@@ -848,6 +848,52 @@ function parseMarkdownBody(raw: string) {
   return m ? m[2].trim() : raw.trim()
 }
 
+function renderInline(text: string, color: string): any {
+  // 将 markdown inline 标记 (**bold**、*italic*) 转为 JSX
+  const tokens: { type: 'text' | 'bold' | 'italic' | 'boldItalic'; content: string }[] = []
+  let remaining = text
+
+  while (remaining.length > 0) {
+    const biMatch = remaining.match(/\*\*\*(.+?)\*\*\*/)
+    const bMatch = remaining.match(/\*\*(.+?)\*\*/)
+    const iMatch = remaining.match(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/)
+
+    let earliest: RegExpMatchArray | undefined
+    let type: 'text' | 'bold' | 'italic' | 'boldItalic' = 'text'
+
+    if (biMatch && (!earliest || biMatch.index! < earliest.index!)) {
+      earliest = biMatch
+      type = 'boldItalic'
+    }
+    if (bMatch && (!earliest || bMatch.index! < earliest.index!)) {
+      earliest = bMatch
+      type = 'bold'
+    }
+    if (iMatch && (!earliest || iMatch.index! < earliest.index!)) {
+      earliest = iMatch
+      type = 'italic'
+    }
+
+    if (!earliest || earliest.index === undefined) {
+      tokens.push({ type: 'text', content: remaining })
+      break
+    }
+
+    if (earliest.index > 0) {
+      tokens.push({ type: 'text', content: remaining.slice(0, earliest.index) })
+    }
+    tokens.push({ type, content: earliest[1] })
+    remaining = remaining.slice(earliest.index + earliest[0].length)
+  }
+
+  return tokens.map((t, i) => {
+    if (t.type === 'bold') return <strong key={i} style={{ color }}>{t.content}</strong>
+    if (t.type === 'italic') return <em key={i} style={{ color }}>{t.content}</em>
+    if (t.type === 'boldItalic') return <strong key={i}><em style={{ color }}>{t.content}</em></strong>
+    return <span key={i} style={{ color }}>{t.content}</span>
+  })
+}
+
 function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) {
   const paragraphs = content.split('\n\n').filter(Boolean)
   return (
@@ -859,26 +905,32 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
           const text = lines[0].replace(/^#+\s*/, '')
           return <h3 key={i} className="text-lg font-semibold" style={{ color: theme.text }}>{text}</h3>
         }
+        // blockquote
+        if (lines[0].startsWith('> ')) {
+          return (
+            <blockquote key={i} className="pl-4 py-1" style={{ borderLeft: `2px solid ${theme.border}` }}>
+              <p className="text-sm leading-relaxed italic" style={{ color: theme.textSec }}>
+                {renderInline(lines.join(' '), theme.textSec)}
+              </p>
+            </blockquote>
+          )
+        }
         // list
-        if (lines[0].startsWith('- ') || lines[0].startsWith('* ')) {
+        if (lines[0].startsWith('- ')) {
           return (
             <ul key={i} className="list-disc list-inside space-y-1" style={{ color: theme.textSec }}>
               {lines.map((l, j) => (
-                <li key={j} className="text-sm leading-relaxed">{l.replace(/^[-*]\s*/, '')}</li>
+                <li key={j} className="text-sm leading-relaxed">{renderInline(l.replace(/^- \s*/, ''), theme.textSec)}</li>
               ))}
             </ul>
           )
         }
-        // bold
-        if (/^\*\*.+\*\*/.test(p)) {
-          const parts = p.split(/\*\*(.+?)\*\*/)
-          return (
-            <p key={i} className="text-sm leading-relaxed" style={{ color: theme.textSec }}>
-              {parts.map((s, j) => j % 2 === 1 ? <strong key={j}>{s}</strong> : s)}
-            </p>
-          )
-        }
-        return <p key={i} className="text-sm leading-relaxed" style={{ color: theme.textSec }}>{p}</p>
+        // paragraph with inline bold/italic
+        return (
+          <p key={i} className="text-sm leading-relaxed" style={{ color: theme.textSec }}>
+            {renderInline(p, theme.textSec)}
+          </p>
+        )
       })}
     </div>
   )

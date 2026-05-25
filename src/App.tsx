@@ -832,7 +832,7 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
           尚未整理为公开仓库，后续收录后会在此更新。
         </p>
         <div className="mt-6">
-          <GitHubContributions theme={theme} />
+          <GitHubContributions />
         </div>
       </div>
     </div>

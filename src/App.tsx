@@ -595,7 +595,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                     ].map((item) => (
                       <div
                         key={item.title}
-                        className="p-4 rounded-xl cursor-default"
+                        className="p-4 rounded-xl cursor-pointer"
                         style={{
                           backgroundColor: 'rgba(94, 130, 104, 0.06)',
                           borderTop: `1px solid ${hoveredRelTrait === item.title ? 'rgba(94, 130, 104, 0.3)' : 'rgba(94, 130, 104, 0.12)'}`,
@@ -606,6 +606,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                         }}
                         onMouseEnter={() => setHoveredRelTrait(item.title)}
                         onMouseLeave={() => setHoveredRelTrait(null)}
+                        onClick={(e) => { e.stopPropagation(); setHoveredRelTrait(hoveredRelTrait === item.title ? null : item.title) }}
                       >
                         <p className="text-sm font-semibold" style={{ color: theme.text }}>{item.title}</p>
                         <div
@@ -636,7 +637,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                     ].map((item) => (
                       <div
                         key={item.title}
-                        className="p-4 rounded-xl cursor-default"
+                        className="p-4 rounded-xl cursor-pointer"
                         style={{
                           backgroundColor: 'rgba(160, 96, 96, 0.06)',
                           borderTop: `1px solid ${hoveredRelTrait === item.title ? 'rgba(160, 96, 96, 0.3)' : 'rgba(160, 96, 96, 0.12)'}`,
@@ -647,6 +648,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                         }}
                         onMouseEnter={() => setHoveredRelTrait(item.title)}
                         onMouseLeave={() => setHoveredRelTrait(null)}
+                        onClick={(e) => { e.stopPropagation(); setHoveredRelTrait(hoveredRelTrait === item.title ? null : item.title) }}
                       >
                         <p className="text-sm font-semibold" style={{ color: theme.text }}>{item.title}</p>
                         <div

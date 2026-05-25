@@ -58,13 +58,13 @@ body {
 .note-quote p {
   color: var(--color-text) !important;
   font-style: italic;
-  font-size: 0.875rem;
+  font-size: 1rem;
   line-height: 1.625;
 }
 .note-quote .quote-en {
   color: var(--color-text-sec) !important;
   font-style: normal;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   line-height: 1.5;
   margin-top: 2px;
   display: block;

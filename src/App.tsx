@@ -921,15 +921,15 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
       }
       if (lines[0].startsWith('- ')) {
         return (
-          <ul key={i} className="list-disc list-inside space-y-1" style={{ color: theme.textSec }}>
+          <ul key={i} className="list-disc list-inside space-y-1 text-base" style={{ color: theme.textSec }}>
             {lines.map((l, j) => (
-              <li key={j} className="text-sm leading-relaxed">{renderInline(l.replace(/^- \s*/, ''), theme.textSec)}</li>
+              <li key={j} className="leading-relaxed">{renderInline(l.replace(/^- \s*/, ''), theme.textSec)}</li>
             ))}
           </ul>
         )
       }
       return (
-        <p key={i} className="text-sm leading-relaxed" style={{ color: theme.text }}>
+        <p key={i} className="text-base leading-relaxed" style={{ color: theme.text }}>
           {renderInline(p, theme.text)}
         </p>
       )

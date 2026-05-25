@@ -789,6 +789,153 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
   )
 }
 
+/* ==================== GitHub Contributions ==================== */
+
+const GITHUB_USERNAME = 'Ethan-decoy'
+
+function GitHubContributions({ theme }: { theme: Theme }) {
+  const [counts, setCounts] = useState<Record<string, number>>({})
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [tooltip, setTooltip] = useState<{ date: string; count: number; idx: number } | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    fetch(`https://api.github.com/users/${GITHUB_USERNAME}/events/public`)
+      .then(res => res.json())
+      .then(data => {
+        if (cancelled) return
+        const map: Record<string, number> = {}
+        for (const ev of data) {
+          const d = ev.created_at.slice(0, 10)
+          map[d] = (map[d] || 0) + 1
+        }
+        setCounts(map)
+        setLoading(false)
+      })
+      .catch(() => {
+        if (!cancelled) { setError(true); setLoading(false) }
+      })
+    return () => { cancelled = true }
+  }, [])
+
+  // 生成最近 52 周的日期数据
+  const today = new Date()
+  today.setDate(today.getDate() - today.getDay()) // 对齐到本周日
+  const weeks: { date: string; count: number }[][] = []
+  for (let w = 51; w >= 0; w--) {
+    const week: { date: string; count: number }[] = []
+    for (let d = 0; d < 7; d++) {
+      const date = new Date(today)
+      date.setDate(date.getDate() - w * 7 - (6 - d))
+      const key = date.toISOString().slice(0, 10)
+      week.push({ date: key, count: counts[key] || 0 })
+    }
+    weeks.push(week)
+  }
+
+  const level = (c: number) => c === 0 ? 0 : c <= 2 ? 1 : c <= 5 ? 2 : c <= 9 ? 3 : 4
+
+  const bg = theme.bgDeep
+  const colors = [
+    theme.borderLight,
+    `${theme.accent}33`,
+    `${theme.accent}66`,
+    `${theme.accent}99`,
+    theme.accent,
+  ]
+
+  const dayLabels = ['', '一', '', '三', '', '五', '']
+
+  if (loading) return <div className="text-sm animate-pulse" style={{ color: theme.textSec }}>加载中...</div>
+  if (error) return <div className="text-sm" style={{ color: theme.textSec }}>加载失败，请稍后重试</div>
+
+  const total = Object.values(counts).reduce((a, b) => a + b, 0)
+
+  return (
+    <div className="relative">
+      {/* 月份标签 + 格子 */}
+      <div className="overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+        <div className="inline-block min-w-fit">
+          {/* 月份行 */}
+          <div className="flex gap-[2px] ml-8 mb-1" style={{ color: theme.textSec, fontSize: '10px' }}>
+            {weeks.map((week, wi) => {
+              const d = week[0].date
+              const month = d.slice(0, 7)
+              const isFirst = wi === 0 || weeks[wi - 1]?.[0]?.date?.slice(0, 7) !== month
+              return <span key={wi} className="w-[10px] text-left">{isFirst ? month.slice(2) + '月' : ''}</span>
+            })}
+          </div>
+
+          {/* 格子网格 */}
+          <div className="flex gap-[2px]">
+            {/* 左侧星期标签 */}
+            <div className="flex flex-col gap-[2px]" style={{ color: theme.textSec, fontSize: '10px' }}>
+              {dayLabels.map((l, i) => (
+                <div key={i} className="w-6 h-[10px] leading-[10px] text-right pr-1">{l}</div>
+              ))}
+            </div>
+
+            {weeks.map((week, wi) => (
+              <div key={wi} className="flex flex-col gap-[2px]">
+                {week.map((cell, di) => {
+                  const lvl = level(cell.count)
+                  return (
+                    <div
+                      key={di}
+                      className="w-[10px] h-[10px] rounded-sm"
+                      style={{
+                        backgroundColor: colors[lvl],
+                        transition: 'transform 0.15s ease-out',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.4)'
+                        setTooltip({ date: cell.date, count: cell.count, idx: wi * 7 + di })
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)'
+                        setTooltip(null)
+                      }}
+                    />
+                  )
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 悬浮提示 */}
+      {tooltip && (
+        <div
+          className="absolute z-50 px-2 py-1 rounded-md text-xs pointer-events-none"
+          style={{
+            backgroundColor: theme.bg,
+            border: `1px solid ${theme.border}`,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            color: theme.text,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {tooltip.date} · {tooltip.count} 次提交
+        </div>
+      )}
+
+      {/* 底部统计 */}
+      <div className="flex items-center gap-2 mt-3" style={{ color: theme.textSec, fontSize: '12px' }}>
+        <span className="inline-block w-2 h-2 rounded-sm" style={{ backgroundColor: colors[0] }} />
+        <span className="inline-block w-2 h-2 rounded-sm" style={{ backgroundColor: colors[1] }} />
+        <span className="inline-block w-2 h-2 rounded-sm" style={{ backgroundColor: colors[2] }} />
+        <span className="inline-block w-2 h-2 rounded-sm" style={{ backgroundColor: colors[3] }} />
+        <span className="inline-block w-2 h-2 rounded-sm" style={{ backgroundColor: colors[4] }} />
+        <span className="ml-1">Less</span>
+        <span className="mx-1">·</span>
+        <span>最近 52 周共 {total} 次公开活动</span>
+      </div>
+    </div>
+  )
+}
+
 /* ==================== Projects Page ==================== */
 
 function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }) {
@@ -796,7 +943,7 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
     <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-24 md:py-32">
       <SectionTitle theme={theme}>项目</SectionTitle>
       <div
-        className="p-8 rounded-2xl mt-8"
+        className="p-6 rounded-2xl mt-8 sm:p-8"
         style={{
           animation: 'fade-up 0.6s ease-out both',
           animationDelay: '150ms',
@@ -805,11 +952,14 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
         }}
       >
         <p className="text-base leading-relaxed" style={{ color: theme.textSec }}>
-          目前还没有公开的开源项目仓库。
+          目前还没有公开的开源项目仓库。以下是我的 GitHub 贡献记录：
         </p>
-        <p className="text-sm mt-3" style={{ color: theme.textSec, opacity: 0.6 }}>
+        <p className="text-sm mt-2" style={{ color: theme.textSec, opacity: 0.6 }}>
           尚未整理为公开仓库，后续收录后会在此更新。
         </p>
+        <div className="mt-6">
+          <GitHubContributions theme={theme} />
+        </div>
       </div>
     </div>
   )

@@ -841,7 +841,7 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
 
 /* ==================== Slider Track ==================== */
 
-const NUM_SEGMENTS = 20
+const NUM_SEGMENTS = 60
 
 function SliderTrack({ progress, accent, accentLight }: { progress: number; accent: string; accentLight: string }) {
   const trackRef = useRef<HTMLDivElement>(null)
@@ -894,7 +894,7 @@ function SliderTrack({ progress, accent, accentLight }: { progress: number; acce
               width: '16px',
               height: '2px',
               backgroundColor: accent,
-              opacity: isCurrent ? 1 : Math.max(0.12, 1 - dist * 0.15),
+              opacity: isCurrent ? 1 : Math.max(0.08, 1 - dist * 0.04),
               boxShadow: isCurrent ? `0 0 0 3px ${accentLight}` : 'none',
             }}
           />

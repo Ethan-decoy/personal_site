@@ -814,21 +814,13 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
     <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-24 md:py-32">
       <SectionTitle theme={theme}>项目</SectionTitle>
 
-      {/* 贡献图：区块外 */}
-      <div
-        className="mt-6 mb-8 rounded-2xl p-5 sm:p-6"
-        style={{
-          animation: 'fade-up 0.6s ease-out both',
-          animationDelay: '100ms',
-          backgroundColor: theme.bgDeep,
-          border: `1px solid ${theme.borderLight}`,
-        }}
-      >
+      {/* 贡献图 */}
+      <div style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '100ms' }}>
         <GitHubContributions />
       </div>
 
       <div
-        className="p-6 rounded-2xl mt-8 sm:p-8"
+        className="p-6 rounded-2xl mt-6 sm:p-8"
         style={{
           animation: 'fade-up 0.6s ease-out both',
           animationDelay: '150ms',

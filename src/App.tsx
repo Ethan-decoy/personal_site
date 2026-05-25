@@ -1089,7 +1089,7 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
           </div>
 
           {/* 主内容 + 右侧工具栏 */}
-          <div className="flex gap-8 items-start">
+          <div className="flex items-start">
             <div className="flex-1 max-w-[720px] w-full">
               {selectedNote ? (
                 <div key={selectedNote.title} style={{ animation: 'fade-up 0.5s ease-out both', animationDelay: '0ms' }}>
@@ -1110,11 +1110,15 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
 
             {/* 右侧工具栏：sticky 吸附 */}
             {selectedNote && (
-              <div className="hidden md:flex flex-col items-center gap-4 sticky top-[50vh] shrink-0" style={{ width: '24px' }}>
-                <div className="w-1 h-48 rounded-full overflow-hidden" style={{ backgroundColor: theme.borderLight }}>
+              <div className="hidden md:flex flex-col items-center gap-3 sticky top-[50vh] ml-16" style={{ width: '32px' }}>
+                <div className="w-1.5 h-48 rounded-full overflow-hidden relative" style={{ backgroundColor: `${theme.accent}18` }}>
                   <div
-                    className="w-full rounded-full transition-[height] duration-150 ease-out"
-                    style={{ height: `${progress}%`, backgroundColor: theme.accent }}
+                    className="w-full absolute bottom-0 rounded-full transition-[height] duration-200 ease-out"
+                    style={{
+                      height: `${progress}%`,
+                      background: `linear-gradient(to top, ${theme.accent}, ${theme.accent}cc)`,
+                      boxShadow: `0 0 8px ${theme.accent}33`,
+                    }}
                   />
                 </div>
                 <button
@@ -1124,7 +1128,7 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
                   style={{
                     backgroundColor: theme.bgDeep,
                     border: `1px solid ${theme.border}`,
-                    opacity: showBackTop ? 1 : 0.3,
+                    opacity: showBackTop ? 1 : 0.25,
                   }}
                 >
                   <svg className="w-3 h-3" style={{ color: theme.textSec }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">

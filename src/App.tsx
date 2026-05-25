@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, ReactNode } from 'react'
+import { useState, useEffect, ReactNode } from 'react'
 
 /* ==================== Themes ==================== */
 
@@ -793,88 +793,16 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
 
 const GITHUB_USERNAME = 'Ethan-decoy'
 
-function GitHubContributions({ theme }: { theme: Theme }) {
-  const [svgHtml, setSvgHtml] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [tooltip, setTooltip] = useState<{ x: number; y: number; text: string } | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    fetch(`https://ghchart.rshah.org/${GITHUB_USERNAME}?t=${Date.now()}`)
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        return res.text()
-      })
-      .then(text => {
-        if (cancelled) return
-        setSvgHtml(text)
-        setLoading(false)
-      })
-      .catch(err => {
-        if (!cancelled) { setErrorMsg(err.message); setLoading(false) }
-      })
-    return () => { cancelled = true }
-  }, [])
-
-  useEffect(() => {
-    const el = containerRef.current
-    if (!el || !svgHtml) return
-
-    const onMove = (e: MouseEvent) => {
-      const target = e.target as SVGElement | null
-      if (!target || target.tagName !== 'rect') return
-
-      const titleEl = target.closest('g')?.querySelector('title')
-      const text = titleEl?.textContent
-      if (!text) return
-
-      const r = target.getBoundingClientRect()
-      setTooltip({ x: r.left + r.width / 2, y: r.top - 8, text })
-    }
-
-    const onLeave = () => setTooltip(null)
-
-    el.addEventListener('mousemove', onMove)
-    el.addEventListener('mouseleave', onLeave)
-    return () => {
-      el.removeEventListener('mousemove', onMove)
-      el.removeEventListener('mouseleave', onLeave)
-    }
-  }, [svgHtml])
-
-  if (loading) return <div className="text-sm py-8" style={{ color: theme.textSec }}>加载贡献图...</div>
-  if (errorMsg) return <div className="text-sm py-8" style={{ color: theme.textSec }}>加载失败 ({errorMsg})</div>
-  if (!svgHtml) return null
-
+function GitHubContributions() {
   return (
-    <div className="overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-      <div
-        ref={containerRef}
-        className="contribution-chart"
-        dangerouslySetInnerHTML={{ __html: svgHtml }}
-        style={{ display: 'block', minWidth: 'fit-content' }}
+    <div className="overflow-x-auto pb-2 mt-6" style={{ scrollbarWidth: 'none' }}>
+      <img
+        src={`https://ghchart.rshah.org/${GITHUB_USERNAME}?t=${Date.now()}`}
+        alt="GitHub Contributions"
+        className="block"
+        style={{ minWidth: 'fit-content' }}
+        referrerPolicy="no-referrer"
       />
-      {tooltip && (
-        <div
-          className="fixed z-50 px-2.5 py-1.5 rounded-md text-xs pointer-events-none whitespace-nowrap"
-          style={{
-            left: tooltip.x,
-            top: tooltip.y,
-            transform: 'translate(-50%, -100%)',
-            backgroundColor: theme.bg,
-            border: `1px solid ${theme.borderLight}`,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-            color: theme.text,
-          }}
-        >
-          {tooltip.text}
-        </div>
-      )}
-      <p className="text-xs mt-2" style={{ color: theme.textSec, opacity: 0.4 }}>
-        数据来源：GitHub · 每次访问自动更新
-      </p>
     </div>
   )
 }
@@ -896,7 +824,7 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
           border: `1px solid ${theme.borderLight}`,
         }}
       >
-        <GitHubContributions theme={theme} />
+        <GitHubContributions />
       </div>
 
       <div

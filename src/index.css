@@ -46,3 +46,8 @@
 body {
   font-family: var(--font-sans);
 }
+
+/* 隐藏导航栏滚动条 */
+::-webkit-scrollbar {
+  display: none;
+}

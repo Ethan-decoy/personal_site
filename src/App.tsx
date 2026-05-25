@@ -106,7 +106,7 @@ function NavBar({
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-40" style={{ backgroundColor: `${theme.bg}ee`, backdropFilter: 'blur(12px)' }}>
-      <div className="max-w-5xl mx-auto flex items-center justify-between px-8 py-4">
+      <div className="max-w-5xl mx-auto flex items-center justify-between px-4 md:px-8 py-4">
         <span
           className="text-base font-bold tracking-widest cursor-pointer select-none"
           style={{ color: theme.text }}
@@ -114,11 +114,11 @@ function NavBar({
         >
           ETHAN C.
         </span>
-        <div className="flex gap-1">
+        <div className="flex gap-1 overflow-x-auto shrink-0" style={{ scrollbarWidth: 'none' }}>
           {links.map((l) => (
             <button
               key={l.key}
-              className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ease-out relative"
+              className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ease-out relative whitespace-nowrap"
               style={{
                 color: active === l.key ? theme.text : theme.textSec,
                 backgroundColor: active === l.key ? theme.accentLight : 'transparent',
@@ -154,10 +154,10 @@ function HomePage({ theme, onNavigate }: { theme: Theme; onNavigate: (s: Section
   const [secondLineVisible, setSecondLineVisible] = useState(false)
   return (
     <div className="min-h-screen flex flex-col justify-center relative overflow-hidden">
-      <div className="max-w-5xl mx-auto px-8 w-full relative z-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 w-full relative z-10">
 
         {/* 两列布局：左侧内容 + 右侧头像 */}
-        <div className="grid grid-cols-[1fr_auto] gap-12 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-8 md:gap-12 items-start">
 
           {/* 左侧：文字内容 */}
           <div className="space-y-10">
@@ -299,7 +299,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-8 py-32">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-24 md:py-32">
       <div
         style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '0ms' }}
       >
@@ -327,11 +327,11 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
       {view === 'personal' && (
         <div key="personal" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
           {/* 上区：左侧（配图+生活切片）与右侧（速览+MBTI）并列 */}
-          <div className="flex gap-12">
+          <div className="flex flex-col md:flex-row gap-8 md:gap-12">
             {/* 左侧列 */}
-            <div className="flex-[2]">
+            <div className="w-full md:flex-[2]">
               {/* 配图 */}
-              <div className="mb-8 rounded-2xl overflow-hidden" style={{ border: `1px solid ${theme.borderLight}`, height: '280px' }}>
+              <div className="mb-6 md:mb-8 rounded-2xl overflow-hidden" style={{ border: `1px solid ${theme.borderLight}`, aspectRatio: '16/9' }}>
                 <img
                   src={`${import.meta.env.BASE_URL}assets/钱学森和袁隆平.png`}
                   alt=""
@@ -343,7 +343,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
               <h3 className="text-sm font-semibold tracking-wider uppercase mb-5" style={{ color: theme.text }}>
                 生活切片
               </h3>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                 {[
                   { title: '费曼式学习者', desc: '讲给别人听之前，自己先假装讲一遍。' },
                   { title: 'Google 工程思维', desc: '相信简单可扩展的解决方案，无论写代码还是生活。' },
@@ -369,7 +369,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
             </div>
 
             {/* 右侧列 */}
-            <div className="flex-1">
+            <div className="w-full md:flex-1">
               {/* 速览 */}
               <div className="space-y-6 mb-12" style={{ color: theme.textSec }}>
                 {[
@@ -445,7 +445,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
 
                       {/* 悬浮解释面板 */}
                       <div
-                        className="absolute left-[calc(100%+20px)] top-0 w-72 rounded-xl p-5 pointer-events-none"
+                        className="absolute md:left-[calc(100%+20px)] md:top-0 left-0 top-full mt-2 w-72 max-w-full rounded-xl p-5 pointer-events-none z-10"
                         style={{
                           backgroundColor: theme.bgDeep,
                           border: `1px solid ${theme.border}`,
@@ -510,7 +510,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                     maxHeight: valuesContentOpen ? '300px' : '0px',
                   }}
                 >
-                  <div className="grid grid-cols-3 gap-4 px-5 pb-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 px-5 pb-5">
                     {values.map((v) => (
                       <div
                         key={v.title}
@@ -579,7 +579,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                   maxHeight: blindspotsContentOpen ? '600px' : '0px',
                 }}
               >
-                <div className="grid grid-cols-2 gap-4 px-5 pb-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 px-5 pb-5">
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: '#5E8268' }} />
@@ -741,7 +741,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
             <h3 className="text-sm font-semibold tracking-wider uppercase mb-5" style={{ color: theme.text }}>
               能力
             </h3>
-            <div className="grid grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
               {[
                 { label: '算法', items: ['3D 重建', '相位解包裹', 'OpenCV', 'Eigen'] },
                 { label: '开发', items: ['C++', 'Python', 'Qt Widgets'] },
@@ -762,7 +762,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
           </div>
 
           {/* 联系 CTA */}
-          <div className="flex items-center justify-between p-6 rounded-2xl" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}` }}>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-6 rounded-2xl" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}` }}>
             <p className="text-sm" style={{ color: theme.textSec }}>
               想要进一步了解我的技术栈与项目经验？
             </p>
@@ -791,7 +791,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
 
 function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }) {
   return (
-    <div className="max-w-5xl mx-auto px-8 py-32">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-24 md:py-32">
       <SectionTitle theme={theme}>项目</SectionTitle>
       <div
         className="p-8 rounded-2xl mt-8"
@@ -862,6 +862,7 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
   const [expandedCats, setExpandedCats] = useState<Record<string, boolean>>(
     treeData.length > 0 ? { [treeData[0].key]: true } : {}
   )
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [selectedNote, setSelectedNote] = useState<{ title: string; date: string; content: string } | null>(null)
 
   const toggleCat = (key: string) => {
@@ -880,7 +881,7 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-8 py-32">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-24 md:py-32">
       <SectionTitle theme={theme}>笔记</SectionTitle>
 
       {treeData.length === 0 ? (
@@ -893,9 +894,35 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
           </p>
         </div>
       ) : (
-        <div className="mt-8 flex gap-8" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
+        <div className="mt-8 flex flex-col gap-6 md:gap-8" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
           {/* 侧边栏：分类树 */}
-          <div className="w-44 shrink-0" style={{ color: theme.textSec }}>
+          <div className="w-full md:w-44 md:shrink-0" style={{ color: theme.textSec }}>
+            {/* 手机端折叠/展开按钮 */}
+            <button
+              className="md:hidden flex items-center justify-between w-full py-3 px-4 rounded-xl mb-2"
+              style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}` }}
+              onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+            >
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: theme.text }}>
+                笔记分类
+              </span>
+              <svg
+                className="w-3 h-3 transition-transform duration-200 ease-out"
+                style={{
+                  transform: mobileSidebarOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+                  color: theme.accent,
+                }}
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <path d="M6 4l4 4-4 4" />
+              </svg>
+            </button>
+
+            {/* 树内容：桌面端始终可见，手机端可折叠 */}
+            <div className={mobileSidebarOpen ? 'block' : 'hidden md:block'}>
             {treeData.map((cat, idx) => (
               <div key={cat.key} style={{ animationDelay: `${200 + idx * 80}ms` }}>
                 <button
@@ -954,10 +981,11 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
                 </div>
               </div>
             ))}
+            </div>
           </div>
 
           {/* 主内容：阅读区 */}
-          <div className="flex-1 max-w-[720px]">
+          <div className="flex-1 max-w-[720px] w-full">
             {selectedNote ? (
               <div key={selectedNote.title} style={{ animation: 'fade-up 0.5s ease-out both', animationDelay: '0ms' }}>
                 <div className="mb-10 pb-6" style={{ borderBottom: `1px solid ${theme.borderLight}` }}>
@@ -1011,11 +1039,11 @@ function TypingText({ text, className, style, delay = 0, cursorColor = '#333' }:
 
 function ContactPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavigate: (s: Section) => void }) {
   return (
-    <div className="max-w-5xl mx-auto px-8 py-32">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-24 md:py-32">
       <SectionTitle theme={theme}>联系</SectionTitle>
 
       <div
-        className="grid grid-cols-2 gap-12 mt-8"
+        className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 mt-8"
         style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}
       >
         <div className="space-y-5 max-w-md" style={{ color: theme.textSec }}>
@@ -1058,7 +1086,7 @@ function ContactPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavig
 
 function Footer({ theme, onNavigate }: { theme: Theme; onNavigate: (s: Section) => void }) {
   return (
-    <footer className="max-w-5xl mx-auto px-8 py-8" style={{ borderTop: `1px solid ${theme.borderLight}` }}>
+    <footer className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-6 md:py-8" style={{ borderTop: `1px solid ${theme.borderLight}` }}>
       <div className="flex justify-between items-center">
         <p className="text-xs tracking-wide" style={{ color: theme.textSec }}>
           &copy; 2026 Ethan C.

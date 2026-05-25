@@ -894,7 +894,7 @@ function SliderTrack({ progress, accent, accentLight }: { progress: number; acce
               width: '16px',
               height: '2px',
               backgroundColor: accent,
-              opacity: isCurrent ? 1 : Math.max(0.08, 1 - dist * 0.06),
+              opacity: isCurrent ? 1 : Math.max(0.08, 1 - dist * 0.12),
               boxShadow: isCurrent ? `0 0 0 3px ${accentLight}` : 'none',
             }}
           />

@@ -1151,7 +1151,7 @@ function ContactPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavig
               </p>
               <a
                 href={item.href}
-                className="text-base leading-relaxed transition-all duration-200 ease-out"
+                className="text-base leading-relaxed font-mono transition-all duration-200 ease-out"
                 style={{ color: theme.accent }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = theme.accentHover

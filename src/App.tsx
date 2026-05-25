@@ -841,7 +841,7 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
 
 /* ==================== Slider Track ==================== */
 
-const TRACK_HEIGHT = 200
+const NUM_SEGMENTS = 20
 
 function SliderTrack({ progress, accent, accentLight }: { progress: number; accent: string; accentLight: string }) {
   const trackRef = useRef<HTMLDivElement>(null)
@@ -875,23 +875,30 @@ function SliderTrack({ progress, accent, accentLight }: { progress: number; acce
     }
   }, [dragging])
 
-  const fillHeight = Math.max(progress * TRACK_HEIGHT / 100, 3)
+  const currentIdx = Math.round((progress / 100) * (NUM_SEGMENTS - 1))
 
   return (
     <div
       ref={trackRef}
-      className="relative w-1.5 cursor-pointer rounded-full"
-      style={{ height: `${TRACK_HEIGHT}px`, backgroundColor: accentLight }}
+      className="flex flex-col items-center gap-1.5 cursor-pointer py-1"
       onMouseDown={(e) => handleStart(e.clientY)}
     >
-      <div
-        className="absolute bottom-0 left-0 right-0 rounded-full"
-        style={{
-          height: `${fillHeight}px`,
-          backgroundColor: accent,
-          transition: dragging ? 'none' : 'height 0.15s ease-out',
-        }}
-      />
+      {Array.from({ length: NUM_SEGMENTS }).map((_, i) => {
+        const isCurrent = i === currentIdx
+        const isPast = i < currentIdx
+        return (
+          <div
+            key={i}
+            className="w-1.5 rounded-full transition-all duration-150 ease-out"
+            style={{
+              height: '2px',
+              backgroundColor: isCurrent ? accent : isPast ? accent : 'transparent',
+              opacity: isCurrent ? 1 : isPast ? Math.max(0.15, 1 - (currentIdx - i) * 0.08) : 0.2,
+              boxShadow: isCurrent ? `0 0 0 3px ${accentLight}` : 'none',
+            }}
+          />
+        )
+      })}
     </div>
   )
 }

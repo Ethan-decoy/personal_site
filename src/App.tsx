@@ -889,11 +889,12 @@ function SliderTrack({ progress, accent, accentLight }: { progress: number; acce
         return (
           <div
             key={i}
-            className="w-1.5 rounded-full transition-all duration-150 ease-out"
+            className="rounded-full transition-all duration-150 ease-out"
             style={{
+              width: '16px',
               height: '2px',
-              backgroundColor: isCurrent ? accent : isPast ? accent : 'transparent',
-              opacity: isCurrent ? 1 : isPast ? Math.max(0.15, 1 - (currentIdx - i) * 0.08) : 0.2,
+              backgroundColor: isCurrent ? accent : isPast ? accent : accentLight,
+              opacity: isCurrent ? 1 : isPast ? Math.max(0.15, 1 - (currentIdx - i) * 0.08) : undefined,
               boxShadow: isCurrent ? `0 0 0 3px ${accentLight}` : 'none',
             }}
           />

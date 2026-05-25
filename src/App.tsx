@@ -953,6 +953,15 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
   )
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [selectedNote, setSelectedNote] = useState<{ title: string; date: string; content: string } | null>(null)
+  const [showBackTop, setShowBackTop] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setShowBackTop(window.scrollY > 300)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
   const toggleCat = (key: string) => {
     setSelectedNote(null)
@@ -1093,6 +1102,25 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
           </div>
         </div>
       )}
+
+      {/* 返回顶部 */}
+      <button
+        aria-label="返回顶部"
+        onClick={scrollToTop}
+        className="fixed bottom-8 right-8 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ease-out"
+        style={{
+          backgroundColor: theme.bgDeep,
+          border: `1px solid ${theme.border}`,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+          opacity: showBackTop ? 1 : 0,
+          transform: showBackTop ? 'translateY(0)' : 'translateY(12px)',
+          pointerEvents: showBackTop ? 'auto' : 'none',
+        }}
+      >
+        <svg className="w-4 h-4" style={{ color: theme.textSec }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M4 10l4-4 4 4" />
+        </svg>
+      </button>
     </div>
   )
 }

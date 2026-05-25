@@ -954,9 +954,15 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [selectedNote, setSelectedNote] = useState<{ title: string; date: string; content: string } | null>(null)
   const [showBackTop, setShowBackTop] = useState(false)
+  const [progress, setProgress] = useState(0)
 
   useEffect(() => {
-    const onScroll = () => setShowBackTop(window.scrollY > 300)
+    const onScroll = () => {
+      const scrollTop = window.scrollY
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight
+      setShowBackTop(scrollTop > 300)
+      setProgress(docHeight > 0 ? Math.min(scrollTop / docHeight * 100, 100) : 0)
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
@@ -1083,7 +1089,17 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
           </div>
 
           {/* 主内容：阅读区 */}
-          <div className="flex-1 max-w-[720px] w-full">
+          <div className="flex-1 max-w-[720px] w-full relative">
+            {/* 进度条：阅读区顶部 */}
+            {selectedNote && (
+              <div className="absolute -top-6 left-0 right-0 h-0.5 rounded-full overflow-hidden" style={{ backgroundColor: theme.borderLight }}>
+                <div
+                  className="h-full rounded-full transition-[width] duration-150 ease-out"
+                  style={{ width: `${progress}%`, backgroundColor: theme.accent }}
+                />
+              </div>
+            )}
+
             {selectedNote ? (
               <div key={selectedNote.title} style={{ animation: 'fade-up 0.5s ease-out both', animationDelay: '0ms' }}>
                 <div className="mb-10 pb-6" style={{ borderBottom: `1px solid ${theme.borderLight}` }}>
@@ -1091,6 +1107,31 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
                   <span className="text-xs font-mono" style={{ color: theme.textSec, opacity: 0.4 }}>{selectedNote.date}</span>
                 </div>
                 <MarkdownPreview content={selectedNote.content} theme={theme} />
+
+                {/* 底部：进度 + 返回顶部 */}
+                <div className="flex items-center justify-between mt-16 pt-4" style={{ borderTop: `1px solid ${theme.borderLight}` }}>
+                  <div className="flex-1 h-1 rounded-full mr-4" style={{ backgroundColor: theme.borderLight }}>
+                    <div
+                      className="h-full rounded-full transition-[width] duration-150 ease-out"
+                      style={{ width: `${progress}%`, backgroundColor: theme.accent }}
+                    />
+                  </div>
+                  <button
+                    aria-label="返回顶部"
+                    onClick={scrollToTop}
+                    className="w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out shrink-0"
+                    style={{
+                      backgroundColor: theme.bgDeep,
+                      border: `1px solid ${theme.border}`,
+                      opacity: showBackTop ? 1 : 0,
+                      pointerEvents: showBackTop ? 'auto' : 'none',
+                    }}
+                  >
+                    <svg className="w-3.5 h-3.5" style={{ color: theme.textSec }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M4 10l4-4 4 4" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="flex items-center justify-center h-48">
@@ -1102,25 +1143,6 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
           </div>
         </div>
       )}
-
-      {/* 返回顶部 */}
-      <button
-        aria-label="返回顶部"
-        onClick={scrollToTop}
-        className="fixed bottom-8 right-8 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ease-out"
-        style={{
-          backgroundColor: theme.bgDeep,
-          border: `1px solid ${theme.border}`,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-          opacity: showBackTop ? 1 : 0,
-          transform: showBackTop ? 'translateY(0)' : 'translateY(12px)',
-          pointerEvents: showBackTop ? 'auto' : 'none',
-        }}
-      >
-        <svg className="w-4 h-4" style={{ color: theme.textSec }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M4 10l4-4 4 4" />
-        </svg>
-      </button>
     </div>
   )
 }

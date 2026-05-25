@@ -896,45 +896,52 @@ function renderInline(text: string, color: string): any {
 }
 
 function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) {
-  const paragraphs = content.split('\n\n').filter(Boolean)
-  return (
-    <div className="space-y-3 max-w-2xl">
-      {paragraphs.map((p, i) => {
-        const lines = p.split('\n').map((l) => l.trim())
-        // heading
-        if (lines.length === 1 && lines[0].startsWith('#')) {
-          const text = lines[0].replace(/^#+\s*/, '')
-          return <h3 key={i} className="text-lg font-semibold" style={{ color: theme.text }}>{text}</h3>
-        }
-        // blockquote — each `>` line becomes its own block
-        if (lines[0].startsWith('> ')) {
-          return (
-            <div key={i} className="space-y-1 pl-4 py-1" style={{ borderLeft: `2px solid ${theme.border}` }}>
-              {lines.filter((l) => l.startsWith('> ')).map((l, j) => (
-                <p key={j} className="text-sm leading-relaxed italic" style={{ color: theme.textSec }}>
-                  {renderInline(l.replace(/^>\s*/, ''), theme.textSec)}
-                </p>
-              ))}
-            </div>
-          )
-        }
-        // list
-        if (lines[0].startsWith('- ')) {
-          return (
-            <ul key={i} className="list-disc list-inside space-y-1" style={{ color: theme.textSec }}>
-              {lines.map((l, j) => (
-                <li key={j} className="text-sm leading-relaxed">{renderInline(l.replace(/^- \s*/, ''), theme.textSec)}</li>
-              ))}
-            </ul>
-          )
-        }
-        // paragraph with inline bold/italic
+  // \n\n\n+ 视为章节分隔，\n\n 视为段落分隔
+  const sections = content.split(/\n{3,}/)
+
+  const renderParagraphs = (text: string) => {
+    const paragraphs = text.split('\n\n').filter(Boolean)
+    return paragraphs.map((p, i) => {
+      const lines = p.split('\n').map((l) => l.trim())
+      if (lines.length === 1 && lines[0].startsWith('#')) {
+        const text = lines[0].replace(/^#+\s*/, '')
+        return <h3 key={i} className="text-lg font-semibold" style={{ color: theme.text }}>{text}</h3>
+      }
+      if (lines[0].startsWith('> ')) {
         return (
-          <p key={i} className="text-sm leading-relaxed" style={{ color: theme.textSec }}>
-            {renderInline(p, theme.textSec)}
-          </p>
+          <div key={i} className="space-y-1 pl-4 py-1" style={{ borderLeft: `2px solid ${theme.border}` }}>
+            {lines.filter((l) => l.startsWith('> ')).map((l, j) => (
+              <p key={j} className="text-sm leading-relaxed italic" style={{ color: theme.textSec }}>
+                {renderInline(l.replace(/^>\s*/, ''), theme.textSec)}
+              </p>
+            ))}
+          </div>
         )
-      })}
+      }
+      if (lines[0].startsWith('- ')) {
+        return (
+          <ul key={i} className="list-disc list-inside space-y-1" style={{ color: theme.textSec }}>
+            {lines.map((l, j) => (
+              <li key={j} className="text-sm leading-relaxed">{renderInline(l.replace(/^- \s*/, ''), theme.textSec)}</li>
+            ))}
+          </ul>
+        )
+      }
+      return (
+        <p key={i} className="text-sm leading-relaxed" style={{ color: theme.textSec }}>
+          {renderInline(p, theme.textSec)}
+        </p>
+      )
+    })
+  }
+
+  return (
+    <div className="max-w-2xl">
+      {sections.map((s, i) => (
+        <div key={i} className="space-y-3 mb-8 last:mb-0">
+          {renderParagraphs(s)}
+        </div>
+      ))}
     </div>
   )
 }

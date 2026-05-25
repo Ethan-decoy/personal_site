@@ -982,7 +982,7 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
 
 /* ==================== Contact Page ==================== */
 
-function TypingText({ text, className, style, delay = 0, cursorColor = '#333', onComplete }: { text: string; className?: string; style?: React.CSSProperties; delay?: number; cursorColor?: string; onComplete?: () => void }) {
+function TypingText({ text, className, style, delay = 0, cursorColor = '#333' }: { text: string; className?: string; style?: React.CSSProperties; delay?: number; cursorColor?: string }) {
   const [visible, setVisible] = useState(0)
   useEffect(() => {
     const startTimer = setTimeout(() => {
@@ -990,10 +990,7 @@ function TypingText({ text, className, style, delay = 0, cursorColor = '#333', o
       const timer = setInterval(() => {
         i++
         setVisible(i)
-        if (i >= text.length) {
-          clearInterval(timer)
-          onComplete?.()
-        }
+        if (i >= text.length) clearInterval(timer)
       }, 20)
       return () => clearInterval(timer)
     }, delay)
@@ -1013,7 +1010,6 @@ function TypingText({ text, className, style, delay = 0, cursorColor = '#333', o
 }
 
 function ContactPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavigate: (s: Section) => void }) {
-  const [githubReady, setGithubReady] = useState(false)
   return (
     <div className="max-w-5xl mx-auto px-8 py-32">
       <SectionTitle theme={theme}>联系</SectionTitle>
@@ -1029,38 +1025,29 @@ function ContactPage({ theme, onNavigate: _onNavigate }: { theme: Theme; onNavig
         </div>
 
         <div className="space-y-8">
-          <div>
-            <p className="text-xs font-semibold tracking-wider uppercase mb-2" style={{ color: theme.textSec, opacity: 0.5 }}>
-              邮箱
-            </p>
-            <a
-              href="mailto:decoy.elevate399@passinbox.com"
-              className="text-base leading-relaxed transition-all duration-200 ease-out"
-              style={{ color: theme.accent }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = theme.accentHover }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = theme.accent }}
-            >
-              <TypingText
-                text="decoy.elevate399@passinbox.com"
-                cursorColor={theme.accent}
-                onComplete={() => setGithubReady(true)}
-              />
-            </a>
-          </div>
-          <div>
-            <p className="text-xs font-semibold tracking-wider uppercase mb-2" style={{ color: theme.textSec, opacity: 0.5 }}>
-              GitHub
-            </p>
-            <a
-              href="https://github.com/Ethan-decoy"
-              className="text-base leading-relaxed transition-all duration-200 ease-out"
-              style={{ color: theme.accent }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = theme.accentHover }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = theme.accent }}
-            >
-              {githubReady && <TypingText text="github.com/Ethan-decoy" cursorColor={theme.accent} />}
-            </a>
-          </div>
+          {[
+            { label: '邮箱', value: 'decoy.elevate399@passinbox.com', href: 'mailto:decoy.elevate399@passinbox.com' },
+            { label: 'GitHub', value: 'github.com/Ethan-decoy', href: 'https://github.com/Ethan-decoy' },
+          ].map((item) => (
+            <div key={item.label}>
+              <p className="text-xs font-semibold tracking-wider uppercase mb-2" style={{ color: theme.textSec, opacity: 0.5 }}>
+                {item.label}
+              </p>
+              <a
+                href={item.href}
+                className="text-base leading-relaxed transition-all duration-200 ease-out"
+                style={{ color: theme.accent }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = theme.accentHover
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = theme.accent
+                }}
+              >
+                <TypingText text={item.value} cursorColor={theme.accent} />
+              </a>
+            </div>
+          ))}
         </div>
       </div>
     </div>

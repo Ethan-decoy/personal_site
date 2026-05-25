@@ -793,144 +793,19 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
 
 const GITHUB_USERNAME = 'Ethan-decoy'
 
-function GitHubContributions({ theme }: { theme: Theme }) {
-  const [counts, setCounts] = useState<Record<string, number>>({})
-  const [loading, setLoading] = useState(true)
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [tooltip, setTooltip] = useState<{ x: number; y: number; date: string; count: number } | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    fetch(`https://api.github.com/users/${GITHUB_USERNAME}/events/public`)
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        return res.json()
-      })
-      .then(data => {
-        if (cancelled) return
-        if (!Array.isArray(data)) throw new Error('Invalid response')
-        const map: Record<string, number> = {}
-        for (const ev of data) {
-          const d = ev.created_at.slice(0, 10)
-          map[d] = (map[d] || 0) + 1
-        }
-        setCounts(map)
-        setLoading(false)
-      })
-      .catch(err => {
-        if (!cancelled) { setErrorMsg(err.message); setLoading(false) }
-      })
-    return () => { cancelled = true }
-  }, [])
-
-  // 生成最近 52 周的日期数据
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const weeks: { date: string; count: number }[][] = []
-  for (let w = 51; w >= 0; w--) {
-    const week: { date: string; count: number }[] = []
-    for (let d = 0; d < 7; d++) {
-      const date = new Date(today)
-      date.setDate(date.getDate() - w * 7 - d)
-      const key = date.toISOString().slice(0, 10)
-      week.push({ date: key, count: counts[key] || 0 })
-    }
-    weeks.push(week)
-  }
-
-  const level = (c: number) => c === 0 ? 0 : c <= 2 ? 1 : c <= 5 ? 2 : c <= 9 ? 3 : 4
-
-  const colors = [
-    theme.borderLight,
-    `${theme.accent}33`,
-    `${theme.accent}66`,
-    `${theme.accent}99`,
-    theme.accent,
-  ]
-
-  const dayLabels = ['', '一', '', '三', '', '五', '']
-
-  if (loading) return <div className="text-sm" style={{ color: theme.textSec }}>加载中...</div>
-  if (errorMsg) return <div className="text-sm" style={{ color: theme.textSec }}>加载失败 ({errorMsg})</div>
-
-  const total = Object.values(counts).reduce((a, b) => a + b, 0)
-
-  const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
-
+function GitHubContributions() {
   return (
-    <div className="relative" style={{ fontSize: '11px' }}>
-      <div className="overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-        <div className="inline-block min-w-fit">
-          {/* 格子网格 */}
-          <div className="flex gap-[2px]">
-            {/* 左侧星期标签 */}
-            <div className="flex flex-col gap-[2px] mr-1" style={{ color: theme.textSec, opacity: 0.5 }}>
-              {dayLabels.map((l, i) => (
-                <div key={i} className="w-5 h-[11px] leading-[11px] text-right pr-1" style={{ fontSize: '9px' }}>{l}</div>
-              ))}
-            </div>
-
-            {weeks.map((week, wi) => {
-              const m = parseInt(week[0].date.slice(5, 7), 10) - 1
-              const prevMonth = wi > 0 ? parseInt(weeks[wi - 1][0].date.slice(5, 7), 10) - 1 : -1
-              return (
-                <div key={wi} className="flex flex-col gap-[2px]">
-                  {/* 月份标签 */}
-                  <div className="h-[10px] leading-[10px]" style={{ color: theme.textSec, opacity: 0.5, fontSize: '9px' }}>
-                    {m !== prevMonth ? monthNames[m] : ''}
-                  </div>
-                  {week.map((cell, di) => {
-                    const lvl = level(cell.count)
-                    return (
-                      <div
-                        key={di}
-                        className="w-[11px] h-[11px] rounded-[2px]"
-                        style={{
-                          backgroundColor: colors[lvl],
-                        }}
-                        onMouseEnter={(e) => {
-                          const rect = e.currentTarget.getBoundingClientRect()
-                          setTooltip({ x: rect.left, y: rect.top - 30, date: cell.date, count: cell.count })
-                        }}
-                        onMouseLeave={() => setTooltip(null)}
-                      />
-                    )
-                  })}
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* 悬浮提示 */}
-      {tooltip && (
-        <div
-          className="fixed z-50 px-2 py-1 rounded text-xs pointer-events-none"
-          style={{
-            left: tooltip.x,
-            top: tooltip.y,
-            backgroundColor: theme.bg,
-            border: `1px solid ${theme.borderLight}`,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            color: theme.text,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {tooltip.date} · {tooltip.count} 次公开活动
-        </div>
-      )}
-
-      {/* 底部统计 */}
-      <div className="flex items-center gap-1 mt-2" style={{ color: theme.textSec, fontSize: '11px' }}>
-        <span>Less</span>
-        {[0, 1, 2, 3, 4].map(i => (
-          <span key={i} className="w-[11px] h-[11px] rounded-[2px]" style={{ backgroundColor: colors[i] }} />
-        ))}
-        <span>More</span>
-        <span className="mx-2">·</span>
-        <span>最近 52 周共 {total} 次公开活动</span>
-      </div>
+    <div className="overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+      <img
+        src={`https://ghchart.rshah.org/${GITHUB_USERNAME}`}
+        alt="GitHub Contributions"
+        className="block w-auto h-auto"
+        style={{ maxWidth: 'none' }}
+        referrerPolicy="no-referrer"
+      />
+      <p className="text-xs mt-2" style={{ color: 'inherit', opacity: 0.4 }}>
+        数据来源：GitHub · 每次访问自动更新
+      </p>
     </div>
   )
 }

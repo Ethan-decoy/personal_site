@@ -884,8 +884,8 @@ function SliderTrack({ progress, accent, accentLight }: { progress: number; acce
       onMouseDown={(e) => handleStart(e.clientY)}
     >
       {Array.from({ length: NUM_SEGMENTS }).map((_, i) => {
+        const dist = Math.abs(i - currentIdx)
         const isCurrent = i === currentIdx
-        const isPast = i < currentIdx
         return (
           <div
             key={i}
@@ -893,8 +893,8 @@ function SliderTrack({ progress, accent, accentLight }: { progress: number; acce
             style={{
               width: '16px',
               height: '2px',
-              backgroundColor: isCurrent ? accent : isPast ? accent : accentLight,
-              opacity: isCurrent ? 1 : isPast ? Math.max(0.15, 1 - (currentIdx - i) * 0.08) : undefined,
+              backgroundColor: accent,
+              opacity: isCurrent ? 1 : Math.max(0.12, 1 - dist * 0.15),
               boxShadow: isCurrent ? `0 0 0 3px ${accentLight}` : 'none',
             }}
           />

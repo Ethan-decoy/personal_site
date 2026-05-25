@@ -1110,16 +1110,19 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
 
             {/* 右侧工具栏：sticky 吸附 */}
             {selectedNote && (
-              <div className="hidden md:flex flex-col items-center sticky top-[50vh] ml-24">
-                <div className="flex flex-col-reverse gap-1.5">
+              <div className="hidden md:flex flex-col items-center sticky top-[50vh] ml-32">
+                <div className="flex flex-col-reverse gap-[3px]">
                   {Array.from({ length: 20 }, (_, i) => {
                     const filled = (i + 1) * 5 <= progress
                     return (
                       <div
                         key={i}
-                        className="w-1.5 h-1.5 rounded-sm transition-all duration-200 ease-out"
+                        className="transition-all duration-200 ease-out"
                         style={{
-                          backgroundColor: filled ? theme.accent : `${theme.accent}20`,
+                          width: '2px',
+                          height: '12px',
+                          borderRadius: '1px',
+                          backgroundColor: filled ? theme.accent : `${theme.accent}18`,
                         }}
                       />
                     )

@@ -108,17 +108,17 @@ function NavBar({
     <nav className="fixed top-0 left-0 right-0 z-40" style={{ backgroundColor: `${theme.bg}ee`, backdropFilter: 'blur(12px)' }}>
       <div className="max-w-5xl mx-auto flex items-center justify-between px-4 md:px-8 py-4">
         <span
-          className="text-base font-bold tracking-widest cursor-pointer select-none"
+          className="text-base font-bold tracking-widest cursor-pointer select-none shrink-0"
           style={{ color: theme.text }}
           onClick={() => onNavigate('home')}
         >
           ETHAN C.
         </span>
-        <div className="flex gap-1 overflow-x-auto shrink-0" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex gap-1 overflow-x-auto ml-2" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
           {links.map((l) => (
             <button
               key={l.key}
-              className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ease-out relative whitespace-nowrap"
+              className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ease-out relative whitespace-nowrap shrink-0"
               style={{
                 color: active === l.key ? theme.text : theme.textSec,
                 backgroundColor: active === l.key ? theme.accentLight : 'transparent',
@@ -483,7 +483,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                 onMouseLeave={() => setValuesHovered(false)}
               >
                 {/* 标题行 */}
-                <div className="flex items-center justify-between px-5 py-4">
+                <div className="flex items-center justify-between px-3 py-3 sm:px-5 sm:py-4">
                   <span className="text-sm font-semibold tracking-wider uppercase" style={{ color: theme.text }}>
                     价值观
                   </span>
@@ -510,7 +510,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                     maxHeight: valuesContentOpen ? '300px' : '0px',
                   }}
                 >
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 px-5 pb-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 px-3 pb-3 sm:px-5 sm:pb-5">
                     {values.map((v) => (
                       <div
                         key={v.title}
@@ -554,7 +554,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
               onMouseEnter={() => setBlindspotsHovered(true)}
               onMouseLeave={() => setBlindspotsHovered(false)}
             >
-              <div className="flex items-center justify-between px-5 py-4">
+              <div className="flex items-center justify-between px-3 py-3 sm:px-5 sm:py-4">
                 <span className="text-sm font-semibold tracking-wider uppercase" style={{ color: theme.text }}>
                   人际关系
                 </span>
@@ -579,7 +579,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                   maxHeight: blindspotsContentOpen ? '600px' : '0px',
                 }}
               >
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 px-5 pb-5">
+                <div className="grid grid-cols-1 gap-3 md:gap-4 px-3 pb-3 sm:px-5 sm:pb-5">
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: '#5E8268' }} />

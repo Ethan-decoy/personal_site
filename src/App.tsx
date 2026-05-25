@@ -880,7 +880,7 @@ function SliderTrack({ progress, accent, accentLight }: { progress: number; acce
   return (
     <div
       ref={trackRef}
-      className="flex flex-col items-center gap-1.5 cursor-pointer py-1"
+      className="flex flex-col items-center gap-[2px] cursor-pointer py-1"
       onMouseDown={(e) => handleStart(e.clientY)}
     >
       {Array.from({ length: NUM_SEGMENTS }).map((_, i) => {

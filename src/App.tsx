@@ -1090,16 +1090,6 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
 
           {/* 主内容：阅读区 */}
           <div className="flex-1 max-w-[720px] w-full relative">
-            {/* 进度条：阅读区顶部 */}
-            {selectedNote && (
-              <div className="absolute -top-6 left-0 right-0 h-0.5 rounded-full overflow-hidden" style={{ backgroundColor: theme.borderLight }}>
-                <div
-                  className="h-full rounded-full transition-[width] duration-150 ease-out"
-                  style={{ width: `${progress}%`, backgroundColor: theme.accent }}
-                />
-              </div>
-            )}
-
             {selectedNote ? (
               <div key={selectedNote.title} style={{ animation: 'fade-up 0.5s ease-out both', animationDelay: '0ms' }}>
                 <div className="mb-10 pb-6" style={{ borderBottom: `1px solid ${theme.borderLight}` }}>
@@ -1107,31 +1097,6 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
                   <span className="text-xs font-mono" style={{ color: theme.textSec, opacity: 0.4 }}>{selectedNote.date}</span>
                 </div>
                 <MarkdownPreview content={selectedNote.content} theme={theme} />
-
-                {/* 底部：进度 + 返回顶部 */}
-                <div className="flex items-center justify-between mt-16 pt-4" style={{ borderTop: `1px solid ${theme.borderLight}` }}>
-                  <div className="flex-1 h-1 rounded-full mr-4" style={{ backgroundColor: theme.borderLight }}>
-                    <div
-                      className="h-full rounded-full transition-[width] duration-150 ease-out"
-                      style={{ width: `${progress}%`, backgroundColor: theme.accent }}
-                    />
-                  </div>
-                  <button
-                    aria-label="返回顶部"
-                    onClick={scrollToTop}
-                    className="w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out shrink-0"
-                    style={{
-                      backgroundColor: theme.bgDeep,
-                      border: `1px solid ${theme.border}`,
-                      opacity: showBackTop ? 1 : 0,
-                      pointerEvents: showBackTop ? 'auto' : 'none',
-                    }}
-                  >
-                    <svg className="w-3.5 h-3.5" style={{ color: theme.textSec }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M4 10l4-4 4 4" />
-                    </svg>
-                  </button>
-                </div>
               </div>
             ) : (
               <div className="flex items-center justify-center h-48">
@@ -1141,6 +1106,32 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
               </div>
             )}
           </div>
+
+          {/* 右侧固定：进度条 + 返回顶部 */}
+          {selectedNote && (
+            <div className="hidden md:flex flex-col items-center gap-4 fixed z-40" style={{ right: 'calc(50vw - 440px)', top: '50%', transform: 'translateY(-50%)' }}>
+              <div className="w-1 h-48 rounded-full overflow-hidden" style={{ backgroundColor: theme.borderLight }}>
+                <div
+                  className="w-full rounded-full transition-[height] duration-150 ease-out"
+                  style={{ height: `${progress}%`, backgroundColor: theme.accent }}
+                />
+              </div>
+              <button
+                aria-label="返回顶部"
+                onClick={scrollToTop}
+                className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out"
+                style={{
+                  backgroundColor: theme.bgDeep,
+                  border: `1px solid ${theme.border}`,
+                  opacity: showBackTop ? 1 : 0.3,
+                }}
+              >
+                <svg className="w-3 h-3" style={{ color: theme.textSec }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M4 10l4-4 4 4" />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

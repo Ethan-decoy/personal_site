@@ -1110,7 +1110,7 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
 
             {/* 右侧工具栏：sticky 吸附 */}
             {selectedNote && (
-              <div className="hidden md:flex flex-col items-center sticky top-[50vh] ml-32">
+              <div className="hidden md:flex flex-col items-center sticky top-[25vh] ml-32">
                 <div className="flex flex-col-reverse gap-[3px]">
                   {Array.from({ length: 20 }, (_, i) => {
                     const filled = (i + 1) * 5 <= progress
@@ -1119,8 +1119,8 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
                         key={i}
                         className="transition-all duration-200 ease-out"
                         style={{
-                          width: '2px',
-                          height: '12px',
+                          width: '16px',
+                          height: '2px',
                           borderRadius: '1px',
                           backgroundColor: filled ? theme.accent : `${theme.accent}18`,
                         }}
@@ -1128,7 +1128,7 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
                     )
                   })}
                 </div>
-                <div className="mt-12">
+                <div className="mt-16">
                   <button
                     aria-label="返回顶部"
                     onClick={scrollToTop}

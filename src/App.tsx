@@ -1088,50 +1088,52 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
             </div>
           </div>
 
-          {/* 主内容：阅读区 */}
-          <div className="flex-1 max-w-[720px] w-full relative">
-            {selectedNote ? (
-              <div key={selectedNote.title} style={{ animation: 'fade-up 0.5s ease-out both', animationDelay: '0ms' }}>
-                <div className="mb-10 pb-6" style={{ borderBottom: `1px solid ${theme.borderLight}` }}>
-                  <h3 className="text-xl font-bold tracking-tight mb-2" style={{ color: theme.text }}>{selectedNote.title}</h3>
-                  <span className="text-xs font-mono" style={{ color: theme.textSec, opacity: 0.4 }}>{selectedNote.date}</span>
+          {/* 主内容 + 右侧工具栏 */}
+          <div className="flex gap-8 items-start">
+            <div className="flex-1 max-w-[720px] w-full">
+              {selectedNote ? (
+                <div key={selectedNote.title} style={{ animation: 'fade-up 0.5s ease-out both', animationDelay: '0ms' }}>
+                  <div className="mb-10 pb-6" style={{ borderBottom: `1px solid ${theme.borderLight}` }}>
+                    <h3 className="text-xl font-bold tracking-tight mb-2" style={{ color: theme.text }}>{selectedNote.title}</h3>
+                    <span className="text-xs font-mono" style={{ color: theme.textSec, opacity: 0.4 }}>{selectedNote.date}</span>
+                  </div>
+                  <MarkdownPreview content={selectedNote.content} theme={theme} />
                 </div>
-                <MarkdownPreview content={selectedNote.content} theme={theme} />
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-48">
-                <p className="text-sm" style={{ color: theme.textSec, opacity: 0.3 }}>
-                  选择一篇笔记开始阅读
-                </p>
+              ) : (
+                <div className="flex items-center justify-center h-48">
+                  <p className="text-sm" style={{ color: theme.textSec, opacity: 0.3 }}>
+                    选择一篇笔记开始阅读
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* 右侧工具栏：sticky 吸附 */}
+            {selectedNote && (
+              <div className="hidden md:flex flex-col items-center gap-4 sticky top-[50vh] shrink-0" style={{ width: '24px' }}>
+                <div className="w-1 h-48 rounded-full overflow-hidden" style={{ backgroundColor: theme.borderLight }}>
+                  <div
+                    className="w-full rounded-full transition-[height] duration-150 ease-out"
+                    style={{ height: `${progress}%`, backgroundColor: theme.accent }}
+                  />
+                </div>
+                <button
+                  aria-label="返回顶部"
+                  onClick={scrollToTop}
+                  className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out shrink-0"
+                  style={{
+                    backgroundColor: theme.bgDeep,
+                    border: `1px solid ${theme.border}`,
+                    opacity: showBackTop ? 1 : 0.3,
+                  }}
+                >
+                  <svg className="w-3 h-3" style={{ color: theme.textSec }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M4 10l4-4 4 4" />
+                  </svg>
+                </button>
               </div>
             )}
           </div>
-
-          {/* 右侧固定：进度条 + 返回顶部 */}
-          {selectedNote && (
-            <div className="hidden md:flex flex-col items-center gap-4 fixed z-40" style={{ right: 'calc(50vw - 440px)', top: '50%', transform: 'translateY(-50%)' }}>
-              <div className="w-1 h-48 rounded-full overflow-hidden" style={{ backgroundColor: theme.borderLight }}>
-                <div
-                  className="w-full rounded-full transition-[height] duration-150 ease-out"
-                  style={{ height: `${progress}%`, backgroundColor: theme.accent }}
-                />
-              </div>
-              <button
-                aria-label="返回顶部"
-                onClick={scrollToTop}
-                className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out"
-                style={{
-                  backgroundColor: theme.bgDeep,
-                  border: `1px solid ${theme.border}`,
-                  opacity: showBackTop ? 1 : 0.3,
-                }}
-              >
-                <svg className="w-3 h-3" style={{ color: theme.textSec }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M4 10l4-4 4 4" />
-                </svg>
-              </button>
-            </div>
-          )}
         </div>
       )}
     </div>

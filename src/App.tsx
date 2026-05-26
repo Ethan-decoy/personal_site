@@ -177,7 +177,7 @@ function HomePage({ theme, onNavigate }: { theme: Theme; onNavigate: (s: Section
                 />
               </span>
               <p className="text-xs font-semibold tracking-[0.2em] uppercase" style={{ color: theme.accent }}>
-                当前在构建个人网站
+                正在尝试驯服 Python
               </p>
             </div>
 

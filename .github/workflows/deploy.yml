@@ -31,7 +31,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
         env:
-          BASE_URL: /personal_site/
+          BASE_URL: /
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

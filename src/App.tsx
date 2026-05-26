@@ -378,7 +378,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                   { label: '位置', value: '中国' },
                   { label: '语言', value: '中文（母语），English（B1）' },
                   { label: 'MBTI', value: 'INTJ-T' },
-                  { label: '当前', value: '构建并部署个人网站' },
+                  { label: '当前', value: '学习 ROS2' },
                 ].map((item) => (
                   <div key={item.label}>
                     <p className="text-xs tracking-wider uppercase mb-1" style={{ color: theme.text }}>{item.label}</p>

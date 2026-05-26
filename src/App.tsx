@@ -702,7 +702,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                 {
                   role: '图像算法工程师',
                   company: '深圳市振华兴智能',
-                  period: '2024 — 至今',
+                  period: '2025 — 至今',
                   details: [
                     '负责 3D-AOI 工业视觉软件的点云处理模块开发',
                     '使用 C++/OpenCV/Eigen 实现相位解包裹与点云重建算法',

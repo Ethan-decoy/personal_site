@@ -908,7 +908,7 @@ function SliderTrack({ progress, accent, accentLight }: { progress: number; acce
 
 /* ==================== Notes Page ==================== */
 
-import { treeData, modules } from './notes'
+import { treeData, modules, indexMap, searchNotes, getSuggestions, parseFrontmatter } from './notes'
 
 function parseMarkdownBody(raw: string) {
   raw = raw.replace(/\r\n/g, '\n')
@@ -1014,14 +1014,187 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
   )
 }
 
-function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }) {
-  const [expandedCats, setExpandedCats] = useState<Record<string, boolean>>(
-    treeData.length > 0 ? { [treeData[0].key]: true } : {}
+/* ---- Nested Tree Node ---- */
+interface FileNode { title: string; date: string; order?: number; file: string }
+interface TreeNode { key: string; title: string; children: (TreeNode | FileNode)[]; isDir: boolean }
+
+function buildNestedTree(): TreeNode[] {
+  const root: Record<string, any> = {}
+  for (const file of Object.keys(modules)) {
+    if (file.endsWith('/_index.md')) continue
+    const parts = file.replace(/^\.\//, '').split('/')
+    let node = root
+    for (let i = 0; i < parts.length - 1; i++) {
+      const p = parts[i]
+      const k = parts.slice(0, i + 1).join('/')
+      if (!node[k]) node[k] = { key: k, title: p, children: {} }
+      node = node[k].children
+    }
+    const fname = parts[parts.length - 1]
+    node[fname] = { file }
+  }
+
+  function walk(obj: Record<string, any>): TreeNode[] {
+    const keys = Object.keys(obj).filter((k) => k !== 'file')
+    return keys.map((k) => {
+      const v = obj[k]
+      if ('file' in v) {
+        // This is a file entry — shouldn't happen at dir level, skip
+        return null as any
+      }
+      const fileChildren = walk(v.children || {})
+      const hasIndex = !!indexMap[v.key]
+      return {
+        key: v.key,
+        title: hasIndex ? indexMap[v.key].title : v.title,
+        children: fileChildren.length > 0 ? fileChildren : [],
+        isDir: true,
+      }
+    }).filter(Boolean)
+  }
+  return walk(root)
+}
+
+const nestedTree = buildNestedTree()
+
+function flattenTree(nodes: TreeNode[]): FileNode[] {
+  const result: FileNode[] = []
+  for (const n of nodes) {
+    if (!n.isDir) {
+      const fm = parseFrontmatter(modules[(n as any).file] || '')
+      result.push({ title: fm.title, date: fm.date, order: fm.order, file: (n as any).file })
+    } else {
+      for (const c of n.children) {
+        if (!(c as TreeNode).isDir) {
+          const fm = parseFrontmatter(modules[(c as any).file] || '')
+          result.push({ title: fm.title, date: fm.date, order: fm.order, file: (c as any).file })
+        }
+      }
+    }
+  }
+  return result
+}
+
+/* ---- Recursive Sidebar Node ---- */
+function SidebarNode({
+  node, theme, depth,
+  expandedKeys, onToggle, selectedFile, onOpen,
+}: {
+  node: TreeNode; theme: Theme; depth: number;
+  expandedKeys: Set<string>; onToggle: (key: string) => void;
+  selectedFile: string | null; onOpen: (file: string, title: string) => void;
+}) {
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
+  const expanded = expandedKeys.has(node.key)
+
+  // Collect files in this node
+  const fileChildren: { title: string; date: string; order?: number; file: string }[] = []
+  const dirChildren: TreeNode[] = []
+  for (const c of node.children) {
+    if ((c as TreeNode).isDir) dirChildren.push(c as TreeNode)
+    else {
+      const fm = parseFrontmatter(modules[(c as any).file] || '')
+      fileChildren.push({ title: fm.title, date: fm.date, order: fm.order, file: (c as any).file })
+    }
+  }
+  fileChildren.sort((a, b) => {
+    if (a.order !== undefined && b.order !== undefined) return a.order - b.order
+    if (a.order !== undefined) return -1
+    if (b.order !== undefined) return 1
+    return a.title.localeCompare(b.title)
+  })
+
+  const hasContent = fileChildren.length > 0 || dirChildren.length > 0 || indexMap[node.key]
+
+  return (
+    <div style={{ marginLeft: depth > 0 ? 12 : 0 }}>
+      {/* Directory row */}
+      <div
+        className="flex items-center gap-1.5 w-full py-1.5 text-left cursor-pointer rounded-r transition-colors duration-150"
+        style={{
+          backgroundColor: selectedFile && indexMap[node.key] && selectedFile === `./${node.key}/_index.md` ? theme.accentLight : 'transparent',
+        }}
+        onClick={() => {
+          if (hasContent) onToggle(node.key)
+          if (indexMap[node.key]) {
+            const idx = indexMap[node.key]
+            onOpen(`./${node.key}/_index.md`, idx.title)
+          }
+        }}
+      >
+        <svg
+          className="w-2.5 h-2.5 transition-transform duration-200 ease-out shrink-0"
+          style={{
+            transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)',
+            color: theme.accent,
+            opacity: hasContent ? 1 : 0.15,
+          }}
+          viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"
+        >
+          <path d="M6 4l4 4-4 4" />
+        </svg>
+        <span
+          className="text-xs font-semibold uppercase tracking-wider truncate"
+          style={{ color: theme.text, fontSize: depth > 0 ? '0.6rem' : undefined }}
+        >
+          {node.title}
+        </span>
+      </div>
+
+      {/* Expanded children */}
+      <div
+        className="overflow-hidden"
+        style={{
+          transition: 'max-height 0.4s ease-out, opacity 0.3s ease-out',
+          maxHeight: expanded ? '800px' : '0px',
+          opacity: expanded ? 1 : 0,
+        }}
+      >
+        {/* File children */}
+        {fileChildren.length > 0 && (
+          <div style={{ borderLeft: `1px solid ${theme.border}`, marginLeft: 10 }}>
+            {fileChildren.map((f, i) => (
+              <div
+                key={f.file}
+                className="py-1 pl-3 pr-2 cursor-pointer text-sm transition-colors duration-200 rounded-r"
+                style={{
+                  backgroundColor: selectedFile === f.file ? theme.accentLight : (hoveredIdx === i ? theme.accentLight + '60' : 'transparent'),
+                  color: selectedFile === f.file ? theme.text : theme.textSec,
+                }}
+                onClick={() => onOpen(f.file, f.title)}
+                onMouseEnter={() => setHoveredIdx(i)}
+                onMouseLeave={() => setHoveredIdx(null)}
+              >
+                {f.title}
+              </div>
+            ))}
+          </div>
+        )}
+        {/* Dir children */}
+        {dirChildren.map((d) => (
+          <SidebarNode
+            key={d.key} node={d} theme={theme} depth={depth + 1}
+            expandedKeys={expandedKeys} onToggle={onToggle}
+            selectedFile={selectedFile} onOpen={onOpen}
+          />
+        ))}
+      </div>
+    </div>
   )
+}
+
+function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }) {
+  const [expandedKeys, setExpandedKeys] = useState<Set<string>>(() => {
+    const s = new Set<string>()
+    if (nestedTree.length > 0) s.add(nestedTree[0].key)
+    return s
+  })
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
-  const [selectedNote, setSelectedNote] = useState<{ title: string; date: string; content: string } | null>(null)
+  const [selectedNote, setSelectedNote] = useState<{ title: string; date: string; content: string; file: string } | null>(null)
   const [showBackTop, setShowBackTop] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchFocused, setSearchFocused] = useState(false)
 
   useEffect(() => {
     const onScroll = () => {
@@ -1036,20 +1209,30 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
-  const toggleCat = (key: string) => {
-    setSelectedNote(null)
-    setExpandedCats((prev) => ({ ...prev, [key]: !prev[key] }))
-  }
-
-  const openNote = (note: { title: string; date: string; file: string }) => {
-    const raw = modules[note.file]
-    if (!raw) return
-    setSelectedNote({
-      title: note.title,
-      date: note.date,
-      content: parseMarkdownBody(raw),
+  const toggleKey = (key: string) => {
+    setExpandedKeys((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key); else next.add(key)
+      return next
     })
   }
+
+  const openNote = (file: string, title: string) => {
+    const raw = modules[file]
+    if (!raw) return
+    const fm = parseFrontmatter(raw)
+    setSelectedNote({
+      title: fm.title || title,
+      date: fm.date,
+      content: parseMarkdownBody(raw),
+      file,
+    })
+    setSearchQuery('')
+    setSearchFocused(false)
+  }
+
+  const suggestions = searchFocused && searchQuery ? getSuggestions(searchQuery) : []
+  const searchResults = searchQuery ? searchNotes(searchQuery) : []
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-24 md:py-32">
@@ -1066,8 +1249,71 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
         </div>
       ) : (
         <div className="mt-8 flex flex-col gap-6 md:gap-8" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
-          {/* 侧边栏：分类树 */}
-          <div className="w-full md:w-44 md:shrink-0" style={{ color: theme.textSec }}>
+          {/* 侧边栏：搜索 + 分类树 */}
+          <div className="w-full md:w-48 md:shrink-0" style={{ color: theme.textSec }}>
+            {/* 搜索框 */}
+            <div className="relative mb-3">
+              <input
+                type="text"
+                placeholder="搜索笔记..."
+                className="w-full px-3 py-2 text-sm rounded-xl outline-none transition-all duration-200"
+                style={{
+                  backgroundColor: theme.bgDeep,
+                  border: `1px solid ${searchFocused ? theme.accent : theme.border}`,
+                  color: theme.text,
+                }}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+              />
+              {/* 自动补全下拉 */}
+              {suggestions.length > 0 && (
+                <div
+                  className="absolute top-full left-0 right-0 mt-1 rounded-xl overflow-hidden z-50"
+                  style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}`, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                >
+                  {suggestions.map((s, i) => (
+                    <div
+                      key={s}
+                      className="px-3 py-2 text-sm cursor-pointer transition-colors duration-100"
+                      style={{
+                        backgroundColor: i === 0 ? theme.accentLight : 'transparent',
+                        color: theme.textSec,
+                      }}
+                      onMouseDown={() => openNote(
+                        Object.entries(modules).find(([, raw]) => parseFrontmatter(raw).title === s)?.[0] || '',
+                        s
+                      )}
+                    >
+                      {s}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* 搜索结果列表 */}
+            {searchQuery && searchResults.length > 0 && (
+              <div className="mb-3 rounded-xl p-2" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}` }}>
+                <p className="text-[10px] uppercase tracking-wider mb-1 px-1" style={{ color: theme.textSec, opacity: 0.4 }}>
+                  {searchResults.length} 条结果
+                </p>
+                {searchResults.slice(0, 8).map((r) => (
+                  <div
+                    key={r.file}
+                    className="px-2 py-1.5 text-sm cursor-pointer rounded transition-colors duration-100"
+                    style={{ color: theme.textSec }}
+                    onClick={() => openNote(r.file, r.title)}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.accentLight }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent' }}
+                  >
+                    {r.title}
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* 手机端折叠/展开按钮 */}
             <button
               className="md:hidden flex items-center justify-between w-full py-3 px-4 rounded-xl mb-2"
@@ -1079,79 +1325,22 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
               </span>
               <svg
                 className="w-3 h-3 transition-transform duration-200 ease-out"
-                style={{
-                  transform: mobileSidebarOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-                  color: theme.accent,
-                }}
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
+                style={{ transform: mobileSidebarOpen ? 'rotate(90deg)' : 'rotate(0deg)', color: theme.accent }}
+                viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"
               >
                 <path d="M6 4l4 4-4 4" />
               </svg>
             </button>
 
-            {/* 树内容：桌面端始终可见，手机端可折叠 */}
+            {/* 树内容 */}
             <div className={mobileSidebarOpen ? 'block' : 'hidden md:block'}>
-            {treeData.map((cat, idx) => (
-              <div key={cat.key} style={{ animationDelay: `${200 + idx * 80}ms` }}>
-                <button
-                  className="flex items-center gap-2 w-full py-2 text-left cursor-pointer group"
-                  onClick={() => toggleCat(cat.key)}
-                >
-                  <svg
-                    className="w-3 h-3 transition-transform duration-200 ease-out shrink-0"
-                    style={{
-                      transform: expandedCats[cat.key] ? 'rotate(90deg)' : 'rotate(0deg)',
-                      color: theme.accent,
-                    }}
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  >
-                    <path d="M6 4l4 4-4 4" />
-                  </svg>
-                  <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: theme.text }}>
-                    {cat.title}
-                  </span>
-                  <span className="text-[10px] ml-auto" style={{ color: theme.textSec, opacity: 0.3 }}>
-                    {cat.children.length}
-                  </span>
-                </button>
-                <div
-                  className="overflow-hidden"
-                  style={{
-                    transition: 'max-height 0.5s ease-out, opacity 0.4s ease-out',
-                    maxHeight: expandedCats[cat.key] ? '400px' : '0px',
-                    opacity: expandedCats[cat.key] ? 1 : 0,
-                  }}
-                >
-                  <div className="py-1" style={{ borderLeft: `1px solid ${theme.border}`, marginLeft: '10px' }}>
-                    {cat.children.map((note) => (
-                      <div
-                        key={note.title}
-                        className="py-1.5 pl-3 pr-2 cursor-pointer text-sm transition-colors duration-200 rounded-r"
-                        style={{
-                          backgroundColor: selectedNote?.title === note.title ? theme.accentLight : 'transparent',
-                          color: selectedNote?.title === note.title ? theme.text : theme.textSec,
-                        }}
-                        onClick={() => openNote(note)}
-                        onMouseEnter={(e) => {
-                          if (selectedNote?.title !== note.title) e.currentTarget.style.backgroundColor = theme.accentLight
-                        }}
-                        onMouseLeave={(e) => {
-                          if (selectedNote?.title !== note.title) e.currentTarget.style.backgroundColor = 'transparent'
-                        }}
-                      >
-                        {note.title}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
+              {!searchQuery && nestedTree.map((node) => (
+                <SidebarNode
+                  key={node.key} node={node} theme={theme} depth={0}
+                  expandedKeys={expandedKeys} onToggle={toggleKey}
+                  selectedFile={selectedNote?.file || null} onOpen={openNote}
+                />
+              ))}
             </div>
           </div>
 
@@ -1159,7 +1348,7 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
           <div className="flex items-start">
             <div className="flex-1 max-w-[720px] w-full">
               {selectedNote ? (
-                <div key={selectedNote.title} style={{ animation: 'fade-up 0.5s ease-out both', animationDelay: '0ms' }}>
+                <div key={selectedNote.file} style={{ animation: 'fade-up 0.5s ease-out both', animationDelay: '0ms' }}>
                   <div className="mb-10 pb-6" style={{ borderBottom: `1px solid ${theme.borderLight}` }}>
                     <h3 className="text-xl font-bold tracking-tight mb-2" style={{ color: theme.text }}>{selectedNote.title}</h3>
                     <span className="text-xs font-mono" style={{ color: theme.textSec, opacity: 0.4 }}>{selectedNote.date}</span>
@@ -1178,11 +1367,7 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
             {/* 右侧工具栏：sticky 吸附 */}
             {selectedNote && (
               <div className="hidden md:flex flex-col items-center sticky top-[37vh] ml-32">
-                <SliderTrack
-                  progress={progress}
-                  accent={theme.accent}
-                  accentLight={theme.accentLight}
-                />
+                <SliderTrack progress={progress} accent={theme.accent} accentLight={theme.accentLight} />
                 <div className="mt-12">
                   <button
                     aria-label="返回顶部"

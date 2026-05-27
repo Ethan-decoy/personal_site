@@ -1057,24 +1057,6 @@ function buildNestedTree(): TreeNode[] {
 
 const nestedTree = buildNestedTree()
 
-function flattenTree(nodes: TreeNode[]): FileNode[] {
-  const result: FileNode[] = []
-  for (const n of nodes) {
-    if (!n.isDir) {
-      const fm = parseFrontmatter(modules[(n as any).file] || '')
-      result.push({ title: fm.title, date: fm.date, order: fm.order, file: (n as any).file })
-    } else {
-      for (const c of n.children) {
-        if (!(c as TreeNode).isDir) {
-          const fm = parseFrontmatter(modules[(c as any).file] || '')
-          result.push({ title: fm.title, date: fm.date, order: fm.order, file: (c as any).file })
-        }
-      }
-    }
-  }
-  return result
-}
-
 /* ---- Recursive Sidebar Node ---- */
 function SidebarNode({
   node, theme, depth,

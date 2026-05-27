@@ -1034,23 +1034,27 @@ function buildNestedTree(): TreeNode[] {
     node[fname] = { file }
   }
 
-  function walk(obj: Record<string, any>): TreeNode[] {
-    const keys = Object.keys(obj).filter((k) => k !== 'file')
-    return keys.map((k) => {
+  function walk(obj: Record<string, any>): (TreeNode | FileNode)[] {
+    const results: (TreeNode | FileNode)[] = []
+    for (const k of Object.keys(obj)) {
       const v = obj[k]
       if ('file' in v) {
-        // This is a file entry — shouldn't happen at dir level, skip
-        return null as any
+        // File entry
+        const fm = parseFrontmatter(modules[v.file] || '')
+        results.push({ title: fm.title, date: fm.date, order: fm.order, file: v.file })
+      } else if ('key' in v) {
+        // Directory entry — recurse
+        const children = walk(v.children || {})
+        const hasIndex = !!indexMap[v.key]
+        results.push({
+          key: v.key,
+          title: hasIndex ? indexMap[v.key].title : v.title,
+          children,
+          isDir: true,
+        })
       }
-      const fileChildren = walk(v.children || {})
-      const hasIndex = !!indexMap[v.key]
-      return {
-        key: v.key,
-        title: hasIndex ? indexMap[v.key].title : v.title,
-        children: fileChildren.length > 0 ? fileChildren : [],
-        isDir: true,
-      }
-    }).filter(Boolean)
+    }
+    return results
   }
   return walk(root)
 }

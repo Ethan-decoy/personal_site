@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type ReactNode } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 
 /* ==================== Themes ==================== */
 
@@ -841,71 +841,6 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
   )
 }
 
-/* ==================== Slider Track ==================== */
-
-const NUM_SEGMENTS = 60
-
-function SliderTrack({ progress, accent, accentLight }: { progress: number; accent: string; accentLight: string }) {
-  const trackRef = useRef<HTMLDivElement>(null)
-  const [dragging, setDragging] = useState(false)
-
-  const scrollToRatio = (ratio: number) => {
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight
-    window.scrollTo({ top: ratio * docHeight, behavior: dragging ? 'auto' : 'smooth' })
-  }
-
-  const handleStart = (clientY: number) => {
-    if (!trackRef.current) return
-    const rect = trackRef.current.getBoundingClientRect()
-    const ratio = Math.max(0, Math.min((clientY - rect.top) / rect.height, 1))
-    scrollToRatio(ratio)
-    setDragging(true)
-  }
-
-  useEffect(() => {
-    if (!dragging) return
-    const onMove = (e: MouseEvent) => {
-      e.preventDefault()
-      handleStart(e.clientY)
-    }
-    const onUp = () => setDragging(false)
-    window.addEventListener('mousemove', onMove, { passive: false })
-    window.addEventListener('mouseup', onUp)
-    return () => {
-      window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('mouseup', onUp)
-    }
-  }, [dragging])
-
-  const currentIdx = Math.round((progress / 100) * (NUM_SEGMENTS - 1))
-
-  return (
-    <div
-      ref={trackRef}
-      className="flex flex-col items-center gap-[2px] cursor-pointer py-1"
-      onMouseDown={(e) => handleStart(e.clientY)}
-    >
-      {Array.from({ length: NUM_SEGMENTS }).map((_, i) => {
-        const dist = Math.abs(i - currentIdx)
-        const isCurrent = i === currentIdx
-        return (
-          <div
-            key={i}
-            className="rounded-full transition-all duration-150 ease-out"
-            style={{
-              width: '16px',
-              height: '2px',
-              backgroundColor: accent,
-              opacity: isCurrent ? 1 : Math.max(0.08, 1 - dist * 0.18),
-              boxShadow: isCurrent ? `0 0 0 3px ${accentLight}` : 'none',
-            }}
-          />
-        )
-      })}
-    </div>
-  )
-}
-
 /* ==================== Notes Page ==================== */
 
 import { treeData, modules, indexMap, searchNotes, getSuggestions, parseFrontmatter } from './notes'
@@ -1180,23 +1115,8 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
   })
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [selectedNote, setSelectedNote] = useState<{ title: string; date: string; content: string; file: string } | null>(null)
-  const [showBackTop, setShowBackTop] = useState(false)
-  const [progress, setProgress] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
-
-  useEffect(() => {
-    const onScroll = () => {
-      const scrollTop = window.scrollY
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight
-      setShowBackTop(scrollTop > 300)
-      setProgress(docHeight > 0 ? Math.min(scrollTop / docHeight * 100, 100) : 0)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
   const toggleKey = (key: string) => {
     setExpandedKeys((prev) => {
@@ -1237,9 +1157,9 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
           </p>
         </div>
       ) : (
-        <div className="mt-8 flex flex-col gap-6 md:gap-8" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
-          {/* 侧边栏：搜索 + 分类树 */}
-          <div className="w-full md:w-48 md:shrink-0" style={{ color: theme.textSec }}>
+        <div className="mt-8 flex gap-6 md:gap-8" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
+          {/* 左侧栏：搜索 + 分类树 */}
+          <div className="w-full md:w-56 md:shrink-0" style={{ color: theme.textSec }}>
             {/* 搜索框 */}
             <div className="relative mb-3">
               <input
@@ -1333,46 +1253,21 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
             </div>
           </div>
 
-          {/* 主内容 + 右侧工具栏 */}
-          <div className="flex items-start">
-            <div className="flex-1 max-w-[720px] w-full">
-              {selectedNote ? (
-                <div key={selectedNote.file} style={{ animation: 'fade-up 0.5s ease-out both', animationDelay: '0ms' }}>
-                  <div className="mb-10 pb-6" style={{ borderBottom: `1px solid ${theme.borderLight}` }}>
-                    <h3 className="text-xl font-bold tracking-tight mb-2" style={{ color: theme.text }}>{selectedNote.title}</h3>
-                    <span className="text-xs font-mono" style={{ color: theme.textSec, opacity: 0.4 }}>{selectedNote.date}</span>
-                  </div>
-                  <MarkdownPreview content={selectedNote.content} theme={theme} />
+          {/* 右侧：笔记详情 */}
+          <div className="flex-1 min-w-0">
+            {selectedNote ? (
+              <div key={selectedNote.file} style={{ animation: 'fade-up 0.5s ease-out both', animationDelay: '0ms' }}>
+                <div className="mb-10 pb-6" style={{ borderBottom: `1px solid ${theme.borderLight}` }}>
+                  <h3 className="text-xl font-bold tracking-tight mb-2" style={{ color: theme.text }}>{selectedNote.title}</h3>
+                  <span className="text-xs font-mono" style={{ color: theme.textSec, opacity: 0.4 }}>{selectedNote.date}</span>
                 </div>
-              ) : (
-                <div className="flex items-center justify-center h-48">
-                  <p className="text-sm" style={{ color: theme.textSec, opacity: 0.3 }}>
-                    选择一篇笔记开始阅读
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* 右侧工具栏：sticky 吸附 */}
-            {selectedNote && (
-              <div className="hidden md:flex flex-col items-center sticky top-[37vh] ml-32">
-                <SliderTrack progress={progress} accent={theme.accent} accentLight={theme.accentLight} />
-                <div className="mt-12">
-                  <button
-                    aria-label="返回顶部"
-                    onClick={scrollToTop}
-                    className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out"
-                    style={{
-                      backgroundColor: theme.bgDeep,
-                      border: `1px solid ${theme.border}`,
-                      opacity: showBackTop ? 1 : 0.2,
-                    }}
-                  >
-                    <svg className="w-3 h-3" style={{ color: theme.textSec }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M4 10l4-4 4 4" />
-                    </svg>
-                  </button>
-                </div>
+                <MarkdownPreview content={selectedNote.content} theme={theme} />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-48">
+                <p className="text-sm" style={{ color: theme.textSec, opacity: 0.3 }}>
+                  选择一篇笔记开始阅读
+                </p>
               </div>
             )}
           </div>

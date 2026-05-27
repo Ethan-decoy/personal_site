@@ -1018,6 +1018,10 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
 interface FileNode { title: string; date: string; order?: number; file: string }
 interface TreeNode { key: string; title: string; children: (TreeNode | FileNode)[]; isDir: boolean }
 
+function isTreeNode(node: TreeNode | FileNode): node is TreeNode {
+  return 'key' in node
+}
+
 function buildNestedTree(): TreeNode[] {
   const root: Record<string, any> = {}
   for (const file of Object.keys(modules)) {
@@ -1039,11 +1043,9 @@ function buildNestedTree(): TreeNode[] {
     for (const k of Object.keys(obj)) {
       const v = obj[k]
       if ('file' in v) {
-        // File entry
         const fm = parseFrontmatter(modules[v.file] || '')
         results.push({ title: fm.title, date: fm.date, order: fm.order, file: v.file })
       } else if ('key' in v) {
-        // Directory entry — recurse
         const children = walk(v.children || {})
         const hasIndex = !!indexMap[v.key]
         results.push({
@@ -1056,7 +1058,8 @@ function buildNestedTree(): TreeNode[] {
     }
     return results
   }
-  return walk(root)
+  // 顶层只返回目录节点
+  return walk(root).filter(isTreeNode)
 }
 
 const nestedTree = buildNestedTree()
@@ -1077,10 +1080,10 @@ function SidebarNode({
   const fileChildren: { title: string; date: string; order?: number; file: string }[] = []
   const dirChildren: TreeNode[] = []
   for (const c of node.children) {
-    if ((c as TreeNode).isDir) dirChildren.push(c as TreeNode)
+    if (isTreeNode(c)) dirChildren.push(c)
     else {
-      const fm = parseFrontmatter(modules[(c as any).file] || '')
-      fileChildren.push({ title: fm.title, date: fm.date, order: fm.order, file: (c as any).file })
+      const fm = parseFrontmatter(modules[c.file] || '')
+      fileChildren.push({ title: fm.title, date: fm.date, order: fm.order, file: c.file })
     }
   }
   fileChildren.sort((a, b) => {

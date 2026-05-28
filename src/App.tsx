@@ -1339,7 +1339,7 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
           </p>
         </div>
       ) : (
-        <div className="mt-8 flex gap-6 md:gap-8" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
+        <div className="mt-8 flex items-start gap-6 md:gap-8" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
           {/* 左侧栏：搜索 + 分类树 */}
           <div className="w-full md:w-56 md:shrink-0" style={{ color: theme.textSec }}>
             {/* 搜索框 */}

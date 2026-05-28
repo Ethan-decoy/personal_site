@@ -1241,34 +1241,20 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
     const style = document.createElement('style')
     style.id = id
     style.textContent = `
-      .hljs-theme-ocean .hljs { color: #2D2418; }
-      .hljs-theme-ocean .hljs-comment, .hljs-theme-ocean .hljs-quote { color: #7A6B5A; font-style: italic; }
-      .hljs-theme-ocean .hljs-keyword, .hljs-theme-ocean .hljs-selector-tag { color: #9B4B6B; }
-      .hljs-theme-ocean .hljs-string, .hljs-theme-ocean .hljs-template-variable, .hljs-theme-ocean .hljs-template-tag { color: #5A8F5A; }
-      .hljs-theme-ocean .hljs-number, .hljs-theme-ocean .hljs-literal { color: #8B6B3A; }
-      .hljs-theme-ocean .hljs-title, .hljs-theme-ocean .hljs-built_in, .hljs-theme-ocean .hljs-type { color: #4A7B8F; }
-      .hljs-theme-ocean .hljs-function, .hljs-theme-ocean .hljs-tag .hljs-name { color: #6B5BAF; }
-      .hljs-theme-ocean .hljs-attr, .hljs-theme-ocean .hljs-attribute { color: #4A6B8F; }
-      .hljs-theme-ocean .hljs-meta, .hljs-theme-ocean .hljs-doctype { color: #7A6B5A; }
-      .hljs-theme-ocean .hljs-bullet, .hljs-theme-ocean .hljs-link { color: #5A7F6B; }
+      .hljs-theme-ocean .hljs { color: #D4D4D4; }
+      .hljs-theme-ocean .hljs-comment, .hljs-theme-ocean .hljs-quote { color: #6A9955; font-style: italic; }
+      .hljs-theme-ocean .hljs-keyword, .hljs-theme-ocean .hljs-selector-tag { color: #569CD6; }
+      .hljs-theme-ocean .hljs-string, .hljs-theme-ocean .hljs-template-variable, .hljs-theme-ocean .hljs-template-tag { color: #CE9178; }
+      .hljs-theme-ocean .hljs-number, .hljs-theme-ocean .hljs-literal { color: #B5CEA8; }
+      .hljs-theme-ocean .hljs-title, .hljs-theme-ocean .hljs-built_in, .hljs-theme-ocean .hljs-type { color: #4EC9B0; }
+      .hljs-theme-ocean .hljs-function, .hljs-theme-ocean .hljs-tag .hljs-name { color: #DCDCAA; }
+      .hljs-theme-ocean .hljs-attr, .hljs-theme-ocean .hljs-attribute { color: #9CDCFE; }
+      .hljs-theme-ocean .hljs-meta, .hljs-theme-ocean .hljs-doctype { color: #9B9B9B; }
+      .hljs-theme-ocean .hljs-bullet, .hljs-theme-ocean .hljs-link { color: #6A9955; }
       .hljs-theme-ocean .hljs-emphasis { font-style: italic; }
       .hljs-theme-ocean .hljs-strong { font-weight: 600; }
-      .hljs-theme-ocean .hljs-deletion { color: #9B4B4B; }
-      .hljs-theme-ocean .hljs-addition { color: #4B8B4B; }
-      .fail-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 26px;
-        height: 26px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 700;
-        line-height: 1;
-        margin-right: 8px;
-        vertical-align: middle;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-      }
+      .hljs-theme-ocean .hljs-deletion { color: #D16969; }
+      .hljs-theme-ocean .hljs-addition { color: #6A9955; }
     `
     document.head.appendChild(style)
     return () => { style.remove() }

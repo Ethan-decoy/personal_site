@@ -122,8 +122,8 @@ body {
   --tw-prose-quote-borders: rgba(27, 58, 92, 0.4);
   --tw-prose-captions: #4A5D73;
   --tw-prose-code: #1B3A5C;
-  --tw-prose-pre-code: #E0DBD0;
-  --tw-prose-pre-bg: #EDE7DB;
+  --tw-prose-pre-code: #D4D4D4;
+  --tw-prose-pre-bg: #1A1F2E;
   --tw-prose-th-borders: rgba(15, 27, 45, 0.12);
   --tw-prose-td-borders: rgba(15, 27, 45, 0.12);
 }

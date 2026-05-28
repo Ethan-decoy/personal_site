@@ -857,11 +857,13 @@ function parseMarkdownBody(raw: string) {
 }
 
 function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) {
+  // v10 components receive { node, ...rest }, must strip `node` before spread
+  const C = (tag: string, className: string, style?: React.CSSProperties) =>
+    ({ children, ...rest }: { children?: React.ReactNode } & Record<string, unknown>) =>
+      React.createElement(tag, { className, ...rest, style }, children)
+
   return (
-    <div
-      className="max-w-2xl prose-note"
-      style={{ color: theme.text }}
-    >
+    <div className="max-w-2xl prose-note" style={{ color: theme.text }}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[
@@ -870,26 +872,50 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
           [rehypePrettyCode, { theme: 'min-light' }],
         ]}
         components={{
-          h1: (p) => <h1 className="text-2xl font-bold tracking-tight mt-8 mb-4" style={{ color: theme.text }} {...p} />,
-          h2: (p) => <h2 className="text-xl font-bold tracking-tight mt-8 mb-3" style={{ color: theme.text }} {...p} />,
-          h3: (p) => <h3 className="text-lg font-semibold mt-6 mb-2" style={{ color: theme.text }} {...p} />,
-          h4: (p) => <h4 className="text-base font-semibold mt-4 mb-2" style={{ color: theme.text }} {...p} />,
-          p: (p) => <p className="text-base leading-relaxed mb-4 last:mb-0" style={{ color: theme.text }} {...p} />,
-          a: (p) => <a className="underline transition-colors duration-150" style={{ color: theme.accent }} onMouseEnter={(e) => { (e.target as HTMLElement).style.color = theme.accentHover }} onMouseLeave={(e) => { (e.target as HTMLElement).style.color = theme.accent }} {...p} />,
-          ul: (p) => <ul className="list-disc list-inside space-y-1 mb-4 ml-2" style={{ color: theme.textSec }} {...p} />,
-          ol: (p) => <ol className="list-decimal list-inside space-y-1 mb-4 ml-2" style={{ color: theme.textSec }} {...p} />,
-          li: (p) => <li className="text-base leading-relaxed" style={{ color: theme.textSec }} {...p} />,
-          blockquote: (p) => <blockquote className="border-l-4 pl-4 italic mb-4" style={{ borderColor: theme.border, color: theme.textSec }} {...p} />,
-          code: (p) => {
-            const { inline, ...rest } = p as any
-            return <code className="px-1.5 py-0.5 rounded text-sm font-mono" style={{ backgroundColor: theme.accentLight, color: theme.accent }} {...rest} />
-          },
-          pre: (p) => <pre className="rounded-xl overflow-x-auto mb-4 p-4 text-sm font-mono leading-relaxed" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}` }} {...p} />,
-          table: (p) => <div className="overflow-x-auto mb-4"><table className="w-full text-sm border-collapse" style={{ borderColor: theme.border }} {...p} /></div>,
-          th: (p) => <th className="border px-3 py-2 text-left font-semibold" style={{ borderColor: theme.border, backgroundColor: theme.accentLight, color: theme.text }} {...p} />,
-          td: (p) => <td className="border px-3 py-2" style={{ borderColor: theme.border, color: theme.textSec }} {...p} />,
+          h1: C('h1', 'text-2xl font-bold tracking-tight mt-8 mb-4', { color: theme.text }),
+          h2: C('h2', 'text-xl font-bold tracking-tight mt-8 mb-3', { color: theme.text }),
+          h3: C('h3', 'text-lg font-semibold mt-6 mb-2', { color: theme.text }),
+          h4: C('h4', 'text-base font-semibold mt-4 mb-2', { color: theme.text }),
+          p: C('p', 'text-base leading-relaxed mb-4 last:mb-0', { color: theme.text }),
+          a: ({ children, ...rest }) => (
+            <a className="underline transition-colors duration-150" style={{ color: theme.accent }} {...rest}>
+              {children}
+            </a>
+          ),
+          ul: C('ul', 'list-disc list-inside space-y-1 mb-4 ml-2', { color: theme.textSec }),
+          ol: C('ol', 'list-decimal list-inside space-y-1 mb-4 ml-2', { color: theme.textSec }),
+          li: C('li', 'text-base leading-relaxed', { color: theme.textSec }),
+          blockquote: C('blockquote', 'border-l-4 pl-4 italic mb-4', {
+            borderColor: theme.border,
+            color: theme.textSec,
+          }),
+          code: ({ children, ...rest }: { children?: React.ReactNode } & Record<string, unknown>) => (
+            <code className="px-1.5 py-0.5 rounded text-sm font-mono" style={{ backgroundColor: theme.accentLight, color: theme.accent }} {...rest}>
+              {children}
+            </code>
+          ),
+          pre: ({ children, ...rest }: { children?: React.ReactNode } & Record<string, unknown>) => (
+            <pre className="rounded-xl overflow-x-auto mb-4 p-4 text-sm font-mono leading-relaxed" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}` }} {...rest}>
+              {children}
+            </pre>
+          ),
+          table: ({ children, ...rest }: { children?: React.ReactNode } & Record<string, unknown>) => (
+            <div className="overflow-x-auto mb-4">
+              <table className="w-full text-sm border-collapse" style={{ borderColor: theme.border }} {...rest}>
+                {children}
+              </table>
+            </div>
+          ),
+          th: C('th', 'border px-3 py-2 text-left font-semibold', {
+            borderColor: theme.border,
+            backgroundColor: theme.accentLight,
+            color: theme.text,
+          }),
+          td: C('td', 'border px-3 py-2', { borderColor: theme.border, color: theme.textSec }),
           hr: () => <div className="my-6 h-px" style={{ backgroundColor: theme.borderLight }} />,
-          img: (p) => <img className="rounded-lg max-w-full my-4" style={{ border: `1px solid ${theme.border}` }} {...p} />,
+          img: ({ ...rest }) => (
+            <img className="rounded-lg max-w-full my-4" style={{ border: `1px solid ${theme.border}` }} {...rest} />
+          ),
         }}
       >
         {content}

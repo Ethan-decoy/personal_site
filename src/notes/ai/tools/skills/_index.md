@@ -12,7 +12,7 @@ date: 2026-05-27
 
 | 编号 | 技能 | 用途 |
 |------|------|------|
-| 0 | [为什么需要这些技能](./engineering/why-these-skills.md) | 概述：为什么需要这些技能 |
+| 0 | [为什么需要这些技能](./why-these-skills.md) | 概述：为什么需要这些技能 |
 | 1 | [diagnose](./engineering/diagnose.md) | 复杂 bug 和性能回归的诊断循环 |
 | 2 | [grill-with-docs](./engineering/grill-with-docs.md) | 拷问式会话，结合领域文档更新 |
 | 3 | [triage](./engineering/triage.md) | 通过状态机分派问题 |

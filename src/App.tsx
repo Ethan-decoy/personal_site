@@ -912,11 +912,33 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
           h2: ({ children }) => <h2 className="text-xl font-bold tracking-tight mt-8 mb-3" style={{ color: theme.text }}>{children}</h2>,
           h3: ({ children }) => <h3 className="text-lg font-semibold mt-6 mb-2" style={{ color: theme.text }}>{children}</h3>,
           p: ({ children }) => <p className="text-base leading-relaxed mb-4 last:mb-0" style={{ color: theme.text }}>{children}</p>,
-          a: ({ children }) => (
-            <a className="underline transition-colors duration-150" style={{ color: theme.accent }} onMouseEnter={(e) => { (e.target as HTMLElement).style.color = theme.accentHover }} onMouseLeave={(e) => { (e.target as HTMLElement).style.color = theme.accent }}>
-              {children}
-            </a>
-          ),
+          a: ({ href, children }) => {
+            if (!href) return <span className="underline" style={{ color: theme.accent }}>{children}</span>
+            // external links → new tab
+            if (href.startsWith('http')) {
+              return (
+                <a href={href} target="_blank" rel="noopener noreferrer" className="underline transition-colors duration-150" style={{ color: theme.accent }} onMouseEnter={(e) => { (e.target as HTMLElement).style.color = theme.accentHover }} onMouseLeave={(e) => { (e.target as HTMLElement).style.color = theme.accent }}>
+                  {children}
+                </a>
+              )
+            }
+            // relative links → hash route to note
+            const noteFile = `./${href.replace(/^\.\/?/, '').replace(/\.md$/, '.md')}`
+            if (modules[noteFile]) {
+              const hash = `#notes/${noteFile}`
+              return (
+                <a href={hash} className="underline transition-colors duration-150" style={{ color: theme.accent }} onMouseEnter={(e) => { (e.target as HTMLElement).style.color = theme.accentHover }} onMouseLeave={(e) => { (e.target as HTMLElement).style.color = theme.accent }}>
+                  {children}
+                </a>
+              )
+            }
+            // internal anchors and fallback
+            return (
+              <a href={href} className="underline transition-colors duration-150" style={{ color: theme.accent }} onMouseEnter={(e) => { (e.target as HTMLElement).style.color = theme.accentHover }} onMouseLeave={(e) => { (e.target as HTMLElement).style.color = theme.accent }}>
+                {children}
+              </a>
+            )
+          },
           ul: ({ children }) => <ul className="list-disc list-inside space-y-1 mb-4 ml-2" style={{ color: theme.textSec }}>{children}</ul>,
           ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-4 ml-2" style={{ color: theme.textSec }}>{children}</ol>,
           li: ({ children }) => <li className="text-base leading-relaxed" style={{ color: theme.textSec }}>{children}</li>,
@@ -1152,6 +1174,32 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
     `
     document.head.appendChild(style)
     return () => { style.remove() }
+  }, [])
+
+  // Handle hash-based note navigation (from markdown internal links)
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash
+      const m = hash.match(/^#notes\/(\.\/.+\.md)$/)
+      if (m) {
+        const file = m[1]
+        const raw = modules[file]
+        if (raw) {
+          const fm = parseFrontmatter(raw)
+          setSelectedNote({ title: fm.title || file, date: fm.date, content: parseMarkdownBody(raw), file })
+          // auto-expand parent directories
+          const parts = file.replace(/^\.\//, '').split('/')
+          const newExpanded = new Set<string>()
+          for (let i = 0; i < parts.length - 1; i++) {
+            newExpanded.add(parts.slice(0, i + 1).join(' > '))
+          }
+          setExpandedKeys(newExpanded)
+        }
+      }
+    }
+    handleHash()
+    window.addEventListener('hashchange', handleHash)
+    return () => window.removeEventListener('hashchange', handleHash)
   }, [])
 
   const toggleKey = (key: string) => {

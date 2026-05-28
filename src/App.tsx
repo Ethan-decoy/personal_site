@@ -1435,7 +1435,7 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
                 <path d="M6 4l4 4-4 4" />
               </svg>
             </button>
-            <div className={mobileSidebarOpen ? 'block mb-6' : 'hidden md:block'}>
+            <div className={mobileSidebarOpen ? 'block mb-6' : 'hidden'}>
               <div className="relative mb-3">
                 <input type="text" placeholder="搜索笔记..." className="w-full px-3 py-2 text-sm rounded-xl outline-none transition-all duration-200" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${searchFocused ? theme.accent : theme.border}`, color: theme.text }} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onFocus={() => setSearchFocused(true)} onBlur={() => setTimeout(() => setSearchFocused(false), 200)} />
               </div>

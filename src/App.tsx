@@ -981,14 +981,16 @@ function CodeBlock({ className, children }: { className?: string; children?: Rea
 
   // no language — render as dark code block without highlighting
   if (!lang) {
-    return <code className="hljs-theme-ocean">{children}</code>
+    return <div className="hljs-theme-ocean"><pre><code>{children}</code></pre></div>
   }
 
   const result = hljs.highlight(value, { language: lang, ignoreIllegals: true })
   return (
-    <code className={`${className} hljs-theme-ocean`}>
-      <span dangerouslySetInnerHTML={{ __html: result.value }} />
-    </code>
+    <div className="hljs-theme-ocean">
+      <pre className={className}>
+        <span dangerouslySetInnerHTML={{ __html: result.value }} />
+      </pre>
+    </div>
   )
 }
 
@@ -1248,8 +1250,8 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
     style.id = id
     style.textContent = `
       .hljs-theme-ocean { color: #D4D4D4 !important; background: #1A1F2E !important; }
+      .hljs-theme-ocean pre { color: #D4D4D4 !important; background: #1A1F2E !important; }
       .hljs-theme-ocean code { color: #D4D4D4 !important; background: transparent !important; }
-      .hljs-theme-ocean pre { background: #1A1F2E !important; border-color: rgba(255,255,255,0.08) !important; }
       .hljs-theme-ocean .hljs-comment, .hljs-theme-ocean .hljs-quote { color: #6A9955 !important; }
       .hljs-theme-ocean .hljs-keyword, .hljs-theme-ocean .hljs-selector-tag { color: #569CD6 !important; }
       .hljs-theme-ocean .hljs-string, .hljs-theme-ocean .hljs-template-variable, .hljs-theme-ocean .hljs-template-tag { color: #CE9178 !important; }

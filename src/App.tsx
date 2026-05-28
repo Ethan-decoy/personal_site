@@ -1397,7 +1397,7 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
 
       {/* 右侧工具栏：fixed 在页面右侧留白区域 */}
       {selectedNote && (
-        <div className="hidden md:flex flex-col items-center fixed right-8 top-1/2 -translate-y-1/2 z-10">
+        <div className="hidden md:flex flex-col items-center fixed right-[calc((100vw-96rem)/2+3rem)] top-1/2 -translate-y-1/2 z-10">
           <SliderTrack progress={progress} accent={theme.accent} accentLight={theme.accentLight} />
           <div className="mt-12">
             <button

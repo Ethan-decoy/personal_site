@@ -1452,34 +1452,34 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
                 </p>
               </div>
             )}
-          </div>
 
-          {/* 右侧工具栏：sticky 吸附 */}
-          {selectedNote && (
-            <div className="hidden md:flex flex-col items-center sticky top-[37vh] ml-6">
-              <SliderTrack
-                progress={progress}
-                accent={theme.accent}
-                accentLight={theme.accentLight}
-              />
-              <div className="mt-12">
-                <button
-                  aria-label="返回顶部"
-                  onClick={scrollToTop}
-                  className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out"
-                  style={{
-                    backgroundColor: theme.bgDeep,
-                    border: `1px solid ${theme.border}`,
-                    opacity: showBackTop ? 1 : 0.2,
-                  }}
-                >
-                  <svg className="w-3 h-3" style={{ color: theme.textSec }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M4 10l4-4 4 4" />
-                  </svg>
-                </button>
+            {/* 右侧工具栏：fixed 定位在视口右侧 */}
+            {selectedNote && (
+              <div className="hidden md:flex flex-col items-center fixed right-8 top-1/2 -translate-y-1/2 z-10">
+                <SliderTrack
+                  progress={progress}
+                  accent={theme.accent}
+                  accentLight={theme.accentLight}
+                />
+                <div className="mt-12">
+                  <button
+                    aria-label="返回顶部"
+                    onClick={scrollToTop}
+                    className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out"
+                    style={{
+                      backgroundColor: theme.bgDeep,
+                      border: `1px solid ${theme.border}`,
+                      opacity: showBackTop ? 1 : 0.2,
+                    }}
+                  >
+                    <svg className="w-3 h-3" style={{ color: theme.textSec }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M4 10l4-4 4 4" />
+                    </svg>
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
     </div>

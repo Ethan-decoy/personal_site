@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@tailwindcss/typography";
 @import "@fontsource/inter/400.css";
 @import "@fontsource/inter/500.css";
 @import "@fontsource/inter/600.css";
@@ -83,3 +84,96 @@ body {
 .contribution-chart rect:hover {
   opacity: 0.7;
 }
+
+/* ==================== Prose Theme Overrides ==================== */
+/* Tailwind @tailwindcss/typography 配色主题 — 与 App.tsx 主题系统同步 */
+
+/* earth (浅棕米白) */
+.prose-earth {
+  --tw-prose-body: #2D2418;
+  --tw-prose-headings: #2D2418;
+  --tw-prose-lead: #7A6B5A;
+  --tw-prose-links: #9B7B5A;
+  --tw-prose-bold: #2D2418;
+  --tw-prose-counters: #7A6B5A;
+  --tw-prose-bullets: #7A6B5A;
+  --tw-prose-hr: rgba(45, 36, 24, 0.08);
+  --tw-prose-quotes: #7A6B5A;
+  --tw-prose-quote-borders: rgba(155, 123, 90, 0.4);
+  --tw-prose-captions: #7A6B5A;
+  --tw-prose-code: #9B7B5A;
+  --tw-prose-pre-code: #E8DFD0;
+  --tw-prose-pre-bg: #F0E8D8;
+  --tw-prose-th-borders: rgba(45, 36, 24, 0.12);
+  --tw-prose-td-borders: rgba(45, 36, 24, 0.12);
+}
+
+/* ocean (深蓝黑) */
+.prose-ocean {
+  --tw-prose-body: #0F1B2D;
+  --tw-prose-headings: #0F1B2D;
+  --tw-prose-lead: #4A5D73;
+  --tw-prose-links: #1B3A5C;
+  --tw-prose-bold: #0F1B2D;
+  --tw-prose-counters: #4A5D73;
+  --tw-prose-bullets: #4A5D73;
+  --tw-prose-hr: rgba(15, 27, 45, 0.08);
+  --tw-prose-quotes: #4A5D73;
+  --tw-prose-quote-borders: rgba(27, 58, 92, 0.4);
+  --tw-prose-captions: #4A5D73;
+  --tw-prose-code: #1B3A5C;
+  --tw-prose-pre-code: #E0DBD0;
+  --tw-prose-pre-bg: #EDE7DB;
+  --tw-prose-th-borders: rgba(15, 27, 45, 0.12);
+  --tw-prose-td-borders: rgba(15, 27, 45, 0.12);
+}
+
+/* sage (浅青绿) */
+.prose-sage {
+  --tw-prose-body: #1A2A24;
+  --tw-prose-headings: #1A2A24;
+  --tw-prose-lead: #4E6A5E;
+  --tw-prose-links: #3D8B7A;
+  --tw-prose-bold: #1A2A24;
+  --tw-prose-counters: #4E6A5E;
+  --tw-prose-bullets: #4E6A5E;
+  --tw-prose-hr: rgba(26, 42, 36, 0.08);
+  --tw-prose-quotes: #4E6A5E;
+  --tw-prose-quote-borders: rgba(61, 139, 122, 0.4);
+  --tw-prose-captions: #4E6A5E;
+  --tw-prose-code: #3D8B7A;
+  --tw-prose-pre-code: #E0EBD8;
+  --tw-prose-pre-bg: #E8EDE6;
+  --tw-prose-th-borders: rgba(26, 42, 36, 0.12);
+  --tw-prose-td-borders: rgba(26, 42, 36, 0.12);
+}
+
+/* black (黑) */
+.prose-black {
+  --tw-prose-body: #1A1A1A;
+  --tw-prose-headings: #1A1A1A;
+  --tw-prose-lead: #666;
+  --tw-prose-links: #333;
+  --tw-prose-bold: #1A1A1A;
+  --tw-prose-counters: #666;
+  --tw-prose-bullets: #666;
+  --tw-prose-hr: rgba(0, 0, 0, 0.08);
+  --tw-prose-quotes: #666;
+  --tw-prose-quote-borders: rgba(0, 0, 0, 0.3);
+  --tw-prose-captions: #666;
+  --tw-prose-code: #333;
+  --tw-prose-pre-code: #E8E8E8;
+  --tw-prose-pre-bg: #F0F0F0;
+  --tw-prose-th-borders: rgba(0, 0, 0, 0.12);
+  --tw-prose-td-borders: rgba(0, 0, 0, 0.12);
+}
+
+/* Prose link hover — transition color on hover */
+.prose-earth a { transition: color 0.15s ease-out; }
+.prose-earth a:hover { color: #7E6045; }
+.prose-ocean a { transition: color 0.15s ease-out; }
+.prose-ocean a:hover { color: #0F2540; }
+.prose-sage a { transition: color 0.15s ease-out; }
+.prose-sage a:hover { color: #2E6B5E; }
+.prose-black a { transition: color 0.15s ease-out; }
+.prose-black a:hover { color: #000; }

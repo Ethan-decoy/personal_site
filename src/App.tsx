@@ -903,58 +903,27 @@ function parseMarkdownBody(raw: string) {
 }
 
 function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) {
+  const proseThemeMap: Record<string, string> = { earth: 'earth', ocean: 'ocean', sage: 'sage', black: 'black' }
+  const proseTheme = proseThemeMap[theme.name] || 'earth'
+
   return (
-    <div className="max-w-2xl prose-note" style={{ color: theme.text }}>
+    <div className={`max-w-2xl prose prose-${proseTheme} prose-headings:tracking-tight prose-a:no-underline hover:prose-a:underline`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSlug, rehypeAutolinkHeadings]}
         components={{
-          h1: ({ children }) => <h1 className="text-2xl font-bold tracking-tight mt-8 mb-4" style={{ color: theme.text }}>{children}</h1>,
-          h2: ({ children }) => <h2 className="text-xl font-bold tracking-tight mt-8 mb-3" style={{ color: theme.text }}>{children}</h2>,
-          h3: ({ children }) => <h3 className="text-lg font-semibold mt-6 mb-2" style={{ color: theme.text }}>{children}</h3>,
-          p: ({ children }) => <p className="text-base leading-relaxed mb-4 last:mb-0" style={{ color: theme.text }}>{children}</p>,
           a: ({ href, children }) => {
-            if (!href) return <span className="underline" style={{ color: theme.accent }}>{children}</span>
-            // external links → new tab
+            if (!href) return <span>{children}</span>
             if (href.startsWith('http')) {
-              return (
-                <a href={href} target="_blank" rel="noopener noreferrer" className="underline transition-colors duration-150" style={{ color: theme.accent }} onMouseEnter={(e) => { (e.target as HTMLElement).style.color = theme.accentHover }} onMouseLeave={(e) => { (e.target as HTMLElement).style.color = theme.accent }}>
-                  {children}
-                </a>
-              )
+              return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
             }
-            // relative links → hash route to note
             const noteFile = `./${href.replace(/^\.\/?/, '').replace(/\.md$/, '.md')}`
             if (modules[noteFile]) {
-              const hash = `#notes/${noteFile}`
-              return (
-                <a href={hash} className="underline transition-colors duration-150" style={{ color: theme.accent }} onMouseEnter={(e) => { (e.target as HTMLElement).style.color = theme.accentHover }} onMouseLeave={(e) => { (e.target as HTMLElement).style.color = theme.accent }}>
-                  {children}
-                </a>
-              )
+              return <a href={`#notes/${noteFile}`}>{children}</a>
             }
-            // internal anchors and fallback
-            return (
-              <a href={href} className="underline transition-colors duration-150" style={{ color: theme.accent }} onMouseEnter={(e) => { (e.target as HTMLElement).style.color = theme.accentHover }} onMouseLeave={(e) => { (e.target as HTMLElement).style.color = theme.accent }}>
-                {children}
-              </a>
-            )
+            return <a href={href}>{children}</a>
           },
-          ul: ({ children }) => <ul className="list-disc list-inside space-y-1 mb-4 ml-2" style={{ color: theme.textSec }}>{children}</ul>,
-          ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-4 ml-2" style={{ color: theme.textSec }}>{children}</ol>,
-          li: ({ children }) => <li className="text-base leading-relaxed" style={{ color: theme.textSec }}>{children}</li>,
-          blockquote: ({ children }) => <blockquote className="border-l-4 pl-4 italic mb-4" style={{ borderColor: theme.border, color: theme.textSec }}>{children}</blockquote>,
-          code: (props) => <CodeBlock {...props} theme={theme} />,
-          pre: ({ children }) => <pre className="rounded-xl overflow-x-auto mb-4 p-4 text-sm leading-relaxed" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}` }}>{children}</pre>,
-          table: ({ children }) => (
-            <div className="overflow-x-auto mb-4">
-              <table className="w-full text-sm border-collapse" style={{ borderColor: theme.border }}>{children}</table>
-            </div>
-          ),
-          th: ({ children }) => <th className="border px-3 py-2 text-left font-semibold" style={{ borderColor: theme.border, backgroundColor: theme.accentLight, color: theme.text }}>{children}</th>,
-          td: ({ children }) => <td className="border px-3 py-2" style={{ borderColor: theme.border, color: theme.textSec }}>{children}</td>,
-          hr: () => <div className="my-6 h-px" style={{ backgroundColor: theme.borderLight }} />,
-          img: ({ src, alt }) => <img src={src} alt={alt} className="rounded-lg max-w-full my-4" style={{ border: `1px solid ${theme.border}` }} />,
+          code: (props) => <CodeBlock {...props} />,
         }}
       >
         {content}
@@ -963,17 +932,15 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
   )
 }
 
-function CodeBlock({ className, children, theme }: { className?: string; children?: React.ReactNode; theme: Theme }) {
+function CodeBlock({ className, children }: { className?: string; children?: React.ReactNode }) {
   const match = /language-(\w+)/.exec(className || '')
   const lang = match ? match[1] : ''
   const value = typeof children === 'string' ? children : ''
 
-  // inline code
   if (!value || !lang) {
-    return <code className="px-1.5 py-0.5 rounded text-sm font-mono" style={{ backgroundColor: theme.accentLight, color: theme.accent }}>{children}</code>
+    return <code>{children}</code>
   }
 
-  // code block with syntax highlighting via highlight.js
   const result = hljs.highlight(value, { language: lang, ignoreIllegals: true })
   return (
     <code className={`${className} hljs-theme-ocean`}>

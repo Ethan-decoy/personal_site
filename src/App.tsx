@@ -848,7 +848,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
-import rehypePrettyCode from 'rehype-pretty-code'
+import rehypeShiki from '@shikijs/rehype'
 
 function parseMarkdownBody(raw: string) {
   raw = raw.replace(/\r\n/g, '\n')
@@ -861,7 +861,7 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
     <div className="max-w-2xl prose-note" style={{ color: theme.text }}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings, [rehypePrettyCode, { theme: 'min-light' }]]}
+        rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings, [rehypeShiki, { theme: 'min-light' }]]}
         components={{
           h1: ({ children }) => <h1 className="text-2xl font-bold tracking-tight mt-8 mb-4" style={{ color: theme.text }}>{children}</h1>,
           h2: ({ children }) => <h2 className="text-xl font-bold tracking-tight mt-8 mb-3" style={{ color: theme.text }}>{children}</h2>,

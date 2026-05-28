@@ -844,6 +844,11 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
 /* ==================== Notes Page ==================== */
 
 import { treeData, modules, indexMap, searchNotes, getSuggestions, parseFrontmatter } from './notes'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypePrettyCode from 'rehype-pretty-code'
+import rehypeSlug from 'rehype-slug'
+import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 
 function parseMarkdownBody(raw: string) {
   raw = raw.replace(/\r\n/g, '\n')
@@ -851,100 +856,44 @@ function parseMarkdownBody(raw: string) {
   return m ? m[2].trim() : raw.trim()
 }
 
-function renderInline(text: string, color: string): any {
-  // 将 markdown inline 标记 (**bold**、*italic*) 转为 JSX
-  const tokens: { type: 'text' | 'bold' | 'italic' | 'boldItalic'; content: string }[] = []
-  let remaining = text
-
-  while (remaining.length > 0) {
-    const biMatch = remaining.match(/\*\*\*(.+?)\*\*\*/)
-    const bMatch = remaining.match(/\*\*(.+?)\*\*/)
-    const iMatch = remaining.match(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/)
-
-    let earliest: RegExpMatchArray | undefined
-    let type: 'text' | 'bold' | 'italic' | 'boldItalic' = 'text'
-
-    if (biMatch && (!earliest || biMatch.index! < earliest.index!)) {
-      earliest = biMatch
-      type = 'boldItalic'
-    }
-    if (bMatch && (!earliest || bMatch.index! < earliest.index!)) {
-      earliest = bMatch
-      type = 'bold'
-    }
-    if (iMatch && (!earliest || iMatch.index! < earliest.index!)) {
-      earliest = iMatch
-      type = 'italic'
-    }
-
-    if (!earliest || earliest.index === undefined) {
-      tokens.push({ type: 'text', content: remaining })
-      break
-    }
-
-    if (earliest.index > 0) {
-      tokens.push({ type: 'text', content: remaining.slice(0, earliest.index) })
-    }
-    tokens.push({ type, content: earliest[1] })
-    remaining = remaining.slice(earliest.index + earliest[0].length)
-  }
-
-  return tokens.map((t, i) => {
-    if (t.type === 'bold') return <strong key={i} style={{ color }}>{t.content}</strong>
-    if (t.type === 'italic') return <em key={i} style={{ color }}>{t.content}</em>
-    if (t.type === 'boldItalic') return <strong key={i}><em style={{ color }}>{t.content}</em></strong>
-    return <span key={i} style={{ color }}>{t.content}</span>
-  })
-}
-
 function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) {
-  // \n\n\n+ 视为章节分隔，\n\n 视为段落分隔
-  const sections = content.split(/\n{3,}/)
-
-  const renderParagraphs = (text: string) => {
-    const paragraphs = text.split('\n\n').filter(Boolean)
-    return paragraphs.map((p, i) => {
-      const lines = p.split('\n').map((l) => l.trim())
-      if (lines.length === 1 && lines[0].startsWith('#')) {
-        const text = lines[0].replace(/^#+\s*/, '')
-        return <h3 key={i} className="text-lg font-semibold" style={{ color: theme.text }}>{text}</h3>
-      }
-      if (lines[0].startsWith('> ')) {
-        // 连续 quote 行：首行为主引用（中文），后续为副引用（英文）
-        const quoteLines = lines.filter((l) => l.startsWith('> '))
-        return (
-          <div key={i} className="note-quote">
-            <p>{renderInline(quoteLines[0].replace(/^>\s*/, ''), theme.text)}</p>
-            {quoteLines.slice(1).map((l, j) => (
-              <span key={j} className="quote-en">{renderInline(l.replace(/^>\s*/, ''), theme.textSec)}</span>
-            ))}
-          </div>
-        )
-      }
-      if (lines[0].startsWith('- ')) {
-        return (
-          <ul key={i} className="list-disc list-inside space-y-1 text-base" style={{ color: theme.textSec }}>
-            {lines.map((l, j) => (
-              <li key={j} className="leading-relaxed">{renderInline(l.replace(/^- \s*/, ''), theme.textSec)}</li>
-            ))}
-          </ul>
-        )
-      }
-      return (
-        <p key={i} className="text-base leading-relaxed" style={{ color: theme.text }}>
-          {renderInline(p, theme.text)}
-        </p>
-      )
-    })
-  }
-
   return (
-    <div className="max-w-2xl">
-      {sections.map((s, i) => (
-        <div key={i} className="space-y-3 mb-8 last:mb-0">
-          {renderParagraphs(s)}
-        </div>
-      ))}
+    <div
+      className="max-w-2xl prose-note"
+      style={{ color: theme.text }}
+    >
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[
+          rehypeSlug,
+          rehypeAutolinkHeadings,
+          [rehypePrettyCode, { theme: 'min-light' }],
+        ]}
+        components={{
+          h1: (p) => <h1 className="text-2xl font-bold tracking-tight mt-8 mb-4" style={{ color: theme.text }} {...p} />,
+          h2: (p) => <h2 className="text-xl font-bold tracking-tight mt-8 mb-3" style={{ color: theme.text }} {...p} />,
+          h3: (p) => <h3 className="text-lg font-semibold mt-6 mb-2" style={{ color: theme.text }} {...p} />,
+          h4: (p) => <h4 className="text-base font-semibold mt-4 mb-2" style={{ color: theme.text }} {...p} />,
+          p: (p) => <p className="text-base leading-relaxed mb-4 last:mb-0" style={{ color: theme.text }} {...p} />,
+          a: (p) => <a className="underline transition-colors duration-150" style={{ color: theme.accent }} onMouseEnter={(e) => { (e.target as HTMLElement).style.color = theme.accentHover }} onMouseLeave={(e) => { (e.target as HTMLElement).style.color = theme.accent }} {...p} />,
+          ul: (p) => <ul className="list-disc list-inside space-y-1 mb-4 ml-2" style={{ color: theme.textSec }} {...p} />,
+          ol: (p) => <ol className="list-decimal list-inside space-y-1 mb-4 ml-2" style={{ color: theme.textSec }} {...p} />,
+          li: (p) => <li className="text-base leading-relaxed" style={{ color: theme.textSec }} {...p} />,
+          blockquote: (p) => <blockquote className="border-l-4 pl-4 italic mb-4" style={{ borderColor: theme.border, color: theme.textSec }} {...p} />,
+          code: (p) => {
+            const { inline, ...rest } = p as any
+            return <code className="px-1.5 py-0.5 rounded text-sm font-mono" style={{ backgroundColor: theme.accentLight, color: theme.accent }} {...rest} />
+          },
+          pre: (p) => <pre className="rounded-xl overflow-x-auto mb-4 p-4 text-sm font-mono leading-relaxed" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}` }} {...p} />,
+          table: (p) => <div className="overflow-x-auto mb-4"><table className="w-full text-sm border-collapse" style={{ borderColor: theme.border }} {...p} /></div>,
+          th: (p) => <th className="border px-3 py-2 text-left font-semibold" style={{ borderColor: theme.border, backgroundColor: theme.accentLight, color: theme.text }} {...p} />,
+          td: (p) => <td className="border px-3 py-2" style={{ borderColor: theme.border, color: theme.textSec }} {...p} />,
+          hr: () => <div className="my-6 h-px" style={{ backgroundColor: theme.borderLight }} />,
+          img: (p) => <img className="rounded-lg max-w-full my-4" style={{ border: `1px solid ${theme.border}` }} {...p} />,
+        }}
+      >
+        {content}
+      </ReactMarkdown>
     </div>
   )
 }

@@ -857,15 +857,8 @@ function parseMarkdownBody(raw: string) {
 }
 
 function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) {
-  // react-markdown v10 passes { node, ...rest }; destructure to exclude `node` from spread
-  const h = (
-    Tag: 'h1' | 'h2' | 'h3' | 'h4',
-    className: string,
-    style?: React.CSSProperties,
-  ) => ({ children, ...rest }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <Tag className={className} style={style} {...rest}>{children}</Tag>
-  )
-
+  // react-markdown v10 passes ExtraProps { node } alongside HTML props.
+  // Must explicitly destructure `node` to prevent it leaking into DOM spread.
   return (
     <div className="max-w-2xl prose-note" style={{ color: theme.text }}>
       <ReactMarkdown
@@ -876,53 +869,81 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
           [rehypePrettyCode, { theme: 'min-light' }],
         ]}
         components={{
-          h1: h('h1', 'text-2xl font-bold tracking-tight mt-8 mb-4', { color: theme.text }),
-          h2: h('h2', 'text-xl font-bold tracking-tight mt-8 mb-3', { color: theme.text }),
-          h3: h('h3', 'text-lg font-semibold mt-6 mb-2', { color: theme.text }),
-          h4: h('h4', 'text-base font-semibold mt-4 mb-2', { color: theme.text }),
-          p: ({ children, ...rest }) => (
-            <p className="text-base leading-relaxed mb-4 last:mb-0" style={{ color: theme.text }} {...rest}>{children}</p>
-          ),
-          a: ({ children, ...rest }) => (
-            <a className="underline transition-colors duration-150" style={{ color: theme.accent }} onMouseEnter={(e) => { (e.target as HTMLElement).style.color = theme.accentHover }} onMouseLeave={(e) => { (e.target as HTMLElement).style.color = theme.accent }} {...rest}>
-              {children}
-            </a>
-          ),
-          ul: ({ children, ...rest }) => (
-            <ul className="list-disc list-inside space-y-1 mb-4 ml-2" style={{ color: theme.textSec }} {...rest}>{children}</ul>
-          ),
-          ol: ({ children, ...rest }) => (
-            <ol className="list-decimal list-inside space-y-1 mb-4 ml-2" style={{ color: theme.textSec }} {...rest}>{children}</ol>
-          ),
-          li: ({ children, ...rest }) => (
-            <li className="text-base leading-relaxed" style={{ color: theme.textSec }} {...rest}>{children}</li>
-          ),
-          blockquote: ({ children, ...rest }) => (
-            <blockquote className="border-l-4 pl-4 italic mb-4" style={{ borderColor: theme.border, color: theme.textSec }} {...rest}>{children}</blockquote>
-          ),
-          code: ({ children, ...rest }) => (
-            <code className="px-1.5 py-0.5 rounded text-sm font-mono" style={{ backgroundColor: theme.accentLight, color: theme.accent }} {...rest}>{children}</code>
-          ),
-          pre: ({ children, ...rest }) => (
-            <pre className="rounded-xl overflow-x-auto mb-4 p-4 text-sm font-mono leading-relaxed" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}` }} {...rest}>{children}</pre>
-          ),
-          table: ({ children, ...rest }) => (
-            <div className="overflow-x-auto mb-4">
-              <table className="w-full text-sm border-collapse" style={{ borderColor: theme.border }} {...rest}>
+          h1: (props) => {
+            const { node, children, ...rest } = props as { node?: unknown; children?: React.ReactNode } & Record<string, unknown>
+            return <h1 className="text-2xl font-bold tracking-tight mt-8 mb-4" style={{ color: theme.text }} {...rest}>{children}</h1>
+          },
+          h2: (props) => {
+            const { node, children, ...rest } = props as { node?: unknown; children?: React.ReactNode } & Record<string, unknown>
+            return <h2 className="text-xl font-bold tracking-tight mt-8 mb-3" style={{ color: theme.text }} {...rest}>{children}</h2>
+          },
+          h3: (props) => {
+            const { node, children, ...rest } = props as { node?: unknown; children?: React.ReactNode } & Record<string, unknown>
+            return <h3 className="text-lg font-semibold mt-6 mb-2" style={{ color: theme.text }} {...rest}>{children}</h3>
+          },
+          h4: (props) => {
+            const { node, children, ...rest } = props as { node?: unknown; children?: React.ReactNode } & Record<string, unknown>
+            return <h4 className="text-base font-semibold mt-4 mb-2" style={{ color: theme.text }} {...rest}>{children}</h4>
+          },
+          p: (props) => {
+            const { node, children, ...rest } = props as { node?: unknown; children?: React.ReactNode } & Record<string, unknown>
+            return <p className="text-base leading-relaxed mb-4 last:mb-0" style={{ color: theme.text }} {...rest}>{children}</p>
+          },
+          a: (props) => {
+            const { node, children, ...rest } = props as { node?: unknown; children?: React.ReactNode } & Record<string, unknown>
+            return (
+              <a className="underline transition-colors duration-150" style={{ color: theme.accent }} onMouseEnter={(e) => { (e.target as HTMLElement).style.color = theme.accentHover }} onMouseLeave={(e) => { (e.target as HTMLElement).style.color = theme.accent }} {...rest}>
                 {children}
-              </table>
-            </div>
-          ),
-          th: ({ children, ...rest }) => (
-            <th className="border px-3 py-2 text-left font-semibold" style={{ borderColor: theme.border, backgroundColor: theme.accentLight, color: theme.text }} {...rest}>{children}</th>
-          ),
-          td: ({ children, ...rest }) => (
-            <td className="border px-3 py-2" style={{ borderColor: theme.border, color: theme.textSec }} {...rest}>{children}</td>
-          ),
+              </a>
+            )
+          },
+          ul: (props) => {
+            const { node, children, ...rest } = props as { node?: unknown; children?: React.ReactNode } & Record<string, unknown>
+            return <ul className="list-disc list-inside space-y-1 mb-4 ml-2" style={{ color: theme.textSec }} {...rest}>{children}</ul>
+          },
+          ol: (props) => {
+            const { node, children, ...rest } = props as { node?: unknown; children?: React.ReactNode } & Record<string, unknown>
+            return <ol className="list-decimal list-inside space-y-1 mb-4 ml-2" style={{ color: theme.textSec }} {...rest}>{children}</ol>
+          },
+          li: (props) => {
+            const { node, children, ...rest } = props as { node?: unknown; children?: React.ReactNode } & Record<string, unknown>
+            return <li className="text-base leading-relaxed" style={{ color: theme.textSec }} {...rest}>{children}</li>
+          },
+          blockquote: (props) => {
+            const { node, children, ...rest } = props as { node?: unknown; children?: React.ReactNode } & Record<string, unknown>
+            return <blockquote className="border-l-4 pl-4 italic mb-4" style={{ borderColor: theme.border, color: theme.textSec }} {...rest}>{children}</blockquote>
+          },
+          code: (props) => {
+            const { node, children, ...rest } = props as { node?: unknown; children?: React.ReactNode } & Record<string, unknown>
+            return <code className="px-1.5 py-0.5 rounded text-sm font-mono" style={{ backgroundColor: theme.accentLight, color: theme.accent }} {...rest}>{children}</code>
+          },
+          pre: (props) => {
+            const { node, children, ...rest } = props as { node?: unknown; children?: React.ReactNode } & Record<string, unknown>
+            return <pre className="rounded-xl overflow-x-auto mb-4 p-4 text-sm font-mono leading-relaxed" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}` }} {...rest}>{children}</pre>
+          },
+          table: (props) => {
+            const { node, children, ...rest } = props as { node?: unknown; children?: React.ReactNode } & Record<string, unknown>
+            return (
+              <div className="overflow-x-auto mb-4">
+                <table className="w-full text-sm border-collapse" style={{ borderColor: theme.border }} {...rest}>
+                  {children}
+                </table>
+              </div>
+            )
+          },
+          th: (props) => {
+            const { node, children, ...rest } = props as { node?: unknown; children?: React.ReactNode } & Record<string, unknown>
+            return <th className="border px-3 py-2 text-left font-semibold" style={{ borderColor: theme.border, backgroundColor: theme.accentLight, color: theme.text }} {...rest}>{children}</th>
+          },
+          td: (props) => {
+            const { node, children, ...rest } = props as { node?: unknown; children?: React.ReactNode } & Record<string, unknown>
+            return <td className="border px-3 py-2" style={{ borderColor: theme.border, color: theme.textSec }} {...rest}>{children}</td>
+          },
           hr: () => <div className="my-6 h-px" style={{ backgroundColor: theme.borderLight }} />,
-          img: ({ ...rest }) => (
-            <img className="rounded-lg max-w-full my-4" style={{ border: `1px solid ${theme.border}` }} {...rest} />
-          ),
+          img: (props) => {
+            const { node, ...rest } = props as { node?: unknown } & Record<string, unknown>
+            return <img className="rounded-lg max-w-full my-4" style={{ border: `1px solid ${theme.border}` }} {...rest} />
+          },
         }}
       >
         {content}

@@ -846,6 +846,7 @@ function ProjectsPage({ theme }: { theme: Theme; onNavigate: (s: Section) => voi
 import { treeData, modules, indexMap, searchNotes, getSuggestions, parseFrontmatter } from './notes'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import hljs from 'highlight.js/lib/core'
@@ -906,7 +907,7 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
     <div className="max-w-2xl prose-note" style={{ color: theme.text }}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings]}
+        rehypePlugins={[rehypeRaw, rehypeSlug, rehypeAutolinkHeadings]}
         components={{
           h1: ({ children }) => <h1 className="text-2xl font-bold tracking-tight mt-8 mb-4" style={{ color: theme.text }}>{children}</h1>,
           h2: ({ children }) => <h2 className="text-xl font-bold tracking-tight mt-8 mb-3" style={{ color: theme.text }}>{children}</h2>,
@@ -1171,6 +1172,20 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
       .hljs-theme-ocean .hljs-strong { font-weight: 600; }
       .hljs-theme-ocean .hljs-deletion { color: #9B4B4B; }
       .hljs-theme-ocean .hljs-addition { color: #4B8B4B; }
+      .fail-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1;
+        margin-right: 8px;
+        vertical-align: middle;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+      }
     `
     document.head.appendChild(style)
     return () => { style.remove() }

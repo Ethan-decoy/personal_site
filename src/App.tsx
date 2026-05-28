@@ -1327,8 +1327,8 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
 
   return (
     <div>
-      {/* 左侧边栏：fixed 在页面左侧留白区域 */}
-      <div className="hidden md:block fixed left-8 top-20 w-56 z-10" style={{ color: theme.textSec }}>
+      {/* 左侧边栏：fixed 在页面左侧留白区域，独立滚动 */}
+      <div className="hidden md:flex md:flex-col fixed left-8 top-32 bottom-0 w-56 z-10 overflow-y-auto" style={{ color: theme.textSec }}>
         {/* 搜索框 */}
         <div className="relative mb-3">
           <input
@@ -1423,8 +1423,8 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
             <p className="text-xs mt-2" style={{ color: theme.textSec, opacity: 0.5 }}>在 src/notes/ 下创建子目录并放入 .md 文件即可自动收录。</p>
           </div>
         ) : (
-          <div className="mt-8" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
-            {/* 手机端折叠/展开按钮 */}
+          <div className="mt-8 max-w-2xl" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
+            {/* 手机端：折叠/展开分类 */}
             <button
               className="md:hidden flex items-center justify-between w-full py-3 px-4 rounded-xl mb-2"
               style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}` }}
@@ -1435,35 +1435,28 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
                 <path d="M6 4l4 4-4 4" />
               </svg>
             </button>
-
-            {/* 手机端侧边栏内容 */}
-            <div className={mobileSidebarOpen ? 'block' : 'hidden md:block'}>
-              <div className="w-full md:w-56 md:shrink-0" style={{ color: theme.textSec }}>
-                <div className="relative mb-3">
-                  <input type="text" placeholder="搜索笔记..." className="w-full px-3 py-2 text-sm rounded-xl outline-none transition-all duration-200" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${searchFocused ? theme.accent : theme.border}`, color: theme.text }} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onFocus={() => setSearchFocused(true)} onBlur={() => setTimeout(() => setSearchFocused(false), 200)} />
-                </div>
-                {!searchQuery && nestedTree.map((node) => (
-                  <SidebarNode key={node.key} node={node} theme={theme} depth={0} expandedKeys={expandedKeys} onToggle={toggleKey} selectedFile={selectedNote?.file || null} onOpen={openNote} />
-                ))}
+            <div className={mobileSidebarOpen ? 'block mb-6' : 'hidden md:block'}>
+              <div className="relative mb-3">
+                <input type="text" placeholder="搜索笔记..." className="w-full px-3 py-2 text-sm rounded-xl outline-none transition-all duration-200" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${searchFocused ? theme.accent : theme.border}`, color: theme.text }} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onFocus={() => setSearchFocused(true)} onBlur={() => setTimeout(() => setSearchFocused(false), 200)} />
               </div>
+              {!searchQuery && nestedTree.map((node) => (
+                <SidebarNode key={node.key} node={node} theme={theme} depth={0} expandedKeys={expandedKeys} onToggle={toggleKey} selectedFile={selectedNote?.file || null} onOpen={openNote} />
+              ))}
             </div>
 
-            {/* 笔记详情 */}
-            <div className="mt-4">
-              {selectedNote ? (
-                <div key={selectedNote.file} style={{ animation: 'fade-up 0.5s ease-out both', animationDelay: '0ms' }}>
-                  <div className="mb-10 pb-6" style={{ borderBottom: `1px solid ${theme.borderLight}` }}>
-                    <h3 className="text-xl font-bold tracking-tight mb-2" style={{ color: theme.text }}>{selectedNote.title}</h3>
-                    <span className="text-xs font-mono" style={{ color: theme.textSec, opacity: 0.4 }}>{selectedNote.date}</span>
-                  </div>
-                  <MarkdownPreview content={selectedNote.content} theme={theme} />
+            {selectedNote ? (
+              <div key={selectedNote.file} style={{ animation: 'fade-up 0.5s ease-out both', animationDelay: '0ms' }}>
+                <div className="mb-10 pb-6" style={{ borderBottom: `1px solid ${theme.borderLight}` }}>
+                  <h3 className="text-xl font-bold tracking-tight mb-2" style={{ color: theme.text }}>{selectedNote.title}</h3>
+                  <span className="text-xs font-mono" style={{ color: theme.textSec, opacity: 0.4 }}>{selectedNote.date}</span>
                 </div>
-              ) : (
-                <div className="flex items-center justify-center h-48">
-                  <p className="text-sm" style={{ color: theme.textSec, opacity: 0.3 }}>选择一篇笔记开始阅读</p>
-                </div>
-              )}
-            </div>
+                <MarkdownPreview content={selectedNote.content} theme={theme} />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-48">
+                <p className="text-sm" style={{ color: theme.textSec, opacity: 0.3 }}>选择一篇笔记开始阅读</p>
+              </div>
+            )}
           </div>
         )}
       </div>

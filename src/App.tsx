@@ -907,16 +907,21 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
   const proseTheme = proseThemeMap[theme.name] || 'earth'
 
   return (
-    <div className={`max-w-2xl prose prose-${proseTheme} prose-headings:tracking-tight prose-a:no-underline hover:prose-a:underline`}>
+    <div className={`max-w-2xl prose prose-${proseTheme} prose-headings:tracking-tight`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSlug, rehypeAutolinkHeadings]}
         components={{
           a: ({ href, children }) => {
+            // heading anchor links from rehype-autolink-headings (empty href with #id)
+            if (href && href.startsWith('#')) {
+              return <a href={href} aria-hidden tabIndex={-1}>{children}</a>
+            }
             if (!href) return <span>{children}</span>
             if (href.startsWith('http')) {
               return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
             }
+            // relative links → hash route to note
             const noteFile = `./${href.replace(/^\.\/?/, '').replace(/\.md$/, '.md')}`
             if (modules[noteFile]) {
               return <a href={`#notes/${noteFile}`}>{children}</a>

@@ -168,12 +168,48 @@ body {
   --tw-prose-td-borders: rgba(0, 0, 0, 0.12);
 }
 
-/* Prose link hover — transition color on hover */
-.prose-earth a { transition: color 0.15s ease-out; }
-.prose-earth a:hover { color: #7E6045; }
-.prose-ocean a { transition: color 0.15s ease-out; }
-.prose-ocean a:hover { color: #0F2540; }
-.prose-sage a { transition: color 0.15s ease-out; }
-.prose-sage a:hover { color: #2E6B5E; }
-.prose-black a { transition: color 0.15s ease-out; }
-.prose-black a:hover { color: #000; }
+/* Prose links — no underline by default, underline on hover. Heading anchor links excluded. */
+.prose-earth a:not([aria-hidden]) { text-decoration: none; transition: color 0.15s ease-out; }
+.prose-earth a:not([aria-hidden]):hover { text-decoration: underline; color: #7E6045; }
+.prose-ocean a:not([aria-hidden]) { text-decoration: none; transition: color 0.15s ease-out; }
+.prose-ocean a:not([aria-hidden]):hover { text-decoration: underline; color: #0F2540; }
+.prose-sage a:not([aria-hidden]) { text-decoration: none; transition: color 0.15s ease-out; }
+.prose-sage a:not([aria-hidden]):hover { text-decoration: underline; color: #2E6B5E; }
+.prose-black a:not([aria-hidden]) { text-decoration: none; transition: color 0.15s ease-out; }
+.prose-black a:not([aria-hidden]):hover { text-decoration: underline; color: #000; }
+
+/* Heading anchor links — use heading color, not link color */
+.prose h2 a[aria-hidden],
+.prose h3 a[aria-hidden],
+.prose h4 a[aria-hidden] {
+  color: inherit;
+}
+
+/* Heading anchor links — chain icon, visible on heading hover */
+.prose .icon-link {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  opacity: 0;
+  transition: opacity 0.15s ease-out;
+  margin-right: 0.25em;
+  vertical-align: middle;
+}
+.prose .icon-link::before {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: text-bottom;
+}
+.prose h2:hover .icon-link,
+.prose h3:hover .icon-link,
+.prose h4:hover .icon-link {
+  opacity: 0.4;
+}
+.prose .icon-link:hover {
+  opacity: 0.7 !important;
+}

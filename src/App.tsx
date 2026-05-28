@@ -974,8 +974,14 @@ function CodeBlock({ className, children }: { className?: string; children?: Rea
   const lang = match ? match[1] : ''
   const value = typeof children === 'string' ? children : ''
 
-  if (!value || !lang) {
+  // inline code
+  if (!value) {
     return <code>{children}</code>
+  }
+
+  // no language — render as dark code block without highlighting
+  if (!lang) {
+    return <code className="hljs-theme-ocean">{children}</code>
   }
 
   const result = hljs.highlight(value, { language: lang, ignoreIllegals: true })

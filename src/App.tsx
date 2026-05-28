@@ -901,6 +901,43 @@ function parseMarkdownBody(raw: string) {
   return m ? m[2].trim() : raw.trim()
 }
 
+/* ---- GitHub-style callout detection ---- */
+const CALLOUTS: Record<string, { label: string; border: string; bg: string; icon: string }> = {
+  '!NOTE': { label: 'Note', border: '#3B82F6', bg: 'rgba(59,130,246,0.06)', icon: 'ℹ️' },
+  '!TIP': { label: 'Tip', border: '#10B981', bg: 'rgba(16,185,129,0.06)', icon: '💡' },
+  '!IMPORTANT': { label: 'Important', border: '#8B5CF6', bg: 'rgba(139,92,246,0.06)', icon: '❗' },
+  '!WARNING': { label: 'Warning', border: '#F59E0B', bg: 'rgba(245,158,11,0.06)', icon: '⚠️' },
+  '!CAUTION': { label: 'Caution', border: '#EF4444', bg: 'rgba(239,68,68,0.06)', icon: '🚨' },
+}
+
+function extractText(node: React.ReactNode): string {
+  if (typeof node === 'string') return node
+  if (Array.isArray(node)) return node.map(extractText).join('')
+  if (node && typeof node === 'object' && 'props' in node) return extractText((node as { props: { children?: React.ReactNode } }).props.children)
+  return ''
+}
+
+function Callout({ children, ...rest }: { children?: React.ReactNode } & Record<string, unknown>) {
+  const text = extractText(children)
+  const firstLine = text.trim().split('\n')[0].trim()
+  const callout = CALLOUTS[firstLine]
+
+  if (callout) {
+    const childArray = Array.isArray(children) ? children : [children]
+    const [, ...restChildren] = childArray
+    return (
+      <div style={{ borderLeft: `3px solid ${callout.border}`, backgroundColor: callout.bg, borderRadius: '0 8px 8px 0', padding: '12px 16px', margin: '1em 0' }} {...rest}>
+        <div style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: 4, color: callout.border }}>
+          {callout.icon} {callout.label}
+        </div>
+        {restChildren}
+      </div>
+    )
+  }
+
+  return <blockquote {...rest}>{children}</blockquote>
+}
+
 function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) {
   const proseThemeMap: Record<string, string> = { earth: 'earth', ocean: 'ocean', sage: 'sage', black: 'black' }
   const proseTheme = proseThemeMap[theme.name] || 'earth'
@@ -916,13 +953,13 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
             if (href.startsWith('http')) {
               return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
             }
-            // relative links → hash route to note
             const noteFile = `./${href.replace(/^\.\/?/, '').replace(/\.md$/, '.md')}`
             if (modules[noteFile]) {
               return <a href={`#notes/${noteFile}`}>{children}</a>
             }
             return <a href={href}>{children}</a>
           },
+          blockquote: (props) => <Callout {...props} />,
           code: (props) => <CodeBlock {...props} />,
         }}
       >

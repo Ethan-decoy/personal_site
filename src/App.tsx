@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from 'react'
+import { useState, useEffect, useRef, type ReactNode } from 'react'
 
 /* ==================== Themes ==================== */
 
@@ -986,6 +986,70 @@ function CodeBlock({ className, children }: { className?: string; children?: Rea
   )
 }
 
+/* ---- Reading Progress SliderTrack ---- */
+const NUM_SEGMENTS = 60
+
+function SliderTrack({ progress, accent, accentLight }: { progress: number; accent: string; accentLight: string }) {
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [dragging, setDragging] = useState(false)
+
+  const scrollToRatio = (ratio: number) => {
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight
+    window.scrollTo({ top: ratio * docHeight, behavior: dragging ? 'auto' : 'smooth' })
+  }
+
+  const handleStart = (clientY: number) => {
+    if (!trackRef.current) return
+    const rect = trackRef.current.getBoundingClientRect()
+    const ratio = Math.max(0, Math.min((clientY - rect.top) / rect.height, 1))
+    scrollToRatio(ratio)
+    setDragging(true)
+  }
+
+  useEffect(() => {
+    if (!dragging) return
+    const onMove = (e: MouseEvent) => {
+      e.preventDefault()
+      handleStart(e.clientY)
+    }
+    const onUp = () => setDragging(false)
+    window.addEventListener('mousemove', onMove, { passive: false })
+    window.addEventListener('mouseup', onUp)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+  }, [dragging])
+
+  const currentIdx = Math.round((progress / 100) * (NUM_SEGMENTS - 1))
+
+  return (
+    <div
+      ref={trackRef}
+      className="flex flex-col items-center gap-[2px] cursor-pointer py-1"
+      onMouseDown={(e) => handleStart(e.clientY)}
+    >
+      {Array.from({ length: NUM_SEGMENTS }).map((_, i) => {
+        const dist = Math.abs(i - currentIdx)
+        const isCurrent = i === currentIdx
+        return (
+          <div
+            key={i}
+            className="rounded-full transition-all duration-150 ease-out"
+            style={{
+              width: '16px',
+              height: '2px',
+              backgroundColor: accent,
+              opacity: isCurrent ? 1 : Math.max(0.08, 1 - dist * 0.18),
+              boxShadow: isCurrent ? `0 0 0 3px ${accentLight}` : 'none',
+            }}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
 /* ---- Nested Tree Node ---- */
 interface FileNode { title: string; date: string; order?: number; file: string }
 interface TreeNode { key: string; title: string; children: (TreeNode | FileNode)[]; isDir: boolean }
@@ -1154,6 +1218,21 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
   const [selectedNote, setSelectedNote] = useState<{ title: string; date: string; content: string; file: string } | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
+  const [showBackTop, setShowBackTop] = useState(false)
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => {
+      const scrollTop = window.scrollY
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight
+      setShowBackTop(scrollTop > 300)
+      setProgress(docHeight > 0 ? Math.min(scrollTop / docHeight * 100, 100) : 0)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
   // Inject highlight.js theme CSS once
   useEffect(() => {
@@ -1374,6 +1453,33 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
               </div>
             )}
           </div>
+
+          {/* 右侧工具栏：sticky 吸附 */}
+          {selectedNote && (
+            <div className="hidden md:flex flex-col items-center sticky top-[37vh] ml-6">
+              <SliderTrack
+                progress={progress}
+                accent={theme.accent}
+                accentLight={theme.accentLight}
+              />
+              <div className="mt-12">
+                <button
+                  aria-label="返回顶部"
+                  onClick={scrollToTop}
+                  className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out"
+                  style={{
+                    backgroundColor: theme.bgDeep,
+                    border: `1px solid ${theme.border}`,
+                    opacity: showBackTop ? 1 : 0.2,
+                  }}
+                >
+                  <svg className="w-3 h-3" style={{ color: theme.textSec }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M4 10l4-4 4 4" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

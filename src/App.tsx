@@ -1241,20 +1241,22 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
     const style = document.createElement('style')
     style.id = id
     style.textContent = `
-      .hljs-theme-ocean .hljs { color: #D4D4D4; }
-      .hljs-theme-ocean .hljs-comment, .hljs-theme-ocean .hljs-quote { color: #6A9955; font-style: italic; }
-      .hljs-theme-ocean .hljs-keyword, .hljs-theme-ocean .hljs-selector-tag { color: #569CD6; }
-      .hljs-theme-ocean .hljs-string, .hljs-theme-ocean .hljs-template-variable, .hljs-theme-ocean .hljs-template-tag { color: #CE9178; }
-      .hljs-theme-ocean .hljs-number, .hljs-theme-ocean .hljs-literal { color: #B5CEA8; }
-      .hljs-theme-ocean .hljs-title, .hljs-theme-ocean .hljs-built_in, .hljs-theme-ocean .hljs-type { color: #4EC9B0; }
-      .hljs-theme-ocean .hljs-function, .hljs-theme-ocean .hljs-tag .hljs-name { color: #DCDCAA; }
-      .hljs-theme-ocean .hljs-attr, .hljs-theme-ocean .hljs-attribute { color: #9CDCFE; }
-      .hljs-theme-ocean .hljs-meta, .hljs-theme-ocean .hljs-doctype { color: #9B9B9B; }
-      .hljs-theme-ocean .hljs-bullet, .hljs-theme-ocean .hljs-link { color: #6A9955; }
-      .hljs-theme-ocean .hljs-emphasis { font-style: italic; }
-      .hljs-theme-ocean .hljs-strong { font-weight: 600; }
-      .hljs-theme-ocean .hljs-deletion { color: #D16969; }
-      .hljs-theme-ocean .hljs-addition { color: #6A9955; }
+      .hljs-theme-ocean { color: #D4D4D4 !important; background: #1A1F2E !important; }
+      .hljs-theme-ocean code { color: #D4D4D4 !important; background: transparent !important; }
+      .hljs-theme-ocean pre { background: #1A1F2E !important; border-color: rgba(255,255,255,0.08) !important; }
+      .hljs-theme-ocean .hljs-comment, .hljs-theme-ocean .hljs-quote { color: #6A9955 !important; }
+      .hljs-theme-ocean .hljs-keyword, .hljs-theme-ocean .hljs-selector-tag { color: #569CD6 !important; }
+      .hljs-theme-ocean .hljs-string, .hljs-theme-ocean .hljs-template-variable, .hljs-theme-ocean .hljs-template-tag { color: #CE9178 !important; }
+      .hljs-theme-ocean .hljs-number, .hljs-theme-ocean .hljs-literal { color: #B5CEA8 !important; }
+      .hljs-theme-ocean .hljs-title, .hljs-theme-ocean .hljs-built_in, .hljs-theme-ocean .hljs-type { color: #4EC9B0 !important; }
+      .hljs-theme-ocean .hljs-function, .hljs-theme-ocean .hljs-tag .hljs-name { color: #DCDCAA !important; }
+      .hljs-theme-ocean .hljs-attr, .hljs-theme-ocean .hljs-attribute { color: #9CDCFE !important; }
+      .hljs-theme-ocean .hljs-meta, .hljs-theme-ocean .hljs-doctype { color: #9B9B9B !important; }
+      .hljs-theme-ocean .hljs-bullet, .hljs-theme-ocean .hljs-link { color: #6A9955 !important; }
+      .hljs-theme-ocean .hljs-emphasis { font-style: italic !important; }
+      .hljs-theme-ocean .hljs-strong { font-weight: 600 !important; }
+      .hljs-theme-ocean .hljs-deletion { color: #D16969 !important; }
+      .hljs-theme-ocean .hljs-addition { color: #6A9955 !important; }
     `
     document.head.appendChild(style)
     return () => { style.remove() }

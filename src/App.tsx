@@ -848,6 +848,52 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
+import hljs from 'highlight.js/lib/core'
+import ts from 'highlight.js/lib/languages/typescript'
+import bash from 'highlight.js/lib/languages/bash'
+import json from 'highlight.js/lib/languages/json'
+import xml from 'highlight.js/lib/languages/xml'
+import css from 'highlight.js/lib/languages/css'
+import yaml from 'highlight.js/lib/languages/yaml'
+import markdown from 'highlight.js/lib/languages/markdown'
+import python from 'highlight.js/lib/languages/python'
+import rust from 'highlight.js/lib/languages/rust'
+import cpp from 'highlight.js/lib/languages/cpp'
+import java from 'highlight.js/lib/languages/java'
+import sql from 'highlight.js/lib/languages/sql'
+import go from 'highlight.js/lib/languages/go'
+import ruby from 'highlight.js/lib/languages/ruby'
+import swift from 'highlight.js/lib/languages/swift'
+import kotlin from 'highlight.js/lib/languages/kotlin'
+import shell from 'highlight.js/lib/languages/shell'
+
+hljs.registerLanguage('typescript', ts)
+hljs.registerLanguage('ts', ts)
+hljs.registerLanguage('javascript', ts)
+hljs.registerLanguage('js', ts)
+hljs.registerLanguage('bash', bash)
+hljs.registerLanguage('sh', shell)
+hljs.registerLanguage('shell', shell)
+hljs.registerLanguage('json', json)
+hljs.registerLanguage('xml', xml)
+hljs.registerLanguage('html', xml)
+hljs.registerLanguage('css', css)
+hljs.registerLanguage('yaml', yaml)
+hljs.registerLanguage('yml', yaml)
+hljs.registerLanguage('markdown', markdown)
+hljs.registerLanguage('md', markdown)
+hljs.registerLanguage('python', python)
+hljs.registerLanguage('py', python)
+hljs.registerLanguage('rust', rust)
+hljs.registerLanguage('rs', rust)
+hljs.registerLanguage('cpp', cpp)
+hljs.registerLanguage('c++', cpp)
+hljs.registerLanguage('java', java)
+hljs.registerLanguage('sql', sql)
+hljs.registerLanguage('go', go)
+hljs.registerLanguage('ruby', ruby)
+hljs.registerLanguage('swift', swift)
+hljs.registerLanguage('kotlin', kotlin)
 
 function parseMarkdownBody(raw: string) {
   raw = raw.replace(/\r\n/g, '\n')
@@ -875,8 +921,8 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
           ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-4 ml-2" style={{ color: theme.textSec }}>{children}</ol>,
           li: ({ children }) => <li className="text-base leading-relaxed" style={{ color: theme.textSec }}>{children}</li>,
           blockquote: ({ children }) => <blockquote className="border-l-4 pl-4 italic mb-4" style={{ borderColor: theme.border, color: theme.textSec }}>{children}</blockquote>,
-          code: ({ children }) => <code className="px-1.5 py-0.5 rounded text-sm font-mono" style={{ backgroundColor: theme.accentLight, color: theme.accent }}>{children}</code>,
-          pre: ({ children }) => <pre className="rounded-xl overflow-x-auto mb-4 p-4 text-sm font-mono leading-relaxed" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}` }}>{children}</pre>,
+          code: (props) => <CodeBlock {...props} theme={theme} />,
+          pre: ({ children }) => <pre className="rounded-xl overflow-x-auto mb-4 p-4 text-sm leading-relaxed" style={{ backgroundColor: theme.bgDeep, border: `1px solid ${theme.border}` }}>{children}</pre>,
           table: ({ children }) => (
             <div className="overflow-x-auto mb-4">
               <table className="w-full text-sm border-collapse" style={{ borderColor: theme.border }}>{children}</table>
@@ -891,6 +937,25 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
         {content}
       </ReactMarkdown>
     </div>
+  )
+}
+
+function CodeBlock({ className, children, theme }: { className?: string; children?: React.ReactNode; theme: Theme }) {
+  const match = /language-(\w+)/.exec(className || '')
+  const lang = match ? match[1] : ''
+  const value = typeof children === 'string' ? children : ''
+
+  // inline code
+  if (!value || !lang) {
+    return <code className="px-1.5 py-0.5 rounded text-sm font-mono" style={{ backgroundColor: theme.accentLight, color: theme.accent }}>{children}</code>
+  }
+
+  // code block with syntax highlighting via highlight.js
+  const result = hljs.highlight(value, { language: lang, ignoreIllegals: true })
+  return (
+    <code className={`${className} hljs-theme-ocean`}>
+      <span dangerouslySetInnerHTML={{ __html: result.value }} />
+    </code>
   )
 }
 
@@ -1062,6 +1127,32 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
   const [selectedNote, setSelectedNote] = useState<{ title: string; date: string; content: string; file: string } | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
+
+  // Inject highlight.js theme CSS once
+  useEffect(() => {
+    const id = 'hljs-theme-ocean'
+    if (document.getElementById(id)) return
+    const style = document.createElement('style')
+    style.id = id
+    style.textContent = `
+      .hljs-theme-ocean .hljs { color: #2D2418; }
+      .hljs-theme-ocean .hljs-comment, .hljs-theme-ocean .hljs-quote { color: #7A6B5A; font-style: italic; }
+      .hljs-theme-ocean .hljs-keyword, .hljs-theme-ocean .hljs-selector-tag { color: #9B4B6B; }
+      .hljs-theme-ocean .hljs-string, .hljs-theme-ocean .hljs-template-variable, .hljs-theme-ocean .hljs-template-tag { color: #5A8F5A; }
+      .hljs-theme-ocean .hljs-number, .hljs-theme-ocean .hljs-literal { color: #8B6B3A; }
+      .hljs-theme-ocean .hljs-title, .hljs-theme-ocean .hljs-built_in, .hljs-theme-ocean .hljs-type { color: #4A7B8F; }
+      .hljs-theme-ocean .hljs-function, .hljs-theme-ocean .hljs-tag .hljs-name { color: #6B5BAF; }
+      .hljs-theme-ocean .hljs-attr, .hljs-theme-ocean .hljs-attribute { color: #4A6B8F; }
+      .hljs-theme-ocean .hljs-meta, .hljs-theme-ocean .hljs-doctype { color: #7A6B5A; }
+      .hljs-theme-ocean .hljs-bullet, .hljs-theme-ocean .hljs-link { color: #5A7F6B; }
+      .hljs-theme-ocean .hljs-emphasis { font-style: italic; }
+      .hljs-theme-ocean .hljs-strong { font-weight: 600; }
+      .hljs-theme-ocean .hljs-deletion { color: #9B4B4B; }
+      .hljs-theme-ocean .hljs-addition { color: #4B8B4B; }
+    `
+    document.head.appendChild(style)
+    return () => { style.remove() }
+  }, [])
 
   const toggleKey = (key: string) => {
     setExpandedKeys((prev) => {

@@ -299,7 +299,7 @@ function ViewSwitcher({ view, theme, onSelect }: { view: AboutView; theme: Theme
         top: rect ? `${rect.bottom + 6}px` : 0,
         left: rect ? `${rect.left}px` : 0,
         minWidth: rect ? `${rect.width}px` : 'auto',
-        zIndex: 9999,
+        zIndex: 100,
         animation: 'fade-up 150ms ease-out both',
         backgroundColor: theme.bg,
         border: `1px solid ${theme.border}`,

@@ -1079,13 +1079,31 @@ function CodeBlock({ className, children }: { className?: string; children?: Rea
 
   // no language — render as dark code block without highlighting
   if (!lang) {
-    return <div className="hljs-theme-ocean"><pre><code>{children}</code></pre></div>
+    return (
+      <div className="hljs-theme-ocean" style={{ borderRadius: '12px' }}>
+        <pre style={{ margin: 0, padding: '1rem 1.25rem' }}><code>{children}</code></pre>
+      </div>
+    )
   }
 
   const result = hljs.highlight(value, { language: lang, ignoreIllegals: true })
   return (
-    <div className="hljs-theme-ocean">
-      <pre className={className}>
+    <div className="hljs-theme-ocean" style={{ borderRadius: '12px' }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0.5rem 1.25rem',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        fontSize: '0.7rem',
+        fontFamily: "'JetBrains Mono', monospace",
+        color: 'rgba(255,255,255,0.35)',
+        textTransform: 'uppercase',
+        letterSpacing: '0.05em',
+      }}>
+        <span>{lang}</span>
+      </div>
+      <pre className={className} style={{ margin: 0, padding: '1rem 1.25rem' }}>
         <span dangerouslySetInnerHTML={{ __html: result.value }} />
       </pre>
     </div>
@@ -1347,22 +1365,36 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
     const style = document.createElement('style')
     style.id = id
     style.textContent = `
-      .hljs-theme-ocean { color: #D4D4D4 !important; background: #1A1F2E !important; }
-      .hljs-theme-ocean pre { color: #D4D4D4 !important; background: #1A1F2E !important; }
+      .hljs-theme-ocean {
+        color: #D4D4D4 !important;
+        background: #262630 !important;
+        border: 1px solid rgba(120,120,130,0.15) !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+        margin: 1rem 0 !important;
+        overflow: hidden;
+      }
+      .hljs-theme-ocean pre {
+        color: #D4D4D4 !important;
+        background: transparent !important;
+        font-family: 'JetBrains Mono', 'Fira Code', Menlo, Consolas, monospace !important;
+        font-size: 0.875rem !important;
+        line-height: 1.7 !important;
+        tab-size: 2 !important;
+      }
       .hljs-theme-ocean code { color: #D4D4D4 !important; background: transparent !important; }
-      .hljs-theme-ocean .hljs-comment, .hljs-theme-ocean .hljs-quote { color: #6A9955 !important; }
-      .hljs-theme-ocean .hljs-keyword, .hljs-theme-ocean .hljs-selector-tag { color: #569CD6 !important; }
-      .hljs-theme-ocean .hljs-string, .hljs-theme-ocean .hljs-template-variable, .hljs-theme-ocean .hljs-template-tag { color: #CE9178 !important; }
-      .hljs-theme-ocean .hljs-number, .hljs-theme-ocean .hljs-literal { color: #B5CEA8 !important; }
-      .hljs-theme-ocean .hljs-title, .hljs-theme-ocean .hljs-built_in, .hljs-theme-ocean .hljs-type { color: #4EC9B0 !important; }
-      .hljs-theme-ocean .hljs-function, .hljs-theme-ocean .hljs-tag .hljs-name { color: #DCDCAA !important; }
-      .hljs-theme-ocean .hljs-attr, .hljs-theme-ocean .hljs-attribute { color: #9CDCFE !important; }
-      .hljs-theme-ocean .hljs-meta, .hljs-theme-ocean .hljs-doctype { color: #9B9B9B !important; }
-      .hljs-theme-ocean .hljs-bullet, .hljs-theme-ocean .hljs-link { color: #6A9955 !important; }
+      .hljs-theme-ocean .hljs-comment, .hljs-theme-ocean .hljs-quote { color: #6A737D !important; }
+      .hljs-theme-ocean .hljs-keyword, .hljs-theme-ocean .hljs-selector-tag { color: #C792EA !important; }
+      .hljs-theme-ocean .hljs-string, .hljs-theme-ocean .hljs-template-variable, .hljs-theme-ocean .hljs-template-tag { color: #C3E88D !important; }
+      .hljs-theme-ocean .hljs-number, .hljs-theme-ocean .hljs-literal { color: #F78C6C !important; }
+      .hljs-theme-ocean .hljs-title, .hljs-theme-ocean .hljs-built_in, .hljs-theme-ocean .hljs-type { color: #82AAFF !important; }
+      .hljs-theme-ocean .hljs-function, .hljs-theme-ocean .hljs-tag .hljs-name { color: #82AAFF !important; }
+      .hljs-theme-ocean .hljs-attr, .hljs-theme-ocean .hljs-attribute { color: #FFCB6B !important; }
+      .hljs-theme-ocean .hljs-meta, .hljs-theme-ocean .hljs-doctype { color: #546E7A !important; }
+      .hljs-theme-ocean .hljs-bullet, .hljs-theme-ocean .hljs-link { color: #89DDFF !important; }
       .hljs-theme-ocean .hljs-emphasis { font-style: italic !important; }
       .hljs-theme-ocean .hljs-strong { font-weight: 600 !important; }
-      .hljs-theme-ocean .hljs-deletion { color: #D16969 !important; }
-      .hljs-theme-ocean .hljs-addition { color: #6A9955 !important; }
+      .hljs-theme-ocean .hljs-deletion { color: #FF5370 !important; }
+      .hljs-theme-ocean .hljs-addition { color: #C3E88D !important; }
     `
     document.head.appendChild(style)
     return () => { style.remove() }

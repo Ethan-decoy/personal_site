@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type ReactNode } from 'react'
+import { useState, useEffect, useRef, createPortal, type ReactNode } from 'react'
 
 /* ==================== Themes ==================== */
 
@@ -265,6 +265,7 @@ type AboutView = 'personal' | 'work'
 
 function ViewSwitcher({ view, theme, onSelect }: { view: AboutView; theme: Theme; onSelect: (v: AboutView) => void }) {
   const [open, setOpen] = useState(false)
+  const btnRef = useRef<HTMLButtonElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const views: { key: AboutView; label: string }[] = [
     { key: 'work', label: '工作' },
@@ -281,10 +282,55 @@ function ViewSwitcher({ view, theme, onSelect }: { view: AboutView; theme: Theme
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
+  // 计算按钮位置，供 Portal 面板使用
+  const [rect, setRect] = useState<DOMRect | null>(null)
+
+  useEffect(() => {
+    if (!open || !btnRef.current) return
+    setRect(btnRef.current.getBoundingClientRect())
+  }, [open])
+
+  const dropdown = open ? (
+    <div
+      ref={containerRef}
+      style={{
+        position: 'fixed',
+        top: rect ? `${rect.bottom + 6}px` : 0,
+        left: rect ? `${rect.left}px` : 0,
+        minWidth: rect ? `${rect.width}px` : 'auto',
+        zIndex: 9999,
+        animation: 'fade-up 150ms ease-out both',
+        backgroundColor: theme.bg,
+        border: `1px solid ${theme.border}`,
+        borderRadius: '12px',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+        padding: '4px',
+      }}
+    >
+      {views.map((v) => (
+        <button
+          key={v.key}
+          onClick={() => {
+            onSelect(v.key)
+            setOpen(false)
+          }}
+          className="w-full text-left px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ease-out"
+          style={{
+            color: view === v.key ? theme.accent : theme.textSec,
+            backgroundColor: view === v.key ? theme.accentLight : 'transparent',
+          }}
+        >
+          {v.label}
+        </button>
+      ))}
+    </div>
+  ) : null
+
   return (
-    <div ref={containerRef} className="mb-3 relative" style={{ width: 'fit-content' }}>
+    <div className="mb-3" style={{ width: 'fit-content' }}>
       {/* 触发按钮 */}
       <button
+        ref={btnRef}
         onClick={() => setOpen((v) => !v)}
         className="px-4 py-2 text-sm font-medium rounded-xl cursor-pointer transition-all duration-200 ease-out flex items-center gap-2"
         style={{
@@ -313,41 +359,8 @@ function ViewSwitcher({ view, theme, onSelect }: { view: AboutView; theme: Theme
         </svg>
       </button>
 
-      {/* 下拉面板 */}
-      {open && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 'calc(100% + 6px)',
-            left: 0,
-            minWidth: '100%',
-            zIndex: 9999,
-            animation: 'fade-up 150ms ease-out both',
-            backgroundColor: theme.bg,
-            border: `1px solid ${theme.border}`,
-            borderRadius: '12px',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-            padding: '4px',
-          }}
-        >
-          {views.map((v) => (
-            <button
-              key={v.key}
-              onClick={() => {
-                onSelect(v.key)
-                setOpen(false)
-              }}
-              className="w-full text-left px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ease-out"
-              style={{
-                color: view === v.key ? theme.accent : theme.textSec,
-                backgroundColor: view === v.key ? theme.accentLight : 'transparent',
-              }}
-            >
-              {v.label}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* 下拉面板 — Portal 渲染到 body，脱离局部 stacking context */}
+      {open && createPortal(dropdown, document.body)}
     </div>
   )
 }

@@ -314,41 +314,40 @@ function ViewSwitcher({ view, theme, onSelect }: { view: AboutView; theme: Theme
       </button>
 
       {/* 下拉面板 */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 'calc(100% + 6px)',
-          left: 0,
-          minWidth: '100%',
-          zIndex: 50,
-          opacity: open ? 1 : 0,
-          transform: open ? 'translateY(0)' : 'translateY(-4px)',
-          pointerEvents: open ? 'auto' : 'none',
-          transition: 'opacity 200ms ease-out, transform 200ms ease-out',
-          backgroundColor: theme.bg,
-          border: `1px solid ${theme.border}`,
-          borderRadius: '12px',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
-          padding: '4px',
-        }}
-      >
-        {views.map((v) => (
-          <button
-            key={v.key}
-            onClick={() => {
-              onSelect(v.key)
-              setOpen(false)
-            }}
-            className="w-full text-left px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ease-out"
-            style={{
-              color: view === v.key ? theme.accent : theme.textSec,
-              backgroundColor: view === v.key ? theme.accentLight : 'transparent',
-            }}
-          >
-            {v.label}
-          </button>
-        ))}
-      </div>
+      {open && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 6px)',
+            left: 0,
+            minWidth: '100%',
+            zIndex: 50,
+            animation: 'fade-up 150ms ease-out both',
+            backgroundColor: theme.bgDeep,
+            border: `1px solid ${theme.border}`,
+            borderRadius: '12px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+            padding: '4px',
+          }}
+        >
+          {views.map((v) => (
+            <button
+              key={v.key}
+              onClick={() => {
+                onSelect(v.key)
+                setOpen(false)
+              }}
+              className="w-full text-left px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ease-out"
+              style={{
+                color: view === v.key ? theme.accent : theme.textSec,
+                backgroundColor: view === v.key ? theme.accentLight : 'transparent',
+              }}
+            >
+              {v.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

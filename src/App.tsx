@@ -264,7 +264,7 @@ type AboutView = 'personal' | 'work'
 /* ==================== About Page ==================== */
 
 function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate: (s: Section, sub?: AboutView) => void; aboutView?: AboutView }) {
-  const view = aboutView ?? 'personal'
+  const view = aboutView ?? 'work'
   const [valuesExpanded, setValuesExpanded] = useState(false)
   const [valuesContentOpen, setValuesContentOpen] = useState(false)
   const [valuesHovered, setValuesHovered] = useState(false)
@@ -274,10 +274,6 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
   const [blindspotsHovered, setBlindspotsHovered] = useState(false)
   const [hoveredRelTrait, setHoveredRelTrait] = useState<string | null>(null)
 
-  const views: { key: AboutView; label: string }[] = [
-    { key: 'personal', label: '生活' },
-    { key: 'work', label: '工作' },
-  ]
 
   const values = [
     { title: '追根溯源', desc: '从根本上讲是什么问题导致的？' },
@@ -306,20 +302,23 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
         <SectionTitle theme={theme}>关于</SectionTitle>
 
         {/* 视图切换 */}
-        <div className="flex gap-1 mb-3">
-          {views.map((v) => (
-            <button
-              key={v.key}
-              className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ease-out relative"
-              style={{
-                color: view === v.key ? theme.text : theme.textSec,
-                backgroundColor: view === v.key ? theme.accentLight : 'transparent',
-              }}
-              onClick={() => onNavigate('about', v.key)}
-            >
-              {v.label}
-            </button>
-          ))}
+        <div className="mb-3">
+          <select
+            value={view}
+            onChange={(e) => onNavigate('about', e.target.value as AboutView)}
+            className="px-3 py-1.5 text-sm font-medium rounded-lg border-0 outline-none cursor-pointer appearance-none"
+            style={{
+              color: theme.text,
+              backgroundColor: theme.accentLight,
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='${encodeURIComponent(theme.textSec)}' d='M6 8.825L1.175 4h9.65z'/%3E%3C/svg%3E")`,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 10px center',
+              paddingRight: '2rem',
+            }}
+          >
+            <option value="work">工作</option>
+            <option value="personal">生活</option>
+          </select>
         </div>
       </div>
 
@@ -1581,7 +1580,7 @@ const sectionTheme: Record<Section, ThemeKey> = {
 
 function App() {
   const [active, setActive] = useState<Section>('home')
-  const [aboutView, setAboutView] = useState<AboutView>('personal')
+  const [aboutView, setAboutView] = useState<AboutView>('work')
   const theme = themes[sectionTheme[active]]
   const Page = sectionMap[active]
 

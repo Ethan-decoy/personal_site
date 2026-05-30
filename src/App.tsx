@@ -730,7 +730,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                       </p>
                     </div>
                     {[
-                      { title: '情感疏离', detail: '表面功夫的关心会让你觉得温暖吗？' },
+                      { title: '情感疏离', detail: '流于表面的关心会让你觉得温暖吗？' },
                       { title: '压力与强控', detail: '直接批评，忽视情感，追求按自己方式行事，会无意中压制他人的想法与自发性。' },
                       { title: '缺乏耐心', detail: '当他人处理事情慢一点或更情绪化时，容易变得急躁并引发紧张。' },
                       { title: '自我隔离', detail: '当压力大时，会选择独处，他人无法靠近或提供帮助。' },

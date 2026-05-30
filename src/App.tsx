@@ -267,7 +267,8 @@ type AboutView = 'personal' | 'work'
 function ViewSwitcher({ view, theme, onSelect }: { view: AboutView; theme: Theme; onSelect: (v: AboutView) => void }) {
   const [open, setOpen] = useState(false)
   const btnRef = useRef<HTMLButtonElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
   const views: { key: AboutView; label: string }[] = [
     { key: 'work', label: '工作' },
     { key: 'personal', label: '生活' },
@@ -277,7 +278,13 @@ function ViewSwitcher({ view, theme, onSelect }: { view: AboutView; theme: Theme
   useEffect(() => {
     if (!open) return
     const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false)
+      const target = e.target as Node
+      if (
+        !wrapperRef.current?.contains(target) &&
+        !panelRef.current?.contains(target)
+      ) {
+        setOpen(false)
+      }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
@@ -293,7 +300,7 @@ function ViewSwitcher({ view, theme, onSelect }: { view: AboutView; theme: Theme
 
   const dropdown = open ? (
     <div
-      ref={containerRef}
+      ref={panelRef}
       style={{
         position: 'fixed',
         top: rect ? `${rect.bottom + 6}px` : 0,
@@ -328,7 +335,7 @@ function ViewSwitcher({ view, theme, onSelect }: { view: AboutView; theme: Theme
   ) : null
 
   return (
-    <div className="mb-3" style={{ width: 'fit-content' }}>
+    <div ref={wrapperRef} className="mb-3" style={{ width: 'fit-content' }}>
       {/* 触发按钮 */}
       <button
         ref={btnRef}

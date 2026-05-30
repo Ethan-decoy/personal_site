@@ -1070,12 +1070,18 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
 function CodeBlock({ className, children }: { className?: string; children?: React.ReactNode }) {
   const match = /language-(\w+)/.exec(className || '')
   const lang = match ? match[1] : ''
-  const value = typeof children === 'string' ? children : ''
 
-  // inline code
-  if (!value) {
-    return <code>{children}</code>
+  // inline code — no className means it's inline, not a block
+  if (!className) {
+    return <code style={{
+      fontFamily: "'JetBrains Mono', monospace",
+      fontSize: '0.875rem',
+      padding: '0.15em 0.4em',
+      borderRadius: '6px',
+    }}>{children}</code>
   }
+
+  const value = typeof children === 'string' ? children : ''
 
   // no language — render as dark code block without highlighting
   if (!lang) {

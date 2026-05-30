@@ -1078,6 +1078,7 @@ function CodeBlock({ className, children }: { className?: string; children?: Rea
       fontSize: '0.875rem',
       padding: '0.15em 0.4em',
       borderRadius: '6px',
+      backgroundColor: 'rgba(0,0,0,0.06)',
     }}>{children}</code>
   }
 

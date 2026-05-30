@@ -261,6 +261,98 @@ function HomePage({ theme, onNavigate }: { theme: Theme; onNavigate: (s: Section
 
 type AboutView = 'personal' | 'work'
 
+/* ==================== About View Switcher ==================== */
+
+function ViewSwitcher({ view, theme, onSelect }: { view: AboutView; theme: Theme; onSelect: (v: AboutView) => void }) {
+  const [open, setOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const views: { key: AboutView; label: string }[] = [
+    { key: 'work', label: '工作' },
+    { key: 'personal', label: '生活' },
+  ]
+  const current = views.find((v) => v.key === view)!
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  return (
+    <div ref={containerRef} className="mb-3 relative" style={{ width: 'fit-content' }}>
+      {/* 触发按钮 */}
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="px-4 py-2 text-sm font-medium rounded-xl cursor-pointer transition-all duration-200 ease-out flex items-center gap-2"
+        style={{
+          color: theme.text,
+          backgroundColor: theme.bg,
+          borderColor: open ? theme.accent : theme.border,
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          boxShadow: open ? `0 4px 12px ${theme.border}` : '0 1px 2px rgba(0,0,0,0.05)',
+          transform: open ? 'translateY(-1px)' : 'none',
+        }}
+      >
+        {current.label}
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 12 12"
+          fill="none"
+          style={{
+            transition: 'transform 200ms ease-out',
+            transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+            color: theme.textSec,
+          }}
+        >
+          <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+
+      {/* 下拉面板 */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 'calc(100% + 6px)',
+          left: 0,
+          minWidth: '100%',
+          zIndex: 50,
+          opacity: open ? 1 : 0,
+          transform: open ? 'translateY(0)' : 'translateY(-4px)',
+          pointerEvents: open ? 'auto' : 'none',
+          transition: 'opacity 200ms ease-out, transform 200ms ease-out',
+          backgroundColor: theme.bg,
+          border: `1px solid ${theme.border}`,
+          borderRadius: '12px',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+          padding: '4px',
+        }}
+      >
+        {views.map((v) => (
+          <button
+            key={v.key}
+            onClick={() => {
+              onSelect(v.key)
+              setOpen(false)
+            }}
+            className="w-full text-left px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ease-out"
+            style={{
+              color: view === v.key ? theme.accent : theme.textSec,
+              backgroundColor: view === v.key ? theme.accentLight : 'transparent',
+            }}
+          >
+            {v.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 /* ==================== About Page ==================== */
 
 function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate: (s: Section, sub?: AboutView) => void; aboutView?: AboutView }) {
@@ -301,25 +393,12 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
       >
         <SectionTitle theme={theme}>关于</SectionTitle>
 
-        {/* 视图切换 */}
-        <div className="mb-3">
-          <select
-            value={view}
-            onChange={(e) => onNavigate('about', e.target.value as AboutView)}
-            className="px-3 py-1.5 text-sm font-medium rounded-lg border-0 outline-none cursor-pointer appearance-none"
-            style={{
-              color: theme.text,
-              backgroundColor: theme.accentLight,
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='${encodeURIComponent(theme.textSec)}' d='M6 8.825L1.175 4h9.65z'/%3E%3C/svg%3E")`,
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'right 10px center',
-              paddingRight: '2rem',
-            }}
-          >
-            <option value="work">工作</option>
-            <option value="personal">生活</option>
-          </select>
-        </div>
+        {/* 视图切换 — 自定义下拉框 */}
+        <ViewSwitcher
+          view={view}
+          theme={theme}
+          onSelect={(v) => onNavigate('about', v)}
+        />
       </div>
 
       {/* 个人面向 */}

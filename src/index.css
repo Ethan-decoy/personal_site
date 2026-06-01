@@ -127,6 +127,28 @@ body {
   --tw-prose-th-borders: rgba(15, 27, 45, 0.12);
   --tw-prose-td-borders: rgba(15, 27, 45, 0.12);
 }
+/* ocean — inline code with subtle navy-tinted bg + rounded border */
+.prose-ocean code {
+  background-color: rgba(27, 58, 92, 0.08);
+  border: 1px solid rgba(27, 58, 92, 0.12);
+  border-radius: 6px;
+  padding: 0.15em 0.4em;
+}
+/* ocean — term badge (kbd) */
+.prose-ocean kbd {
+  display: inline-block;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 0.88em;
+  letter-spacing: 0.02em;
+  padding: 0.12em 0.45em;
+  border-radius: 6px;
+  border: 1px solid rgba(27, 58, 92, 0.2);
+  background: rgba(27, 58, 92, 0.06);
+  color: #1B3A5C;
+  vertical-align: baseline;
+  transition: background 0.2s ease-out;
+}
 
 /* sage (浅青绿) */
 .prose-sage {

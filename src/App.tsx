@@ -1037,7 +1037,12 @@ function Callout({ children, ...rest }: { children?: React.ReactNode } & Record<
 }
 
 function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) {
-  const proseThemeMap: Record<string, string> = { earth: 'earth', ocean: 'ocean', sage: 'sage', black: 'black' }
+  const proseThemeMap: Record<string, string> = {
+    '浅棕米白': 'earth',
+    '深蓝黑': 'ocean',
+    '浅青绿': 'sage',
+    '黑': 'black',
+  }
   const proseTheme = proseThemeMap[theme.name] || 'earth'
 
   // Inject term badge CSS (theme-aware via CSS variables on the prose container)
@@ -1103,13 +1108,12 @@ function CodeBlock({ className, children }: { className?: string; children?: Rea
   const lang = match ? match[1] : ''
 
   // inline code — no className means it's inline, not a block
+  // styling is delegated to the prose-${proseTheme} code CSS rule in <MarkdownPreview>
   if (!className) {
     return <code style={{
       fontFamily: "'JetBrains Mono', monospace",
       fontSize: '0.875rem',
       padding: '0.15em 0.4em',
-      borderRadius: '6px',
-      backgroundColor: 'rgba(0,0,0,0.06)',
     }}>{children}</code>
   }
 

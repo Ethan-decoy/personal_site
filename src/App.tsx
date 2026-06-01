@@ -1089,9 +1089,21 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
             if (href.startsWith('http')) {
               return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
             }
-            const noteFile = `./${href.replace(/^\.\/?/, '').replace(/\.md$/, '.md')}`
+            // Internal link: "./wiki.md#idl" or "./robotics/ros2/basic_concepts.md"
+            const [path, anchor] = href.replace(/^\.\/?/, '').split('#')
+            const noteFile = `./${path.replace(/\.md$/, '')}.md`
             if (modules[noteFile]) {
-              return <a href={`#notes/${noteFile}`}>{children}</a>
+              return (
+                <a
+                  href="javascript:void(0)"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    window.dispatchEvent(new CustomEvent('note:open', { detail: { file: noteFile, anchor: anchor || null } }))
+                  }}
+                >
+                  {children}
+                </a>
+              )
             }
             return <a href={href}>{children}</a>
           },
@@ -1384,6 +1396,13 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
   })
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [selectedNote, setSelectedNote] = useState<{ title: string; date: string; content: string; file: string } | null>(null)
+  const currentNoteFile = useRef<string | null>(null)
+  const [backToSource, setBackToSource] = useState<{ file: string; scrollY: number } | null>(null)
+
+  // Keep ref in sync for use in hash handler closure
+  useEffect(() => {
+    currentNoteFile.current = selectedNote?.file ?? null
+  }, [selectedNote])
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
   const [showBackTop, setShowBackTop] = useState(false)
@@ -1444,32 +1463,47 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
     return () => { style.remove() }
   }, [])
 
-  // Handle hash-based note navigation (from markdown internal links)
+  // Track pending anchor for cross-note navigation
+  const [pendingAnchor, setPendingAnchor] = useState<string | null>(null)
+
+  // Handle internal link clicks via custom event
   useEffect(() => {
-    const handleHash = () => {
-      const hash = window.location.hash
-      const m = hash.match(/^#notes\/(\.\/.+\.md)$/)
-      if (m) {
-        const file = m[1]
-        const raw = modules[file]
-        if (raw) {
-          const fm = parseFrontmatter(raw)
-          const body = parseMarkdownBody(raw)
-          setSelectedNote({ title: fm.title || file, date: fm.date, content: body, file })
-          // auto-expand parent directories
-          const parts = file.replace(/^\.\//, '').split('/')
-          const newExpanded = new Set<string>()
-          for (let i = 0; i < parts.length - 1; i++) {
-            newExpanded.add(parts.slice(0, i + 1).join(' > '))
-          }
-          setExpandedKeys(newExpanded)
-        }
+    const handler = (e: Event) => {
+      const { file, anchor } = (e as CustomEvent).detail as { file: string; anchor: string | null }
+      const raw = modules[file]
+      if (!raw) return
+      const fm = parseFrontmatter(raw)
+      // Remember source before navigating to wiki
+      if (file === './wiki.md') {
+        setBackToSource(currentNoteFile.current ? { file: currentNoteFile.current, scrollY: window.scrollY } : null)
+      } else {
+        setBackToSource(null)
       }
+      const body = parseMarkdownBody(raw)
+      setSelectedNote({ title: fm.title || file, date: fm.date, content: body, file })
+      if (file !== './wiki.md') {
+        const parts = file.replace(/^\.\//, '').split('/')
+        const newExpanded = new Set<string>()
+        for (let i = 0; i < parts.length - 1; i++) {
+          newExpanded.add(parts.slice(0, i + 1).join(' > '))
+        }
+        setExpandedKeys(newExpanded)
+      }
+      if (anchor) setPendingAnchor(anchor)
     }
-    handleHash()
-    window.addEventListener('hashchange', handleHash)
-    return () => window.removeEventListener('hashchange', handleHash)
-  }, [])
+    window.addEventListener('note:open', handler)
+    return () => window.removeEventListener('note:open', handler)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Scroll to anchor after note content changes
+  useEffect(() => {
+    if (!pendingAnchor) return
+    const el = document.getElementById(pendingAnchor)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      setPendingAnchor(null)
+    }
+  }, [pendingAnchor, selectedNote?.file])
 
   const toggleKey = (key: string) => {
     setExpandedKeys((prev) => {
@@ -1483,6 +1517,7 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
     const raw = modules[file]
     if (!raw) return
     const fm = parseFrontmatter(raw)
+    setBackToSource(null)
     setSelectedNote({
       title: fm.title || title,
       date: fm.date,
@@ -1569,6 +1604,27 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
       {/* 右侧工具栏：fixed 在页面右侧留白区域 */}
       {selectedNote && (
         <div className="hidden md:flex flex-col items-center fixed right-[calc((100vw-96rem)/2+3rem)] top-1/2 -translate-y-1/2 z-10">
+          {/* Back to source — wiki only, absolute so it doesn't push the slider */}
+          {backToSource && (() => {
+            const srcRaw = modules[backToSource.file]
+            const srcTitle = srcRaw ? parseFrontmatter(srcRaw).title : '笔记'
+            return (
+              <button
+                aria-label="返回来源笔记"
+                onClick={() => openNote(backToSource.file, srcTitle)}
+                className="absolute w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out"
+                style={{
+                  top: '-80px',
+                  backgroundColor: theme.bgDeep,
+                  border: `1px solid ${theme.border}`,
+                }}
+              >
+                <svg className="w-3 h-3" style={{ color: theme.textSec }} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M10 3l-5 5 5 5" />
+                </svg>
+              </button>
+            )
+          })()}
           <SliderTrack progress={progress} accent={theme.accent} accentLight={theme.accentLight} />
           <div className="mt-12">
             <button

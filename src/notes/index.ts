@@ -67,6 +67,9 @@ function buildTree(): TreeNode[] {
       continue
     }
 
+    // 跳过 wiki.md，不显示在侧边栏树中
+    if (file === './wiki.md') continue
+
     const parts = file.replace(/^\.\//, '').split('/')
     const catParts = parts.length > 1 ? parts.slice(0, -1) : ['other']
     const fm = parseFrontmatter(raw)
@@ -114,6 +117,7 @@ export function searchNotes(query: string): SearchResult[] {
 
   for (const [file, raw] of Object.entries(modules)) {
     if (file.endsWith('/_index.md')) continue
+    if (file === './wiki.md') continue
     const fm = parseFrontmatter(raw)
     // 标题匹配
     const titleMatch = fm.title.toLowerCase().includes(q)
@@ -147,6 +151,7 @@ export function getSuggestions(query: string): string[] {
 
   for (const [file, raw] of Object.entries(modules)) {
     if (file.endsWith('/_index.md')) continue
+    if (file === './wiki.md') continue
     const fm = parseFrontmatter(raw)
     // 模糊匹配：检查 query 的字符是否按顺序出现在标题中
     const title = fm.title.toLowerCase()

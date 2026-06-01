@@ -1053,6 +1053,11 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
       style={termVars}
     >
       <style>{`
+        /* cancel Tailwind typography's auto-backtick pseudo-elements on <code> */
+        .prose-${proseTheme} code::before,
+        .prose-${proseTheme} code::after {
+          content: '' !important;
+        }
         .prose-${proseTheme} kbd {
           display: inline-block;
           font-family: inherit;
@@ -1443,7 +1448,8 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
         const raw = modules[file]
         if (raw) {
           const fm = parseFrontmatter(raw)
-          setSelectedNote({ title: fm.title || file, date: fm.date, content: parseMarkdownBody(raw), file })
+          const body = parseMarkdownBody(raw)
+          setSelectedNote({ title: fm.title || file, date: fm.date, content: body, file })
           // auto-expand parent directories
           const parts = file.replace(/^\.\//, '').split('/')
           const newExpanded = new Set<string>()

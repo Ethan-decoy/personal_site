@@ -1054,10 +1054,12 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
 
   return (
     <div
-      className={`max-w-2xl prose prose-${proseTheme} prose-headings:tracking-tight prose-a:no-underline hover:prose-a:underline`}
+      className={`w-full prose prose-${proseTheme} prose-headings:tracking-tight prose-a:no-underline hover:prose-a:underline`}
       style={termVars}
     >
       <style>{`
+        /* override prose's 65ch max-width so content fills available space */
+        .prose-${proseTheme} { max-width: none !important; }
         /* cancel Tailwind typography's auto-backtick pseudo-elements on <code> */
         .prose-${proseTheme} code::before,
         .prose-${proseTheme} code::after {
@@ -1592,7 +1594,7 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
             <p className="text-xs mt-2" style={{ color: theme.textSec, opacity: 0.5 }}>在 src/notes/ 下创建子目录并放入 .md 文件即可自动收录。</p>
           </div>
         ) : (
-          <div className="mt-8 max-w-2xl" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
+          <div className="mt-8 max-w-4xl" style={{ animation: 'fade-up 0.6s ease-out both', animationDelay: '150ms' }}>
             {/* 手机端：折叠/展开分类 */}
             <button
               className="md:hidden flex items-center justify-between w-full py-3 px-4 rounded-xl mb-2"

@@ -1040,8 +1040,34 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
   const proseThemeMap: Record<string, string> = { earth: 'earth', ocean: 'ocean', sage: 'sage', black: 'black' }
   const proseTheme = proseThemeMap[theme.name] || 'earth'
 
+  // Inject term badge CSS (theme-aware via CSS variables on the prose container)
+  const termVars = {
+    '--term-border': theme.accent + '33',   // accent @ ~20%
+    '--term-bg': theme.accent + '14',        // accent @ ~8%
+    '--term-text': theme.accent,
+  } as React.CSSProperties
+
   return (
-    <div className={`max-w-2xl prose prose-${proseTheme} prose-headings:tracking-tight prose-a:no-underline hover:prose-a:underline`}>
+    <div
+      className={`max-w-2xl prose prose-${proseTheme} prose-headings:tracking-tight prose-a:no-underline hover:prose-a:underline`}
+      style={termVars}
+    >
+      <style>{`
+        .prose-${proseTheme} kbd {
+          display: inline-block;
+          font-family: inherit;
+          font-weight: 500;
+          font-size: 0.88em;
+          letter-spacing: 0.02em;
+          padding: 0.12em 0.45em;
+          border-radius: 6px;
+          border: 1px solid var(--term-border);
+          background: var(--term-bg);
+          color: var(--term-text);
+          vertical-align: baseline;
+          transition: background 0.2s ease-out;
+        }
+      `}</style>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSlug]}

@@ -1623,7 +1623,11 @@ function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }
             return (
               <button
                 aria-label="返回来源笔记"
-                onClick={() => openNote(backToSource.file, srcTitle)}
+                onClick={() => {
+                  const y = backToSource.scrollY ?? 0
+                  openNote(backToSource.file, srcTitle)
+                  requestAnimationFrame(() => window.scrollTo({ top: y, behavior: 'smooth' }))
+                }}
                 className="absolute w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out"
                 style={{
                   top: '-80px',

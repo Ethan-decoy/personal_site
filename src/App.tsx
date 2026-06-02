@@ -946,6 +946,84 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import rehypeSlug from 'rehype-slug'
+
+/* ---- remark plugin: 用正则处理 **text**（加粗）和 *text*（倾斜）
+ * 绕过 remark 的分隔符规则，保证 CJK 文字旁边也能 100% 识别。
+ */
+function remarkCJKEmphasis() {
+  return (tree: any) => {
+    for (const node of tree.children ?? []) {
+      processEmphasis(node)
+    }
+  }
+}
+
+function processEmphasis(node: any) {
+  const children = node.children
+  if (!children || !Array.isArray(children) || children.length === 0) return
+
+  const newChildren: any[] = []
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i]
+
+    if (child.type === 'text' && typeof child.value === 'string') {
+      let rest = child.value
+      let processed = false
+
+      while (rest.length > 0) {
+        // 找最近的 ** 或 *（优先匹配更早出现的那个）
+        const strongPos = rest.indexOf('**')
+        let emPos = -1
+        for (let j = 0; j < rest.length - 1; j++) {
+          if (rest[j] === '*' && rest[j + 1] !== '*') { emPos = j; break }
+        }
+        // 最后一个字符也可能是单个 *
+        if (emPos < 0 && rest.length > 0 && rest[rest.length - 1] === '*') emPos = rest.length - 1
+
+        if (strongPos >= 0 && (emPos < 0 || strongPos <= emPos)) {
+          // **...** → bold
+          const closePos = rest.indexOf('**', strongPos + 2)
+          if (closePos < 0) break // 没有闭合，停止
+          if (strongPos > 0) newChildren.push({ type: 'text', value: rest.slice(0, strongPos) })
+          newChildren.push({
+            type: 'strong',
+            children: [{ type: 'text', value: rest.slice(strongPos + 2, closePos) }],
+          })
+          rest = rest.slice(closePos + 2)
+          processed = true
+        } else if (emPos >= 0) {
+          // *...* → italic
+          let closePos = -1
+          for (let j = emPos + 1; j < rest.length; j++) {
+            if (rest[j] === '*' && (j + 1 >= rest.length || rest[j + 1] !== '*')) {
+              closePos = j; break
+            }
+          }
+          if (closePos < 0) break // 没有闭合
+          if (emPos > 0) newChildren.push({ type: 'text', value: rest.slice(0, emPos) })
+          newChildren.push({
+            type: 'emphasis',
+            children: [{ type: 'text', value: rest.slice(emPos + 1, closePos) }],
+          })
+          rest = rest.slice(closePos + 1)
+          processed = true
+        } else {
+          break
+        }
+      }
+
+      if (processed) {
+        if (rest.length > 0) newChildren.push({ type: 'text', value: rest })
+      } else {
+        newChildren.push(child)
+      }
+    } else {
+      newChildren.push(child)
+      processEmphasis(child)
+    }
+  }
+  node.children = newChildren
+}
 import hljs from 'highlight.js/lib/core'
 import { highlight as tsHighlight } from './highlighter'
 import ts from 'highlight.js/lib/languages/typescript'
@@ -1082,7 +1160,7 @@ function MarkdownPreview({ content, theme }: { content: string; theme: Theme }) 
         }
       `}</style>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkCJKEmphasis]}
         rehypePlugins={[rehypeRaw, rehypeSlug]}
         components={{
           a: ({ href, children }) => {

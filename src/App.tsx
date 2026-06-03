@@ -448,7 +448,7 @@ function AboutPage({ theme, onNavigate, aboutView }: { theme: Theme; onNavigate:
                   { title: '费曼式学习者', desc: '讲给别人听之前，自己先假装讲一遍。' },
                   { title: 'Google 工程思维', desc: '相信简单可扩展的解决方案，无论写代码还是生活。' },
                   { title: '模拟竞速', desc: '更好的走线，更快的入弯。' },
-                  { title: '单排 AD', desc: '牢中牢，但我扛得住。' },
+                  { title: '单排 AD', desc: '...' },
                   { title: '共产主义', desc: '相信劳动的价值。' },
                   { title: '城市漫步', desc: '散步是整理思绪的最佳方式。' },
                 ].map((item) => (

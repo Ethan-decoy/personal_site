@@ -25,7 +25,7 @@ export function Tag({ children, theme }: { children: ReactNode; theme: Theme }) 
 }
 
 export function NavBar({ theme, active, onNavigate }: { theme: Theme; active: Section; onNavigate: (s: Section) => void }) {
-  const { t, locale, setLocale } = useI18n()
+  const { t } = useI18n()
   const links: { key: Section; label: string }[] = [
     { key: 'home', label: t('nav.home') },
     { key: 'about', label: t('nav.about') },
@@ -43,24 +43,28 @@ export function NavBar({ theme, active, onNavigate }: { theme: Theme; active: Se
             <button key={l.key} className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ease-out relative whitespace-nowrap shrink-0" style={{ color: active === l.key ? theme.text : theme.textSec, backgroundColor: active === l.key ? theme.accentLight : 'transparent' }} onClick={() => onNavigate(l.key)}>{l.label}</button>
           ))}
 
-          {/* Language pill toggle with sliding indicator */}
-          <div className="shrink-0 ml-1 flex items-center relative" style={{ backgroundColor: theme.borderLight, borderRadius: '9999px', padding: '2px' }}>
-            <div
-              className="absolute rounded-full"
-              style={{
-                left: locale === 'zh' ? '2px' : '50%',
-                width: 'calc(50% - 2px)',
-                height: 'calc(100% - 4px)',
-                backgroundColor: theme.accent,
-                transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              }}
-            />
-            <button className="relative z-10 px-2 py-1 text-xs font-semibold rounded-full transition-colors duration-300 ease-out" style={{ color: locale === 'zh' ? '#fff' : theme.textSec, opacity: locale === 'zh' ? 1 : 0.5 }} onClick={() => setLocale('zh')}>中</button>
-            <button className="relative z-10 px-2 py-1 text-xs font-semibold rounded-full transition-colors duration-300 ease-out" style={{ color: locale === 'en' ? '#fff' : theme.textSec, opacity: locale === 'en' ? 1 : 0.5 }} onClick={() => setLocale('en')}>EN</button>
-          </div>
         </div>
       </div>
     </nav>
+  )
+}
+
+export function LangToggle({ locale, setLocale, theme }: { locale: string; setLocale: (l: 'zh' | 'en') => void; theme: Theme }) {
+  return (
+    <button
+      className="fixed top-[18px] right-5 z-50 flex items-center gap-1.5 rounded-full cursor-pointer transition-all duration-200 ease-out"
+      style={{ color: theme.textSec, backgroundColor: `${theme.bg}ee`, backdropFilter: 'blur(12px)', border: `1px solid ${theme.border}`, padding: '6px 10px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+      onClick={() => setLocale(locale === 'zh' ? 'en' : 'zh')}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = theme.accent }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = theme.border }}
+    >
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M2 12h20" />
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+      </svg>
+      <span className="text-xs font-semibold" style={{ fontSize: '0.65rem' }}>{locale === 'zh' ? 'EN' : '中文'}</span>
+    </button>
   )
 }
 

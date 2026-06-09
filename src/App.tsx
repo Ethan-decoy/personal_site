@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { themes, type ThemeKey, type Section } from './themes'
-import { NavBar, Footer } from './components'
+import { NavBar, Footer, LangToggle } from './components'
+import { useI18n } from './i18n'
 import { I18nProvider } from './i18n/index'
 import HomePage from './pages/home'
 import AboutPage from './pages/about'
@@ -31,6 +32,7 @@ function getTheme(key: ThemeKey) {
 }
 
 function AppInner() {
+  const { locale, setLocale } = useI18n()
   const [active, setActive] = useState<Section>('home')
   const [aboutView, setAboutView] = useState<AboutView>('work')
   const theme = getTheme(sectionTheme[active])
@@ -56,6 +58,7 @@ function AppInner() {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: theme.bg, color: theme.text }}>
       <NavBar theme={theme} active={active} onNavigate={navigate} />
+      <LangToggle locale={locale} setLocale={setLocale} theme={theme} />
       <main className="flex-1">
         {active === 'about'
           ? <Page theme={theme} onNavigate={navigate} aboutView={aboutView} />

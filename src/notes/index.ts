@@ -103,6 +103,70 @@ function buildTree(): TreeNode[] {
 export const treeData = buildTree()
 
 /* ---- 搜索 ---- */
+/* ---- 嵌套树形结构（侧边栏递归用） ---- */
+
+export interface NestedFileNode {
+  title: string
+  date: string
+  order?: number
+  file: string
+}
+
+export interface NestedTreeNode {
+  key: string
+  title: string
+  children: (NestedTreeNode | NestedFileNode)[]
+  isDir: boolean
+}
+
+function isNestedTreeNode(node: NestedTreeNode | NestedFileNode): node is NestedTreeNode {
+  return 'key' in node
+}
+
+function buildNestedTreeImpl(): NestedTreeNode[] {
+  const root: Record<string, any> = {}
+  for (const file of Object.keys(modules)) {
+    if (file.endsWith('/_index.md')) continue
+    if (file === './wiki.md') continue
+    const parts = file.replace(/^\.\//, '').split('/')
+    let node = root
+    for (let i = 0; i < parts.length - 1; i++) {
+      const p = parts[i]
+      const k = parts.slice(0, i + 1).join('/')
+      if (!node[k]) node[k] = { key: k, title: p, children: {} }
+      node = node[k].children
+    }
+    const fname = parts[parts.length - 1]
+    node[fname] = { file }
+  }
+
+  function walk(obj: Record<string, any>): (NestedTreeNode | NestedFileNode)[] {
+    const results: (NestedTreeNode | NestedFileNode)[] = []
+    for (const k of Object.keys(obj)) {
+      const v = obj[k]
+      if ('file' in v) {
+        const fm = parseFrontmatter(modules[v.file] || '')
+        results.push({ title: fm.title, date: fm.date, order: fm.order, file: v.file })
+      } else if ('key' in v) {
+        const children = walk(v.children || {})
+        const hasIndex = !!indexMap[v.key]
+        results.push({
+          key: v.key,
+          title: hasIndex ? indexMap[v.key].title : v.title,
+          children,
+          isDir: true,
+        })
+      }
+    }
+    return results
+  }
+  return walk(root).filter(isNestedTreeNode)
+}
+
+export const nestedTree = buildNestedTreeImpl()
+
+/* ---- 搜索 ---- */
+
 export interface SearchResult {
   title: string
   date: string

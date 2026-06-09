@@ -1,0 +1,58 @@
+export const themes = {
+  earth: {
+    name: '浅棕米白',
+    bg: '#F8F3EA',
+    bgDeep: '#F0E8D8',
+    bgCard: '#F5EDE0',
+    text: '#2D2418',
+    textSec: '#7A6B5A',
+    accent: '#9B7B5A',
+    accentHover: '#7E6045',
+    accentLight: 'rgba(155, 123, 90, 0.08)',
+    border: 'rgba(45, 36, 24, 0.12)',
+    borderLight: 'rgba(45, 36, 24, 0.06)',
+  },
+  ocean: {
+    name: '深蓝黑',
+    bg: '#F5F0E8',
+    bgDeep: '#EDE7DB',
+    bgCard: '#F0EBE0',
+    text: '#0F1B2D',
+    textSec: '#4A5D73',
+    accent: '#1B3A5C',
+    accentHover: '#0F2540',
+    accentLight: 'rgba(27, 58, 92, 0.08)',
+    border: 'rgba(15, 27, 45, 0.12)',
+    borderLight: 'rgba(15, 27, 45, 0.06)',
+  },
+  sage: {
+    name: '浅青绿',
+    bg: '#F5F0E8',
+    bgDeep: '#E8EDE6',
+    bgCard: '#EEF3EC',
+    text: '#1A2A24',
+    textSec: '#4E6A5E',
+    accent: '#3D8B7A',
+    accentHover: '#2E6B5E',
+    accentLight: 'rgba(61, 139, 122, 0.08)',
+    border: 'rgba(26, 42, 36, 0.12)',
+    borderLight: 'rgba(26, 42, 36, 0.06)',
+  },
+  black: {
+    name: '黑',
+    bg: '#F5F0E8',
+    bgDeep: '#EDE7DB',
+    bgCard: '#E8E2D6',
+    text: '#0A0A0A',
+    textSec: '#555555',
+    accent: '#0A0A0A',
+    accentHover: '#222222',
+    accentLight: 'rgba(10, 10, 10, 0.08)',
+    border: 'rgba(10, 10, 10, 0.15)',
+    borderLight: 'rgba(10, 10, 10, 0.06)',
+  },
+}
+
+export type ThemeKey = keyof typeof themes
+export type Section = 'home' | 'about' | 'projects' | 'notes' | 'contact'
+export type Theme = (typeof themes)[ThemeKey]

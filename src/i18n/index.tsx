@@ -9,7 +9,11 @@ const I18nContext = createContext<{ locale: Locale; t: (key: DictKey) => string;
 
 export function I18nProvider({ children }: { children: ReactNode }): ReactNode {
   const [locale, setLocale] = useState<Locale>(() => {
-    if (typeof navigator !== 'undefined' && navigator.language.startsWith('en')) return 'en'
+    if (typeof navigator !== 'undefined') {
+      const langs = [navigator.language, ...(navigator.languages || [])]
+      if (langs.some((l) => l.startsWith('zh'))) return 'zh'
+      return 'en'
+    }
     return 'zh'
   })
   const t = (key: DictKey) => dict[key][locale] ?? dict[key].zh

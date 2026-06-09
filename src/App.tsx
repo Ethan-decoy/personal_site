@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { themes, type ThemeKey, type Section } from './themes'
 import { NavBar, Footer } from './components'
+import { I18nProvider } from './i18n/index'
 import HomePage from './pages/home'
 import AboutPage from './pages/about'
 import ProjectsPage from './pages/projects'
@@ -29,7 +30,7 @@ function getTheme(key: ThemeKey) {
   return themes[key]
 }
 
-export default function App() {
+function AppInner() {
   const [active, setActive] = useState<Section>('home')
   const [aboutView, setAboutView] = useState<AboutView>('work')
   const theme = getTheme(sectionTheme[active])
@@ -63,5 +64,13 @@ export default function App() {
       </main>
       <Footer theme={theme} onNavigate={navigate} />
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <I18nProvider>
+      <AppInner />
+    </I18nProvider>
   )
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { type Section, type Theme } from '../themes'
+import { type Section, type Theme, type ThemeMode } from '../themes'
 import { SectionTitle } from '../components'
 import { treeData, modules, indexMap, searchNotes, getSuggestions, parseFrontmatter, nestedTree, type NestedTreeNode } from '../notes'
 import { MarkdownPreview, parseMarkdownBody } from '../notes-renderer'
@@ -97,7 +97,7 @@ function SidebarNode({ node, theme, depth, expandedKeys, onToggle, selectedFile,
   )
 }
 
-export default function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Section) => void }) {
+export default function NotesPage({ theme, mode }: { theme: Theme; onNavigate: (s: Section) => void; mode?: ThemeMode }) {
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(() => {
     const s = new Set<string>()
     if (nestedTree.length > 0) s.add(nestedTree[0].key)
@@ -239,7 +239,7 @@ export default function NotesPage({ theme }: { theme: Theme; onNavigate: (s: Sec
                   <h3 className="text-xl font-bold tracking-tight mb-2" style={{ color: theme.text }}>{selectedNote.title}</h3>
                   <span className="text-xs font-mono" style={{ color: theme.textSec, opacity: 0.4 }}>{selectedNote.date}</span>
                 </div>
-                <MarkdownPreview content={selectedNote.content} theme={theme} />
+                <MarkdownPreview content={selectedNote.content} theme={theme} isDark={mode === 'dark'} />
               </div>
             ) : (
               <div className="flex items-center justify-center h-48"><p className="text-sm" style={{ color: theme.textSec, opacity: 0.3 }}>选择一篇笔记开始阅读</p></div>

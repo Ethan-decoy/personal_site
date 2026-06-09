@@ -54,56 +54,113 @@ hljs.registerLanguage('ruby', ruby)
 hljs.registerLanguage('swift', swift)
 hljs.registerLanguage('kotlin', kotlin)
 
-/* ---- Catppuccin Mocha theme injection ---- */
-export function useHljsTheme() {
+/* ---- Code highlighter themes ---- */
+const HLJS_THEMES = {
+  light: {
+    bg: '#F5F0EB',
+    text: '#2D2A24',
+    comment: '#8C8378',
+    keyword: '#8B5A7C',
+    string: '#5B7A3A',
+    number: '#B85A2E',
+    function: '#3A6B8C',
+    class_: '#8C6B3A',
+    type: '#8C6B3A',
+    builtIn: '#A03A5A',
+    variable: '#2D2A24',
+    templateVar: '#A03A5A',
+    attr: '#B85A2E',
+    meta: '#8C8378',
+    metaKeyword: '#8B5A7C',
+    metaString: '#5B7A3A',
+    punctuation: '#6B6358',
+    operator: '#6B6358',
+    bullet: '#3A8C6B',
+    link: '#3A6B8C',
+    deletion: '#A03A5A',
+    addition: '#5B7A3A',
+    border: 'rgba(45, 36, 24, 0.12)',
+    langBar: 'rgba(45, 36, 24, 0.35)',
+  },
+  dark: {
+    bg: '#1E1E2E',
+    text: '#CDD6F4',
+    comment: '#585B70',
+    keyword: '#CBA6F7',
+    string: '#A6E3A1',
+    number: '#FAB387',
+    function: '#89B4FA',
+    class_: '#F9E2AF',
+    type: '#F9E2AF',
+    builtIn: '#F38BA8',
+    variable: '#CDD6F4',
+    templateVar: '#F38BA8',
+    attr: '#FAB387',
+    meta: '#585B70',
+    metaKeyword: '#CBA6F7',
+    metaString: '#A6E3A1',
+    punctuation: '#9399B2',
+    operator: '#9399B2',
+    bullet: '#89DCEB',
+    link: '#89B4FA',
+    deletion: '#F38BA8',
+    addition: '#A6E3A1',
+    border: 'rgba(255,255,255,0.06)',
+    langBar: 'rgba(255,255,255,0.35)',
+  },
+}
+
+export function useHljsTheme(isDark: boolean) {
+  const t = isDark ? HLJS_THEMES.dark : HLJS_THEMES.light
   useEffect(() => {
     const id = 'hljs-theme-catppuccin'
-    if (document.getElementById(id)) return
+    const old = document.getElementById(id)
+    if (old) old.remove()
     const style = document.createElement('style')
     style.id = id
     style.textContent = `
       .hljs-theme-catppuccin {
-        color: #CDD6F4 !important;
-        background: #1E1E2E !important;
-        border: 1px solid rgba(120,120,130,0.15) !important;
+        color: ${t.text} !important;
+        background: ${t.bg} !important;
+        border: 1px solid ${t.border} !important;
         box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
         margin: 1rem 0 !important;
         overflow: hidden;
       }
       .hljs-theme-catppuccin pre {
-        color: #CDD6F4 !important;
+        color: ${t.text} !important;
         background: transparent !important;
         font-family: 'JetBrains Mono', 'Fira Code', Menlo, Consolas, monospace !important;
         font-size: 0.875rem !important;
         line-height: 1.7 !important;
         tab-size: 2 !important;
       }
-      .hljs-theme-catppuccin code { color: #CDD6F4 !important; background: transparent !important; }
-      .hljs-theme-catppuccin .hljs-comment, .hljs-theme-catppuccin .hljs-quote { color: #585B70 !important; font-style: italic !important; }
-      .hljs-theme-catppuccin .hljs-keyword, .hljs-theme-catppuccin .hljs-selector-tag { color: #CBA6F7 !important; }
-      .hljs-theme-catppuccin .hljs-string, .hljs-theme-catppuccin .hljs-template-tag { color: #A6E3A1 !important; }
-      .hljs-theme-catppuccin .hljs-number, .hljs-theme-catppuccin .hljs-literal { color: #FAB387 !important; }
-      .hljs-theme-catppuccin .hljs-title.function_, .hljs-theme-catppuccin .hljs-title.function_.invoke { color: #89B4FA !important; }
-      .hljs-theme-catppuccin .hljs-title.class_ { color: #F9E2AF !important; }
-      .hljs-theme-catppuccin .hljs-type { color: #F9E2AF !important; }
-      .hljs-theme-catppuccin .hljs-built_in, .hljs-theme-catppuccin .hljs-builtin-name { color: #F38BA8 !important; }
-      .hljs-theme-catppuccin .hljs-function { color: #89B4FA !important; }
-      .hljs-theme-catppuccin .hljs-variable { color: #CDD6F4 !important; }
-      .hljs-theme-catppuccin .hljs-template-variable { color: #F38BA8 !important; }
-      .hljs-theme-catppuccin .hljs-attr, .hljs-theme-catppuccin .hljs-attribute { color: #FAB387 !important; }
-      .hljs-theme-catppuccin .hljs-meta { color: #585B70 !important; }
-      .hljs-theme-catppuccin .hljs-meta .hljs-string { color: #A6E3A1 !important; }
-      .hljs-theme-catppuccin .hljs-meta .hljs-keyword { color: #CBA6F7 !important; }
-      .hljs-theme-catppuccin .hljs-operator, .hljs-theme-catppuccin .hljs-punctuation { color: #9399B2 !important; }
-      .hljs-theme-catppuccin .hljs-bullet, .hljs-theme-catppuccin .hljs-link { color: #89DCEB !important; }
+      .hljs-theme-catppuccin code { color: ${t.text} !important; background: transparent !important; }
+      .hljs-theme-catppuccin .hljs-comment, .hljs-theme-catppuccin .hljs-quote { color: ${t.comment} !important; font-style: italic !important; }
+      .hljs-theme-catppuccin .hljs-keyword, .hljs-theme-catppuccin .hljs-selector-tag { color: ${t.keyword} !important; }
+      .hljs-theme-catppuccin .hljs-string, .hljs-theme-catppuccin .hljs-template-tag { color: ${t.string} !important; }
+      .hljs-theme-catppuccin .hljs-number, .hljs-theme-catppuccin .hljs-literal { color: ${t.number} !important; }
+      .hljs-theme-catppuccin .hljs-title.function_, .hljs-theme-catppuccin .hljs-title.function_.invoke { color: ${t.function} !important; }
+      .hljs-theme-catppuccin .hljs-title.class_ { color: ${t.class_} !important; }
+      .hljs-theme-catppuccin .hljs-type { color: ${t.type} !important; }
+      .hljs-theme-catppuccin .hljs-built_in, .hljs-theme-catppuccin .hljs-builtin-name { color: ${t.builtIn} !important; }
+      .hljs-theme-catppuccin .hljs-function { color: ${t.function} !important; }
+      .hljs-theme-catppuccin .hljs-variable { color: ${t.variable} !important; }
+      .hljs-theme-catppuccin .hljs-template-variable { color: ${t.templateVar} !important; }
+      .hljs-theme-catppuccin .hljs-attr, .hljs-theme-catppuccin .hljs-attribute { color: ${t.attr} !important; }
+      .hljs-theme-catppuccin .hljs-meta { color: ${t.meta} !important; }
+      .hljs-theme-catppuccin .hljs-meta .hljs-string { color: ${t.metaString} !important; }
+      .hljs-theme-catppuccin .hljs-meta .hljs-keyword { color: ${t.metaKeyword} !important; }
+      .hljs-theme-catppuccin .hljs-operator, .hljs-theme-catppuccin .hljs-punctuation { color: ${t.punctuation} !important; }
+      .hljs-theme-catppuccin .hljs-bullet, .hljs-theme-catppuccin .hljs-link { color: ${t.bullet} !important; }
       .hljs-theme-catppuccin .hljs-emphasis { font-style: italic !important; }
       .hljs-theme-catppuccin .hljs-strong { font-weight: 600 !important; }
-      .hljs-theme-catppuccin .hljs-deletion { color: #F38BA8 !important; }
-      .hljs-theme-catppuccin .hljs-addition { color: #A6E3A1 !important; }
+      .hljs-theme-catppuccin .hljs-deletion { color: ${t.deletion} !important; }
+      .hljs-theme-catppuccin .hljs-addition { color: ${t.addition} !important; }
     `
     document.head.appendChild(style)
     return () => { style.remove() }
-  }, [])
+  }, [isDark])
 }
 
 /* ---- remark plugin: CJK emphasis ---- */
@@ -186,12 +243,15 @@ export function parseMarkdownBody(raw: string) {
 }
 
 /* ---- GitHub-style callout detection ---- */
-const CALLOUTS: Record<string, { label: string; border: string; bg: string; icon: string }> = {
-  '!NOTE': { label: 'Note', border: '#3B82F6', bg: 'rgba(59,130,246,0.06)', icon: 'ℹ️' },
-  '!TIP': { label: 'Tip', border: '#10B981', bg: 'rgba(16,185,129,0.06)', icon: '💡' },
-  '!IMPORTANT': { label: 'Important', border: '#8B5CF6', bg: 'rgba(139,92,246,0.06)', icon: '❗' },
-  '!WARNING': { label: 'Warning', border: '#F59E0B', bg: 'rgba(245,158,11,0.06)', icon: '⚠️' },
-  '!CAUTION': { label: 'Caution', border: '#EF4444', bg: 'rgba(239,68,68,0.06)', icon: '🚨' },
+function makeCallouts(isDark: boolean): Record<string, { label: string; border: string; bg: string; icon: string }> {
+  const alpha = isDark ? 0.15 : 0.08
+  return {
+    '!NOTE': { label: 'Note', border: isDark ? '#58A6D0' : '#3B82F6', bg: `rgba(59,130,246,${alpha})`, icon: 'ℹ️' },
+    '!TIP': { label: 'Tip', border: isDark ? '#5CC9A7' : '#10B981', bg: `rgba(16,185,129,${alpha})`, icon: '💡' },
+    '!IMPORTANT': { label: 'Important', border: isDark ? '#A78BFA' : '#8B5CF6', bg: `rgba(139,92,246,${alpha})`, icon: '❗' },
+    '!WARNING': { label: 'Warning', border: isDark ? '#FBBF24' : '#F59E0B', bg: `rgba(245,158,11,${alpha})`, icon: '⚠️' },
+    '!CAUTION': { label: 'Caution', border: isDark ? '#F87171' : '#EF4444', bg: `rgba(239,68,68,${alpha})`, icon: '🚨' },
+  }
 }
 
 function extractText(node: ReactNode): string {
@@ -201,10 +261,10 @@ function extractText(node: ReactNode): string {
   return ''
 }
 
-function Callout({ children, ...rest }: { children?: ReactNode } & Record<string, unknown>) {
+function Callout({ children, isDark, ...rest }: { children?: ReactNode; isDark: boolean } & Record<string, unknown>) {
   const text = extractText(children)
   const firstLine = text.trim().split('\n')[0].trim()
-  const callout = CALLOUTS[firstLine]
+  const callout = makeCallouts(isDark)[firstLine]
 
   if (callout) {
     const childArray = Array.isArray(children) ? children : [children]
@@ -223,12 +283,12 @@ function Callout({ children, ...rest }: { children?: ReactNode } & Record<string
 }
 
 /* ---- Code block with async tree-sitter highlighting ---- */
-function CodeBlock({ className, children }: { className?: string; children?: ReactNode }) {
+function CodeBlock({ className, children, isDark }: { className?: string; children?: ReactNode; isDark: boolean }) {
   const match = /language-(\w+)/.exec(className || '')
   const lang = match ? match[1] : ''
 
   if (!className) {
-    return <code style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.875rem', padding: '0.15em 0.4em' }}>{children}</code>
+    return <code style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.875rem', padding: '0.15em 0.4em', backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', borderRadius: '4px' }}>{children}</code>
   }
 
   const value = typeof children === 'string' ? children : ''
@@ -241,10 +301,10 @@ function CodeBlock({ className, children }: { className?: string; children?: Rea
     )
   }
 
-  return <AsyncCodeBlock lang={lang} value={value} className={className} />
+  return <AsyncCodeBlock lang={lang} value={value} className={className} isDark={isDark} />
 }
 
-function AsyncCodeBlock({ lang, value, className }: { lang: string; value: string; className: string }) {
+function AsyncCodeBlock({ lang, value, className, isDark }: { lang: string; value: string; className: string; isDark: boolean }) {
   const [html, setHtml] = useState<string | null>(null)
 
   useEffect(() => {
@@ -256,14 +316,15 @@ function AsyncCodeBlock({ lang, value, className }: { lang: string; value: strin
   }, [value, lang])
 
   const hljsHtml = hljs.highlight(value, { language: lang, ignoreIllegals: true }).value
+  const t = isDark ? HLJS_THEMES.dark : HLJS_THEMES.light
 
   return (
     <div className="hljs-theme-catppuccin" style={{ borderRadius: '12px' }}>
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '0.5rem 1.25rem', borderBottom: '1px solid rgba(255,255,255,0.06)',
+        padding: '0.5rem 1.25rem', borderBottom: `1px solid ${t.border}`,
         fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace",
-        color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.05em',
+        color: t.langBar, textTransform: 'uppercase', letterSpacing: '0.05em',
       }}>
         <span>{lang}</span>
       </div>
@@ -280,26 +341,27 @@ export interface ThemeColors {
   accent: string
 }
 
-export function MarkdownPreview({ content, theme }: { content: string; theme: ThemeColors }) {
-  useHljsTheme()
+export function MarkdownPreview({ content, theme, isDark }: { content: string; theme: ThemeColors; isDark?: boolean }) {
+  const dark = isDark ?? false
+  useHljsTheme(dark)
 
   const proseThemeMap: Record<string, string> = {
-    '浅棕米白': 'earth',
-    '深蓝黑': 'ocean',
-    '浅青绿': 'sage',
-    '黑': 'black',
+    '浅棕米白': 'earth', '深棕暗色': 'earth',
+    '深蓝黑': 'ocean', '深海暗蓝': 'ocean',
+    '浅青绿': 'sage', '暗青墨绿': 'sage',
+    '黑': 'black', '极夜黑': 'black',
   }
   const proseTheme = proseThemeMap[theme.name] || 'earth'
 
   const termVars = {
-    '--term-border': theme.accent + '33',
-    '--term-bg': theme.accent + '14',
+    '--term-border': theme.accent + (dark ? '40' : '33'),
+    '--term-bg': theme.accent + (dark ? '20' : '14'),
     '--term-text': theme.accent,
   } as React.CSSProperties
 
   return (
     <div
-      className={`w-full prose prose-${proseTheme} prose-headings:tracking-tight prose-a:no-underline hover:prose-a:underline`}
+      className={`w-full prose prose-${proseTheme}${dark ? ' dark' : ''} prose-headings:tracking-tight prose-a:no-underline hover:prose-a:underline`}
       style={termVars}
     >
       <style>{`
@@ -359,8 +421,8 @@ export function MarkdownPreview({ content, theme }: { content: string; theme: Th
             }
             return <a href={href}>{children}</a>
           },
-          blockquote: (props) => <Callout {...props} />,
-          code: (props) => <CodeBlock {...props} />,
+          blockquote: (props) => <Callout {...props} isDark={dark} />,
+          code: (props) => <CodeBlock {...props} isDark={dark} />,
         }}
       >
         {content}

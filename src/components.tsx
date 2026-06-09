@@ -49,22 +49,65 @@ export function NavBar({ theme, active, onNavigate }: { theme: Theme; active: Se
   )
 }
 
-export function LangToggle({ locale, setLocale, theme }: { locale: string; setLocale: (l: 'zh' | 'en') => void; theme: Theme }) {
+function ToggleButton({ onClick, icon, label, theme }: { onClick: () => void; icon: ReactNode; label: string; theme: Theme }) {
   return (
     <button
-      className="fixed top-[18px] right-5 z-50 flex items-center gap-1.5 rounded-full cursor-pointer transition-all duration-200 ease-out"
-      style={{ color: theme.textSec, backgroundColor: `${theme.bg}ee`, backdropFilter: 'blur(12px)', border: `1px solid ${theme.border}`, padding: '6px 10px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
-      onClick={() => setLocale(locale === 'zh' ? 'en' : 'zh')}
+      className="flex items-center justify-center w-8 h-8 rounded-full cursor-pointer transition-all duration-200 ease-out"
+      style={{ color: theme.textSec, backgroundColor: `${theme.bg}ee`, backdropFilter: 'blur(12px)', border: `1px solid ${theme.border}`, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+      onClick={onClick}
       onMouseEnter={(e) => { e.currentTarget.style.borderColor = theme.accent }}
       onMouseLeave={(e) => { e.currentTarget.style.borderColor = theme.border }}
+      aria-label={label}
     >
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
-        <circle cx="12" cy="12" r="10" />
-        <path d="M2 12h20" />
-        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-      </svg>
-      <span className="text-xs font-semibold" style={{ fontSize: '0.65rem' }}>{locale === 'zh' ? 'EN' : '中文'}</span>
+      {icon}
     </button>
+  )
+}
+
+export function LangToggle({ locale, setLocale, theme }: { locale: string; setLocale: (l: 'zh' | 'en') => void; theme: Theme }) {
+  return (
+    <ToggleButton
+      theme={theme}
+      label="Switch language"
+      onClick={() => setLocale(locale === 'zh' ? 'en' : 'zh')}
+      icon={
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M2 12h20" />
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </svg>
+      }
+    />
+  )
+}
+
+export function ThemeToggle({ mode, setMode, theme }: { mode: 'light' | 'dark'; setMode: (m: 'light' | 'dark') => void; theme: Theme }) {
+  return (
+    <ToggleButton
+      theme={theme}
+      label="Toggle theme"
+      onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}
+      icon={mode === 'light'
+        ? (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+        )
+        : (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </svg>
+        )
+      }
+    />
   )
 }
 

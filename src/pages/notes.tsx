@@ -168,6 +168,7 @@ export default function NotesPage({ theme, mode }: { theme: Theme; onNavigate: (
     setSelectedNote({ title: fm.title || title, date: fm.date, content: parseMarkdownBody(raw), file })
     setSearchQuery('')
     setSearchFocused(false)
+    window.scrollTo({ top: 0, behavior: 'instant' })
   }
 
   const suggestions = searchFocused && searchQuery ? getSuggestions(searchQuery) : []

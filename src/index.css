@@ -282,6 +282,12 @@ body {
 	--tw-prose-td-borders: rgba(224, 224, 224, 0.12);
 }
 
+/* Prose blockquote — no quotes */
+.prose blockquote p:first-of-type::before,
+.prose blockquote p:last-of-type::after {
+	content: none !important;
+}
+
 /* Prose links — no underline by default, underline on hover. Heading anchor links excluded. */
 .prose-earth a {
 	text-decoration: none;

@@ -2,6 +2,11 @@ export type Locale = "zh" | "en";
 
 export type DictKey = keyof typeof dict;
 
+/* ---- Shared values (edited once, referenced everywhere) ---- */
+const SHARED = {
+	currentFocus: { zh: "正在学习线性代数", en: "Learning Linear Algebra" },
+};
+
 export const dict = {
 	// NavBar
 	"nav.home": { zh: "首页", en: "Home" },
@@ -11,7 +16,7 @@ export const dict = {
 	"nav.contact": { zh: "联系", en: "Contact" },
 
 	// Home
-	"home.status": { zh: "正在学习 ROS2", en: "Learning ROS2" },
+	"home.status": SHARED.currentFocus,
 	"home.greeting": { zh: "我是 Ethan C.", en: "I'm Ethan C." },
 	"home.subtitle": { zh: "R&D / 探索者.", en: "R&D / Explorer." },
 	"home.desc": {
@@ -75,7 +80,7 @@ export const dict = {
 	},
 	"about.mbti": { zh: "MBTI", en: "MBTI" },
 	"about.current": { zh: "当前", en: "Currently" },
-	"about.current.v": { zh: "学习 ROS2", en: "Learning ROS2" },
+	"about.current.v": SHARED.currentFocus,
 
 	// MBTI dimensions
 	"mbti.I": { zh: "内向", en: "Introverted" },

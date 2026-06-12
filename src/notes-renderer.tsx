@@ -1,8 +1,11 @@
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import rehypeRaw from "rehype-raw";
 import rehypeSlug from "rehype-slug";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import hljs from "highlight.js/lib/core";
 import { highlight as tsHighlight } from "./highlighter";
 import ts from "highlight.js/lib/languages/typescript";
@@ -446,6 +449,307 @@ function AsyncCodeBlock({
 	);
 }
 
+/* ---- Function Plot component ---- */
+function makePlotFn(expr: string): (x: number) => number {
+	const fn = new Function(
+		"x",
+		"with(Math){return(" + expr.replace(/;/g, "") + ")}",
+	) as (x: number) => number;
+	return fn;
+}
+
+function parseRange(raw: string): [number, number] | null {
+	const inner = raw.replace(/^\[?\s*/, "").replace(/\s*\]?$/, "");
+	const parts = inner.split(",").map((s) => {
+		s = s.trim();
+		try {
+			return Function("with(Math){return(" + s + ")}")();
+		} catch {
+			return NaN;
+		}
+	});
+	return parts.length === 2 && parts.every((n) => !isNaN(n))
+		? (parts as [number, number])
+		: null;
+}
+
+function PlotCanvas({
+	fnExpr,
+	xMin,
+	xMax,
+	strokeColor,
+	isDark,
+}: {
+	fnExpr: string;
+	xMin: number;
+	xMax: number;
+	strokeColor: string;
+	isDark: boolean;
+}) {
+	const ref = useRef<HTMLCanvasElement>(null);
+
+	useEffect(() => {
+		const canvas = ref.current;
+		if (!canvas) return;
+		const ctx = canvas.getContext("2d");
+		if (!ctx) return;
+
+		const dpr = window.devicePixelRatio || 1;
+		const cssW = canvas.clientWidth;
+		if (cssW === 0) return;
+		const cssH = Math.max(200, Math.min(300, cssW * 0.45));
+		canvas.style.height = cssH + "px";
+		canvas.width = cssW * dpr;
+		canvas.height = cssH * dpr;
+		ctx.scale(dpr, dpr);
+
+		const fn = makePlotFn(fnExpr);
+		const samples = Math.max(cssW * 2, 400);
+
+		// sample y values to determine y range
+		const pts: number[] = [];
+		for (let i = 0; i <= samples; i++) {
+			const x = xMin + ((xMax - xMin) * i) / samples;
+			try {
+				const y = fn(x);
+				if (isFinite(y)) pts.push(y);
+			} catch {}
+		}
+		if (pts.length === 0) return;
+		let yMin = Math.min(...pts);
+		let yMax = Math.max(...pts);
+		const yPad = (yMax - yMin) * 0.12 || 1;
+		yMin -= yPad;
+		yMax += yPad;
+
+		const pad = { top: 12, right: 16, bottom: 24, left: 42 };
+		const pw = cssW - pad.left - pad.right;
+		const ph = cssH - pad.top - pad.bottom;
+
+		const toX = (v: number) => pad.left + ((v - xMin) / (xMax - xMin)) * pw;
+		const toY = (v: number) => pad.top + (1 - (v - yMin) / (yMax - yMin)) * ph;
+
+		// helpers
+		function niceStep(range: number, targetTicks: number): number {
+			const rough = range / targetTicks;
+			const mag = Math.pow(10, Math.floor(Math.log10(rough)));
+			const residual = rough / mag;
+			let nice: number;
+			if (residual <= 1.5) nice = 1;
+			else if (residual <= 3.5) nice = 2;
+			else if (residual <= 7.5) nice = 5;
+			else nice = 10;
+			return nice * mag;
+		}
+
+		const gridColor = isDark ? "#333344" : "#e8e4e0";
+		const axisColor = isDark ? "#777788" : "#555";
+		const labelColor = isDark ? "#9999aa" : "#777";
+
+		// grid
+		const xStep = niceStep(xMax - xMin, 8);
+		const yStep = niceStep(yMax - yMin, 6);
+
+		ctx.strokeStyle = gridColor;
+		ctx.lineWidth = 0.5;
+		for (let v = Math.ceil(xMin / xStep) * xStep; v <= xMax; v += xStep) {
+			ctx.beginPath();
+			ctx.moveTo(toX(v), pad.top);
+			ctx.lineTo(toX(v), pad.top + ph);
+			ctx.stroke();
+		}
+		for (let v = Math.ceil(yMin / yStep) * yStep; v <= yMax; v += yStep) {
+			ctx.beginPath();
+			ctx.moveTo(pad.left, toY(v));
+			ctx.lineTo(pad.left + pw, toY(v));
+			ctx.stroke();
+		}
+
+		// axes
+		ctx.strokeStyle = axisColor;
+		ctx.lineWidth = 1;
+		if (yMin <= 0 && yMax >= 0) {
+			ctx.beginPath();
+			ctx.moveTo(pad.left, toY(0));
+			ctx.lineTo(pad.left + pw, toY(0));
+			ctx.stroke();
+		}
+		if (xMin <= 0 && xMax >= 0) {
+			ctx.beginPath();
+			ctx.moveTo(toX(0), pad.top);
+			ctx.lineTo(toX(0), pad.top + ph);
+			ctx.stroke();
+		}
+
+		// labels
+		ctx.fillStyle = labelColor;
+		ctx.font = "10px sans-serif";
+		ctx.textAlign = "center";
+		for (let v = Math.ceil(xMin / xStep) * xStep; v <= xMax; v += xStep) {
+			const label =
+				Math.abs(v) < 1e-10 ? "0" : Number(v.toPrecision(4)).toString();
+			ctx.fillText(label, toX(v), cssH - 4);
+		}
+		ctx.textAlign = "right";
+		for (let v = Math.ceil(yMin / yStep) * yStep; v <= yMax; v += yStep) {
+			const label =
+				Math.abs(v) < 1e-10 ? "0" : Number(v.toPrecision(4)).toString();
+			ctx.fillText(label, pad.left - 4, toY(v) + 3);
+		}
+
+		// curve
+		ctx.strokeStyle = strokeColor;
+		ctx.lineWidth = 2;
+		ctx.lineJoin = "round";
+		ctx.lineCap = "round";
+		ctx.beginPath();
+		let drawing = false;
+		let prevY: number | null = null;
+		for (let i = 0; i <= samples; i++) {
+			const x = xMin + ((xMax - xMin) * i) / samples;
+			try {
+				const y = fn(x);
+				if (!isFinite(y)) {
+					drawing = false;
+					prevY = null;
+					continue;
+				}
+				const cy = toY(y);
+				if (prevY !== null && Math.abs(cy - prevY) > ph * 2) {
+					drawing = false;
+				}
+				if (!drawing) {
+					ctx.moveTo(toX(x), cy);
+					drawing = true;
+				} else {
+					ctx.lineTo(toX(x), cy);
+				}
+				prevY = cy;
+			} catch {
+				drawing = false;
+				prevY = null;
+			}
+		}
+		ctx.stroke();
+	}, [fnExpr, xMin, xMax, strokeColor, isDark]);
+
+	return (
+		<div style={{ minHeight: 220, margin: "0.5em 0" }}>
+			<canvas
+				ref={ref}
+				style={{
+					display: "block",
+					width: "100%",
+					height: "100%",
+					borderRadius: "8px",
+				}}
+			/>
+		</div>
+	);
+}
+
+function Plot({
+	fn,
+	range,
+	accent,
+	isDark,
+}: { fn?: string; range?: string; accent?: string; isDark?: boolean }) {
+	const fnExpr = fn || "Math.cos(x)";
+	const [xMin, xMax] = range
+		? (parseRange(range) ?? [-Math.PI * 2, Math.PI * 2])
+		: [-Math.PI * 2, Math.PI * 2];
+	const stroke = accent || "#2563eb";
+	const dk = isDark ?? false;
+	return (
+		<PlotCanvas
+			fnExpr={fnExpr}
+			xMin={xMin}
+			xMax={xMax}
+			strokeColor={stroke}
+			isDark={dk}
+		/>
+	);
+}
+
+/* ---- Stable plugin arrays (prevents ReactMarkdown re-processing) ---- */
+const REMARK_PLUGINS = [remarkMath, remarkGfm, remarkCJKEmphasis];
+const REHYPE_PLUGINS = [rehypeRaw, rehypeSlug, rehypeKatex];
+
+/* ---- Cached components (same reference for same dark/theme combo) ---- */
+const _compCache = new Map<string, any>();
+function getComponents(dark: boolean, theme: { accent: string }) {
+	const key = `${dark}:${theme.accent}`;
+	if (!_compCache.has(key)) {
+		_compCache.set(key, makeComponents(dark, theme));
+	}
+	return _compCache.get(key);
+}
+
+/* ---- Components factory (avoids TS type conflict with custom Plot) ---- */
+function makeComponents(dark: boolean, theme: { accent: string }) {
+	return {
+		a: ({ href, children }: { href?: string; children?: ReactNode }) => {
+			if (!href) return <span>{children}</span>;
+			if (href.startsWith("http")) {
+				return (
+					<a href={href} target="_blank" rel="noopener noreferrer">
+						{children}
+					</a>
+				);
+			}
+			const [path, anchor] = href.replace(/^\.\/?/, "").split("#");
+			const noteFile = `./${path.replace(/\.md$/, "")}.md`;
+			if (modules[noteFile]) {
+				const isWiki = noteFile === "./wiki.md";
+				return (
+					<a
+						href="javascript:void(0)"
+						onClick={(e) => {
+							e.preventDefault();
+							window.dispatchEvent(
+								new CustomEvent("note:open", {
+									detail: { file: noteFile, anchor: anchor || null },
+								}),
+							);
+						}}
+						className={`inline-flex items-center gap-0.5 ${isWiki ? "font-medium" : ""}`}
+						style={isWiki ? { color: theme.accent } : undefined}
+					>
+						{children}
+						{isWiki && (
+							<svg
+								className="inline-block flex-shrink-0"
+								width="11"
+								height="11"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2.5"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								style={{ opacity: 0.5 }}
+							>
+								<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+								<polyline points="15 3 21 3 21 9" />
+								<line x1="10" y1="14" x2="21" y2="3" />
+							</svg>
+						)}
+					</a>
+				);
+			}
+			return <a href={href}>{children}</a>;
+		},
+		blockquote: (props: any) => <Callout {...props} isDark={dark} />,
+		code: (props: any) => {
+			const cls = props.className || "";
+			if (/^language-plot\b/.test(cls) && typeof props.children === "string") {
+				return <Plot fn={props.children.trim()} isDark={dark} />;
+			}
+			return <CodeBlock {...props} isDark={dark} />;
+		},
+	};
+}
+
 /* ---- Main renderer ---- */
 export interface ThemeColors {
 	name: string;
@@ -505,63 +809,9 @@ export function MarkdownPreview({
         }
       `}</style>
 			<ReactMarkdown
-				remarkPlugins={[remarkGfm, remarkCJKEmphasis]}
-				rehypePlugins={[rehypeRaw, rehypeSlug]}
-				components={{
-					a: ({ href, children }) => {
-						if (!href) return <span>{children}</span>;
-						if (href.startsWith("http")) {
-							return (
-								<a href={href} target="_blank" rel="noopener noreferrer">
-									{children}
-								</a>
-							);
-						}
-						const [path, anchor] = href.replace(/^\.\/?/, "").split("#");
-						const noteFile = `./${path.replace(/\.md$/, "")}.md`;
-						if (modules[noteFile]) {
-							const isWiki = noteFile === "./wiki.md";
-							return (
-								<a
-									href="javascript:void(0)"
-									onClick={(e) => {
-										e.preventDefault();
-										window.dispatchEvent(
-											new CustomEvent("note:open", {
-												detail: { file: noteFile, anchor: anchor || null },
-											}),
-										);
-									}}
-									className={`inline-flex items-center gap-0.5 ${isWiki ? "font-medium" : ""}`}
-									style={isWiki ? { color: theme.accent } : undefined}
-								>
-									{children}
-									{isWiki && (
-										<svg
-											className="inline-block flex-shrink-0"
-											width="11"
-											height="11"
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											strokeWidth="2.5"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											style={{ opacity: 0.5 }}
-										>
-											<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-											<polyline points="15 3 21 3 21 9" />
-											<line x1="10" y1="14" x2="21" y2="3" />
-										</svg>
-									)}
-								</a>
-							);
-						}
-						return <a href={href}>{children}</a>;
-					},
-					blockquote: (props) => <Callout {...props} isDark={dark} />,
-					code: (props) => <CodeBlock {...props} isDark={dark} />,
-				}}
+				remarkPlugins={REMARK_PLUGINS}
+				rehypePlugins={REHYPE_PLUGINS}
+				components={getComponents(dark, theme)}
 			>
 				{content}
 			</ReactMarkdown>

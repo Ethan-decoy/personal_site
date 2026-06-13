@@ -807,6 +807,25 @@ export function MarkdownPreview({
           vertical-align: baseline;
           transition: background 0.2s ease-out;
         }
+        /* KaTeX — only reset table-related styles (matrix rendering), preserve spacing */
+        .prose-${proseTheme} .katex table,
+        .prose-${proseTheme} .katex tbody,
+        .prose-${proseTheme} .katex thead,
+        .prose-${proseTheme} .katex tr,
+        .prose-${proseTheme} .katex td,
+        .prose-${proseTheme} .katex th {
+          border: none !important;
+          background: transparent !important;
+        }
+        .prose-${proseTheme} .katex-display {
+          display: block !important;
+          margin: 1em 0 !important;
+        }
+        .prose-${proseTheme} .katex table {
+          display: table !important;
+          border-collapse: collapse !important;
+          border-spacing: 0 !important;
+        }
       `}</style>
 			<ReactMarkdown
 				remarkPlugins={REMARK_PLUGINS}

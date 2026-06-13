@@ -92,13 +92,22 @@ function buildTree(): TreeNode[] {
 		});
 	}
 
-	// 排序：优先按 order，其次按 date，最后按 title
+	// 排序：优先按 order，其次提取 filename 数字前缀（如 "01-xxx.md"），其次按 date，最后按 title
+	function extractPrefix(file: string): number {
+		const fname = file.replace(/^.*\//, "");
+		const m = fname.match(/^(\d+)/);
+		return m ? parseInt(m[1], 10) : Infinity;
+	}
+
 	for (const g of Object.values(groups)) {
 		g.children.sort((a, b) => {
 			if (a.order !== undefined && b.order !== undefined)
 				return a.order - b.order;
 			if (a.order !== undefined) return -1;
 			if (b.order !== undefined) return 1;
+			const aNum = extractPrefix(a.file);
+			const bNum = extractPrefix(b.file);
+			if (aNum !== bNum) return aNum - bNum;
 			if (a.date && b.date) return b.date.localeCompare(a.date);
 			return a.title.localeCompare(b.title);
 		});
@@ -179,9 +188,39 @@ function buildNestedTreeImpl(): NestedTreeNode[] {
 				});
 			}
 		}
+
+		// 排序：优先按 order，其次提取 filename 数字前缀，其次按 date，最后按 title
+		function extractPrefix(file: string): number {
+			const fname = file.replace(/^.*\//, "");
+			const m = fname.match(/^(\d+)/);
+			return m ? parseInt(m[1], 10) : Infinity;
+		}
+
+		results.sort((a, b) => {
+			const aIsNode = isNestedTreeNode(a);
+			const bIsNode = isNestedTreeNode(b);
+			if (aIsNode !== bIsNode) return aIsNode ? -1 : 1;
+			if (aIsNode && bIsNode)
+				return (a as NestedTreeNode).title.localeCompare(
+					(b as NestedTreeNode).title,
+				);
+			const aa = a as NestedFileNode;
+			const bb = b as NestedFileNode;
+			if (aa.order !== undefined && bb.order !== undefined)
+				return aa.order - bb.order;
+			if (aa.order !== undefined) return -1;
+			if (bb.order !== undefined) return 1;
+			const aNum = extractPrefix(aa.file);
+			const bNum = extractPrefix(bb.file);
+			if (aNum !== bNum) return aNum - bNum;
+			if (aa.date && bb.date) return bb.date.localeCompare(aa.date);
+			return aa.title.localeCompare(bb.title);
+		});
+
 		return results;
 	}
-	return walk(root).filter(isNestedTreeNode);
+	const result = walk(root).filter(isNestedTreeNode);
+	return result;
 }
 
 export const nestedTree = buildNestedTreeImpl();

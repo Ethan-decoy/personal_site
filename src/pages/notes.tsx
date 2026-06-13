@@ -111,25 +111,37 @@ function SidebarNode({
 		date: string;
 		order?: number;
 		file: string;
+		filename: string;
 	}[] = [];
 	const dirChildren: NestedTreeNode[] = [];
 	for (const c of node.children) {
 		if ("key" in c) dirChildren.push(c);
 		else {
 			const fm = parseFrontmatter(modules[c.file] || "");
+			const fname = c.file.replace(/^.*\//, "");
 			fileChildren.push({
 				title: fm.title,
 				date: fm.date,
 				order: fm.order,
 				file: c.file,
+				filename: fname,
 			});
 		}
 	}
+	function extractPrefix(filename: string): number {
+		const m = filename.match(/^(\d+)/);
+		return m ? parseInt(m[1], 10) : Infinity;
+	}
+
 	fileChildren.sort((a, b) => {
 		if (a.order !== undefined && b.order !== undefined)
 			return a.order - b.order;
 		if (a.order !== undefined) return -1;
 		if (b.order !== undefined) return 1;
+		const aNum = extractPrefix(a.filename);
+		const bNum = extractPrefix(b.filename);
+		if (aNum !== bNum) return aNum - bNum;
+		if (a.date && b.date) return b.date.localeCompare(a.date);
 		return a.title.localeCompare(b.title);
 	});
 

@@ -52,7 +52,7 @@ export const themes = {
 			accentHover: "#79BDE0",
 			accentLight: "rgba(88, 166, 208, 0.12)",
 			border: "rgba(224, 230, 237, 0.08)",
-			borderLight: "rgba(224, 230, 237, 0.04)",
+			borderLight: "rgba(224, 230, 237, 0.12)",
 		},
 	},
 	sage: {

@@ -15,7 +15,7 @@ date: 2026-06-11
 - 对应分量相加：
 
 $$
-\begin{bmatrix} 1 \\ 3 \end{bmatrix} + \begin{bmatrix} 4 \\ -1 \end{bmatrix} = \begin{bmatrix} 5 \\ 2 \end{bmatrix}
+\begin{bmatrix} 1 \cr 3 \end{bmatrix} + \begin{bmatrix} 4 \cr -1 \end{bmatrix} = \begin{bmatrix} 5 \cr 2 \end{bmatrix}
 $$
 几何上箭头的"首尾相接"
 
@@ -26,7 +26,7 @@ $$
 - 每个分量乘以同一个数：
 
 $$
-3 \times \begin{bmatrix} 2 \\ -1 \end{bmatrix} = \begin{bmatrix} 6 \\ -3 \end{bmatrix}
+3 \times \begin{bmatrix} 2 \cr -1 \end{bmatrix} = \begin{bmatrix} 6 \cr -3 \end{bmatrix}
 $$
 几何上把向量拉长（或缩短、反向）
 
@@ -53,7 +53,7 @@ $$
 
 对应分量相乘再相加。结果是**一个数（标量）**，不是向量。
 
-比如：$\begin{bmatrix} 1 \\ 3 \end{bmatrix} \cdot \begin{bmatrix} 4 \\ -2 \end{bmatrix} = 1 \times 4 + 3 \times (-2) = -2$
+比如：$\begin{bmatrix} 1 \cr 3 \end{bmatrix} \cdot \begin{bmatrix} 4 \cr -2 \end{bmatrix} = 1 \times 4 + 3 \times (-2) = -2$
 
 点积最重要的几何意义：
 
@@ -94,9 +94,9 @@ $$
 
 $$\text{单位化}(\vec{v}) = \frac{\vec{v}}{|\vec{v}|}$$
 
-比如 $\vec{v} = \begin{bmatrix} 3 \\ 4 \end{bmatrix}$，$|\vec{v}| = \sqrt{9+16} = 5$
+比如 $\vec{v} = \begin{bmatrix} 3 \cr 4 \end{bmatrix}$，$|\vec{v}| = \sqrt{9+16} = 5$
 
-归一化后：$\frac{1}{5}\begin{bmatrix} 3 \\ 4 \end{bmatrix} = \begin{bmatrix} 0.6 \\ 0.8 \end{bmatrix}$，长度是 1，方向不变。
+归一化后：$\frac{1}{5}\begin{bmatrix} 3 \cr 4 \end{bmatrix} = \begin{bmatrix} 0.6 \cr 0.8 \end{bmatrix}$，长度是 1，方向不变。
 
 #### 归一化应用方向：
 - 判断方向时长度可以忽略
@@ -141,16 +141,16 @@ $$
 
 - 在二维空间 $\mathbb{R}^2$ 里，标准基是：
 
-  $$\vec{e_1} = \begin{bmatrix} 1 \\ 0 \end{bmatrix}, \quad \vec{e_2} = \begin{bmatrix} 0 \\ 1 \end{bmatrix}$$
+  $$\vec{e_1} = \begin{bmatrix} 1 \cr 0 \end{bmatrix}, \quad \vec{e_2} = \begin{bmatrix} 0 \cr 1 \end{bmatrix}$$
 
 - 在三维空间 $\mathbb{R}^3$ 里，标准基是：
 
-  $$\vec{e_1} = \begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix}, \quad \vec{e_2} = \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix}, \quad \vec{e_3} = \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix}$$
+  $$\vec{e_1} = \begin{bmatrix} 1 \cr 0 \cr 0 \end{bmatrix}, \quad \vec{e_2} = \begin{bmatrix} 0 \cr 1 \cr 0 \end{bmatrix}, \quad \vec{e_3} = \begin{bmatrix} 0 \cr 0 \cr 1 \end{bmatrix}$$
 
   注意：$\vec{e_1}, \vec{e_2}, \vec{e_3}$ 就是之前叉积里用的 $\mathbf{i}, \mathbf{j}, \mathbf{k}$。
 
 非标准基（可以不是单位向量）：
 
-$$\vec{b_1} = \begin{bmatrix} 2 \\ 0 \end{bmatrix}, \quad \vec{b_2} = \begin{bmatrix} 0 \\ 3 \end{bmatrix}$$
+$$\vec{b_1} = \begin{bmatrix} 2 \cr 0 \end{bmatrix}, \quad \vec{b_2} = \begin{bmatrix} 0 \cr 3 \end{bmatrix}$$
 
 这组基也能张成二维空间，但每个向量长度不是 1。用这组基表示 [2, 3] 时，坐标是 [1, 1]（1 个 b1 + 1 个 b2），而不是标准基下的 [2, 3]。

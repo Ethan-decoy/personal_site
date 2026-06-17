@@ -5,7 +5,7 @@ date: 2026-06-13
 
 # 矩阵与线性方程组
 
-## 矩阵  Matrix
+## 矩阵  (Matrix)
 
 > 矩阵代表一个特定的线性变换
 
@@ -131,7 +131,7 @@ $$
 
 ---
 
-## 转置 Transpose
+## 转置 (Transpose)
 
 操作：**行变列，列变行**。
 
@@ -169,7 +169,7 @@ $A^T A$ **总是对称矩阵**（$(A^T A)^T = A^T A$）。
 
 ---
 
-## 高斯消元法  Gaussian Elimination
+## 高斯消元法  (Gaussian Elimination)
 
 > 通过一系列合法的变形，把一个复杂的方程组，变成一个阶梯状（上三角）的形式。
 
@@ -264,7 +264,7 @@ $$
 
 ---
 
-## 逆矩阵  Matrix Inverse
+## 逆矩阵  (Matrix Inverse)
 
 先看一个简单例子。我们知道 $3 \times \frac{1}{3} = 1$，$\frac{1}{3}$ 是 $3$ 的"撤销"操作 — 乘以 3 再乘以 $\frac{1}{3}$，回到原点。
 
@@ -350,7 +350,7 @@ $$
 
 ---
 
-## 行列式  Determinant
+## 行列式  (Determinant)
 ### 2×2
 
 $$
@@ -394,7 +394,7 @@ $$
 
 ---
 
-## LU分解  LU Decomposition
+## LU分解  (LU Decomposition)
 
 假设要解一个 $3 \times 3$ 的线性方程组 $Ax = b$。
 

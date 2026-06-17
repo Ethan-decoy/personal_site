@@ -4,7 +4,7 @@ date: 2026-06-11
 ---
 # 向量与基本运算
 
-## 向量  Vector
+## 向量  (Vector)
 
 - 向量是一个有序数列
 
@@ -32,13 +32,13 @@ $$
 $$
 几何上把向量拉长（或缩短、反向）
 
-### 共线  Collinear
+### 共线  (Collinear)
 
 $$ 
 \vec{v_1} = a\vec{v_2}
 $$
 
-### 共面  Coplanar
+### 共面  (Coplanar)
 $$
 \vec{v_1} \neq k,\vec{v_2}, \quad \forall k \in \mathbb{R}
 $$
@@ -47,7 +47,7 @@ $$
 
 ---
 
-## 点积  Dot product/Inner product
+## 点积  (Dot product/Inner product)
 
 $$
 \vec{a} \cdot \vec{b} = a_1 b_1 + a_2 b_2 + \cdots + a_n b_n
@@ -77,7 +77,7 @@ Math.cos(x)
 
 ---
 
-## 投影  Projection
+## 投影  (Projection)
 
 投影是**向量对向量**的：$\vec{a}$ 在 $\vec{b}$ 上的投影，参考系是 $\vec{b}$ 的方向
 
@@ -90,7 +90,7 @@ $$
 投影为正：夹角 < 90°，a 的方向和 b 大致一致，影子落在 b 的前方
 投影为负：夹角 > 90°，a 的方向和 b 大致相反，影子落在 b 的反方向
 
-### 归一化  Normalization
+### 归一化  (Normalization)
 
 把一个向量除以它自己的长度，结果就是长度为 1 的单位向量：
 
@@ -108,7 +108,7 @@ $$\text{单位化}(\vec{v}) = \frac{\vec{v}}{|\vec{v}|}$$
 
 ---
 
-## 叉积  Cross product
+## 叉积  (Cross product)
 
 一个向量（不是标量）垂直于 $\vec{a}$ 和 $\vec{b}$ 构成的平面，由右手定则确定
 
@@ -131,7 +131,7 @@ $$
 
 ---
 
-## 基与坐标系  Basis & Coordinate Systems
+## 基与坐标系  (Basis & Coordinate Systems)
 
 基向量只需要满足两个条件：
 

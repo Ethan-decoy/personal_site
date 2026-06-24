@@ -217,25 +217,22 @@ export const dict = {
 	},
 	"about.exp.period": { zh: "2025 — 至今", en: "2025 — Present" },
 	"about.exp.d1": {
-		zh: "负责 3D-AOI 工业视觉软件的点云处理模块开发",
-		en: "Developed point cloud processing module for 3D-AOI industrial vision software",
+		zh: "独立负责点云构建模块：结构光、理论推导及实现、工程调试",
+		en: "Independently responsible for point cloud construction module: structured light, theoretical derivation and implementation, engineering debugging",
 	},
 	"about.exp.d2": {
-		zh: "使用 C++/OpenCV/Eigen 实现相位解包裹与点云重建算法",
-		en: "Implemented phase unwrapping and point cloud reconstruction algorithms using C++/OpenCV/Eigen",
-	},
-	"about.exp.d3": {
 		zh: "基于 Qt Widgets 构建上位机界面",
 		en: "Built host computer UI using Qt Widgets",
 	},
 
 	"about.skills": { zh: "能力", en: "Skills" },
-	"about.skills.algo": { zh: "算法", en: "Algorithms" },
-	"about.skills.algo.0": { zh: "3D 重建", en: "3D Reconstruction" },
-	"about.skills.algo.1": { zh: "相位解包裹", en: "Phase Unwrapping" },
-	"about.skills.dev": { zh: "开发", en: "Development" },
-	"about.skills.eng": { zh: "工程", en: "Engineering" },
-	"about.skills.eng.1": { zh: "系统设计", en: "System Design" },
+	"about.skills.lang": { zh: "编程语言", en: "Languages" },
+	"about.skills.libs": { zh: "框架与库", en: "Frameworks & Libraries" },
+	"about.skills.domains": { zh: "涉及领域", en: "Domains" },
+	"about.skills.domains.0": { zh: "机器视觉", en: "Machine Vision" },
+	"about.skills.domains.1": { zh: "点云重建", en: "Point Cloud Reconstruction" },
+	"about.skills.domains.2": { zh: "图像预处理", en: "Image Preprocessing" },
+	"about.skills.domains.3": { zh: "相位测量轮廓术", en: "Phase Measurement Profilometry" },
 
 	"about.cta": {
 		zh: "想要进一步了解我的技术栈与项目经验？",

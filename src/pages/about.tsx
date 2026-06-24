@@ -248,17 +248,20 @@ export default function AboutPage({
 	];
 
 	const skills = [
+		{ label: t("about.skills.lang"), items: ["C++"] },
 		{
-			label: t("about.skills.algo"),
+			label: t("about.skills.libs"),
+			items: ["Qt", "OpenCV", "Eigen", "CUDA"],
+		},
+		{
+			label: t("about.skills.domains"),
 			items: [
-				t("about.skills.algo.0"),
-				t("about.skills.algo.1"),
-				"OpenCV",
-				"Eigen",
+				t("about.skills.domains.0"),
+				t("about.skills.domains.1"),
+				t("about.skills.domains.2"),
+				t("about.skills.domains.3"),
 			],
 		},
-		{ label: t("about.skills.dev"), items: ["C++", "Python", "Qt Widgets"] },
-		{ label: t("about.skills.eng"), items: ["Git", t("about.skills.eng.1")] },
 	];
 
 	return (
@@ -738,7 +741,6 @@ export default function AboutPage({
 										details: [
 											t("about.exp.d1"),
 											t("about.exp.d2"),
-											t("about.exp.d3"),
 										],
 									},
 								].map((exp) => (

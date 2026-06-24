@@ -76,7 +76,13 @@ function AppInner() {
 			style={{ backgroundColor: theme.bg, color: theme.text }}
 		>
 			<NavBar theme={theme} active={active} onNavigate={navigate} />
-			<div className="fixed top-[18px] right-5 z-50 flex items-center gap-2">
+			<div className="fixed top-2 right-5 z-50 flex items-center gap-2 hidden md:flex">
+				<ThemeToggle mode={mode} setMode={setMode} theme={theme} />
+				<LangToggle locale={locale} setLocale={setLocale} theme={theme} />
+			</div>
+			<div className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center gap-4 px-4 py-3"
+				style={{ backgroundColor: `${theme.bg}f0`, backdropFilter: "blur(12px)", borderTop: `1px solid ${theme.border}` }}
+			>
 				<ThemeToggle mode={mode} setMode={setMode} theme={theme} />
 				<LangToggle locale={locale} setLocale={setLocale} theme={theme} />
 			</div>

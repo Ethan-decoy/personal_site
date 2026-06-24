@@ -230,7 +230,7 @@ $$
 A(\vec{x}_0 + \vec{n}) = A\vec{x}_0 + A\vec{n} = \vec{b} + \vec{0} = \vec{b}
 $$
 
-所以 $\vec{x}_0 + \vec{n}$ 也是解！
+所以 $\vec{x}_0 + \vec{n}$ 也是解。
 
 **通解公式**：$\vec{x} = \vec{x}_0 + t \cdot \vec{n}$（$t$ 任意实数，$\vec{n}$ 为零空间基向量）
 
@@ -238,4 +238,3 @@ $$
 
 ## 线性映射/变换 (Linear Transformations)
 
-> 待补充

@@ -64,7 +64,7 @@ export function NavBar({
 					ETHAN C.
 				</span>
 				<div
-					className="flex gap-1 overflow-x-auto ml-2 items-center"
+					className="flex gap-1 overflow-x-auto ml-2 mr-24 items-center"
 					style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
 				>
 					{links.map((l) => (

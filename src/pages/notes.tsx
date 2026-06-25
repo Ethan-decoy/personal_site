@@ -335,7 +335,26 @@ export default function NotesPage({
 		if (el) {
 			el.scrollIntoView({ behavior: "smooth", block: "start" });
 			setPendingAnchor(null);
+			return;
 		}
+		// pendingAnchor is a search query — find text in rendered content
+		const timer = setTimeout(() => {
+			const content = document.querySelector("[data-note-content]");
+			if (!content) { setPendingAnchor(null); return; }
+			const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT);
+			let node: Node | null;
+			while ((node = walker.nextNode())) {
+				if (node.textContent?.toLowerCase().includes(pendingAnchor.toLowerCase())) {
+					const parent = node.parentElement;
+					if (parent) {
+						parent.scrollIntoView({ behavior: "smooth", block: "center" });
+					}
+					break;
+				}
+			}
+			setPendingAnchor(null);
+		}, 100);
+		return () => clearTimeout(timer);
 	}, [pendingAnchor, selectedNote?.file]);
 
 	const toggleKey = (key: string) => {
@@ -347,7 +366,7 @@ export default function NotesPage({
 		});
 	};
 
-	const openNote = (file: string, title: string) => {
+	const openNote = (file: string, title: string, query?: string) => {
 		const raw = modules[file];
 		if (!raw) return;
 		const fm = parseFrontmatter(raw);
@@ -360,7 +379,11 @@ export default function NotesPage({
 		});
 		setSearchQuery("");
 		setSearchFocused(false);
-		window.scrollTo({ top: 0, behavior: "instant" });
+		if (query) {
+			setPendingAnchor(query);
+		} else {
+			window.scrollTo({ top: 0, behavior: "instant" });
+		}
 	};
 
 	const suggestions =
@@ -412,6 +435,7 @@ export default function NotesPage({
 												([, raw]) => parseFrontmatter(raw).title === s,
 											)?.[0] || "",
 											s,
+										searchQuery,
 										)
 									}
 								>
@@ -440,7 +464,7 @@ export default function NotesPage({
 								key={r.file}
 								className="px-2 py-1.5 text-sm cursor-pointer rounded transition-colors duration-100"
 								style={{ color: theme.textSec }}
-								onClick={() => openNote(r.file, r.title)}
+								onClick={() => openNote(r.file, r.title, searchQuery)}
 								onMouseEnter={(e) => {
 									e.currentTarget.style.backgroundColor = theme.accentLight;
 								}}
@@ -652,11 +676,13 @@ export default function NotesPage({
 										{selectedNote.date}
 									</span>
 								</div>
-								<MarkdownPreview
-									content={selectedNote.content}
-									theme={theme}
-									isDark={mode === "dark"}
-								/>
+								<div data-note-content>
+									<MarkdownPreview
+										content={selectedNote.content}
+										theme={theme}
+										isDark={mode === "dark"}
+									/>
+								</div>
 							</div>
 						) : (
 							<div className="flex items-center justify-center h-48">

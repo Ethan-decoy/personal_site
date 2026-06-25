@@ -1,5 +1,5 @@
 ---
-title: Basic concept
+title: Basic concepts
 date: 2026-06-11
 ---
 # Basic concept

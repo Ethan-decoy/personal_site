@@ -3,3 +3,9 @@ dist/
 .env
 .DS_Store
 package-lock.json
+
+# Claude Code local skills & settings
+.agents/skills/
+.claude/skills/
+skills-lock.json
+.claude/settings.local.json

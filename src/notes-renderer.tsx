@@ -56,6 +56,22 @@ hljs.registerLanguage("go", go);
 hljs.registerLanguage("ruby", ruby);
 hljs.registerLanguage("swift", swift);
 hljs.registerLanguage("kotlin", kotlin);
+hljs.registerLanguage("cmake", hljs => ({
+	name: "CMake",
+	case_insensitive: true,
+	keywords: {
+		keyword:
+			"if else elseif endif foreach endwhile while endwhile endforeach endfunction endmacro endblock cmake_minimum_required project set option macro function include find_package add_executable add_library target_link_libraries target_include_directories target_compile_definitions target_compile_options add_subdirectory install export configure_file file message string list math execute_process add_definitions remove_definitions add_compile_options source_group set_property get_property get_target_property set_target_properties get_directory_property include_directories link_directories link_libraries aux_source_directory create_test_sourcelist add_test enable_testing",
+		built_in:
+			"TRUE FALSE ON OFF AND OR NOT COMMAND POLICY TARGET PROPERTY CACHE ENV VARIABLE IN_LIST APPEND PREPEND REMOVE_AT REMOVE_ITEM REPLACE REGEX MATCH MATCHALL LESS GREATER EQUAL STRLESS STRGREATER STREQUAL VERSION_LESS VERSION_GREATER VERSION_EQUAL",
+	},
+	contains: [
+		hljs.HASH_COMMENT_MODE,
+		{ className: "variable", begin: /\$\{/, end: /\}/, contains: ["self"] },
+		hljs.QUOTE_STRING_MODE,
+		hljs.NUMBER_MODE,
+	],
+}));
 
 /* ---- Code highlighter themes ---- */
 const HLJS_THEMES = {
@@ -410,9 +426,11 @@ function AsyncCodeBlock({
 
 	useEffect(() => {
 		let cancelled = false;
-		tsHighlight(value, lang).then((result) => {
-			if (!cancelled && result) setHtml(result);
-		});
+		tsHighlight(value, lang)
+			.then((result) => {
+				if (!cancelled && result) setHtml(result);
+			})
+			.catch(() => {});
 		return () => {
 			cancelled = true;
 		};

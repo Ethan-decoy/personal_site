@@ -79,6 +79,21 @@ export const dict = {
 		en: "Chinese (native), English (B1)",
 	},
 	"about.mbti": { zh: "MBTI", en: "MBTI" },
+	"about.iq": { zh: "IQ", en: "IQ" },
+	"about.iq.v": { zh: "115", en: "115" },
+	"about.iq.source": { zh: "瑞文SPM 标准量表", en: "Raven's SPM" },
+	"about.iq.label": { zh: "较高（中上聪明）", en: "Above Average" },
+	"about.iq.test": { zh: "瑞文标准推理测验（SPM）", en: "Raven's SPM" },
+	"about.iq.factors": { zh: "因子表现", en: "Factor Breakdown" },
+	"about.iq.factors.raw": { zh: "得分", en: "Score" },
+	"about.iq.factors.pct": { zh: "占比", en: "Contribution" },
+
+	"iq.factor.perception": { zh: "知觉辨别", en: "Perception & Discrimination" },
+	"iq.factor.similarity": { zh: "类同比较", en: "Similarity & Comparison" },
+	"iq.factor.comparison": { zh: "比较推理", en: "Comparative Reasoning" },
+	"iq.factor.series": { zh: "系列关系", en: "Serial Relations" },
+	"iq.factor.abstract": { zh: "抽象推理", en: "Abstract Reasoning" },
+
 	"about.current": { zh: "当前", en: "Currently" },
 	"about.current.v": SHARED.currentFocus,
 

@@ -183,6 +183,7 @@ export default function AboutPage({
 		{ label: t("about.location"), value: t("about.location.v") },
 		{ label: t("about.language"), value: t("about.language.v") },
 		{ label: "MBTI", value: "INTJ-T" },
+		{ label: t("about.iq"), value: t("about.iq.v"), source: t("about.iq.source") },
 		{ label: t("about.current"), value: t("about.current.v") },
 	];
 
@@ -348,6 +349,14 @@ export default function AboutPage({
 											{item.label}
 										</p>
 										<p className="text-sm">{item.value}</p>
+											{item.source && (
+												<p
+													className="text-[10px] mt-0.5"
+													style={{ color: theme.textSec, opacity: 0.5 }}
+												>
+													{item.source}
+												</p>
+											)}
 									</div>
 								))}
 							</div>

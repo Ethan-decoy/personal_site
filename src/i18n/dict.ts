@@ -4,7 +4,7 @@ export type DictKey = keyof typeof dict;
 
 /* ---- Shared values (edited once, referenced everywhere) ---- */
 const SHARED = {
-	currentFocus: { zh: "正在学习线性代数", en: "Learning Linear Algebra" },
+	currentFocus: { zh: "构建个人视觉算法库", en: "Building a Personal Visual Algorithm Library" },
 };
 
 export const dict = {

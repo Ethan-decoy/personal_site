@@ -787,8 +787,12 @@ export function MarkdownPreview({
 		深棕暗色: "earth",
 		深蓝黑: "ocean",
 		深海暗蓝: "ocean",
+		青瓷米白: "sage",
+		青瓷暗色: "sage",
 		浅青绿: "sage",
 		暗青墨绿: "sage",
+		"GitHub Light": "black",
+		"GitHub Dark": "black",
 		黑: "black",
 		极夜黑: "black",
 	};

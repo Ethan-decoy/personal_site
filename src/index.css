@@ -206,42 +206,42 @@ body {
 	color: #58a6d0;
 }
 
-/* sage (浅青绿) */
+/* sage (青瓷米白) */
 .prose-sage {
-	--tw-prose-body: #1a2a24;
-	--tw-prose-headings: #1a2a24;
-	--tw-prose-lead: #4e6a5e;
-	--tw-prose-links: #3d8b7a;
-	--tw-prose-bold: #1a2a24;
-	--tw-prose-counters: #4e6a5e;
-	--tw-prose-bullets: #4e6a5e;
-	--tw-prose-hr: rgba(26, 42, 36, 0.08);
-	--tw-prose-quotes: #4e6a5e;
-	--tw-prose-quote-borders: rgba(61, 139, 122, 0.4);
-	--tw-prose-captions: #4e6a5e;
-	--tw-prose-code: #3d8b7a;
-	--tw-prose-pre-code: #e0ebd8;
+	--tw-prose-body: #182820;
+	--tw-prose-headings: #182820;
+	--tw-prose-lead: #5b6f66;
+	--tw-prose-links: #4f8f7b;
+	--tw-prose-bold: #182820;
+	--tw-prose-counters: #5b6f66;
+	--tw-prose-bullets: #5b6f66;
+	--tw-prose-hr: rgba(24, 40, 32, 0.08);
+	--tw-prose-quotes: #5b6f66;
+	--tw-prose-quote-borders: rgba(79, 143, 123, 0.4);
+	--tw-prose-captions: #5b6f66;
+	--tw-prose-code: #4f8f7b;
+	--tw-prose-pre-code: #d8e7de;
 	--tw-prose-pre-bg: transparent;
-	--tw-prose-th-borders: rgba(26, 42, 36, 0.12);
-	--tw-prose-td-borders: rgba(26, 42, 36, 0.12);
+	--tw-prose-th-borders: rgba(24, 40, 32, 0.12);
+	--tw-prose-td-borders: rgba(24, 40, 32, 0.12);
 }
 .prose-sage.dark {
-	--tw-prose-body: #d8e8e0;
-	--tw-prose-headings: #d8e8e0;
-	--tw-prose-lead: #7ea896;
-	--tw-prose-links: #5cc9a7;
-	--tw-prose-bold: #d8e8e0;
-	--tw-prose-counters: #7ea896;
-	--tw-prose-bullets: #7ea896;
-	--tw-prose-hr: rgba(216, 232, 224, 0.08);
-	--tw-prose-quotes: #7ea896;
-	--tw-prose-quote-borders: rgba(92, 201, 167, 0.4);
-	--tw-prose-captions: #7ea896;
-	--tw-prose-code: #5cc9a7;
-	--tw-prose-pre-code: #c0d8cc;
+	--tw-prose-body: #dde9e2;
+	--tw-prose-headings: #dde9e2;
+	--tw-prose-lead: #8fa79b;
+	--tw-prose-links: #78c6aa;
+	--tw-prose-bold: #dde9e2;
+	--tw-prose-counters: #8fa79b;
+	--tw-prose-bullets: #8fa79b;
+	--tw-prose-hr: rgba(221, 233, 226, 0.08);
+	--tw-prose-quotes: #8fa79b;
+	--tw-prose-quote-borders: rgba(120, 198, 170, 0.4);
+	--tw-prose-captions: #8fa79b;
+	--tw-prose-code: #78c6aa;
+	--tw-prose-pre-code: #cfe2d8;
 	--tw-prose-pre-bg: transparent;
-	--tw-prose-th-borders: rgba(216, 232, 224, 0.08);
-	--tw-prose-td-borders: rgba(216, 232, 224, 0.08);
+	--tw-prose-th-borders: rgba(221, 233, 226, 0.08);
+	--tw-prose-td-borders: rgba(221, 233, 226, 0.08);
 }
 
 /* black (黑) */
@@ -317,10 +317,10 @@ body {
 }
 .prose-sage a:hover {
 	text-decoration: underline;
-	color: #2e6b5e;
+	color: #3f7465;
 }
 .prose-sage.dark a:hover {
-	color: #7ddbb9;
+	color: #94d8c0;
 }
 .prose-black a {
 	text-decoration: none;

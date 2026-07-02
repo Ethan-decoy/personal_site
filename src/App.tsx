@@ -34,9 +34,9 @@ const sectionMap: Record<
 };
 
 const sectionTheme: Record<Section, ThemeKey> = {
-	home: "earth",
-	about: "earth",
-	projects: "sage",
+	home: "sage",
+	about: "sage",
+	projects: "github",
 	notes: "ocean",
 	contact: "black",
 };

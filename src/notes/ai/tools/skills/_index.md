@@ -1,59 +1,84 @@
 ---
-title: Skills
-date: 2026-05-27
+title: Matt Pocock Skills
+date: 2026-07-04
 ---
-# Mattpocock Skills — 中文笔记
+# Matt Pocock Skills 中文笔记
 
-> 本文档翻译自 [mattpocock/skills](https://github.com/mattpocock/skills)，版权归原作者所有。
+> 本组笔记中文转述自 [mattpocock/skills](https://github.com/mattpocock/skills)。  
+> 本次同步来源：`main` 分支 `272f99b22574f50e4266791c86b9302682970e23`。  
+> 原仓库采用 MIT License，版权归 Matt Pocock 所有。
 
-## 技能总览
+## 这套技能解决什么
 
-### 工程类（日常代码工作）
+这是一组面向真实工程工作的 Agent 技能。它们的核心不是“让 AI 多写代码”，而是把软件工程里的几个关键反馈环固定下来：
 
-| 编号 | 技能 | 用途 |
-|------|------|------|
-| 0 | [为什么需要这些技能](./why-these-skills.md) | 概述：为什么需要这些技能 |
-| 1 | [diagnose](./engineering/diagnose.md) | 复杂 bug 和性能回归的诊断循环 |
-| 2 | [grill-with-docs](./engineering/grill-with-docs.md) | 拷问式会话，结合领域文档更新 |
-| 3 | [triage](./engineering/triage.md) | 通过状态机分派问题 |
-| 4 | [improve-codebase-architecture](./engineering/improve-codebase-architecture.md) | 发现深化设计机会，改善代码架构 |
-| 5 | [setup-matt-pocock-skills](./engineering/setup-matt-pocock-skills.md) | 仓库级配置搭建（问题追踪、标签、领域文档） |
-| 6 | [tdd](./engineering/tdd.md) | 测试驱动开发，红-绿-重构循环 |
-| 7 | [to-issues](./engineering/to-issues.md) | 将计划/PRD 拆分为垂直切片的 Issue |
-| 8 | [to-prd](./engineering/to-prd.md) | 将对话转化为 PRD 并发布为 Issue |
-| 9 | [zoom-out](./engineering/zoom-out.md) | 拉远视角，从系统层面理解代码 |
-| 10 | [prototype](./engineering/prototype.md) | 构建临时原型来探索设计方向 |
+- 先对齐问题，再写规格。
+- 先拆成可验证的垂直切片，再实现。
+- 先有红绿反馈，再改代码。
+- 用稳定术语、深模块和明确接口降低复杂度。
+- 在长会话、代码审查、问题分诊和架构整理之间留下可交接的产物。
 
-### 效率类（通用工作流）
+## 快速安装
 
-| 编号 | 技能 | 用途 |
-|------|------|------|
-| 11 | [caveman](./efficiency/caveman.md) | 极致压缩沟通模式，降低 75% token |
-| 12 | [grill-me](./efficiency/grill-me.md) | 对计划/设计接受无情拷问访谈 |
-| 13 | [handoff](./efficiency/handoff.md) | 将对话压缩为交接文档 |
-| 14 | [write-a-skill](./efficiency/write-a-skill.md) | 创建新的技能 |
+```bash
+npx skills@latest add mattpocock/skills
+```
 
-### 附录与模板
+安装时需要至少选择 `/setup-matt-pocock-skills`。首次进入某个仓库后，先运行它，让技能知道 issue tracker、分诊标签和领域文档放在哪里。
 
-| 文件 | 内容 |
-|------|------|
-| [CONTEXT 格式](./templates/context-format.md) | CONTEXT.md 的编写规范 |
-| [ADR 格式](./templates/adr-format.md) | 架构决策记录的编写规范 |
-| [Agent Brief 编写指南](./templates/agent-brief.md) | 如何编写可托付给 AFK agent 的 Brief |
-| [Out-of-Scope 知识库](./templates/out-of-scope.md) | 被拒绝需求的持久化记录机制 |
-| [深模块](./templates/deep-modules.md) | 深模块 vs 浅模块的概念图解 |
-| [接口可测试性设计](./templates/interface-design.md) | 面向测试的接口设计原则 |
-| [Mock 使用指南](./templates/mocking.md) | 何时该 Mock、何时不该 |
-| [重构候选项](./templates/refactoring.md) | TDD 循环后的重构信号 |
-| [好坏测试示例](./templates/tests.md) | 好测试与坏测试的对比 |
-| [深化方法](./templates/deepening.md) | 如何安全地深化浅模块 |
-| [接口设计](./templates/interface-design-arch.md) | 多方案并行接口设计流程 |
-| [架构语言](./templates/language.md) | 架构审查中的统一术语表 |
-| [HTML 报告格式](./templates/html-report.md) | 架构审查 HTML 报告的编写规范 |
-| [逻辑原型](./templates/logic-prototype.md) | 终端交互式逻辑原型构建指南 |
-| [UI 原型](./templates/ui-prototype.md) | 多变体 UI 原型构建指南 |
-| [领域文档消费规则](./templates/domain-docs.md) | 工程技能如何消费领域文档 |
-| [GitHub Issue 追踪](./templates/issue-tracker-github.md) | GitHub 作为问题追踪器的使用约定 |
-| [GitLab Issue 追踪](./templates/issue-tracker-gitlab.md) | GitLab 作为问题追踪器的使用约定 |
-| [本地 Markdown 追踪](./templates/issue-tracker-local.md) | 本地文件作为问题追踪器的使用约定 |
-| [分派标签映射](./templates/triage-labels.md) | 五种分派角色的标签映射表 |
+## 调用方式
+
+新版文档把技能分成两类：
+
+- **User-invoked**：只能由用户显式输入，例如 `/grill-with-docs`、`/to-prd`。它们负责组织流程。
+- **Model-invoked**：用户可以显式调用，Agent 在任务匹配时也可以自动使用，例如 `/tdd`、`/diagnosing-bugs`、`/codebase-design`。
+
+一个 user-invoked 技能可以调用 model-invoked 技能，但不会再调用另一个 user-invoked 技能。这个边界让流程更可预期。
+
+## 主线流程
+
+```txt
+grill-with-docs -> to-prd -> to-issues -> implement -> code-review
+```
+
+- `grill-with-docs`：先用一问一答把计划、术语和关键决策磨清楚。
+- `to-prd`：把已经对齐的理解写成 PRD，不重新访谈。
+- `to-issues`：把 PRD 拆成可独立交给 Agent 的垂直切片。
+- `implement`：按 issue 或 PRD 执行实现，内部驱动 `tdd`。
+- `code-review`：从标准和规格两个维度审查 diff。
+
+## 工程类
+
+| 技能 | 类型 | 用途 |
+| --- | --- | --- |
+| [ask-matt](./engineering/ask-matt.md) | User-invoked | 不知道该用哪个技能时的路由器 |
+| [setup-matt-pocock-skills](./engineering/setup-matt-pocock-skills.md) | User-invoked | 每个仓库首次使用前的配置入口 |
+| [grill-with-docs](./engineering/grill-with-docs.md) | User-invoked | 拷问计划，同时写入 glossary 和 ADR |
+| [to-prd](./engineering/to-prd.md) | User-invoked | 把已对齐的对话转成 PRD |
+| [to-issues](./engineering/to-issues.md) | User-invoked | 把计划拆成垂直切片 issue |
+| [implement](./engineering/implement.md) | User-invoked | 按 PRD 或 issue 执行实现 |
+| [triage](./engineering/triage.md) | User-invoked | 分诊已有 issue 或外部 PR |
+| [improve-codebase-architecture](./engineering/improve-codebase-architecture.md) | User-invoked | 扫描代码库，寻找深模块改进机会 |
+| [tdd](./engineering/tdd.md) | Model-invoked | 红绿重构，一次一个行为 |
+| [diagnosing-bugs](./engineering/diagnosing-bugs.md) | Model-invoked | 复现、缩小、假设、插桩、回归测试 |
+| [code-review](./engineering/code-review.md) | Model-invoked | 按 Standards 和 Spec 两轴审查 |
+| [codebase-design](./engineering/codebase-design.md) | Model-invoked | 深模块、接口、接缝的设计语言 |
+| [domain-modeling](./engineering/domain-modeling.md) | Model-invoked | 维护领域统一语言和 ADR |
+| [prototype](./engineering/prototype.md) | Model-invoked | 用一次性原型回答设计问题 |
+| [research](./engineering/research.md) | Model-invoked | 基于一手资料做研究并留下引用文档 |
+| [resolving-merge-conflicts](./engineering/resolving-merge-conflicts.md) | Model-invoked | 按意图解决 merge/rebase 冲突 |
+
+## 生产力类
+
+| 技能 | 类型 | 用途 |
+| --- | --- | --- |
+| [grill-me](./productivity/grill-me.md) | User-invoked | 不写文档的计划拷问 |
+| [handoff](./productivity/handoff.md) | User-invoked | 把长会话压缩成交接文档 |
+| [teach](./productivity/teach.md) | User-invoked | 把当前目录变成长期学习工作区 |
+| [writing-great-skills](./productivity/writing-great-skills.md) | User-invoked | 编写和维护技能的元参考 |
+| [grilling](./productivity/grilling.md) | Model-invoked | `grill-me` 与 `grill-with-docs` 背后的拷问原语 |
+
+## 版本变化
+
+- [最新变化](./latest-changes.md)：新版仓库的重命名、移除、新增和分类调整。
+- [其他目录](./other-skills.md)：`misc`、`personal`、`in-progress`、`deprecated` 中的技能清单。

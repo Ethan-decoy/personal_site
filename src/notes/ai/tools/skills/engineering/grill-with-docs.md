@@ -1,90 +1,47 @@
 ---
-title: grill-with-docs — 结合领域文档的拷问式会话
-date: 2026-05-27
-order: 2
+title: grill-with-docs
+date: 2026-07-04
 ---
-# grill-with-docs — 结合领域文档的拷问式会话
+# grill-with-docs
 
-> 转自 [mattpocock/skills](https://github.com/mattpocock/skills)，版权归原作者所有。
+来源：[skills/engineering/grill-with-docs](https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs)
 
-**触发时机**：用户想要根据项目的领域语言和已有文档来压力测试一个计划。
+## 快速安装
 
-**描述**：拷问式会话，挑战你的计划与现有领域模型的一致性，推敲术语，并内联更新 `CONTEXT.md` 和 ADR。
-
----
-
-## 核心流程
-
-无情地拷问这个计划的方方面面，直到我们达成共享理解。逐个走下设计树的每个分支，逐一解决决策之间的依赖关系。对每个问题，提供你的推荐答案。
-
-**一次问一个问题**，等待用户反馈后再继续。
-
-如果某个问题可以通过探索代码库来回答，那就探索代码库而不是问用户。
-
-## 领域感知
-
-### 文件结构
-
-大多数仓库是单上下文的：
-
-```
-/
-├── CONTEXT.md
-├── docs/
-│   └── adr/
-│       ├── 0001-event-sourced-orders.md
-│       └── 0002-postgres-for-write-model.md
-└── src/
+```bash
+npx skills add mattpocock/skills --skill=grill-with-docs
+npx skills update grill-with-docs
 ```
 
-如果根目录有 `CONTEXT-MAP.md`，说明仓库有多个上下文。地图指向每个上下文的位置：
+## 它解决什么
 
+`grill-with-docs` 在动手前对计划进行一问一答的拷问，直到你和 Agent 达成共同理解。同时，它会把变清楚的术语写入 `CONTEXT.md`，把重要决策写入 ADR。
+
+普通拷问会让理解停留在会话里；这个技能会留下纸面轨迹。
+
+## 何时使用
+
+在一个改动刚开始、计划还模糊、领域语言也没有完全定下来时使用。
+
+如果只想被追问但不写文档，用 `grilling` 或 `grill-me`。如果计划已经清楚，只是想沉淀术语或决策，用 `domain-modeling`。
+
+## 前置条件
+
+它会向仓库写入文档，但这些文件按需创建：
+
+- 术语写入根目录 `CONTEXT.md`，或多上下文仓库里的对应 `CONTEXT.md`。
+- 难以逆转的决策写入 `docs/adr/`。
+
+## 工作方式
+
+它沿着设计决策树向下问，一次只问一个问题。能从代码库读出来的问题，会自己读代码，不浪费你的回答。
+
+术语一旦明确，就立即写入 glossary，而不是等会话结束再批量整理。ADR 则保持稀少，只在真正有取舍且后续难以回退时出现。
+
+## 在流程中的位置
+
+```txt
+grill-with-docs -> to-prd -> to-issues -> implement -> code-review
 ```
-/
-├── CONTEXT-MAP.md
-├── docs/
-│   └── adr/                          ← 系统级决策
-└── src/
-    ├── ordering/
-    │   ├── CONTEXT.md
-    │   └── docs/adr/                 ← 上下文特定决策
-    └── billing/
-        ├── CONTEXT.md
-        └── docs/adr/
-```
 
-**惰性创建文件**——只有有东西可写时才创建。如果不存在 `CONTEXT.md`，在第一个术语被确定时创建。如果不存在 `docs/adr/`，在需要第一个 ADR 时创建。
-
-## 会话中的行为
-
-### 对照词汇表挑战
-
-当用户使用的术语与 `CONTEXT.md` 中已有语言冲突时，立即指出。"你的词汇表将 'cancellation' 定义为 X，但你似乎指的是 Y——到底是哪个？"
-
-### 提炼模糊语言
-
-当用户使用模糊或过载的术语时，提出一个精确的规范术语。"你说的是 'account'——是指 Customer 还是 User？这是两个不同的东西。"
-
-### 讨论具体场景
-
-当讨论领域关系时，用具体场景压力测试。发明场景来探测边界情况，迫使用户精确界定概念之间的边界。
-
-### 对照代码交叉验证
-
-当用户陈述某事的工作原理时，检查代码是否一致。如果发现矛盾，明确指出："你的代码取消整个 Order，但你刚才说可以部分取消——哪个是对的？"
-
-### 内联更新 CONTEXT.md
-
-当术语被确定时，立即更新 `CONTEXT.md`。不要批量处理——发生时即捕获。
-
-`CONTEXT.md` 应**完全不含实现细节**。不要把它当成规格说明书、草稿纸或实现决策的仓库。它就是一个词汇表，仅此而已。
-
-### 谨慎提供 ADR
-
-只有在以下**三个条件都满足**时才提议创建 ADR：
-
-1. **难以逆转**——以后改变主意的代价是实实在在的
-2. **缺少上下文会让人惊讶**——未来的读者会疑惑"他们为什么这么做？"
-3. **真实权衡的结果**——确实有替代方案，你出于特定原因选择了其中一个
-
-如果缺了任一条件，跳过 ADR。
+它是主线入口，负责把模糊想法变成足够稳定的上下文。

@@ -300,7 +300,7 @@ export default function AboutPage({
 								}}
 							>
 								<img
-									src={`${import.meta.env.BASE_URL}assets/qian_xuesen_yuan_longping_style.webp`}
+									src={`${import.meta.env.BASE_URL}assets/qian_xuesen_yuan_longping_style.jpg`}
 									alt=""
 									className="w-full h-full object-cover"
 									loading="lazy"

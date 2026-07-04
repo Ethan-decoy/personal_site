@@ -491,7 +491,7 @@ function highlightWithFallback(value: string, lang: string): string {
 function makePlotFn(expr: string): (x: number) => number {
 	const fn = new Function(
 		"x",
-		"with(Math){return(" + expr.replace(/;/g, "") + ")}",
+		`with(Math){return(${expr.replace(/;/g, "")})}`,
 	) as (x: number) => number;
 	return fn;
 }
@@ -501,7 +501,7 @@ function parseRange(raw: string): [number, number] | null {
 	const parts = inner.split(",").map((s) => {
 		s = s.trim();
 		try {
-			return Function("with(Math){return(" + s + ")}")();
+			return Function(`with(Math){return(${s})}`)();
 		} catch {
 			return Number.NaN;
 		}
@@ -509,6 +509,85 @@ function parseRange(raw: string): [number, number] | null {
 	return parts.length === 2 && parts.every((n) => !isNaN(n))
 		? (parts as [number, number])
 		: null;
+}
+
+interface PlotPoint {
+	x: number;
+	y: number | null;
+}
+
+export interface PlotModel {
+	points: PlotPoint[];
+	yMin: number;
+	yMax: number;
+}
+
+function percentile(sorted: number[], q: number): number {
+	if (sorted.length === 1) return sorted[0];
+	const index = (sorted.length - 1) * q;
+	const lower = Math.floor(index);
+	const upper = Math.ceil(index);
+	if (lower === upper) return sorted[lower];
+	const weight = index - lower;
+	return sorted[lower] * (1 - weight) + sorted[upper] * weight;
+}
+
+function getPlotYRange(values: number[]): [number, number] | null {
+	if (values.length === 0) return null;
+
+	const sorted = [...values].sort((a, b) => a - b);
+	const fullMin = sorted[0];
+	const fullMax = sorted[sorted.length - 1];
+	const fullRange = fullMax - fullMin;
+	const robustMin = percentile(sorted, 0.02);
+	const robustMax = percentile(sorted, 0.98);
+	const robustRange = robustMax - robustMin;
+
+	let yMin = fullMin;
+	let yMax = fullMax;
+	if (robustRange > 0 && fullRange / robustRange > 8) {
+		yMin = robustMin;
+		yMax = robustMax;
+	}
+
+	const yPad = (yMax - yMin) * 0.12 || 1;
+	yMin -= yPad;
+	yMax += yPad;
+
+	if (yMin > 0) yMin = 0;
+	if (yMax < 0) yMax = 0;
+
+	return [yMin, yMax];
+}
+
+export function buildPlotModel(
+	fnExpr: string,
+	xMin: number,
+	xMax: number,
+	samples: number,
+): PlotModel | null {
+	const fn = makePlotFn(fnExpr);
+	const points: PlotPoint[] = [];
+	const values: number[] = [];
+
+	for (let i = 0; i <= samples; i++) {
+		const x = xMin + ((xMax - xMin) * i) / samples;
+		try {
+			const y = fn(x);
+			if (Number.isFinite(y)) {
+				points.push({ x, y });
+				values.push(y);
+			} else {
+				points.push({ x, y: null });
+			}
+		} catch {
+			points.push({ x, y: null });
+		}
+	}
+
+	const yRange = getPlotYRange(values);
+	if (!yRange) return null;
+	return { points, yMin: yRange[0], yMax: yRange[1] };
 }
 
 function PlotCanvas({
@@ -536,29 +615,15 @@ function PlotCanvas({
 		const cssW = canvas.clientWidth;
 		if (cssW === 0) return;
 		const cssH = Math.max(200, Math.min(300, cssW * 0.45));
-		canvas.style.height = cssH + "px";
+		canvas.style.height = `${cssH}px`;
 		canvas.width = cssW * dpr;
 		canvas.height = cssH * dpr;
 		ctx.scale(dpr, dpr);
 
-		const fn = makePlotFn(fnExpr);
 		const samples = Math.max(cssW * 2, 400);
-
-		// sample y values to determine y range
-		const pts: number[] = [];
-		for (let i = 0; i <= samples; i++) {
-			const x = xMin + ((xMax - xMin) * i) / samples;
-			try {
-				const y = fn(x);
-				if (isFinite(y)) pts.push(y);
-			} catch {}
-		}
-		if (pts.length === 0) return;
-		let yMin = Math.min(...pts);
-		let yMax = Math.max(...pts);
-		const yPad = (yMax - yMin) * 0.12 || 1;
-		yMin -= yPad;
-		yMax += yPad;
+		const model = buildPlotModel(fnExpr, xMin, xMax, samples);
+		if (!model) return;
+		const { points, yMin, yMax } = model;
 
 		const pad = { top: 12, right: 16, bottom: 24, left: 42 };
 		const pw = cssW - pad.left - pad.right;
@@ -643,30 +708,26 @@ function PlotCanvas({
 		ctx.beginPath();
 		let drawing = false;
 		let prevY: number | null = null;
-		for (let i = 0; i <= samples; i++) {
-			const x = xMin + ((xMax - xMin) * i) / samples;
-			try {
-				const y = fn(x);
-				if (!isFinite(y)) {
-					drawing = false;
-					prevY = null;
-					continue;
-				}
-				const cy = toY(y);
-				if (prevY !== null && Math.abs(cy - prevY) > ph * 2) {
-					drawing = false;
-				}
-				if (!drawing) {
-					ctx.moveTo(toX(x), cy);
-					drawing = true;
-				} else {
-					ctx.lineTo(toX(x), cy);
-				}
-				prevY = cy;
-			} catch {
+		const ySpan = yMax - yMin;
+		for (const point of points) {
+			const { x, y } = point;
+			if (y === null || y < yMin || y > yMax) {
 				drawing = false;
 				prevY = null;
+				continue;
 			}
+
+			const cy = toY(y);
+			if (prevY !== null && Math.abs(y - prevY) > ySpan * 0.75) {
+				drawing = false;
+			}
+			if (!drawing) {
+				ctx.moveTo(toX(x), cy);
+				drawing = true;
+			} else {
+				ctx.lineTo(toX(x), cy);
+			}
+			prevY = y;
 		}
 		ctx.stroke();
 	}, [fnExpr, xMin, xMax, strokeColor, isDark]);

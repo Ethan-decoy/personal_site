@@ -1,38 +1,83 @@
-/* ==================== Notes Tree Builder ==================== */
-/*
- * 自动扫描 src/notes/ 目录下的 .md 文件，构建分类树。
- *
- * 用法：在 src/notes/ 下创建分类子目录，放入 .md 文件。
- * 每个文件需包含 frontmatter：
- *
- *   ---
- *   title: 笔记标题
- *   date: YYYY-MM-DD
- *   order: 数字（可选，用于自定义排序）
- *   ---
- *
- * 约定：
- * - `_index.md` 作为目录的索引页（README），点击该目录时展示索引内容。
- * - `_index.md` 不显示在子列表中。
- * - 文件名采用 snake_case，展示名由 frontmatter title 决定。
- */
-
-export const modules = import.meta.glob("./**/*.md", {
+const rawModules = import.meta.glob("./**/*.md", {
 	eager: true,
 	query: "?raw",
 	import: "default",
 }) as Record<string, string>;
 
-export function parseFrontmatter(raw: string) {
+const WIKI_FILE = "./wiki.md";
+const INDEX_FILE_SUFFIX = "/_index.md";
+
+interface Frontmatter {
+	title: string;
+	date: string;
+	order?: number;
+}
+
+export interface NoteContent {
+	file: string;
+	title: string;
+	date: string;
+	content: string;
+}
+
+export interface NestedFileNode {
+	title: string;
+	date: string;
+	order?: number;
+	file: string;
+	filename: string;
+}
+
+export interface NestedTreeNode {
+	key: string;
+	title: string;
+	children: (NestedTreeNode | NestedFileNode)[];
+	isDir: true;
+	indexFile?: string;
+}
+
+export interface SearchResult {
+	title: string;
+	date: string;
+	file: string;
+	category: string;
+}
+
+export interface NoteSuggestion {
+	title: string;
+	file: string;
+}
+
+export interface NoteLinkTarget {
+	file: string;
+	anchor: string | null;
+	isWiki: boolean;
+}
+
+interface DirectoryBuilder {
+	key: string;
+	title: string;
+	dirs: Record<string, DirectoryBuilder>;
+	files: NestedFileNode[];
+}
+
+interface NotesIndex {
+	sidebarTree: NestedTreeNode[];
+	notesByFile: Record<string, NoteContent>;
+	directoryIndexes: Record<string, string>;
+	visibleFiles: string[];
+	isEmpty: boolean;
+}
+
+function parseFrontmatter(raw: string): Frontmatter {
 	const m = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/);
-	if (!m)
-		return { title: "", date: "", order: undefined as number | undefined };
+	if (!m) return { title: "", date: "" };
 	const fm = Object.fromEntries(
-		m[1].split("\n").map((l) => {
-			const idx = l.indexOf(":");
+		m[1].split("\n").map((line) => {
+			const idx = line.indexOf(":");
 			return idx === -1
-				? [l.trim(), ""]
-				: [l.slice(0, idx).trim(), l.slice(idx + 1).trim()];
+				? [line.trim(), ""]
+				: [line.slice(0, idx).trim(), line.slice(idx + 1).trim()];
 		}),
 	);
 	const order = fm.order !== undefined ? Number(fm.order) : undefined;
@@ -43,103 +88,53 @@ export function parseFrontmatter(raw: string) {
 	};
 }
 
-/* ---- 索引文件映射 ---- */
-// 将每个目录映射到其 _index.md 内容
-export const indexMap: Record<string, { title: string; content: string }> = {};
-
-/* ---- 树形结构 ---- */
-export interface NoteEntry {
-	title: string;
-	date: string;
-	order?: number;
-	file: string;
+function parseMarkdownBody(raw: string): string {
+	const normalized = raw.replace(/\r\n/g, "\n");
+	const m = normalized.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/);
+	return m ? m[2].trim() : normalized.trim();
 }
 
-export interface TreeNode {
-	key: string;
-	title: string;
-	children: NoteEntry[];
-	isLeaf: boolean; // true = 单文件（无子目录）
+function fallbackTitle(file: string): string {
+	const parts = file.replace(/^\.\//, "").replace(/\.md$/, "").split("/");
+	return parts[parts.length - 1] || "Untitled";
 }
 
-function buildTree(): TreeNode[] {
-	const groups: Record<string, { title: string; children: NoteEntry[] }> = {};
-
-	for (const [file, raw] of Object.entries(modules)) {
-		// 跳过 _index.md，它们单独处理
-		if (file.endsWith("/_index.md")) {
-			const dir = file.replace(/\/_index\.md$/, "");
-			const fm = parseFrontmatter(raw);
-			indexMap[dir] = { title: fm.title, content: raw };
-			continue;
-		}
-
-		// 跳过 wiki.md，不显示在侧边栏树中
-		if (file === "./wiki.md") continue;
-
-		const parts = file.replace(/^\.\//, "").split("/");
-		const catParts = parts.length > 1 ? parts.slice(0, -1) : ["other"];
-		const fm = parseFrontmatter(raw);
-
-		const catKey = catParts.join(" > ");
-		if (!groups[catKey])
-			groups[catKey] = { title: catParts.join(" > "), children: [] };
-		groups[catKey].children.push({
-			title: fm.title,
-			date: fm.date,
-			order: fm.order,
-			file,
-		});
-	}
-
-	// 排序：优先按 order，其次提取 filename 数字前缀（如 "01-xxx.md"），其次按 date，最后按 title
-	function extractPrefix(file: string): number {
-		const fname = file.replace(/^.*\//, "");
-		const m = fname.match(/^(\d+)/);
-		return m ? parseInt(m[1], 10) : Infinity;
-	}
-
-	for (const g of Object.values(groups)) {
-		g.children.sort((a, b) => {
-			if (a.order !== undefined && b.order !== undefined)
-				return a.order - b.order;
-			if (a.order !== undefined) return -1;
-			if (b.order !== undefined) return 1;
-			const aNum = extractPrefix(a.file);
-			const bNum = extractPrefix(b.file);
-			if (aNum !== bNum) return aNum - bNum;
-			if (a.date && b.date) return b.date.localeCompare(a.date);
-			return a.title.localeCompare(b.title);
-		});
-	}
-
-	return Object.entries(groups)
-		.sort(([a], [b]) => a.localeCompare(b))
-		.map(([key, g]) => ({
-			key,
-			title: g.title,
-			children: g.children,
-			isLeaf: false,
-		}));
+function fileName(file: string): string {
+	return file.replace(/^.*\//, "");
 }
 
-export const treeData = buildTree();
-
-/* ---- 搜索 ---- */
-/* ---- 嵌套树形结构（侧边栏递归用） ---- */
-
-export interface NestedFileNode {
-	title: string;
-	date: string;
-	order?: number;
-	file: string;
+function isIndexFile(file: string): boolean {
+	return file.endsWith(INDEX_FILE_SUFFIX);
 }
 
-export interface NestedTreeNode {
-	key: string;
-	title: string;
-	children: (NestedTreeNode | NestedFileNode)[];
-	isDir: boolean;
+function normalizeFileKey(file: string): string {
+	const normalized = file.replace(/\\/g, "/").replace(/^\/+/, "");
+	return normalized.startsWith("./") ? normalized : `./${normalized}`;
+}
+
+function directoryKeyForIndexFile(file: string): string {
+	return file.replace(/^\.\//, "").replace(/\/_index\.md$/, "");
+}
+
+function directoryKeyForFile(file: string): string {
+	const parts = normalizeFileKey(file).replace(/^\.\//, "").split("/");
+	return parts.length > 1 ? parts.slice(0, -1).join("/") : "";
+}
+
+function extractPrefix(file: string): number {
+	const m = fileName(file).match(/^(\d+)/);
+	return m ? Number.parseInt(m[1], 10) : Number.POSITIVE_INFINITY;
+}
+
+function compareFiles(a: NestedFileNode, b: NestedFileNode): number {
+	if (a.order !== undefined && b.order !== undefined) return a.order - b.order;
+	if (a.order !== undefined) return -1;
+	if (b.order !== undefined) return 1;
+	const aNum = extractPrefix(a.file);
+	const bNum = extractPrefix(b.file);
+	if (aNum !== bNum) return aNum - bNum;
+	if (a.date && b.date) return b.date.localeCompare(a.date);
+	return a.title.localeCompare(b.title);
 }
 
 function isNestedTreeNode(
@@ -148,90 +143,118 @@ function isNestedTreeNode(
 	return "key" in node;
 }
 
-function buildNestedTreeImpl(): NestedTreeNode[] {
-	const root: Record<string, any> = {};
-	for (const file of Object.keys(modules)) {
-		if (file.endsWith("/_index.md")) continue;
-		if (file === "./wiki.md") continue;
+function buildNotesIndex(): NotesIndex {
+	const notesByFile: Record<string, NoteContent> = {};
+	const directoryIndexes: Record<string, string> = {};
+	const visibleFiles: string[] = [];
+	const root: DirectoryBuilder = { key: "", title: "", dirs: {}, files: [] };
+
+	for (const [file, raw] of Object.entries(rawModules)) {
+		const fm = parseFrontmatter(raw);
+		notesByFile[file] = {
+			file,
+			title: fm.title || fallbackTitle(file),
+			date: fm.date,
+			content: parseMarkdownBody(raw),
+		};
+
+		if (isIndexFile(file)) {
+			directoryIndexes[directoryKeyForIndexFile(file)] = file;
+			continue;
+		}
+		if (file === WIKI_FILE) continue;
+
+		visibleFiles.push(file);
 		const parts = file.replace(/^\.\//, "").split("/");
-		let node = root;
+		let current = root;
 		for (let i = 0; i < parts.length - 1; i++) {
-			const p = parts[i];
-			const k = parts.slice(0, i + 1).join("/");
-			if (!node[k]) node[k] = { key: k, title: p, children: {} };
-			node = node[k].children;
-		}
-		const fname = parts[parts.length - 1];
-		node[fname] = { file };
-	}
-
-	function walk(obj: Record<string, any>): (NestedTreeNode | NestedFileNode)[] {
-		const results: (NestedTreeNode | NestedFileNode)[] = [];
-		for (const k of Object.keys(obj)) {
-			const v = obj[k];
-			if ("file" in v) {
-				const fm = parseFrontmatter(modules[v.file] || "");
-				results.push({
-					title: fm.title,
-					date: fm.date,
-					order: fm.order,
-					file: v.file,
-				});
-			} else if ("key" in v) {
-				const children = walk(v.children || {});
-				const hasIndex = !!indexMap[v.key];
-				results.push({
-					key: v.key,
-					title: hasIndex ? indexMap[v.key].title : v.title,
-					children,
-					isDir: true,
-				});
+			const key = parts.slice(0, i + 1).join("/");
+			if (!current.dirs[key]) {
+				current.dirs[key] = {
+					key,
+					title: parts[i],
+					dirs: {},
+					files: [],
+				};
 			}
+			current = current.dirs[key];
 		}
-
-		// 排序：优先按 order，其次提取 filename 数字前缀，其次按 date，最后按 title
-		function extractPrefix(file: string): number {
-			const fname = file.replace(/^.*\//, "");
-			const m = fname.match(/^(\d+)/);
-			return m ? parseInt(m[1], 10) : Infinity;
-		}
-
-		results.sort((a, b) => {
-			const aIsNode = isNestedTreeNode(a);
-			const bIsNode = isNestedTreeNode(b);
-			if (aIsNode !== bIsNode) return aIsNode ? -1 : 1;
-			if (aIsNode && bIsNode)
-				return (a as NestedTreeNode).title.localeCompare(
-					(b as NestedTreeNode).title,
-				);
-			const aa = a as NestedFileNode;
-			const bb = b as NestedFileNode;
-			if (aa.order !== undefined && bb.order !== undefined)
-				return aa.order - bb.order;
-			if (aa.order !== undefined) return -1;
-			if (bb.order !== undefined) return 1;
-			const aNum = extractPrefix(aa.file);
-			const bNum = extractPrefix(bb.file);
-			if (aNum !== bNum) return aNum - bNum;
-			if (aa.date && bb.date) return bb.date.localeCompare(aa.date);
-			return aa.title.localeCompare(bb.title);
+		current.files.push({
+			title: fm.title || fallbackTitle(file),
+			date: fm.date,
+			order: fm.order,
+			file,
+			filename: fileName(file),
 		});
-
-		return results;
 	}
-	const result = walk(root).filter(isNestedTreeNode);
-	return result;
+
+	function toTreeNode(builder: DirectoryBuilder): NestedTreeNode {
+		const indexFile = directoryIndexes[builder.key];
+		const dirChildren = Object.values(builder.dirs)
+			.map(toTreeNode)
+			.sort((a, b) => a.title.localeCompare(b.title));
+		const fileChildren = [...builder.files].sort(compareFiles);
+
+		return {
+			key: builder.key,
+			title: indexFile ? notesByFile[indexFile].title : builder.title,
+			children: [...dirChildren, ...fileChildren],
+			isDir: true,
+			indexFile,
+		};
+	}
+
+	const sidebarTree = Object.values(root.dirs)
+		.map(toTreeNode)
+		.sort((a, b) => a.title.localeCompare(b.title));
+
+	return {
+		sidebarTree,
+		notesByFile,
+		directoryIndexes,
+		visibleFiles,
+		isEmpty: visibleFiles.length === 0,
+	};
 }
 
-export const nestedTree = buildNestedTreeImpl();
+export const notesIndex = buildNotesIndex();
 
-/* ---- 搜索 ---- */
+export function getSidebarTree(): NestedTreeNode[] {
+	return notesIndex.sidebarTree;
+}
 
-export interface SearchResult {
-	title: string;
-	date: string;
-	file: string;
-	category: string;
+export function isNotesEmpty(): boolean {
+	return notesIndex.isEmpty;
+}
+
+export function getInitialExpandedKeys(): Set<string> {
+	const keys = new Set<string>();
+	const firstNode = notesIndex.sidebarTree[0];
+	if (firstNode) keys.add(firstNode.key);
+	return keys;
+}
+
+export function getNote(file: string): NoteContent | null {
+	return notesIndex.notesByFile[normalizeFileKey(file)] ?? null;
+}
+
+export function expandedKeysForFile(file: string): Set<string> {
+	const keys = new Set<string>();
+	const parts = normalizeFileKey(file).replace(/^\.\//, "").split("/");
+	for (let i = 0; i < parts.length - 1; i++) {
+		keys.add(parts.slice(0, i + 1).join("/"));
+	}
+	return keys;
+}
+
+export function directoryHasContent(node: NestedTreeNode): boolean {
+	return node.children.length > 0 || Boolean(node.indexFile);
+}
+
+export function isDirectoryNode(
+	node: NestedTreeNode | NestedFileNode,
+): node is NestedTreeNode {
+	return isNestedTreeNode(node);
 }
 
 export function searchNotes(query: string): SearchResult[] {
@@ -239,24 +262,24 @@ export function searchNotes(query: string): SearchResult[] {
 	const q = query.toLowerCase().trim();
 	const results: SearchResult[] = [];
 
-	for (const [file, raw] of Object.entries(modules)) {
-		if (file.endsWith("/_index.md")) continue;
-		if (file === "./wiki.md") continue;
-		const fm = parseFrontmatter(raw);
-		// 标题匹配
-		const titleMatch = fm.title.toLowerCase().includes(q);
-		// 内容匹配（搜索前 500 字符）
+	for (const file of notesIndex.visibleFiles) {
+		const note = notesIndex.notesByFile[file];
+		const raw = rawModules[file] || "";
+		const titleMatch = note.title.toLowerCase().includes(q);
 		const bodyMatch = raw.toLowerCase().includes(q);
 
 		if (titleMatch || bodyMatch) {
-			const parts = file.replace(/^\.\//, "").split("/");
 			const category =
-				parts.length > 1 ? parts.slice(0, -1).join(" > ") : "other";
-			results.push({ title: fm.title, date: fm.date, file, category });
+				directoryKeyForFile(file).replace(/\//g, " > ") || "other";
+			results.push({
+				title: note.title,
+				date: note.date,
+				file,
+				category,
+			});
 		}
 	}
 
-	// 标题匹配优先
 	results.sort((a, b) => {
 		const aTitle = a.title.toLowerCase().includes(q);
 		const bTitle = b.title.toLowerCase().includes(q);
@@ -268,26 +291,90 @@ export function searchNotes(query: string): SearchResult[] {
 	return results;
 }
 
-/* ---- 自动补全建议 ---- */
-export function getSuggestions(query: string): string[] {
+export function getSuggestions(query: string): NoteSuggestion[] {
 	if (!query.trim()) return [];
 	const q = query.toLowerCase().trim();
-	const suggestions: string[] = [];
+	const suggestions: NoteSuggestion[] = [];
 
-	for (const [file, raw] of Object.entries(modules)) {
-		if (file.endsWith("/_index.md")) continue;
-		if (file === "./wiki.md") continue;
-		const fm = parseFrontmatter(raw);
-		// 模糊匹配：检查 query 的字符是否按顺序出现在标题中
-		const title = fm.title.toLowerCase();
+	for (const file of notesIndex.visibleFiles) {
+		const note = notesIndex.notesByFile[file];
+		const title = note.title.toLowerCase();
 		let qi = 0;
 		for (let ti = 0; ti < title.length && qi < q.length; ti++) {
 			if (title[ti] === q[qi]) qi++;
 		}
 		if (qi === q.length) {
-			suggestions.push(fm.title);
+			suggestions.push({ title: note.title, file });
 		}
 	}
 
 	return suggestions.slice(0, 10);
+}
+
+function safeDecode(value: string): string {
+	try {
+		return decodeURIComponent(value);
+	} catch {
+		return value;
+	}
+}
+
+function normalizePathParts(parts: string[]): string[] {
+	const normalized: string[] = [];
+	for (const part of parts) {
+		if (!part || part === ".") continue;
+		if (part === "..") {
+			normalized.pop();
+			continue;
+		}
+		normalized.push(part);
+	}
+	return normalized;
+}
+
+function resolvePathToFile(path: string, fromFile: string): string {
+	const decodedPath = safeDecode(path).replace(/\\/g, "/");
+	const baseParts = decodedPath.startsWith("/")
+		? []
+		: directoryKeyForFile(fromFile).split("/").filter(Boolean);
+	const rawParts = decodedPath.replace(/^\/+/, "").split("/");
+	const parts = normalizePathParts([...baseParts, ...rawParts]);
+	const joined = parts.join("/");
+	const file = joined.endsWith(".md") ? joined : `${joined}.md`;
+	return `./${file}`;
+}
+
+function resolveRootPathToFile(path: string): string {
+	const decodedPath = safeDecode(path).replace(/\\/g, "/").replace(/^\/+/, "");
+	const parts = normalizePathParts(decodedPath.split("/"));
+	const joined = parts.join("/");
+	const file = joined.endsWith(".md") ? joined : `${joined}.md`;
+	return `./${file.replace(/^\.\//, "")}`;
+}
+
+export function resolveNoteHref(
+	href: string,
+	fromFile: string,
+): NoteLinkTarget | null {
+	if (!href) return null;
+	if (/^[a-z][a-z\d+.-]*:/i.test(href) || href.startsWith("//")) return null;
+
+	const [pathPart, ...anchorParts] = href.split("#");
+	const anchor =
+		anchorParts.length > 0 ? safeDecode(anchorParts.join("#")) : null;
+	let file = pathPart
+		? resolvePathToFile(pathPart, fromFile)
+		: normalizeFileKey(fromFile);
+
+	if (pathPart && !notesIndex.notesByFile[file]) {
+		file = resolveRootPathToFile(pathPart);
+	}
+
+	if (!notesIndex.notesByFile[file]) return null;
+
+	return {
+		file,
+		anchor,
+		isWiki: file === WIKI_FILE,
+	};
 }

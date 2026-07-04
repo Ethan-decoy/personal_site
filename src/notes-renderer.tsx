@@ -1,31 +1,30 @@
-import { useState, useEffect, useRef, type ReactNode } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
 import rehypeSlug from "rehype-slug";
-import rehypeKatex from "rehype-katex";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import "katex/dist/katex.min.css";
 import hljs from "highlight.js/lib/core";
-import { highlight as tsHighlight } from "./highlighter";
-import ts from "highlight.js/lib/languages/typescript";
 import bash from "highlight.js/lib/languages/bash";
-import json from "highlight.js/lib/languages/json";
-import xml from "highlight.js/lib/languages/xml";
+import cpp from "highlight.js/lib/languages/cpp";
 import css from "highlight.js/lib/languages/css";
-import yaml from "highlight.js/lib/languages/yaml";
+import go from "highlight.js/lib/languages/go";
+import java from "highlight.js/lib/languages/java";
+import json from "highlight.js/lib/languages/json";
+import kotlin from "highlight.js/lib/languages/kotlin";
 import markdown from "highlight.js/lib/languages/markdown";
 import python from "highlight.js/lib/languages/python";
-import rust from "highlight.js/lib/languages/rust";
-import cpp from "highlight.js/lib/languages/cpp";
-import java from "highlight.js/lib/languages/java";
-import sql from "highlight.js/lib/languages/sql";
-import go from "highlight.js/lib/languages/go";
 import ruby from "highlight.js/lib/languages/ruby";
-import swift from "highlight.js/lib/languages/swift";
-import kotlin from "highlight.js/lib/languages/kotlin";
+import rust from "highlight.js/lib/languages/rust";
 import shell from "highlight.js/lib/languages/shell";
-import { modules } from "./notes";
+import sql from "highlight.js/lib/languages/sql";
+import swift from "highlight.js/lib/languages/swift";
+import ts from "highlight.js/lib/languages/typescript";
+import xml from "highlight.js/lib/languages/xml";
+import yaml from "highlight.js/lib/languages/yaml";
+import { highlight as tsHighlight } from "./highlighter";
 
 /* ---- highlight.js language registrations ---- */
 hljs.registerLanguage("typescript", ts);
@@ -56,7 +55,7 @@ hljs.registerLanguage("go", go);
 hljs.registerLanguage("ruby", ruby);
 hljs.registerLanguage("swift", swift);
 hljs.registerLanguage("kotlin", kotlin);
-hljs.registerLanguage("cmake", hljs => ({
+hljs.registerLanguage("cmake", (hljs) => ({
 	name: "CMake",
 	case_insensitive: true,
 	keywords: {
@@ -270,13 +269,6 @@ function processEmphasis(node: any) {
 	node.children = newChildren;
 }
 
-/* ---- Markdown frontmatter strip ---- */
-export function parseMarkdownBody(raw: string) {
-	raw = raw.replace(/\r\n/g, "\n");
-	const m = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/);
-	return m ? m[2].trim() : raw.trim();
-}
-
 /* ---- GitHub-style callout detection ---- */
 function makeCallouts(
 	isDark: boolean,
@@ -483,7 +475,7 @@ function parseRange(raw: string): [number, number] | null {
 		try {
 			return Function("with(Math){return(" + s + ")}")();
 		} catch {
-			return NaN;
+			return Number.NaN;
 		}
 	});
 	return parts.length === 2 && parts.every((n) => !isNaN(n))
@@ -693,18 +685,23 @@ function Plot({
 const REMARK_PLUGINS = [remarkMath, remarkGfm, remarkCJKEmphasis];
 const REHYPE_PLUGINS = [rehypeRaw, rehypeSlug, rehypeKatex];
 
-/* ---- Cached components (same reference for same dark/theme combo) ---- */
-const _compCache = new Map<string, any>();
-function getComponents(dark: boolean, theme: { accent: string }) {
-	const key = `${dark}:${theme.accent}`;
-	if (!_compCache.has(key)) {
-		_compCache.set(key, makeComponents(dark, theme));
-	}
-	return _compCache.get(key);
+export interface NoteLinkTarget {
+	file: string;
+	anchor: string | null;
+	isWiki: boolean;
+}
+
+interface NoteLinkAdapter {
+	resolveNoteHref?: (href: string) => NoteLinkTarget | null;
+	onNoteOpen?: (target: NoteLinkTarget) => void;
 }
 
 /* ---- Components factory (avoids TS type conflict with custom Plot) ---- */
-function makeComponents(dark: boolean, theme: { accent: string }) {
+function makeComponents(
+	dark: boolean,
+	theme: { accent: string },
+	noteLinks: NoteLinkAdapter,
+) {
 	return {
 		a: ({ href, children }: { href?: string; children?: ReactNode }) => {
 			if (!href) return <span>{children}</span>;
@@ -715,26 +712,20 @@ function makeComponents(dark: boolean, theme: { accent: string }) {
 					</a>
 				);
 			}
-			const [path, anchor] = href.replace(/^\.\/?/, "").split("#");
-			const noteFile = `./${path.replace(/\.md$/, "")}.md`;
-			if (modules[noteFile]) {
-				const isWiki = noteFile === "./wiki.md";
+			const noteTarget = noteLinks.resolveNoteHref?.(href) ?? null;
+			if (noteTarget && noteLinks.onNoteOpen) {
 				return (
 					<a
-						href="javascript:void(0)"
+						href={href}
 						onClick={(e) => {
 							e.preventDefault();
-							window.dispatchEvent(
-								new CustomEvent("note:open", {
-									detail: { file: noteFile, anchor: anchor || null },
-								}),
-							);
+							noteLinks.onNoteOpen?.(noteTarget);
 						}}
-						className={`inline-flex items-center gap-0.5 ${isWiki ? "font-medium" : ""}`}
-						style={isWiki ? { color: theme.accent } : undefined}
+						className={`inline-flex items-center gap-0.5 ${noteTarget.isWiki ? "font-medium" : ""}`}
+						style={noteTarget.isWiki ? { color: theme.accent } : undefined}
 					>
 						{children}
-						{isWiki && (
+						{noteTarget.isWiki && (
 							<svg
 								className="inline-block flex-shrink-0"
 								width="11"
@@ -778,9 +769,21 @@ export function MarkdownPreview({
 	content,
 	theme,
 	isDark,
-}: { content: string; theme: ThemeColors; isDark?: boolean }) {
+	resolveNoteHref,
+	onNoteOpen,
+}: {
+	content: string;
+	theme: ThemeColors;
+	isDark?: boolean;
+	resolveNoteHref?: (href: string) => NoteLinkTarget | null;
+	onNoteOpen?: (target: NoteLinkTarget) => void;
+}) {
 	const dark = isDark ?? false;
 	useHljsTheme(dark);
+	const components = useMemo(
+		() => makeComponents(dark, theme, { resolveNoteHref, onNoteOpen }),
+		[dark, theme, resolveNoteHref, onNoteOpen],
+	);
 
 	const proseThemeMap: Record<string, string> = {
 		浅棕米白: "earth",
@@ -852,7 +855,7 @@ export function MarkdownPreview({
 			<ReactMarkdown
 				remarkPlugins={REMARK_PLUGINS}
 				rehypePlugins={REHYPE_PLUGINS}
-				components={getComponents(dark, theme)}
+				components={components}
 			>
 				{content}
 			</ReactMarkdown>

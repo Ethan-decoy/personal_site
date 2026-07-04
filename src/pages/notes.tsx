@@ -1,20 +1,27 @@
-import { useState, useEffect, useRef } from "react";
-import { type Section, type Theme, type ThemeMode } from "../themes";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SectionTitle } from "../components";
 import {
-	treeData,
-	modules,
-	indexMap,
-	searchNotes,
-	getSuggestions,
-	parseFrontmatter,
-	nestedTree,
+	type NestedFileNode,
 	type NestedTreeNode,
+	type NoteContent,
+	type NoteLinkTarget,
+	directoryHasContent,
+	expandedKeysForFile,
+	getInitialExpandedKeys,
+	getNote,
+	getSidebarTree,
+	getSuggestions,
+	isDirectoryNode,
+	isNotesEmpty,
+	resolveNoteHref as resolveCatalogNoteHref,
+	searchNotes,
 } from "../notes";
-import { MarkdownPreview, parseMarkdownBody } from "../notes-renderer";
+import { MarkdownPreview } from "../notes-renderer";
+import type { Section, Theme, ThemeMode } from "../themes";
 
 /* ---- Reading Progress SliderTrack ---- */
 const NUM_SEGMENTS = 60;
+const sidebarTree = getSidebarTree();
 
 function SliderTrack({
 	progress,
@@ -24,22 +31,22 @@ function SliderTrack({
 	const trackRef = useRef<HTMLDivElement>(null);
 	const [dragging, setDragging] = useState(false);
 
-	const scrollToRatio = (ratio: number) => {
+	const scrollToRatio = useCallback((ratio: number) => {
 		const docHeight =
 			document.documentElement.scrollHeight - window.innerHeight;
 		window.scrollTo({
 			top: ratio * docHeight,
 			behavior: dragging ? "auto" : "smooth",
 		});
-	};
+	}, [dragging]);
 
-	const handleStart = (clientY: number) => {
+	const handleStart = useCallback((clientY: number) => {
 		if (!trackRef.current) return;
 		const rect = trackRef.current.getBoundingClientRect();
 		const ratio = Math.max(0, Math.min((clientY - rect.top) / rect.height, 1));
 		scrollToRatio(ratio);
 		setDragging(true);
-	};
+	}, [scrollToRatio]);
 
 	useEffect(() => {
 		if (!dragging) return;
@@ -54,7 +61,7 @@ function SliderTrack({
 			window.removeEventListener("mousemove", onMove);
 			window.removeEventListener("mouseup", onUp);
 		};
-	}, [dragging]);
+	}, [dragging, handleStart]);
 
 	const currentIdx = Math.round((progress / 100) * (NUM_SEGMENTS - 1));
 
@@ -101,52 +108,19 @@ function SidebarNode({
 	expandedKeys: Set<string>;
 	onToggle: (key: string) => void;
 	selectedFile: string | null;
-	onOpen: (file: string, title: string) => void;
+	onOpen: (file: string) => void;
 }) {
 	const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 	const expanded = expandedKeys.has(node.key);
 
-	const fileChildren: {
-		title: string;
-		date: string;
-		order?: number;
-		file: string;
-		filename: string;
-	}[] = [];
+	const fileChildren: NestedFileNode[] = [];
 	const dirChildren: NestedTreeNode[] = [];
 	for (const c of node.children) {
-		if ("key" in c) dirChildren.push(c);
-		else {
-			const fm = parseFrontmatter(modules[c.file] || "");
-			const fname = c.file.replace(/^.*\//, "");
-			fileChildren.push({
-				title: fm.title,
-				date: fm.date,
-				order: fm.order,
-				file: c.file,
-				filename: fname,
-			});
-		}
-	}
-	function extractPrefix(filename: string): number {
-		const m = filename.match(/^(\d+)/);
-		return m ? parseInt(m[1], 10) : Infinity;
+		if (isDirectoryNode(c)) dirChildren.push(c);
+		else fileChildren.push(c);
 	}
 
-	fileChildren.sort((a, b) => {
-		if (a.order !== undefined && b.order !== undefined)
-			return a.order - b.order;
-		if (a.order !== undefined) return -1;
-		if (b.order !== undefined) return 1;
-		const aNum = extractPrefix(a.filename);
-		const bNum = extractPrefix(b.filename);
-		if (aNum !== bNum) return aNum - bNum;
-		if (a.date && b.date) return b.date.localeCompare(a.date);
-		return a.title.localeCompare(b.title);
-	});
-
-	const hasContent =
-		fileChildren.length > 0 || dirChildren.length > 0 || indexMap[node.key];
+	const hasContent = directoryHasContent(node);
 
 	return (
 		<div style={{ marginLeft: depth > 0 ? 12 : 0 }}>
@@ -154,18 +128,13 @@ function SidebarNode({
 				className="flex items-center gap-1.5 w-full py-1.5 text-left cursor-pointer rounded-r transition-colors duration-150"
 				style={{
 					backgroundColor:
-						selectedFile &&
-						indexMap[node.key] &&
-						selectedFile === `./${node.key}/_index.md`
+						selectedFile && node.indexFile && selectedFile === node.indexFile
 							? theme.accentLight
 							: "transparent",
 				}}
 				onClick={() => {
 					if (hasContent) onToggle(node.key);
-					if (indexMap[node.key]) {
-						const idx = indexMap[node.key];
-						onOpen(`./${node.key}/_index.md`, idx.title);
-					}
+					if (node.indexFile) onOpen(node.indexFile);
 				}}
 			>
 				<svg
@@ -213,11 +182,11 @@ function SidebarNode({
 										selectedFile === f.file
 											? theme.accentLight
 											: hoveredIdx === i
-												? theme.accentLight + "60"
+												? `${theme.accentLight}60`
 												: "transparent",
 									color: selectedFile === f.file ? theme.text : theme.textSec,
 								}}
-								onClick={() => onOpen(f.file, f.title)}
+								onClick={() => onOpen(f.file)}
 								onMouseEnter={() => setHoveredIdx(i)}
 								onMouseLeave={() => setHoveredIdx(null)}
 							>
@@ -247,18 +216,11 @@ export default function NotesPage({
 	theme,
 	mode,
 }: { theme: Theme; onNavigate: (s: Section) => void; mode?: ThemeMode }) {
-	const [expandedKeys, setExpandedKeys] = useState<Set<string>>(() => {
-		const s = new Set<string>();
-		if (nestedTree.length > 0) s.add(nestedTree[0].key);
-		return s;
-	});
+	const [expandedKeys, setExpandedKeys] = useState<Set<string>>(
+		getInitialExpandedKeys,
+	);
 	const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-	const [selectedNote, setSelectedNote] = useState<{
-		title: string;
-		date: string;
-		content: string;
-		file: string;
-	} | null>(null);
+	const [selectedNote, setSelectedNote] = useState<NoteContent | null>(null);
 	const currentNoteFile = useRef<string | null>(null);
 	const [backToSource, setBackToSource] = useState<{
 		file: string;
@@ -292,44 +254,6 @@ export default function NotesPage({
 	const [pendingAnchor, setPendingAnchor] = useState<string | null>(null);
 
 	useEffect(() => {
-		const handler = (e: Event) => {
-			const { file, anchor } = (e as CustomEvent).detail as {
-				file: string;
-				anchor: string | null;
-			};
-			const raw = modules[file];
-			if (!raw) return;
-			const fm = parseFrontmatter(raw);
-			if (file === "./wiki.md") {
-				setBackToSource(
-					currentNoteFile.current
-						? { file: currentNoteFile.current, scrollY: window.scrollY }
-						: null,
-				);
-			} else {
-				setBackToSource(null);
-			}
-			const body = parseMarkdownBody(raw);
-			setSelectedNote({
-				title: fm.title || file,
-				date: fm.date,
-				content: body,
-				file,
-			});
-			if (file !== "./wiki.md") {
-				const parts = file.replace(/^\.\//, "").split("/");
-				const newExpanded = new Set<string>();
-				for (let i = 0; i < parts.length - 1; i++)
-					newExpanded.add(parts.slice(0, i + 1).join(" > "));
-				setExpandedKeys(newExpanded);
-			}
-			if (anchor) setPendingAnchor(anchor);
-		};
-		window.addEventListener("note:open", handler);
-		return () => window.removeEventListener("note:open", handler);
-	}, []);
-
-	useEffect(() => {
 		if (!pendingAnchor) return;
 		const el = document.getElementById(pendingAnchor);
 		if (el) {
@@ -340,22 +264,28 @@ export default function NotesPage({
 		// pendingAnchor is a search query — find text in rendered content
 		const timer = setTimeout(() => {
 			const content = document.querySelector("[data-note-content]");
-			if (!content) { setPendingAnchor(null); return; }
+			if (!content) {
+				setPendingAnchor(null);
+				return;
+			}
 			const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT);
-			let node: Node | null;
-			while ((node = walker.nextNode())) {
-				if (node.textContent?.toLowerCase().includes(pendingAnchor.toLowerCase())) {
+			let node = walker.nextNode();
+			while (node) {
+				if (
+					node.textContent?.toLowerCase().includes(pendingAnchor.toLowerCase())
+				) {
 					const parent = node.parentElement;
 					if (parent) {
 						parent.scrollIntoView({ behavior: "smooth", block: "center" });
 					}
 					break;
 				}
+				node = walker.nextNode();
 			}
 			setPendingAnchor(null);
 		}, 100);
 		return () => clearTimeout(timer);
-	}, [pendingAnchor, selectedNote?.file]);
+	}, [pendingAnchor]);
 
 	const toggleKey = (key: string) => {
 		setExpandedKeys((prev) => {
@@ -366,25 +296,74 @@ export default function NotesPage({
 		});
 	};
 
-	const openNote = (file: string, title: string, query?: string) => {
-		const raw = modules[file];
-		if (!raw) return;
-		const fm = parseFrontmatter(raw);
-		setBackToSource(null);
-		setSelectedNote({
-			title: fm.title || title,
-			date: fm.date,
-			content: parseMarkdownBody(raw),
-			file,
-		});
-		setSearchQuery("");
-		setSearchFocused(false);
-		if (query) {
-			setPendingAnchor(query);
-		} else {
+	const openNote = useCallback(
+		(
+			file: string,
+			options: {
+				anchor?: string | null;
+				query?: string;
+				rememberSource?: boolean;
+				restoreScrollY?: number;
+				syncSidebar?: boolean;
+			} = {},
+		) => {
+			const note = getNote(file);
+			if (!note) return;
+
+			if (
+				options.rememberSource &&
+				currentNoteFile.current &&
+				currentNoteFile.current !== file
+			) {
+				setBackToSource({
+					file: currentNoteFile.current,
+					scrollY: window.scrollY,
+				});
+			} else {
+				setBackToSource(null);
+			}
+
+			setSelectedNote(note);
+			setSearchQuery("");
+			setSearchFocused(false);
+			if (file !== "./wiki.md" && options.syncSidebar !== false) {
+				setExpandedKeys(expandedKeysForFile(file));
+			}
+
+			const pendingTarget = options.anchor || options.query || null;
+			if (pendingTarget) {
+				setPendingAnchor(pendingTarget);
+				return;
+			}
+
+			if (options.restoreScrollY !== undefined) {
+				requestAnimationFrame(() =>
+					window.scrollTo({ top: options.restoreScrollY, behavior: "smooth" }),
+				);
+				return;
+			}
+
 			window.scrollTo({ top: 0, behavior: "instant" });
-		}
-	};
+		},
+		[],
+	);
+
+	const selectedNoteFile = selectedNote?.file ?? null;
+	const resolveMarkdownNoteHref = useCallback(
+		(href: string) =>
+			selectedNoteFile ? resolveCatalogNoteHref(href, selectedNoteFile) : null,
+		[selectedNoteFile],
+	);
+
+	const openMarkdownNote = useCallback(
+		(target: NoteLinkTarget) => {
+			openNote(target.file, {
+				anchor: target.anchor,
+				rememberSource: target.isWiki,
+			});
+		},
+		[openNote],
+	);
 
 	const suggestions =
 		searchFocused && searchQuery ? getSuggestions(searchQuery) : [];
@@ -422,24 +401,16 @@ export default function NotesPage({
 						>
 							{suggestions.map((s, i) => (
 								<div
-									key={s}
+									key={s.file}
 									className="px-3 py-2 text-sm cursor-pointer transition-colors duration-100"
 									style={{
 										backgroundColor:
 											i === 0 ? theme.accentLight : "transparent",
 										color: theme.textSec,
 									}}
-									onMouseDown={() =>
-										openNote(
-											Object.entries(modules).find(
-												([, raw]) => parseFrontmatter(raw).title === s,
-											)?.[0] || "",
-											s,
-										searchQuery,
-										)
-									}
+									onMouseDown={() => openNote(s.file, { query: searchQuery })}
 								>
-									{s}
+									{s.title}
 								</div>
 							))}
 						</div>
@@ -464,7 +435,7 @@ export default function NotesPage({
 								key={r.file}
 								className="px-2 py-1.5 text-sm cursor-pointer rounded transition-colors duration-100"
 								style={{ color: theme.textSec }}
-								onClick={() => openNote(r.file, r.title, searchQuery)}
+								onClick={() => openNote(r.file, { query: searchQuery })}
 								onMouseEnter={(e) => {
 									e.currentTarget.style.backgroundColor = theme.accentLight;
 								}}
@@ -478,7 +449,7 @@ export default function NotesPage({
 					</div>
 				)}
 				{!searchQuery &&
-					nestedTree.map((node) => (
+					sidebarTree.map((node) => (
 						<SidebarNode
 							key={node.key}
 							node={node}
@@ -496,17 +467,13 @@ export default function NotesPage({
 				<div className="hidden md:flex flex-col items-center fixed right-[calc((100vw-96rem)/2+3rem)] top-1/2 -translate-y-1/2 z-10">
 					{backToSource &&
 						(() => {
-							const srcRaw = modules[backToSource.file];
-							const srcTitle = srcRaw ? parseFrontmatter(srcRaw).title : "笔记";
 							return (
 								<button
+									type="button"
 									aria-label="返回来源笔记"
 									onClick={() => {
 										const y = backToSource.scrollY ?? 0;
-										openNote(backToSource.file, srcTitle);
-										requestAnimationFrame(() =>
-											window.scrollTo({ top: y, behavior: "smooth" }),
-										);
+										openNote(backToSource.file, { restoreScrollY: y });
 									}}
 									className="absolute w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out"
 									style={{
@@ -535,6 +502,7 @@ export default function NotesPage({
 					/>
 					<div className="mt-12">
 						<button
+							type="button"
 							aria-label="返回顶部"
 							onClick={scrollToTop}
 							className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out"
@@ -561,7 +529,7 @@ export default function NotesPage({
 
 			<div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-24 md:py-32">
 				<SectionTitle theme={theme}>笔记</SectionTitle>
-				{treeData.length === 0 ? (
+				{isNotesEmpty() ? (
 					<div
 						style={{
 							animation: "fade-up 0.6s ease-out both",
@@ -590,6 +558,7 @@ export default function NotesPage({
 						}}
 					>
 						<button
+							type="button"
 							className="md:hidden flex items-center justify-between w-full py-3 px-4 rounded-xl mb-2"
 							style={{
 								backgroundColor: theme.bgDeep,
@@ -637,7 +606,7 @@ export default function NotesPage({
 								/>
 							</div>
 							{!searchQuery &&
-								nestedTree.map((node) => (
+								sidebarTree.map((node) => (
 									<SidebarNode
 										key={node.key}
 										node={node}
@@ -681,6 +650,8 @@ export default function NotesPage({
 										content={selectedNote.content}
 										theme={theme}
 										isDark={mode === "dark"}
+										resolveNoteHref={resolveMarkdownNoteHref}
+										onNoteOpen={openMarkdownNote}
 									/>
 								</div>
 							</div>

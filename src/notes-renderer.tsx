@@ -428,10 +428,7 @@ function AsyncCodeBlock({
 		};
 	}, [value, lang]);
 
-	const hljsHtml = hljs.highlight(value, {
-		language: lang,
-		ignoreIllegals: true,
-	}).value;
+	const hljsHtml = highlightWithFallback(value, lang);
 	const t = isDark ? HLJS_THEMES.dark : HLJS_THEMES.light;
 
 	return (
@@ -457,6 +454,37 @@ function AsyncCodeBlock({
 			</pre>
 		</div>
 	);
+}
+
+function escapeHtml(value: string): string {
+	return value.replace(/[&<>"']/g, (char) => {
+		switch (char) {
+			case "&":
+				return "&amp;";
+			case "<":
+				return "&lt;";
+			case ">":
+				return "&gt;";
+			case '"':
+				return "&quot;";
+			case "'":
+				return "&#39;";
+			default:
+				return char;
+		}
+	});
+}
+
+function highlightWithFallback(value: string, lang: string): string {
+	if (!hljs.getLanguage(lang)) return escapeHtml(value);
+	try {
+		return hljs.highlight(value, {
+			language: lang,
+			ignoreIllegals: true,
+		}).value;
+	} catch {
+		return escapeHtml(value);
+	}
 }
 
 /* ---- Function Plot component ---- */

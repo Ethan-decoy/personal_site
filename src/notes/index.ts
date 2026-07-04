@@ -332,24 +332,43 @@ function normalizePathParts(parts: string[]): string[] {
 	return normalized;
 }
 
-function resolvePathToFile(path: string, fromFile: string): string {
+function pathCandidatesFromParts(
+	parts: string[],
+	directoryFirst: boolean,
+): string[] {
+	const joined = parts.join("/");
+	if (!joined) return [];
+	if (joined.endsWith(".md")) return [`./${joined}`];
+
+	const fileCandidate = `./${joined}.md`;
+	const indexCandidate = `./${joined}/_index.md`;
+	return directoryFirst
+		? [indexCandidate, fileCandidate]
+		: [fileCandidate, indexCandidate];
+}
+
+function resolvePathCandidates(path: string, fromFile: string): string[] {
 	const decodedPath = safeDecode(path).replace(/\\/g, "/");
 	const baseParts = decodedPath.startsWith("/")
 		? []
 		: directoryKeyForFile(fromFile).split("/").filter(Boolean);
 	const rawParts = decodedPath.replace(/^\/+/, "").split("/");
 	const parts = normalizePathParts([...baseParts, ...rawParts]);
-	const joined = parts.join("/");
-	const file = joined.endsWith(".md") ? joined : `${joined}.md`;
-	return `./${file}`;
+	return pathCandidatesFromParts(parts, decodedPath.endsWith("/"));
 }
 
-function resolveRootPathToFile(path: string): string {
+function resolveRootPathCandidates(path: string): string[] {
 	const decodedPath = safeDecode(path).replace(/\\/g, "/").replace(/^\/+/, "");
 	const parts = normalizePathParts(decodedPath.split("/"));
-	const joined = parts.join("/");
-	const file = joined.endsWith(".md") ? joined : `${joined}.md`;
-	return `./${file.replace(/^\.\//, "")}`;
+	return pathCandidatesFromParts(parts, decodedPath.endsWith("/"));
+}
+
+function findFirstNoteFile(candidates: string[]): string | null {
+	for (const candidate of candidates) {
+		const file = normalizeFileKey(candidate);
+		if (notesIndex.notesByFile[file]) return file;
+	}
+	return null;
 }
 
 export function resolveNoteHref(
@@ -363,14 +382,14 @@ export function resolveNoteHref(
 	const anchor =
 		anchorParts.length > 0 ? safeDecode(anchorParts.join("#")) : null;
 	let file = pathPart
-		? resolvePathToFile(pathPart, fromFile)
+		? findFirstNoteFile(resolvePathCandidates(pathPart, fromFile))
 		: normalizeFileKey(fromFile);
 
-	if (pathPart && !notesIndex.notesByFile[file]) {
-		file = resolveRootPathToFile(pathPart);
+	if (pathPart && !file) {
+		file = findFirstNoteFile(resolveRootPathCandidates(pathPart));
 	}
 
-	if (!notesIndex.notesByFile[file]) return null;
+	if (!file || !notesIndex.notesByFile[file]) return null;
 
 	return {
 		file,

@@ -194,8 +194,8 @@ export const dict = {
 	},
 	"about.rel.distant": { zh: "情感疏离", en: "Emotional detachment" },
 	"about.rel.distant.d": {
-		zh: "流于表面的关心会让你觉得温暖吗？",
-		en: "Would you feel warmth from surface-level concern?",
+		zh: "脱离事实的安慰会让你觉得温暖吗？",
+		en: "Would comfort detached from the facts make you feel warm?",
 	},
 	"about.rel.control": { zh: "压力与强控", en: "Pressure & control" },
 	"about.rel.control.d": {

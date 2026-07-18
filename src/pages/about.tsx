@@ -133,6 +133,20 @@ export default function AboutPage({
 }) {
 	const { t } = useI18n();
 	const view = aboutView ?? "work";
+	const personalIntro = [
+		{
+			key: "reliability",
+			text: t("about.personal.intro.reliability"),
+		},
+		{
+			key: "relationships",
+			text: t("about.personal.intro.relationships"),
+		},
+		{
+			key: "growth",
+			text: t("about.personal.intro.growth"),
+		},
+	];
 	const [valuesExpanded, setValuesExpanded] = useState(false);
 	const [valuesContentOpen, setValuesContentOpen] = useState(false);
 	const [valuesHovered, setValuesHovered] = useState(false);
@@ -289,6 +303,23 @@ export default function AboutPage({
 						animationDelay: "150ms",
 					}}
 				>
+					<div
+						className="max-w-3xl mb-8 md:mb-10 pl-4 sm:pl-5"
+						style={{ borderLeft: `2px solid ${theme.accent}` }}
+					>
+						<div className="space-y-3">
+							{personalIntro.map((paragraph) => (
+								<p
+									key={paragraph.key}
+									className="text-sm leading-relaxed"
+									style={{ color: theme.textSec }}
+								>
+									{paragraph.text}
+								</p>
+							))}
+						</div>
+					</div>
+
 					<div className="flex flex-col md:flex-row gap-8 md:gap-12">
 						<div className="w-full md:flex-[2]">
 							<div

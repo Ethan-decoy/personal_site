@@ -39,6 +39,18 @@ export const dict = {
 	"about.title": { zh: "关于", en: "About" },
 
 	// About - personal
+	"about.personal.intro.reliability": {
+		zh: "我把可靠看得比耀眼更重要。进入一个位置，就认真承担它；面对比自己优秀的人，我更愿意欣赏、学习，并找到自己能让整个系统变得更好的位置。",
+		en: "I value being reliable more than standing out. When I take on a role, I take its responsibilities seriously; when I meet people more capable than I am, I would rather appreciate them, learn from them, and find where I can make the whole system work better.",
+	},
+	"about.personal.intro.relationships": {
+		zh: "我喜欢真实目标、坦率反馈和共同成长，也珍惜安静而稳定的陪伴。对我而言，好的关系不是彼此完全相同，而是各自拥有力量，并愿意在重要时刻互相支撑。",
+		en: "I value genuine goals, candid feedback, and mutual growth, as well as quiet, steady companionship. To me, a good relationship is not about being identical, but about each person having strengths of their own and being willing to support the other when it matters.",
+	},
+	"about.personal.intro.growth": {
+		zh: "我的惯性是分析问题、独自承担，有时会忽略情绪本身。现在我也在学习更直接地表达感受、接受帮助，并允许自己在暂时没有产出时依然停下来。",
+		en: "My instinct is to analyze problems and carry them alone, which can make me overlook the emotions involved. I am learning to express how I feel more directly, accept help, and allow myself to pause even when I am not producing anything.",
+	},
 	"about.life": { zh: "生活切片", en: "Life slices" },
 	"about.life.learner": { zh: "费曼式学习者", en: "Feynman-style learner" },
 	"about.life.learner.d": {

@@ -148,3 +148,46 @@ double before{
 - `before == 2.25`：先把 `distance` 转换为 `double`，再执行浮点除法。
 
 在信息已经被整数除法丢弃后再转换，无法找回小数部分。
+
+## 有符号与无符号整数
+
+`int` 能表示负数，`unsigned int` 只表示非负值。无符号整数并不是“更安全的正整数”：它的算术按模运算进行，越过边界后会环绕。
+
+设 `Umax` 是 `unsigned int` 能表示的最大值：
+
+```cpp
+unsigned int count{0u};
+count = count - 1u;
+```
+
+结果不是 `-1`，而是 `Umax`。这是无符号整数定义明确的环绕行为，不是未定义行为。
+
+### 混合比较的转换陷阱
+
+对应的 `int` 与 `unsigned int` 参与同一个比较时，负的 `int` 通常会先转换为 `unsigned int`：
+
+```cpp
+int position{-2};
+unsigned int limit{3u};
+
+bool before_limit{position < limit};
+```
+
+在这里，`-2` 转换为无符号值 `Umax - 1`，所以比较相当于一个非常大的正数与 `3u` 比较，最终 `before_limit == false`。
+
+如果业务允许负值，通常应让比较双方都使用有符号类型：
+
+```cpp
+int position{-2};
+int limit{3};
+
+bool before_limit{position < limit}; // true
+```
+
+关键不是机械地禁止 `unsigned`，而是让类型表达数据的真实范围，并避免无意中混合有符号与无符号算术。
+
+## 当前 `static_cast` 的学习边界
+
+目前只使用 `static_cast` 显式表达基础数值转换，例如在除法前把一个操作数转成 `double`，或明确接受浮点数向整数截断。
+
+类层次转换、指针转换以及其他 C++ 转换形式尚未进入当前范围。不要把“会写 `static_cast`”理解成所有显式转换都已经安全或合适。

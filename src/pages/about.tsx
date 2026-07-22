@@ -1,10 +1,186 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { type Section, type Theme } from "../themes";
 import { SectionTitle, Tag } from "../components";
 import { useI18n } from "../i18n";
+import type { Section, Theme } from "../themes";
 
 type AboutView = "personal" | "work";
+
+type PersonalLayoutProps = {
+	theme: Theme;
+	lifeCards: { title: string; desc: string }[];
+	quickStats: {
+		label: string;
+		value: string;
+		decoration?: "globe";
+	}[];
+	principleGroups: { title: string; items: string[] }[];
+	valuesTitle: string;
+	lifeLabel: string;
+	inspirationAlt: string;
+};
+
+function PersonalProfile({
+	theme,
+	lifeCards,
+	quickStats,
+	principleGroups,
+	valuesTitle,
+	lifeLabel,
+	inspirationAlt,
+}: PersonalLayoutProps) {
+	return (
+		<div className="grid grid-cols-1 gap-y-9 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-x-12 lg:gap-y-10">
+			<div className="lg:col-start-1 lg:row-start-1">
+				<img
+					src={`${import.meta.env.BASE_URL}assets/qian_xuesen_yuan_longping_style.webp`}
+					alt={inspirationAlt}
+					className="block h-auto w-full rounded-2xl"
+					loading="eager"
+					decoding="async"
+				/>
+			</div>
+
+			<div className="flex min-w-0 flex-col lg:col-start-2 lg:row-span-2 lg:row-start-1">
+				<dl className="grid grid-cols-2 gap-3">
+					{quickStats.map((item, index) => (
+						<div
+							key={item.label}
+							className={`relative overflow-hidden rounded-xl px-3.5 py-3 ${index === 0 ? "col-span-2" : ""}`}
+							style={{
+								backgroundColor: theme.accentLight,
+								border: `1px solid ${theme.borderLight}`,
+							}}
+						>
+							{item.decoration === "globe" && (
+								<img
+									src={`${import.meta.env.BASE_URL}assets/location-globe-print.webp`}
+									alt=""
+									aria-hidden="true"
+									className="pointer-events-none absolute right-2 top-1/2 h-auto w-[32%] max-w-16 -translate-y-1/2 select-none object-contain opacity-40"
+									loading="eager"
+									decoding="async"
+								/>
+							)}
+							<dt
+								className="relative z-10 text-[10px] font-medium uppercase tracking-[0.1em] sm:text-[11px]"
+								style={{ color: theme.accent }}
+							>
+								{item.label}
+							</dt>
+							<dd
+								className="relative z-10 mt-1 text-xs leading-[1.55] sm:text-[13px]"
+								style={{ color: theme.textSec }}
+							>
+								{item.value}
+							</dd>
+						</div>
+					))}
+				</dl>
+
+				<div
+					className="mt-7 overflow-hidden rounded-2xl"
+					style={{
+						backgroundColor: theme.bgCard,
+						border: `1px solid ${theme.border}`,
+						boxShadow: "0 8px 24px rgba(24,40,32,0.04)",
+					}}
+				>
+					<header
+						className="flex items-center gap-3 px-5 py-4 sm:px-6"
+						style={{ borderBottom: `1px solid ${theme.border}` }}
+					>
+						<span
+							aria-hidden="true"
+							className="h-5 w-[3px] rounded-full"
+							style={{ backgroundColor: theme.accent }}
+						/>
+						<h3
+							className="text-base font-medium leading-6 tracking-normal sm:text-[17px]"
+							style={{ color: theme.text }}
+						>
+							{valuesTitle}
+						</h3>
+					</header>
+					{principleGroups.map((group, groupIndex) => (
+						<section
+							key={group.title}
+							className="px-4 py-4 sm:px-5"
+							style={{
+								borderTop:
+									groupIndex === 0 ? "none" : `1px solid ${theme.borderLight}`,
+							}}
+						>
+							<h4
+								className="text-xs font-medium leading-5 tracking-[0.02em] sm:text-[13px]"
+								style={{ color: theme.accent }}
+							>
+								{group.title}
+							</h4>
+							<ul
+								className="mt-2.5 space-y-2.5 border-l-2 pl-3"
+								style={{ borderColor: theme.accent }}
+							>
+								{group.items.map((principle) => (
+									<li key={principle}>
+										<p
+											className="text-[14px] font-normal leading-[1.6] sm:text-[15px] sm:leading-[1.65]"
+											style={{ color: theme.text }}
+										>
+											{principle}
+										</p>
+									</li>
+								))}
+							</ul>
+						</section>
+					))}
+				</div>
+			</div>
+
+			<section className="lg:col-start-1 lg:row-start-2">
+				<div className="mb-4 flex items-center gap-3">
+					<span
+						className="h-px w-8"
+						style={{ backgroundColor: theme.accent }}
+					/>
+					<h3
+						className="text-xs font-medium uppercase tracking-[0.1em] sm:text-[13px]"
+						style={{ color: theme.text }}
+					>
+						{lifeLabel}
+					</h3>
+				</div>
+				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+					{lifeCards.map((item) => (
+						<div
+							key={item.title}
+							className="rounded-xl p-4"
+							style={{
+								backgroundColor: theme.bgDeep,
+								border: `1px solid ${theme.borderLight}`,
+							}}
+						>
+							<p
+								className="text-sm font-medium leading-5 sm:text-[15px]"
+								style={{ color: theme.text }}
+							>
+								{item.title}
+							</p>
+							{item.desc !== "..." && (
+								<p
+									className="mt-1 text-xs leading-[1.6] sm:text-[13px]"
+									style={{ color: theme.textSec }}
+								>
+									{item.desc}
+								</p>
+							)}
+						</div>
+					))}
+				</div>
+			</section>
+		</div>
+	);
+}
 
 function ViewSwitcher({
 	view,
@@ -20,7 +196,7 @@ function ViewSwitcher({
 		{ key: "work", label: t("about.view.work") },
 		{ key: "personal", label: t("about.view.personal") },
 	];
-	const current = views.find((v) => v.key === view)!;
+	const current = views.find((v) => v.key === view) ?? views[0];
 
 	useEffect(() => {
 		if (!open) return;
@@ -61,6 +237,7 @@ function ViewSwitcher({
 		>
 			{views.map((v) => (
 				<button
+					type="button"
 					key={v.key}
 					onClick={() => {
 						onSelect(v.key);
@@ -81,6 +258,7 @@ function ViewSwitcher({
 	return (
 		<div ref={wrapperRef} className="mb-3" style={{ width: "fit-content" }}>
 			<button
+				type="button"
 				ref={btnRef}
 				onClick={() => setOpen((v) => !v)}
 				className="px-4 py-2 text-sm font-medium rounded-xl cursor-pointer transition-all duration-200 ease-out flex items-center gap-2"
@@ -98,6 +276,7 @@ function ViewSwitcher({
 			>
 				{current.label}
 				<svg
+					aria-hidden="true"
 					width="12"
 					height="12"
 					viewBox="0 0 12 12"
@@ -133,82 +312,50 @@ export default function AboutPage({
 }) {
 	const { t } = useI18n();
 	const view = aboutView ?? "work";
-	const personalIntro = [
+	const principleGroups = [
 		{
-			key: "reliability",
-			text: t("about.personal.intro.reliability"),
+			title: t("about.personal.group.together"),
+			items: [
+				t("about.personal.principle.commonGoal"),
+				t("about.personal.principle.excellence"),
+			],
 		},
 		{
-			key: "relationships",
-			text: t("about.personal.intro.relationships"),
+			title: t("about.personal.group.contribution"),
+			items: [
+				t("about.personal.principle.reliability"),
+				t("about.personal.principle.responsibility"),
+				t("about.personal.principle.legacy"),
+			],
 		},
 		{
-			key: "growth",
-			text: t("about.personal.intro.growth"),
-		},
-	];
-	const [valuesExpanded, setValuesExpanded] = useState(false);
-	const [valuesContentOpen, setValuesContentOpen] = useState(false);
-	const [valuesHovered, setValuesHovered] = useState(false);
-	const [blindspotsExpanded, setBlindspotsExpanded] = useState(false);
-	const [blindspotsContentOpen, setBlindspotsContentOpen] = useState(false);
-	const [blindspotsHovered, setBlindspotsHovered] = useState(false);
-	const [hoveredRelTrait, setHoveredRelTrait] = useState<string | null>(null);
-
-	const values = [
-		{ title: t("about.values.root"), desc: t("about.values.root.d") },
-		{ title: t("about.values.energy"), desc: t("about.values.energy.d") },
-		{
-			title: t("about.values.resilience"),
-			desc: t("about.values.resilience.d"),
-		},
-		{
-			title: t("about.values.excellence"),
-			desc: t("about.values.excellence.d"),
-		},
-		{ title: t("about.values.learning"), desc: t("about.values.learning.d") },
-		{
-			title: t("about.values.independence"),
-			desc: t("about.values.independence.d"),
+			title: t("about.personal.group.growth"),
+			items: [
+				t("about.personal.principle.support"),
+				t("about.personal.principle.effort"),
+				t("about.personal.principle.pause"),
+			],
 		},
 	];
-
-	const toggleValues = () => {
-		if (!valuesExpanded) {
-			setValuesExpanded(true);
-			setTimeout(() => setValuesContentOpen(true), 100);
-		} else {
-			setValuesContentOpen(false);
-			setTimeout(() => setValuesExpanded(false), 300);
-		}
-	};
 
 	const lifeCards = [
-		{ title: t("about.life.learner"), desc: t("about.life.learner.d") },
-		{ title: t("about.life.google"), desc: t("about.life.google.d") },
+		{
+			title: t("about.life.learnSkill"),
+			desc: t("about.life.learnSkill.d"),
+		},
 		{ title: t("about.life.racing"), desc: t("about.life.racing.d") },
 		{ title: t("about.life.ad"), desc: t("about.life.ad.d") },
-		{ title: t("about.life.communism"), desc: t("about.life.communism.d") },
 		{ title: t("about.life.walking"), desc: t("about.life.walking.d") },
 	];
 
 	const quickStats = [
-		{ label: t("about.location"), value: t("about.location.v") },
-		{ label: t("about.language"), value: t("about.language.v") },
 		{ label: t("about.current"), value: t("about.current.v") },
-	];
-
-	const pros = [
-		{ title: t("about.rel.calm"), detail: t("about.rel.calm.d") },
-		{ title: t("about.rel.deep"), detail: t("about.rel.deep.d") },
-		{ title: t("about.rel.partner"), detail: t("about.rel.partner.d") },
-		{ title: t("about.rel.growth"), detail: t("about.rel.growth.d") },
-	];
-	const cons = [
-		{ title: t("about.rel.distant"), detail: t("about.rel.distant.d") },
-		{ title: t("about.rel.control"), detail: t("about.rel.control.d") },
-		{ title: t("about.rel.impatient"), detail: t("about.rel.impatient.d") },
-		{ title: t("about.rel.isolation"), detail: t("about.rel.isolation.d") },
+		{
+			label: t("about.location"),
+			value: t("about.location.v"),
+			decoration: "globe" as const,
+		},
+		{ label: t("about.language"), value: t("about.language.v") },
 	];
 
 	const skills = [
@@ -229,7 +376,7 @@ export default function AboutPage({
 	];
 
 	return (
-		<div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-24 md:py-32">
+		<div className="max-w-5xl mx-auto px-4 pt-16 pb-10 sm:px-6 sm:pt-24 sm:pb-12 md:px-8 md:pt-32 md:pb-12">
 			<div
 				style={{
 					animation: "fade-up 0.6s ease-out both",
@@ -252,336 +399,15 @@ export default function AboutPage({
 						animationDelay: "150ms",
 					}}
 				>
-					<div
-						className="max-w-3xl mb-8 md:mb-10 pl-4 sm:pl-5"
-						style={{ borderLeft: `2px solid ${theme.accent}` }}
-					>
-						<div className="space-y-3">
-							{personalIntro.map((paragraph) => (
-								<p
-									key={paragraph.key}
-									className="text-sm leading-relaxed"
-									style={{ color: theme.textSec }}
-								>
-									{paragraph.text}
-								</p>
-							))}
-						</div>
-					</div>
-
-					<div className="flex flex-col md:flex-row gap-8 md:gap-12">
-						<div className="w-full md:flex-[2]">
-							<div
-								className="mb-6 md:mb-8 rounded-2xl overflow-hidden"
-								style={{
-									border: `1px solid ${theme.borderLight}`,
-									aspectRatio: "16/9",
-									backgroundColor: theme.bgDeep,
-								}}
-							>
-								<img
-									src={`${import.meta.env.BASE_URL}assets/qian_xuesen_yuan_longping_style.webp`}
-									alt=""
-									className="w-full h-full object-cover"
-									loading="lazy"
-									decoding="async"
-									style={{ objectPosition: "center 30%" }}
-								/>
-							</div>
-							<h3
-								className="text-sm font-semibold tracking-wider uppercase mb-5"
-								style={{ color: theme.text }}
-							>
-								{t("about.life")}
-							</h3>
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-								{lifeCards.map((item) => (
-									<div
-										key={item.title}
-										className="p-5 rounded-2xl"
-										style={{
-											backgroundColor: theme.bgDeep,
-											border: `1px solid ${theme.borderLight}`,
-										}}
-									>
-										<p
-											className="text-sm font-semibold mb-1"
-											style={{ color: theme.text }}
-										>
-											{item.title}
-										</p>
-										<p className="text-sm" style={{ color: theme.textSec }}>
-											{item.desc}
-										</p>
-									</div>
-								))}
-							</div>
-						</div>
-
-						<div className="w-full md:flex-1">
-							<div className="space-y-6 mb-12" style={{ color: theme.textSec }}>
-								{quickStats.map((item) => (
-									<div key={item.label}>
-										<p
-											className="text-xs tracking-wider uppercase mb-1"
-											style={{ color: theme.text }}
-										>
-											{item.label}
-										</p>
-										<p className="text-sm">{item.value}</p>
-									</div>
-								))}
-							</div>
-						</div>
-					</div>
-
-					<div className="mt-12">
-						<div
-							className="rounded-2xl cursor-pointer select-none transition-all duration-200 ease-out"
-							onClick={toggleValues}
-							style={{
-								backgroundColor: theme.bgDeep,
-								border: `1px solid ${valuesHovered || valuesExpanded ? theme.border : theme.borderLight}`,
-								boxShadow: valuesExpanded
-									? "0 2px 8px rgba(0,0,0,0.04)"
-									: "none",
-							}}
-							onMouseEnter={() => setValuesHovered(true)}
-							onMouseLeave={() => setValuesHovered(false)}
-						>
-							<div className="flex items-center justify-between px-3 py-3 sm:px-5 sm:py-4">
-								<span
-									className="text-sm font-semibold tracking-wider uppercase"
-									style={{ color: theme.text }}
-								>
-									{t("about.values")}
-								</span>
-								<svg
-									className="w-4 h-4 transition-transform duration-300 ease-out"
-									style={{
-										transform: valuesExpanded
-											? "rotate(180deg)"
-											: "rotate(0deg)",
-										color: theme.textSec,
-									}}
-									viewBox="0 0 16 16"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="1.5"
-								>
-									<path d="M4 6l4 4 4-4" />
-								</svg>
-							</div>
-							<div
-								className="overflow-hidden"
-								style={{
-									transition: "max-height 0.7s ease-out",
-									maxHeight: valuesContentOpen ? "600px" : "0px",
-								}}
-							>
-								<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 px-3 pb-3 sm:px-5 sm:pb-5">
-									{values.map((v) => (
-										<div
-											key={v.title}
-											className="p-4 rounded-xl"
-											style={{
-												backgroundColor: theme.bgCard || theme.bg,
-												border: `1px solid ${theme.borderLight}`,
-											}}
-										>
-											<p
-												className="text-sm font-semibold mb-1"
-												style={{ color: theme.text }}
-											>
-												{v.title}
-											</p>
-											<p className="text-sm" style={{ color: theme.textSec }}>
-												{v.desc}
-											</p>
-										</div>
-									))}
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div className="mt-12">
-						<div
-							className="rounded-2xl cursor-pointer select-none transition-all duration-200 ease-out"
-							onClick={() => {
-								if (!blindspotsExpanded) {
-									setBlindspotsExpanded(true);
-									setTimeout(() => setBlindspotsContentOpen(true), 100);
-								} else {
-									setBlindspotsContentOpen(false);
-									setTimeout(() => setBlindspotsExpanded(false), 300);
-								}
-							}}
-							style={{
-								backgroundColor: theme.bgDeep,
-								border: `1px solid ${blindspotsHovered || blindspotsExpanded ? theme.border : theme.borderLight}`,
-								boxShadow: blindspotsExpanded
-									? "0 2px 8px rgba(0,0,0,0.04)"
-									: "none",
-							}}
-							onMouseEnter={() => setBlindspotsHovered(true)}
-							onMouseLeave={() => setBlindspotsHovered(false)}
-						>
-							<div className="flex items-center justify-between px-3 py-3 sm:px-5 sm:py-4">
-								<span
-									className="text-sm font-semibold tracking-wider uppercase"
-									style={{ color: theme.text }}
-								>
-									{t("about.interpersonal")}
-								</span>
-								<svg
-									className="w-4 h-4 transition-transform duration-300 ease-out"
-									style={{
-										transform: blindspotsExpanded
-											? "rotate(180deg)"
-											: "rotate(0deg)",
-										color: theme.textSec,
-									}}
-									viewBox="0 0 16 16"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="1.5"
-								>
-									<path d="M4 6l4 4 4-4" />
-								</svg>
-							</div>
-							<div
-								className="overflow-hidden"
-								style={{
-									transition: "max-height 0.7s ease-out",
-									maxHeight: blindspotsContentOpen ? "1000px" : "0px",
-								}}
-							>
-								<div className="grid grid-cols-1 gap-3 md:gap-4 px-3 pb-3 sm:px-5 sm:pb-5">
-									<div className="space-y-3">
-										<div className="flex items-center gap-2 mb-1">
-											<span
-												className="inline-block w-2 h-2 rounded-full"
-												style={{ backgroundColor: "#5E8268" }}
-											/>
-											<p
-												className="text-xs tracking-wider uppercase"
-												style={{ color: theme.text }}
-											>
-												{t("about.interpersonal.pros")}
-											</p>
-										</div>
-										{pros.map((item) => (
-											<div
-												key={item.title}
-												className="p-4 rounded-xl cursor-pointer"
-												style={{
-													backgroundColor: "rgba(94, 130, 104, 0.06)",
-													borderTop: `1px solid ${hoveredRelTrait === item.title ? "rgba(94, 130, 104, 0.3)" : "rgba(94, 130, 104, 0.12)"}`,
-													borderRight: `1px solid ${hoveredRelTrait === item.title ? "rgba(94, 130, 104, 0.3)" : "rgba(94, 130, 104, 0.12)"}`,
-													borderBottom: `1px solid ${hoveredRelTrait === item.title ? "rgba(94, 130, 104, 0.3)" : "rgba(94, 130, 104, 0.12)"}`,
-													borderLeft: `4px solid rgba(94, 130, 104, 0.5)`,
-													transition: "border-color 0.2s ease-out",
-												}}
-												onMouseEnter={() => setHoveredRelTrait(item.title)}
-												onMouseLeave={() => setHoveredRelTrait(null)}
-												onClick={(e) => {
-													e.stopPropagation();
-													setHoveredRelTrait(
-														hoveredRelTrait === item.title ? null : item.title,
-													);
-												}}
-											>
-												<p
-													className="text-sm font-semibold"
-													style={{ color: theme.text }}
-												>
-													{item.title}
-												</p>
-												<div
-													className="overflow-hidden"
-													style={{
-														transition:
-															"max-height 0.5s ease-out, opacity 0.4s ease-out",
-														maxHeight:
-															hoveredRelTrait === item.title ? "100px" : "0px",
-														opacity: hoveredRelTrait === item.title ? 1 : 0,
-													}}
-												>
-													<p
-														className="text-sm leading-relaxed pt-2"
-														style={{ color: theme.textSec }}
-													>
-														{item.detail}
-													</p>
-												</div>
-											</div>
-										))}
-									</div>
-									<div className="space-y-3">
-										<div className="flex items-center gap-2 mb-1">
-											<span
-												className="inline-block w-2 h-2 rounded-full"
-												style={{ backgroundColor: "#A06060" }}
-											/>
-											<p
-												className="text-xs tracking-wider uppercase"
-												style={{ color: theme.text }}
-											>
-												{t("about.interpersonal.cons")}
-											</p>
-										</div>
-										{cons.map((item) => (
-											<div
-												key={item.title}
-												className="p-4 rounded-xl cursor-pointer"
-												style={{
-													backgroundColor: "rgba(160, 96, 96, 0.06)",
-													borderTop: `1px solid ${hoveredRelTrait === item.title ? "rgba(160, 96, 96, 0.3)" : "rgba(160, 96, 96, 0.12)"}`,
-													borderRight: `1px solid ${hoveredRelTrait === item.title ? "rgba(160, 96, 96, 0.3)" : "rgba(160, 96, 96, 0.12)"}`,
-													borderBottom: `1px solid ${hoveredRelTrait === item.title ? "rgba(160, 96, 96, 0.3)" : "rgba(160, 96, 96, 0.12)"}`,
-													borderLeft: `4px solid rgba(160, 96, 96, 0.5)`,
-													transition: "border-color 0.2s ease-out",
-												}}
-												onMouseEnter={() => setHoveredRelTrait(item.title)}
-												onMouseLeave={() => setHoveredRelTrait(null)}
-												onClick={(e) => {
-													e.stopPropagation();
-													setHoveredRelTrait(
-														hoveredRelTrait === item.title ? null : item.title,
-													);
-												}}
-											>
-												<p
-													className="text-sm font-semibold"
-													style={{ color: theme.text }}
-												>
-													{item.title}
-												</p>
-												<div
-													className="overflow-hidden"
-													style={{
-														transition:
-															"max-height 0.5s ease-out, opacity 0.4s ease-out",
-														maxHeight:
-															hoveredRelTrait === item.title ? "100px" : "0px",
-														opacity: hoveredRelTrait === item.title ? 1 : 0,
-													}}
-												>
-													<p
-														className="text-sm leading-relaxed pt-2"
-														style={{ color: theme.textSec }}
-													>
-														{item.detail}
-													</p>
-												</div>
-											</div>
-										))}
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
+					<PersonalProfile
+						theme={theme}
+						lifeCards={lifeCards}
+						quickStats={quickStats}
+						principleGroups={principleGroups}
+						valuesTitle={t("about.personal.values.title")}
+						lifeLabel={t("about.life")}
+						inspirationAlt={t("about.personal.inspiration.alt")}
+					/>
 				</div>
 			)}
 
@@ -623,10 +449,7 @@ export default function AboutPage({
 										role: t("about.exp.role"),
 										company: t("about.exp.company"),
 										period: t("about.exp.period"),
-										details: [
-											t("about.exp.d1"),
-											t("about.exp.d2"),
-										],
+										details: [t("about.exp.d1"), t("about.exp.d2")],
 									},
 								].map((exp) => (
 									<div
@@ -720,6 +543,7 @@ export default function AboutPage({
 								{t("about.cta")}
 							</p>
 							<button
+								type="button"
 								className="px-5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ease-out"
 								style={{
 									color: theme.accent,

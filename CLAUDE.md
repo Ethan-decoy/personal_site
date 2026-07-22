@@ -28,7 +28,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 全部页面逻辑集中在 [src/App.tsx](src/App.tsx)，包含 5 个 section 组件：
 - `HomePage` — 首页
-- `AboutPage` — 关于页（生活/工作双视图，MBTI 可视化，价值观/人际关系折叠面板）
+- `AboutPage` — 关于页（生活/工作双视图，生活切片，价值观/人际关系折叠面板）
 - `ProjectsPage` — 项目页（GitHub 贡献图 + 占位卡片）
 - `NotesPage` — 笔记页（左侧分类树 + 右侧 Markdown 阅读区 + 滚动进度指示器）
 - `ContactPage` — 联系页（打字机效果）

@@ -150,7 +150,6 @@ export default function AboutPage({
 	const [valuesExpanded, setValuesExpanded] = useState(false);
 	const [valuesContentOpen, setValuesContentOpen] = useState(false);
 	const [valuesHovered, setValuesHovered] = useState(false);
-	const [hoveredDimension, setHoveredDimension] = useState<string | null>(null);
 	const [blindspotsExpanded, setBlindspotsExpanded] = useState(false);
 	const [blindspotsContentOpen, setBlindspotsContentOpen] = useState(false);
 	const [blindspotsHovered, setBlindspotsHovered] = useState(false);
@@ -196,57 +195,7 @@ export default function AboutPage({
 	const quickStats = [
 		{ label: t("about.location"), value: t("about.location.v") },
 		{ label: t("about.language"), value: t("about.language.v") },
-		{ label: "MBTI", value: "INTJ-T" },
-		{ label: t("about.iq"), value: t("about.iq.v"), source: t("about.iq.source") },
 		{ label: t("about.current"), value: t("about.current.v") },
-	];
-
-	const mbtiDims = [
-		{
-			key: "I",
-			label: t("mbti.I"),
-			pct: 86,
-			left: t("mbti.I.left"),
-			right: t("mbti.I.right"),
-			color: "#5A7A82",
-			desc: t("mbti.I.d"),
-		},
-		{
-			key: "N",
-			label: t("mbti.N"),
-			pct: 58,
-			left: t("mbti.N.left"),
-			right: t("mbti.N.right"),
-			color: "#B8944F",
-			desc: t("mbti.N.d"),
-		},
-		{
-			key: "T",
-			label: t("mbti.T"),
-			pct: 85,
-			left: t("mbti.T.left"),
-			right: t("mbti.T.right"),
-			color: "#5E8268",
-			desc: t("mbti.T.d"),
-		},
-		{
-			key: "J",
-			label: t("mbti.J"),
-			pct: 71,
-			left: t("mbti.J.left"),
-			right: t("mbti.J.right"),
-			color: "#7B6B8B",
-			desc: t("mbti.J.d"),
-		},
-		{
-			key: "T2",
-			label: t("mbti.T2"),
-			pct: 51,
-			left: t("mbti.T2.left"),
-			right: t("mbti.T2.right"),
-			color: "#A06060",
-			desc: t("mbti.T2.d"),
-		},
 	];
 
 	const pros = [
@@ -380,112 +329,8 @@ export default function AboutPage({
 											{item.label}
 										</p>
 										<p className="text-sm">{item.value}</p>
-											{item.source && (
-												<p
-													className="text-[10px] mt-0.5"
-													style={{ color: theme.textSec, opacity: 0.5 }}
-												>
-													{item.source}
-												</p>
-											)}
 									</div>
 								))}
-							</div>
-
-							<div className="mb-4">
-								<h3
-									className="text-sm font-semibold tracking-wider uppercase mb-5"
-									style={{ color: theme.text }}
-								>
-									MBTI
-								</h3>
-								<div className="space-y-4">
-									{mbtiDims.map((d) => (
-										<div
-											key={d.key}
-											className="relative cursor-pointer"
-											onMouseEnter={() => setHoveredDimension(d.key)}
-											onMouseLeave={() => setHoveredDimension(null)}
-										>
-											<p
-												className="text-center text-xs font-medium mb-1.5"
-												style={{
-													color:
-														hoveredDimension === d.key
-															? d.color
-															: `${d.color}cc`,
-												}}
-											>
-												{d.pct}% {d.label}
-											</p>
-											<div
-												className="relative h-2 rounded-full overflow-hidden"
-												style={{ backgroundColor: theme.border }}
-											>
-												<div
-													className="absolute left-0 top-0 h-full rounded-full"
-													style={{
-														width: `${d.pct}%`,
-														backgroundColor: d.color,
-														filter:
-															hoveredDimension === d.key
-																? "none"
-																: "brightness(0.8)",
-														transition: "filter 0.25s ease-out",
-													}}
-												/>
-											</div>
-											<div className="flex justify-between mt-1">
-												<span
-													className="text-xs"
-													style={{ color: theme.textSec, opacity: 0.5 }}
-												>
-													{d.left}
-												</span>
-												<span
-													className="text-xs"
-													style={{ color: theme.textSec, opacity: 0.5 }}
-												>
-													{d.right}
-												</span>
-											</div>
-											<div
-												className="absolute md:left-[calc(100%+20px)] md:top-0 left-0 top-full mt-2 w-72 max-w-full rounded-xl p-5 pointer-events-none z-10"
-												style={{
-													backgroundColor: theme.bgDeep,
-													border: `1px solid ${theme.border}`,
-													boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
-													opacity: hoveredDimension === d.key ? 1 : 0,
-													transform:
-														hoveredDimension === d.key
-															? "translateX(0)"
-															: "translateX(-8px)",
-													transition:
-														"opacity 0.25s ease-out, transform 0.25s ease-out",
-												}}
-											>
-												<p
-													className="text-xs font-medium mb-2"
-													style={{ color: d.color }}
-												>
-													{d.label}
-												</p>
-												<p
-													className="text-sm leading-relaxed"
-													style={{ color: theme.textSec }}
-												>
-													{d.desc}
-												</p>
-											</div>
-										</div>
-									))}
-								</div>
-								<p
-									className="text-[10px] mt-4 text-center"
-									style={{ color: theme.textSec, opacity: 0.4 }}
-								>
-									{t("about.mbti.footer")}
-								</p>
 							</div>
 						</div>
 					</div>

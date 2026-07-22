@@ -90,65 +90,9 @@ export const dict = {
 		zh: "中文（母语），English（B1）",
 		en: "Chinese (native), English (B1)",
 	},
-	"about.mbti": { zh: "MBTI", en: "MBTI" },
-	"about.iq": { zh: "IQ", en: "IQ" },
-	"about.iq.v": { zh: "115", en: "115" },
-	"about.iq.source": { zh: "瑞文SPM 标准量表", en: "Raven's SPM" },
-	"about.iq.label": { zh: "较高（中上聪明）", en: "Above Average" },
-	"about.iq.test": { zh: "瑞文标准推理测验（SPM）", en: "Raven's SPM" },
-	"about.iq.factors": { zh: "因子表现", en: "Factor Breakdown" },
-	"about.iq.factors.raw": { zh: "得分", en: "Score" },
-	"about.iq.factors.pct": { zh: "占比", en: "Contribution" },
-
-	"iq.factor.perception": { zh: "知觉辨别", en: "Perception & Discrimination" },
-	"iq.factor.similarity": { zh: "类同比较", en: "Similarity & Comparison" },
-	"iq.factor.comparison": { zh: "比较推理", en: "Comparative Reasoning" },
-	"iq.factor.series": { zh: "系列关系", en: "Serial Relations" },
-	"iq.factor.abstract": { zh: "抽象推理", en: "Abstract Reasoning" },
 
 	"about.current": { zh: "当前", en: "Currently" },
 	"about.current.v": SHARED.currentFocus,
-
-	// MBTI dimensions
-	"mbti.I": { zh: "内向", en: "Introverted" },
-	"mbti.I.left": { zh: "外向", en: "Extroverted" },
-	"mbti.I.right": { zh: "内向", en: "Introverted" },
-	"mbti.I.d": {
-		zh: "往往更喜欢较少但深入和有意义的社交互动，通常更喜欢安静的环境。",
-		en: "Tends to prefer fewer but deeper and more meaningful social interactions, often preferring quieter environments.",
-	},
-	"mbti.N": { zh: "天马行空", en: "Imaginative" },
-	"mbti.N.left": { zh: "天马行空", en: "Imaginative" },
-	"mbti.N.right": { zh: "求真务实", en: "Practical" },
-	"mbti.N.d": {
-		zh: "将独创性视若珍宝，热衷于探寻那些隐藏在表象之下的深层含义，以及看似遥远却充满希望的可能性。",
-		en: "Cherishes originality and loves exploring the deeper meanings hidden beneath the surface, along with possibilities that may seem distant yet full of hope.",
-	},
-	"mbti.T": { zh: "理性思考", en: "Rational" },
-	"mbti.T.left": { zh: "理性思考", en: "Rational" },
-	"mbti.T.right": { zh: "情感细腻", en: "Empathetic" },
-	"mbti.T.d": {
-		zh: "注重客观性和合理性，通常不考虑情感，只考虑逻辑。往往认为效率比社会和谐更重要。",
-		en: "Values objectivity and rationality, often prioritizing logic over emotions. Tends to value efficiency over social harmony.",
-	},
-	"mbti.J": { zh: "运筹帷幄", en: "Decisive" },
-	"mbti.J.left": { zh: "运筹帷幄", en: "Decisive" },
-	"mbti.J.right": { zh: "随机应变", en: "Spontaneous" },
-	"mbti.J.d": {
-		zh: "将明确性、可预测性以及事情的圆满解决奉为圭臬。",
-		en: "Values clarity, predictability, and the thorough completion of tasks.",
-	},
-	"mbti.T2": { zh: "情绪易波动", en: "Turbulent" },
-	"mbti.T2.left": { zh: "自信果断", en: "Assertive" },
-	"mbti.T2.right": { zh: "情绪易波动", en: "Turbulent" },
-	"mbti.T2.d": {
-		zh: "对压力敏感。在情绪上有一种紧迫感，往往以成功为导向，追求完美，渴望进步。",
-		en: "Sensitive to stress. Has a sense of emotional urgency, often success-oriented, perfectionistic, and eager to improve.",
-	},
-	"about.mbti.footer": {
-		zh: "连续三年测评均为 INTJ · 未采用大五人格（自测置信度低）",
-		en: "Rated INTJ for three consecutive years · Did not adopt Big Five (low self-assessed confidence)",
-	},
 
 	// About - values
 	"about.values": { zh: "价值观", en: "Values" },

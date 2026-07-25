@@ -94,6 +94,29 @@ export const dict = {
 		zh: "钱学森与袁隆平的线描画",
 		en: "Line-art portrait of Qian Xuesen and Yuan Longping",
 	},
+	"about.favorites": { zh: "喜欢", en: "Favorites" },
+	"about.favorites.movies": { zh: "电影", en: "Films" },
+	"about.favorites.music": { zh: "音乐", en: "Music" },
+	"about.favorites.movie.pursuit": {
+		zh: "电影《当幸福来敲门》海报",
+		en: "Poster for The Pursuit of Happyness",
+	},
+	"about.favorites.movie.pursuit.title": {
+		zh: "当幸福来敲门",
+		en: "The Pursuit of Happyness",
+	},
+	"about.favorites.song.ferrari": {
+		zh: "Bebe Rexha《Ferrari》歌曲封面",
+		en: "Cover for Ferrari by Bebe Rexha",
+	},
+	"about.favorites.song.ferrari.title": {
+		zh: "Ferrari",
+		en: "Ferrari",
+	},
+	"about.favorites.song.ferrari.artist": {
+		zh: "Bebe Rexha",
+		en: "Bebe Rexha",
+	},
 	"about.life": { zh: "兴趣与实践", en: "Interests & pursuits" },
 	"about.life.learnSkill": { zh: "Learn Skill", en: "Learn Skill" },
 	"about.life.learnSkill.d": {
@@ -105,8 +128,11 @@ export const dict = {
 		zh: "更好的走线，更快的入弯。",
 		en: "Better racing lines, faster corner entries.",
 	},
-	"about.life.ad": { zh: "单排 AD", en: "Solo queue ADC" },
-	"about.life.ad.d": { zh: "...", en: "..." },
+	"about.life.personalDev": { zh: "个人开发", en: "Personal projects" },
+	"about.life.personalDev.d": {
+		zh: "把零散的想法做成可以运行、可以持续改进的东西。",
+		en: "Turning rough ideas into working things that can keep evolving.",
+	},
 	"about.life.walking": { zh: "城市漫步", en: "City walking" },
 	"about.life.walking.d": {
 		zh: "散步是整理思绪的最佳方式。",

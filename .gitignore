@@ -4,6 +4,10 @@ dist/
 .DS_Store
 package-lock.json
 
+# Local drafts
+/temp.md
+/temp-personal-profile.md
+
 # Claude Code local skills & settings
 .agents/skills/
 .claude/skills/

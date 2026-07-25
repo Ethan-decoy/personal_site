@@ -94,6 +94,10 @@ export const dict = {
 		zh: "钱学森与袁隆平的线描画",
 		en: "Line-art portrait of Qian Xuesen and Yuan Longping",
 	},
+	"about.personal.inspiration.caption": {
+		zh: "为人民服务",
+		en: "为人民服务",
+	},
 	"about.favorites": { zh: "喜欢", en: "Favorites" },
 	"about.favorites.movies": { zh: "电影", en: "Films" },
 	"about.favorites.music": { zh: "音乐", en: "Music" },

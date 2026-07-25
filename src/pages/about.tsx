@@ -27,6 +27,7 @@ type PersonalLayoutProps = {
 	valuesTitle: string;
 	lifeLabel: string;
 	inspirationAlt: string;
+	inspirationCaption: string;
 	favoritesTitle: string;
 	moviesTitle: string;
 	musicTitle: string;
@@ -42,6 +43,7 @@ function PersonalProfile({
 	valuesTitle,
 	lifeLabel,
 	inspirationAlt,
+	inspirationCaption,
 	favoritesTitle,
 	moviesTitle,
 	musicTitle,
@@ -49,10 +51,11 @@ function PersonalProfile({
 	song,
 }: PersonalLayoutProps) {
 	const [favoritesOpen, setFavoritesOpen] = useState(false);
+	const inspirationCaptionImage = `${import.meta.env.BASE_URL}assets/mao-style-serve-the-people.png`;
 
 	return (
 		<div>
-			<div className="grid grid-cols-1 gap-y-9 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-x-12 lg:gap-y-10">
+			<div className="grid grid-cols-1 gap-y-9 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-x-12 lg:gap-y-6">
 				<div className="lg:col-start-1 lg:row-start-1">
 					<img
 						src={`${import.meta.env.BASE_URL}assets/qian_xuesen_yuan_longping_style.webp`}
@@ -60,6 +63,23 @@ function PersonalProfile({
 						className="block h-auto w-full rounded-2xl"
 						loading="eager"
 						decoding="async"
+					/>
+					<span
+						role="img"
+						aria-label={inspirationCaption}
+						className="mx-auto mt-2 block aspect-[1629/513] w-[clamp(112px,24%,148px)]"
+						style={{
+							backgroundColor: theme.textSec,
+							opacity: 0.68,
+							WebkitMaskImage: `url("${inspirationCaptionImage}")`,
+							maskImage: `url("${inspirationCaptionImage}")`,
+							WebkitMaskPosition: "center",
+							maskPosition: "center",
+							WebkitMaskRepeat: "no-repeat",
+							maskRepeat: "no-repeat",
+							WebkitMaskSize: "contain",
+							maskSize: "contain",
+						}}
 					/>
 				</div>
 
@@ -551,6 +571,7 @@ export default function AboutPage({
 						valuesTitle={t("about.personal.values.title")}
 						lifeLabel={t("about.life")}
 						inspirationAlt={t("about.personal.inspiration.alt")}
+						inspirationCaption={t("about.personal.inspiration.caption")}
 						favoritesTitle={t("about.favorites")}
 						moviesTitle={t("about.favorites.movies")}
 						musicTitle={t("about.favorites.music")}

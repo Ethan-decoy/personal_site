@@ -464,8 +464,8 @@ export default function AboutPage({
 
 	const lifeCards = [
 		{
-			title: t("about.life.learnSkill"),
-			desc: t("about.life.learnSkill.d"),
+			title: t("about.life.lifelongLearner"),
+			desc: t("about.life.lifelongLearner.d"),
 		},
 		{ title: t("about.life.racing"), desc: t("about.life.racing.d") },
 		{

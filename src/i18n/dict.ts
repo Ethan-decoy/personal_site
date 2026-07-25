@@ -118,10 +118,13 @@ export const dict = {
 		en: "Bebe Rexha",
 	},
 	"about.life": { zh: "兴趣与实践", en: "Interests & pursuits" },
-	"about.life.learnSkill": { zh: "Learn Skill", en: "Learn Skill" },
-	"about.life.learnSkill.d": {
-		zh: "把学习与讲解进一步沉淀为可复用的学习系统。",
-		en: "Turning learning and explanation into a reusable learning system.",
+	"about.life.lifelongLearner": {
+		zh: "终身学习者",
+		en: "Lifelong learner",
+	},
+	"about.life.lifelongLearner.d": {
+		zh: "愿意改变，就是好事。",
+		en: "Being willing to change is a good thing.",
 	},
 	"about.life.racing": { zh: "模拟竞速", en: "Sim racing" },
 	"about.life.racing.d": {

@@ -175,6 +175,10 @@ export const dict = {
 		en: "Shenzhen Zhenhuaxing Intelligent",
 	},
 	"about.exp.period": { zh: "2025 — 至今", en: "2025 — Present" },
+	"about.exp.d0": {
+		zh: "主导工业 AOI 宽量程三维测量算法升级，完成技术方案、标定链路、C++/CUDA 重建、实机验证与产品集成，解决既有方案在扩展工作范围后的精度与稳定性问题。",
+		en: "Led the upgrade of a wide-range 3D measurement algorithm for industrial AOI, delivering the technical design, calibration pipeline, C++/CUDA reconstruction, machine validation, and product integration while resolving accuracy and stability issues after the working range was extended.",
+	},
 	"about.exp.d1": {
 		zh: "独立负责点云构建模块：结构光、理论推导及实现、工程调试",
 		en: "Independently responsible for point cloud construction module: structured light, theoretical derivation and implementation, engineering debugging",

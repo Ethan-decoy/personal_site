@@ -619,7 +619,11 @@ export default function AboutPage({
 										role: t("about.exp.role"),
 										company: t("about.exp.company"),
 										period: t("about.exp.period"),
-										details: [t("about.exp.d1"), t("about.exp.d2")],
+										details: [
+											t("about.exp.d0"),
+											t("about.exp.d1"),
+											t("about.exp.d2"),
+										],
 									},
 								].map((exp) => (
 									<div

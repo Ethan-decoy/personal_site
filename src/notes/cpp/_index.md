@@ -11,3 +11,4 @@ date: 2026-08-08
 
 1. [C++ 导论](00-introduction/_index.md)
 2. [对象、类型与变量](01-objects-types-and-variables/_index.md)
+3. [表达式与运算符](02-expressions-and-operators/_index.md)

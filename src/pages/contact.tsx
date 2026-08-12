@@ -67,8 +67,8 @@ export default function ContactPage({
 					{[
 						{
 							label: t("contact.email"),
-							value: "decoy.elevate399@passinbox.com",
-							href: "mailto:decoy.elevate399@passinbox.com",
+							value: "decoy.thievish318@passinbox.com",
+							href: "mailto:decoy.thievish318@passinbox.com",
 						},
 						{
 							label: t("contact.github"),

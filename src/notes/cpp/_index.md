@@ -9,5 +9,5 @@ date: 2026-08-08
 
 ## 当前章节
 
-1. [C++ 概述](00-introduction/_index.md)
-2. [类型与变量](01-types-and-variables/_index.md)
+1. [C++ 导论](00-introduction/_index.md)
+2. [对象、类型与变量](01-objects-types-and-variables/_index.md)

@@ -1,22 +1,22 @@
 ---
-title: 对象、变量与类型（Objects, Variables and Types）
+title: 对象与数据类型（Objects and Data Types）
 date: 2026-08-10
 ---
 
-# 对象、变量与类型（Objects, Variables and Types）
+# 对象与数据类型（Objects and Data Types）
 
 ## 对象（Object）
 
 例如，模拟汽车时需要记住左前轮当前的气压。C++ 中可以写成：
 
 ```cpp
-double frontLeftPressure{2.4};
+double front_left_pressure{2.4};
 ```
 
 先不急着拆解其中的语法，只看这行代码执行后发生了什么：程序中出现了一份能够持续保存轮胎气压的数据。它当前保存 `2.4`，以后还可以发生变化：
 
 ```cpp
-frontLeftPressure = 1.8;
+front_left_pressure = 1.8;
 ```
 
 数值从 `2.4` 变成了 `1.8`，但保存气压的那份数据仍然是原来的那一份。由此可以先建立对象最重要的直觉：
@@ -36,10 +36,10 @@ binary 表示中的每一位称为比特（`bit`），它的值只能是 `0` 或
 回到最初的代码：
 
 ```cpp
-double frontLeftPressure{2.4};
+double front_left_pressure{2.4};
 ```
 
-`double` 位于对象名称的前面，它是 `frontLeftPressure` 的数据类型。`double` 属于浮点类型（floating-point type），可以表示一定范围内带有小数部分的数值。它告诉编译器应当按照 `double` 的规则为这个对象安排存储，并怎样解释和处理其中保存的数据。因此，`frontLeftPressure` 从创建开始就是一个 `double` 对象；将它的值从 `2.4` 改为 `1.8`，改变的是对象当前保存的值，而不是对象的数据类型。
+`double` 位于对象名称的前面，它是 `front_left_pressure` 的数据类型。`double` 属于浮点类型（floating-point type），可以表示一定范围内带有小数部分的数值。它告诉编译器应当按照 `double` 的规则为这个对象安排存储，并怎样解释和处理其中保存的数据。因此，`front_left_pressure` 从创建开始就是一个 `double` 对象；将它的值从 `2.4` 改为 `1.8`，改变的是对象当前保存的值，而不是对象的数据类型。
 
 下面的表格只列出当前需要认识的常用基本类型。表中的存储大小和表示范围来自采用 8-bit byte 的两种主流 64 位实现，用于观察类型与存储之间的关系，并不是 C++ 对所有平台作出的固定规定。
 
@@ -85,10 +85,77 @@ double frontLeftPressure{2.4};
 
 完整的 7-bit ASCII 编码表与 bit 排列方式可参阅 [RFC 20：ASCII format for Network Interchange](https://www.rfc-editor.org/rfc/rfc20.html)。
 
-有了字符编码，便可以回到 C++ 中的 `char`。`char` 是 `character` 的缩写，也是 C++ 的一种整数类型，一个 `char` 对象占用一个 byte。它本身不保存字符的形状，也不携带 ASCII 或 UTF-8 等编码信息，只保存一个整数值。代码 `char letter{'A'};` 中，`'A'` 是字符字面量（character literal）；在采用 ASCII 兼容编码的常见实现中，它对应的数值是 65，因此 `letter` 实际保存的是编码值 65。
+有了字符编码，便可以回到 C++ 中的 `char`。`char` 是 `character` 的缩写，也是 C++ 的一种整数类型，一个 `char` 对象占用一个 byte。它本身不保存字符的形状，也不携带任何字符编码信息，只保存一个整数值。例如：
+
+```cpp
+char letter{'A'};
+```
+
+`'A'` 是字符字面量（character literal）；在采用 ASCII 兼容编码的常见实现中，它对应的数值是 65，因此 `letter` 实际保存的是编码值 65。
+
+`char`、`signed char` 和 `unsigned char` 是三种不同的类型。在常见的 8-bit byte 实现中，`signed char` 通常表示 −128 到 127，`unsigned char` 表示 0 到 255；普通 `char` 采用其中哪一种数值范围，由具体实现决定。ASCII 的编码值都位于 0 到 127，因此无论普通 `char` 是否有符号，都能够完整表示 ASCII。
+
+ASCII 的 128 个编码值足以表示基础英文字母、数字和符号，却无法容纳中文以及世界上其他书写系统。单纯增加更多 bits 只能扩大可用编号的数量；如果不同系统仍然采用各自的字符映射，交换文本时依然可能得到不同结果。因此，需要一套能够统一收录不同语言文字和符号的字符标准。Unicode（统一码）为收录的字符分配唯一的码点（code point），例如字符 `A` 的码点是 `U+0041`，字符 `中` 的码点是 `U+4E2D`。Unicode 在这里解决的是“一个字符使用哪个编号”的问题，并不要求这些编号必须以固定数量的 bytes 存入内存。
+
+Unicode 码点需要经过具体的编码方式才能写入内存。UTF-8（8 位 Unicode 转换格式，8-bit Unicode Transformation Format）使用 1 到 4 bytes 编码一个码点，并完整保留 ASCII：0 到 127 仍使用原来的单个 byte。超出 ASCII 范围的字符则需要多个 bytes，例如字符 `中` 在 UTF-8 中需要三个 bytes。在常见的 8-bit byte 实现中，每个 UTF-8 byte 可以由一个 `char` 对象保存。因此，`char` 保存的是一个编码单元（code unit），不一定是一个完整字符。
+
+<span id="floating-point-basics"></span>
+
+### 浮点数（Floating-Point Numbers）
+
+`float`、`double` 和 `long double` 是 C++ 中常用的浮点类型，用于表示带有小数部分或者跨越较大数量级的数值。浮点类型只拥有有限数量的 bit patterns，因此只能表示有限个离散数值。表示范围（range）描述类型能够覆盖多大或多小的数量级；表示精度（precision）描述能够保留多少位有效数字（significant digits），并不表示小数点后固定拥有多少位。
 
 | C++ 类型 | Windows x64 / MSVC | Linux x86-64 / GCC、Clang | 常见有限数值范围 | 常见十进制有效精度 |
 |---|---:|---:|---:|---:|
 | `float` | 4 bytes | 4 bytes | 约 $[-3.40\times10^{38},\,3.40\times10^{38}]$ | 约 6～7 位 |
 | `double` | 8 bytes | 8 bytes | 约 $[-1.80\times10^{308},\,1.80\times10^{308}]$ | 约 15～16 位 |
 | `long double` | 8 bytes | 16 bytes | Windows 与 `double` 相同；Linux 约为 $\pm1.19\times10^{4932}$ | Windows 约 15～16 位；Linux 约 18 位 |
+
+主流实现通常采用二进制浮点表示，因此无法精确表示 `0.1` 等部分十进制小数，只能通过舍入（rounding）保存附近的可表示值；浮点运算的结果也可能再次发生舍入。这不是计算机“算错了”，而是有限表示能力带来的必然结果。
+
+一般计算通常优先使用 `double`，它比 `float` 提供更高的常见精度。只有在存储空间、内存带宽、硬件接口或既有数据格式明确要求时，才需要优先考虑 `float`；`long double` 的大小与精度则需要结合具体平台判断。
+
+> 附章：[浮点数的表示与运算（Floating-Point Representation and Arithmetic）](deep-dives/01-floating-point-representation-and-arithmetic.md)
+
+<span id="floating-point-continue"></span>
+
+### bool（Boolean）
+
+有些数据并不表示数量、字符或者测量值，而只需要回答一个问题：发动机是否正在运行、车门是否已经关闭、当前数据是否有效。这样的状态只有“是”和“否”两种可能，可以使用布尔类型（Boolean type）`bool` 表示。
+
+```cpp
+bool engine_running{false};
+```
+
+这行代码创建了一个 `bool` 对象 `engine_running`，当前值为 `false`，表示发动机没有运行。状态发生变化时，可以修改它保存的值：
+
+```cpp
+engine_running = true;
+```
+
+`true` 和 `false` 是 C++ 的两个布尔字面量（Boolean literals）。赋值后，`engine_running` 仍然是原来的 `bool` 对象，只是当前值从 `false` 变成了 `true`。
+
+C++ 还规定了整数与 `bool` 之间的转换规则。整数 `0` 转换为 `false`，任何非零整数都转换为 `true`：
+
+```cpp
+bool active{false};
+
+active = 0;   // active == false
+active = 7;   // active == true
+active = -3;  // active == true
+```
+
+赋入 `7` 或 `-3` 后，`active` 不会保存原来的整数，只会保存转换后的逻辑值 `true`。反过来，将 `bool` 转换为整数时，`false` 转换为 `0`，`true` 转换为 `1`。因此，“零为假、非零为真”描述的是转换规则，并不表示 `bool` 可以保存任意整数。
+
+在 C++ 的类型分类中，`bool` 属于整数类型的一部分，但它是一个独立的类型，其语义范围只有：
+
+```text
+false
+true
+```
+
+因此，`bool` 不应被理解成一个范围很小的普通整数。它表达的是一个判断是否成立，而不是参与计数或测量的数值。
+
+两个逻辑值理论上只需要一个 bit 就能区分，但一个可以独立寻址的 C++ 对象通常至少占用一个 byte。因此，在表格列出的主流实现中，`bool` 通常占用 1 byte。存储空间包含多少 bits，与这个类型在语言层面拥有多少个有效值，是两件不同的事情。
+
+`bool` 适合表示真正只有两种状态的信息。如果“未知”“尚未检查”或者“发生故障”也是具有独立含义的状态，那么单独一个 `bool` 就无法完整表达这些情况。

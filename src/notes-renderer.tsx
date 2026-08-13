@@ -103,7 +103,7 @@ const HLJS_THEMES = {
 	dark: {
 		bg: "#1E1E2E",
 		text: "#CDD6F4",
-		comment: "#585B70",
+		comment: "#8A90AA",
 		keyword: "#CBA6F7",
 		string: "#A6E3A1",
 		number: "#FAB387",

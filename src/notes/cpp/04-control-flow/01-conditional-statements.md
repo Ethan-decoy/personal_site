@@ -11,25 +11,26 @@ date: 2026-08-13
 
 ```text
 if (condition)
-    statement;
+    statement
 ```
 
-其中，条件外侧的圆括号 `()` 是语法的一部分。条件为 `true` 时执行随后的语句，为 `false` 时跳过它。
+这里的 `condition` 和 `statement` 是用于说明语法结构的占位符，并不是实际的 C++ 代码。`statement` 表示一条完整语句；具体语句是否需要以分号结束，由该语句自身的语法决定。条件外侧的圆括号 `()` 是 `if` 语法的一部分。条件为 `true` 时执行随后的语句，为 `false` 时跳过它。
 
 当一个分支需要执行多条语句时，可以使用复合语句将它们组成一条语句：
 
 ```text
 if (condition) {
-    statement_1;
-    statement_2;
+    statement-seq
 }
 ```
+
+`statement-seq` 表示由零条或多条完整语句组成的语句序列，每条具体语句仍然保留自身所需的语法。
 
 即使分支中暂时只有一条语句，工程实践中通常也保留花括号。这样可以让分支边界始终清晰，并避免后续增加语句时意外将它写到 `if` 的控制范围之外。后续笔记中的条件语句将统一使用花括号：
 
 ```text
 if (condition) {
-    statement;
+    statement-seq
 }
 ```
 
@@ -55,9 +56,9 @@ if (tire_pressure < 200) {
 
 ```text
 if (condition) {
-    statement_when_true;
+    statement-seq
 } else {
-    statement_when_false;
+    statement-seq
 }
 ```
 
@@ -81,27 +82,27 @@ if (tire_pressure < 200) {
 
 当两条执行路径不足以表达全部情况时，可以让 `else` 后面的语句本身成为另一条 `if` 语句：
 
-```cpp
+```text
 if (condition_1) {
-    statement_1;
+    statement-seq
 } else {
     if (condition_2) {
-        statement_2;
+        statement-seq
     } else {
-        statement_3;
+        statement-seq
     }
 }
 ```
 
 `if` 语句整体也是一条语句，因此第二条 `if` 不必额外放入代码块，通常将上面的结构平铺为：
 
-```cpp
+```text
 if (condition_1) {
-    statement_1;
+    statement-seq
 } else if (condition_2) {
-    statement_2;
+    statement-seq
 } else {
-    statement_3;
+    statement-seq
 }
 ```
 

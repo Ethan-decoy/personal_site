@@ -72,6 +72,23 @@ double front_left_pressure{2.0};
 
 这里使用花括号，并将初始化器直接写在变量名之后，因此这种形式称为直接列表初始化（direct-list-initialization）。初始化是变量创建过程的一部分，并不是变量创建之后再执行的另一项操作。
 
+### 由已有对象初始化新对象
+
+初始化器不必是直接写在源代码中的数值，也可以使用另一个对象当前保存的值：
+
+```cpp
+int starting_count{12};
+int remaining_count{starting_count};
+```
+
+执行第二行时，`starting_count` 提供当时保存的 `int` 值 `12`，这个值用于初始化新对象 `remaining_count`。两条声明结束后，程序中存在两个彼此独立的 `int` 对象；它们最初保存相同的值，却不是同一个对象。
+
+```cpp
+remaining_count = 9;
+```
+
+这次赋值只修改 `remaining_count`。最终，`starting_count` 仍然保存 `12`，`remaining_count` 保存 `9`。对于这里的 `int` 对象，初始化读取的是源对象当时的值，并不会在两个对象之间建立自动同步的关系。
+
 ### 没有显式初始化器时
 
 考虑下面的代码：

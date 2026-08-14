@@ -102,9 +102,9 @@ int displayed_pressure{
 };
 ```
 
-`measured_pressure` 产生 `double` 值 `240.8`，而形参 `pressure` 是 `int` 对象。这次调用在语言层面允许将 `240.8` 转换为 `int` 值 `240`，编译器可能给出警告。
+`measured_pressure` 产生 `double` 值，而形参 `pressure` 是 `int` 对象。转换发生在建立参数对象的过程中，具体规则参见[整数类型与浮点类型之间](../06-constants-literals-and-type-conversions/04-implicit-type-conversions.md#整数类型与浮点类型之间)。
 
-外层的花括号初始化接收的是函数最终产生的 `int` 结果，不能阻止此前已经发生的 `double` 到 `int` 转换。因此，函数接口的参数类型同样决定调用者的数据会怎样被接收；允许调用不等于转换不会丢失信息。
+外层的花括号初始化接收的是函数最终产生的 `int` 结果，不能阻止此前已经发生的实参到形参转换。列表初始化只检查直接需要的转换，参见[列表初始化只检查直接需要的转换](../06-constants-literals-and-type-conversions/05-narrowing-and-explicit-type-conversions.md#列表初始化只检查直接需要的转换)。
 
 ## 参数名称的作用域
 

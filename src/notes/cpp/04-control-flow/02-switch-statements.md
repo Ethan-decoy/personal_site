@@ -125,7 +125,7 @@ case 20:
 }
 ```
 
-每个 `case` 后面必须是编译期可以确定的常量表达式，而不能依赖程序运行期间才能取得的普通变量：
+每个 `case` 后面必须是编译期可以确定的常量表达式，而不能依赖程序运行期间才能取得的普通变量；常量表达式与 `case` 标签的精确要求参见[常量表达式与 constexpr](../06-constants-literals-and-type-conversions/03-constant-expressions-and-constexpr.md)：
 
 ```cpp
 int selected_mode{1};

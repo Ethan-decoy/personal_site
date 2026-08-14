@@ -35,7 +35,7 @@ int total{left + right};
 
 ## 通常算术转换（Usual Arithmetic Conversions）
 
-C++ 将整数类型和浮点类型统称为算术类型（arithmetic types）。许多接受算术类型操作数的二元运算符，会按照通常算术转换（usual arithmetic conversions）为两个操作数确定共同类型，再以该类型完成运算。这个共同类型也是表达式结果的类型。
+C++ 将整数类型和浮点类型统称为算术类型（arithmetic types）。许多接受算术类型操作数的二元运算符，会按照通常算术转换（usual arithmetic conversions）为两个操作数确定共同类型，再以该类型完成运算。对于本篇讨论的算术运算符，这个共同类型也是表达式结果的类型。通常算术转换在隐式转换体系中的位置，参见[通常算术转换中的隐式转换](../06-constants-literals-and-type-conversions/04-implicit-type-conversions.md#通常算术转换中的隐式转换)。
 
 ### 浮点类型参与运算
 

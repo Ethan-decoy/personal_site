@@ -57,9 +57,9 @@ int whole_part(double measurement) {
 }
 ```
 
-`measurement` 产生 `double` 值，而函数返回类型是 `int`。执行 `return measurement;` 时，浮点值会转换为 `int`；小数部分向零截断，编译器可能给出有损转换警告。如果截断后的值不能由目标整数类型表示，程序行为未定义。
+`measurement` 产生 `double` 值，而函数返回类型是 `int`。执行 `return measurement;` 时，转换发生在建立函数返回结果的过程中，具体规则参见[整数类型与浮点类型之间](../06-constants-literals-and-type-conversions/04-implicit-type-conversions.md#整数类型与浮点类型之间)。
 
-这种写法不会因为函数返回类型写在函数名前面，就自动获得花括号初始化拒绝窄化的保护。返回类型应当真实表达函数希望交付的结果；如果转换可能损失业务需要的信息，应重新检查接口和计算过程，而不是只以“能够编译”为准。浮点数与整数之间的具体规则可参阅 C++23 工作草案中的[浮点数到整数转换](https://timsong-cpp.github.io/cppwp/n4950/conv.fpint)。
+返回语句不是列表初始化，不会自动获得花括号初始化拒绝窄化的保护；外层列表初始化也只会看到函数调用最终产生的类型，参见[列表初始化只检查直接需要的转换](../06-constants-literals-and-type-conversions/05-narrowing-and-explicit-type-conversions.md#列表初始化只检查直接需要的转换)。返回类型应当真实表达函数希望交付的结果；如果转换可能损失业务需要的信息，应重新检查接口和计算过程。
 
 ## 每条执行路径都需要产生结果
 

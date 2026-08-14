@@ -51,9 +51,7 @@ int displayed_temperature{0};
 displayed_temperature = temperature;
 ```
 
-右侧表达式 `temperature` 产生 `double` 值 `14.9`。赋值时，这个值转换为 `int`；浮点数转换为整数会丢弃小数部分，因此 `displayed_temperature` 最终保存 `14`。负数同样向零截断，例如 `-14.9` 转换为 `int` 后得到 `-14`。
-
-如果截断后的数值无法由目标整数类型表示，行为未定义。
+右侧表达式 `temperature` 产生 `double` 值 `14.9`。赋值时，这个值先转换为 `int` 值 `14`，再存入 `displayed_temperature`。浮点类型与整数类型之间的完整转换规则参见[整数类型与浮点类型之间](../06-constants-literals-and-type-conversions/04-implicit-type-conversions.md#整数类型与浮点类型之间)。
 
 同样的转换如果发生在列表初始化的最外层，则会被判定为窄化转换（narrowing conversion）：
 
@@ -69,11 +67,7 @@ displayed_temperature = temperature;  // 语言允许，编译器可能警告
 int initial_temperature{temperature};  // 程序不合法，编译器必须诊断
 ```
 
-将警告视为错误的项目也可能拒绝第一种写法，但这是构建策略，不是 C++ 语言将该赋值判定为不合法。
-
-能够通过编译不表示转换不会丢失信息。赋值两侧采用不同的算术类型时，应确认目标类型能够保留业务所需的范围与精度；不应把“编译器没有报错”当作转换安全的证明。确实需要有损转换时，怎样显式表达并验证这种意图，将在类型转换章节继续说明。
-
-相关规则可参阅 [C++ 工作草案中的赋值运算](https://eel.is/c%2B%2Bdraft/expr.assign)、[浮点数与整数之间的转换](https://eel.is/c%2B%2Bdraft/conv.fpint) 与[列表初始化中的窄化转换](https://eel.is/c%2B%2Bdraft/dcl.init.list)。这项实践也与 [C++ Core Guidelines ES.46](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es46-avoid-lossy-narrowing-truncating-arithmetic-conversions) 的建议一致。
+赋值允许这项转换，编译器可以选择警告；列表初始化中的同一转换则使程序不合法，编译器必须诊断。列表初始化的窄化边界、警告与语言诊断的区别，以及显式表达转换意图的方式，参见[窄化与显式类型转换](../06-constants-literals-and-type-conversions/05-narrowing-and-explicit-type-conversions.md)。
 
 ## 复合赋值运算符（Compound Assignment Operators）
 

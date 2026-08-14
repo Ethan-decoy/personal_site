@@ -11,11 +11,11 @@ date: 2026-08-13
 
 ```text
 while (condition) {
-    statement-seq
+    statement_sequence
 }
 ```
 
-这里的 `condition` 和 `statement-seq` 是用于说明语法结构的占位符，并不是实际的 C++ 代码。`statement-seq` 表示由零条或多条完整语句组成的语句序列；每条具体语句是否需要以分号结束，由该语句自身的语法决定。
+这里的 `condition` 和 `statement_sequence` 是用于说明语法结构的占位符，并不是实际的 C++ 代码。`statement_sequence` 表示由零条或多条完整语句组成的语句序列；每条具体语句是否需要以分号结束，由该语句自身的语法决定。
 
 例如：
 
@@ -37,7 +37,7 @@ while (remaining_laps > 0) {
 
 ```text
 do {
-    statement-seq
+    statement_sequence
 } while (condition);
 ```
 
@@ -63,7 +63,7 @@ do {
 
 ```text
 for (initialization; condition; update) {
-    statement-seq
+    statement_sequence
 }
 ```
 

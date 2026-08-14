@@ -20,17 +20,17 @@ if (condition)
 
 ```text
 if (condition) {
-    statement-seq
+    statement_sequence
 }
 ```
 
-`statement-seq` 表示由零条或多条完整语句组成的语句序列，每条具体语句仍然保留自身所需的语法。
+`statement_sequence` 表示由零条或多条完整语句组成的语句序列，每条具体语句仍然保留自身所需的语法。
 
 即使分支中暂时只有一条语句，工程实践中通常也保留花括号。这样可以让分支边界始终清晰，并避免后续增加语句时意外将它写到 `if` 的控制范围之外。后续笔记中的条件语句将统一使用花括号：
 
 ```text
 if (condition) {
-    statement-seq
+    statement_sequence
 }
 ```
 
@@ -56,9 +56,9 @@ if (tire_pressure < 200) {
 
 ```text
 if (condition) {
-    statement-seq
+    statement_sequence
 } else {
-    statement-seq
+    statement_sequence
 }
 ```
 
@@ -84,12 +84,12 @@ if (tire_pressure < 200) {
 
 ```text
 if (condition_1) {
-    statement-seq
+    statement_sequence
 } else {
     if (condition_2) {
-        statement-seq
+        statement_sequence
     } else {
-        statement-seq
+        statement_sequence
     }
 }
 ```
@@ -98,11 +98,11 @@ if (condition_1) {
 
 ```text
 if (condition_1) {
-    statement-seq
+    statement_sequence
 } else if (condition_2) {
-    statement-seq
+    statement_sequence
 } else {
-    statement-seq
+    statement_sequence
 }
 ```
 

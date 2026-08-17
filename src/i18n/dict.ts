@@ -211,6 +211,15 @@ export const dict = {
 
 	// Projects
 	"projects.title": { zh: "项目", en: "Projects" },
+	"projects.activity.eyebrow": { zh: "GitHub 活动", en: "GitHub activity" },
+	"projects.activity.contribution": { zh: "次贡献", en: "contribution" },
+	"projects.activity.contributions": { zh: "次贡献", en: "contributions" },
+	"projects.activity.none": { zh: "无贡献", en: "No contributions" },
+	"projects.activity.open": { zh: "查看 GitHub", en: "View GitHub" },
+	"projects.activity.scrollHint": {
+		zh: "左右滑动查看全年",
+		en: "Scroll horizontally to explore the year",
+	},
 	"projects.empty": {
 		zh: "目前还没有公开的开源项目仓库。",
 		en: "No public open-source repositories yet.",

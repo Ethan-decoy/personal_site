@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && pnpm check:markdown && pnpm check:sidebar && vite build",
+    "build": "tsc -b && pnpm check:markdown && pnpm check:sidebar && pnpm check:projects && vite build",
+    "fetch:contributions": "node scripts/fetch-github-contributions.mjs",
     "check:markdown": "node scripts/check-markdown-renderer.mjs",
+    "check:projects": "node scripts/check-projects-page.mjs",
     "check:sidebar": "node scripts/check-notes-sidebar.mjs",
     "lint": "biome check --write src/",
     "format": "biome format --write src/",

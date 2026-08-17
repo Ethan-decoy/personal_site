@@ -29,6 +29,10 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm fetch:contributions
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_USERNAME: Ethan-decoy
       - run: pnpm build
         env:
           BASE_URL: /

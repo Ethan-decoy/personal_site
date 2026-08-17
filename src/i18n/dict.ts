@@ -5,7 +5,7 @@ export type DictKey = keyof typeof dict;
 /* ---- Shared values (edited once, referenced everywhere) ---- */
 const SHARED = {
 	currentFocus: {
-		zh: "正在撰写 C++ 笔记",
+		zh: "正在写 C++ 笔记",
 		en: "Writing C++ Notes",
 	},
 };
@@ -20,21 +20,17 @@ export const dict = {
 
 	// Home
 	"home.status": SHARED.currentFocus,
-	"home.greeting": { zh: "我是 Ethan C.", en: "I'm Ethan C." },
-	"home.subtitle": { zh: "R&D / 探索者.", en: "R&D / Explorer." },
-	"home.desc": {
-		zh: "在这里记录我的探索与思考。",
-		en: "I document my explorations and reflections here.",
+	"home.name": { zh: "Ethan C.", en: "Ethan C." },
+	"home.role": {
+		zh: "图像算法工程师",
+		en: "Image Algorithm Engineer",
 	},
-	"home.hidden": {
-		zh: "我相信好的工具应该隐形，让你专注于真正重要的事情。",
-		en: "I believe good tools should be invisible, letting you focus on what truly matters.",
+	"home.focusLabel": { zh: "方向", en: "FOCUS" },
+	"home.focus": {
+		zh: "工业视觉 · 三维测量",
+		en: "Industrial Vision · 3D Measurement",
 	},
-	"home.motto": {
-		zh: '"先做人民需要的工程师，再做自己时间的主人。"',
-		en: '"Be the engineer people need before being the master of your own time."',
-	},
-	"home.cta": { zh: "了解我", en: "Know me" },
+	"home.nowLabel": { zh: "近况", en: "NOW" },
 
 	// About - view switcher
 	"about.view.work": { zh: "工作", en: "Work" },

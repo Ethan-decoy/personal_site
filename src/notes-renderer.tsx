@@ -1,4 +1,13 @@
-import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import {
+	type CSSProperties,
+	type ReactElement,
+	type ReactNode,
+	isValidElement,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
@@ -128,75 +137,32 @@ const HLJS_THEMES = {
 	},
 };
 
-export function useHljsTheme(isDark: boolean) {
-	const t = isDark ? HLJS_THEMES.dark : HLJS_THEMES.light;
-	useEffect(() => {
-		const id = "hljs-theme-catppuccin";
-		const old = document.getElementById(id);
-		if (old) old.remove();
-		const style = document.createElement("style");
-		style.id = id;
-		style.textContent = `
-      .hljs-theme-catppuccin {
-        color: ${t.text} !important;
-        background: ${t.bg} !important;
-        border: 1px solid ${t.border} !important;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
-        margin: 1rem 0 !important;
-        overflow: hidden;
-      }
-      .hljs-theme-catppuccin pre {
-        color: ${t.text} !important;
-        background: transparent !important;
-        font-family: 'JetBrains Mono', 'Fira Code', Menlo, Consolas, monospace !important;
-        font-size: 0.875rem !important;
-        line-height: 1.7 !important;
-        tab-size: 2 !important;
-      }
-      .hljs-theme-catppuccin code { color: ${t.text} !important; background: transparent !important; }
-      .hljs-theme-catppuccin .hljs-comment, .hljs-theme-catppuccin .hljs-quote { color: ${t.comment} !important; font-style: italic !important; }
-      .hljs-theme-catppuccin .hljs-keyword, .hljs-theme-catppuccin .hljs-selector-tag { color: ${t.keyword} !important; }
-      .hljs-theme-catppuccin .hljs-string, .hljs-theme-catppuccin .hljs-template-tag { color: ${t.string} !important; }
-      .hljs-theme-catppuccin .hljs-number, .hljs-theme-catppuccin .hljs-literal { color: ${t.number} !important; }
-      .hljs-theme-catppuccin .hljs-title.function_, .hljs-theme-catppuccin .hljs-title.function_.invoke { color: ${t.function} !important; }
-      .hljs-theme-catppuccin .hljs-title.class_ { color: ${t.class_} !important; }
-      .hljs-theme-catppuccin .hljs-type { color: ${t.type} !important; }
-      .hljs-theme-catppuccin .hljs-built_in, .hljs-theme-catppuccin .hljs-builtin-name { color: ${t.builtIn} !important; }
-      .hljs-theme-catppuccin .hljs-function { color: ${t.function} !important; }
-      .hljs-theme-catppuccin .hljs-variable { color: ${t.variable} !important; }
-      .hljs-theme-catppuccin .hljs-template-variable { color: ${t.templateVar} !important; }
-      .hljs-theme-catppuccin .hljs-attr, .hljs-theme-catppuccin .hljs-attribute { color: ${t.attr} !important; }
-      .hljs-theme-catppuccin .hljs-meta { color: ${t.meta} !important; }
-      .hljs-theme-catppuccin .hljs-meta .hljs-string { color: ${t.metaString} !important; }
-      .hljs-theme-catppuccin .hljs-meta .hljs-keyword { color: ${t.metaKeyword} !important; }
-      .hljs-theme-catppuccin .hljs-operator, .hljs-theme-catppuccin .hljs-punctuation { color: ${t.punctuation} !important; }
-      .hljs-theme-catppuccin .hljs-bullet, .hljs-theme-catppuccin .hljs-link { color: ${t.bullet} !important; }
-      .hljs-theme-catppuccin .hljs-emphasis { font-style: italic !important; }
-      .hljs-theme-catppuccin .hljs-strong { font-weight: 600 !important; }
-      .hljs-theme-catppuccin .hljs-deletion { color: ${t.deletion} !important; }
-      .hljs-theme-catppuccin .hljs-addition { color: ${t.addition} !important; }
-    `;
-		document.head.appendChild(style);
-		return () => {
-			style.remove();
-		};
-	}, [isDark]);
+/* ---- remark plugin: CJK emphasis ---- */
+interface MarkdownAstNode {
+	type?: string;
+	value?: unknown;
+	children?: MarkdownAstNode[];
+	[key: string]: unknown;
 }
 
-/* ---- remark plugin: CJK emphasis ---- */
+function isMarkdownAstNode(value: unknown): value is MarkdownAstNode {
+	return typeof value === "object" && value !== null;
+}
+
 function remarkCJKEmphasis() {
-	return (tree: any) => {
+	return (tree: unknown) => {
+		if (!isMarkdownAstNode(tree)) return;
 		for (const node of tree.children ?? []) {
 			processEmphasis(node);
 		}
 	};
 }
 
-function processEmphasis(node: any) {
+function processEmphasis(node: MarkdownAstNode) {
 	const children = node.children;
 	if (!children || !Array.isArray(children) || children.length === 0) return;
 
-	const newChildren: any[] = [];
+	const newChildren: MarkdownAstNode[] = [];
 	for (let i = 0; i < children.length; i++) {
 		const child = children[i];
 
@@ -359,61 +325,77 @@ function Callout({
 	return <blockquote {...rest}>{children}</blockquote>;
 }
 
-/* ---- Code block with async tree-sitter highlighting ---- */
-function CodeBlock({
-	className,
+/* ---- Code blocks: <pre> is the only block-level rendering seam ---- */
+interface CodeElementProps {
+	className?: string;
+	children?: ReactNode;
+}
+
+function languageFromClassName(className?: string): string {
+	return /(?:^|\s)language-([^\s]+)/.exec(className ?? "")?.[1] ?? "";
+}
+
+function InlineCode({ className, children }: CodeElementProps) {
+	return (
+		<code className={className || "markdown-inline-code"}>{children}</code>
+	);
+}
+
+function findCodeElement(
+	children: ReactNode,
+): ReactElement<CodeElementProps> | null {
+	const candidates = Array.isArray(children) ? children : [children];
+	for (const candidate of candidates) {
+		if (isValidElement<CodeElementProps>(candidate)) {
+			return candidate;
+		}
+	}
+	return null;
+}
+
+function MarkdownCodeBlock({
 	children,
 	isDark,
-}: { className?: string; children?: ReactNode; isDark: boolean }) {
-	const match = /language-(\w+)/.exec(className || "");
-	const lang = match ? match[1] : "";
+	accent,
+}: {
+	children?: ReactNode;
+	isDark: boolean;
+	accent: string;
+}) {
+	const code = findCodeElement(children);
+	const className = code?.props.className;
+	const value = extractText(code?.props.children ?? children).replace(
+		/\n$/,
+		"",
+	);
+	const lang = languageFromClassName(className);
 
-	if (!className) {
+	if (lang === "plot") {
 		return (
-			<code
-				style={{
-					fontFamily: "'JetBrains Mono', monospace",
-					fontSize: "0.875rem",
-					padding: "0.15em 0.4em",
-					backgroundColor: isDark
-						? "rgba(255,255,255,0.08)"
-						: "rgba(0,0,0,0.06)",
-					borderRadius: "4px",
-				}}
-			>
-				{children}
-			</code>
-		);
-	}
-
-	const value = typeof children === "string" ? children : "";
-
-	if (!lang) {
-		return (
-			<div className="hljs-theme-catppuccin" style={{ borderRadius: "12px" }}>
-				<pre style={{ margin: 0, padding: "1rem 1.25rem" }}>
-					<code>{children}</code>
-				</pre>
+			<div className="not-prose markdown-plot-block">
+				<Plot fn={value.trim()} accent={accent} isDark={isDark} />
 			</div>
 		);
 	}
 
-	return (
-		<AsyncCodeBlock
-			lang={lang}
-			value={value}
-			className={className}
-			isDark={isDark}
-		/>
-	);
+	if (!lang) {
+		return (
+			<figure className="not-prose markdown-code-block hljs-theme-catppuccin">
+				<pre>
+					<code>{value}</code>
+				</pre>
+			</figure>
+		);
+	}
+
+	return <AsyncCodeBlock lang={lang} value={value} className={className} />;
 }
 
 function AsyncCodeBlock({
 	lang,
 	value,
 	className,
-	isDark,
-}: { lang: string; value: string; className: string; isDark: boolean }) {
+}: { lang: string; value: string; className?: string }) {
 	const [html, setHtml] = useState<string | null>(null);
 
 	useEffect(() => {
@@ -429,30 +411,18 @@ function AsyncCodeBlock({
 	}, [value, lang]);
 
 	const hljsHtml = highlightWithFallback(value, lang);
-	const t = isDark ? HLJS_THEMES.dark : HLJS_THEMES.light;
 
 	return (
-		<div className="hljs-theme-catppuccin" style={{ borderRadius: "12px" }}>
-			<div
-				style={{
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "space-between",
-					padding: "0.5rem 1.25rem",
-					borderBottom: `1px solid ${t.border}`,
-					fontSize: "0.7rem",
-					fontFamily: "'JetBrains Mono', monospace",
-					color: t.langBar,
-					textTransform: "uppercase",
-					letterSpacing: "0.05em",
-				}}
-			>
-				<span>{lang}</span>
-			</div>
-			<pre className={className} style={{ margin: 0, padding: "1rem 1.25rem" }}>
-				<span dangerouslySetInnerHTML={{ __html: html || hljsHtml }} />
+		<figure className="not-prose markdown-code-block hljs-theme-catppuccin">
+			<figcaption className="markdown-code-language">{lang}</figcaption>
+			<pre>
+				<code
+					className={className}
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: both highlighters escape source text and only add span markup
+					dangerouslySetInnerHTML={{ __html: html || hljsHtml }}
+				/>
 			</pre>
-		</div>
+		</figure>
 	);
 }
 
@@ -499,14 +469,14 @@ function makePlotFn(expr: string): (x: number) => number {
 function parseRange(raw: string): [number, number] | null {
 	const inner = raw.replace(/^\[?\s*/, "").replace(/\s*\]?$/, "");
 	const parts = inner.split(",").map((s) => {
-		s = s.trim();
+		const expression = s.trim();
 		try {
-			return Function(`with(Math){return(${s})}`)();
+			return Function(`with(Math){return(${expression})}`)();
 		} catch {
 			return Number.NaN;
 		}
 	});
-	return parts.length === 2 && parts.every((n) => !isNaN(n))
+	return parts.length === 2 && parts.every((n) => !Number.isNaN(n))
 		? (parts as [number, number])
 		: null;
 }
@@ -635,7 +605,7 @@ function PlotCanvas({
 		// helpers
 		function niceStep(range: number, targetTicks: number): number {
 			const rough = range / targetTicks;
-			const mag = Math.pow(10, Math.floor(Math.log10(rough)));
+			const mag = 10 ** Math.floor(Math.log10(rough));
 			const residual = rough / mag;
 			let nice: number;
 			if (residual <= 1.5) nice = 1;
@@ -733,7 +703,7 @@ function PlotCanvas({
 	}, [fnExpr, xMin, xMax, strokeColor, isDark]);
 
 	return (
-		<div style={{ minHeight: 220, margin: "0.5em 0" }}>
+		<div style={{ minHeight: 220 }}>
 			<canvas
 				ref={ref}
 				style={{
@@ -816,6 +786,7 @@ function makeComponents(
 						{children}
 						{noteTarget.isWiki && (
 							<svg
+								aria-hidden="true"
 								className="inline-block flex-shrink-0"
 								width="11"
 								height="11"
@@ -837,14 +808,17 @@ function makeComponents(
 			}
 			return <a href={href}>{children}</a>;
 		},
-		blockquote: (props: any) => <Callout {...props} isDark={dark} />,
-		code: (props: any) => {
-			const cls = props.className || "";
-			if (/^language-plot\b/.test(cls) && typeof props.children === "string") {
-				return <Plot fn={props.children.trim()} isDark={dark} />;
-			}
-			return <CodeBlock {...props} isDark={dark} />;
-		},
+		blockquote: ({ children }: { children?: ReactNode }) => (
+			<Callout isDark={dark}>{children}</Callout>
+		),
+		code: ({ className, children }: CodeElementProps) => (
+			<InlineCode className={className}>{children}</InlineCode>
+		),
+		pre: ({ children }: { children?: ReactNode }) => (
+			<MarkdownCodeBlock isDark={dark} accent={theme.accent}>
+				{children}
+			</MarkdownCodeBlock>
+		),
 	};
 }
 
@@ -852,15 +826,91 @@ function makeComponents(
 export interface ThemeColors {
 	name: string;
 	accent: string;
+	text?: string;
+	textSec?: string;
+	borderLight?: string;
+}
+
+function normalizeDocumentTitle(value: string): string {
+	return value
+		.normalize("NFKC")
+		.replace(/<[^>]*>/g, "")
+		.replace(/[`*_~[\]()]/g, "")
+		.replace(/[^\p{L}\p{N}]+/gu, "")
+		.toLocaleLowerCase();
+}
+
+function withoutDuplicateLeadingTitle(content: string, title: string): string {
+	const heading = /^\uFEFF?\s*#\s+([^\r\n]+)\r?\n?/.exec(content);
+	if (!heading) return content;
+
+	const headingText = heading[1].replace(/\s+#+\s*$/, "").trim();
+	if (normalizeDocumentTitle(headingText) !== normalizeDocumentTitle(title)) {
+		return content;
+	}
+
+	return content.slice(heading[0].length).replace(/^\s*\r?\n/, "");
+}
+
+function headingId(value: string): string | undefined {
+	const slug = value
+		.normalize("NFKC")
+		.trim()
+		.toLocaleLowerCase()
+		.replace(/<[^>]*>/g, "")
+		.replace(/[^\p{L}\p{N}\s_-]/gu, "")
+		.replace(/\s+/g, "-")
+		.replace(/-+/g, "-");
+	return slug || undefined;
+}
+
+function markdownThemeVariables(
+	theme: ThemeColors,
+	dark: boolean,
+): CSSProperties {
+	const syntax = dark ? HLJS_THEMES.dark : HLJS_THEMES.light;
+	return {
+		"--markdown-accent": theme.accent,
+		"--markdown-inline-border": `${theme.accent}${dark ? "26" : "1F"}`,
+		"--markdown-inline-bg": `${theme.accent}${dark ? "1A" : "14"}`,
+		"--markdown-term-border": `${theme.accent}${dark ? "40" : "33"}`,
+		"--markdown-term-bg": `${theme.accent}${dark ? "1A" : "0F"}`,
+		"--syntax-bg": syntax.bg,
+		"--syntax-text": syntax.text,
+		"--syntax-border": syntax.border,
+		"--syntax-label": syntax.langBar,
+		"--syntax-comment": syntax.comment,
+		"--syntax-keyword": syntax.keyword,
+		"--syntax-string": syntax.string,
+		"--syntax-number": syntax.number,
+		"--syntax-function": syntax.function,
+		"--syntax-class": syntax.class_,
+		"--syntax-type": syntax.type,
+		"--syntax-builtin": syntax.builtIn,
+		"--syntax-variable": syntax.variable,
+		"--syntax-template-variable": syntax.templateVar,
+		"--syntax-attribute": syntax.attr,
+		"--syntax-meta": syntax.meta,
+		"--syntax-meta-keyword": syntax.metaKeyword,
+		"--syntax-meta-string": syntax.metaString,
+		"--syntax-punctuation": syntax.punctuation,
+		"--syntax-bullet": syntax.bullet,
+		"--syntax-deletion": syntax.deletion,
+		"--syntax-addition": syntax.addition,
+	} as CSSProperties;
 }
 
 export function MarkdownPreview({
+	title,
+	date,
 	content,
 	theme,
 	isDark,
 	resolveNoteHref,
 	onNoteOpen,
 }: {
+	title: string;
+	date?: string;
 	content: string;
 	theme: ThemeColors;
 	isDark?: boolean;
@@ -868,10 +918,13 @@ export function MarkdownPreview({
 	onNoteOpen?: (target: NoteLinkTarget) => void;
 }) {
 	const dark = isDark ?? false;
-	useHljsTheme(dark);
 	const components = useMemo(
 		() => makeComponents(dark, theme, { resolveNoteHref, onNoteOpen }),
 		[dark, theme, resolveNoteHref, onNoteOpen],
+	);
+	const renderedContent = useMemo(
+		() => withoutDuplicateLeadingTitle(content, title),
+		[content, title],
 	);
 
 	const proseThemeMap: Record<string, string> = {
@@ -890,64 +943,45 @@ export function MarkdownPreview({
 	};
 	const proseTheme = proseThemeMap[theme.name] || "earth";
 
-	const termVars = {
-		"--term-border": theme.accent + (dark ? "40" : "33"),
-		"--term-bg": theme.accent + (dark ? "20" : "14"),
-		"--term-text": theme.accent,
-	} as React.CSSProperties;
+	const markdownStyle = markdownThemeVariables(theme, dark);
 
 	return (
-		<div
-			className={`w-full prose prose-${proseTheme}${dark ? " dark" : ""} prose-headings:tracking-tight prose-a:no-underline hover:prose-a:underline`}
-			style={termVars}
-		>
-			<style>{`
-        .prose-${proseTheme} { max-width: none !important; }
-        .prose-${proseTheme} code::before,
-        .prose-${proseTheme} code::after {
-          content: '' !important;
-        }
-        .prose-${proseTheme} kbd {
-          display: inline-block;
-          font-family: inherit;
-          font-weight: 500;
-          font-size: 0.88em;
-          letter-spacing: 0.02em;
-          padding: 0.12em 0.45em;
-          border-radius: 6px;
-          border: 1px solid var(--term-border);
-          background: var(--term-bg);
-          color: var(--term-text);
-          vertical-align: baseline;
-          transition: background 0.2s ease-out;
-        }
-        /* KaTeX — only reset table-related styles (matrix rendering), preserve spacing */
-        .prose-${proseTheme} .katex table,
-        .prose-${proseTheme} .katex tbody,
-        .prose-${proseTheme} .katex thead,
-        .prose-${proseTheme} .katex tr,
-        .prose-${proseTheme} .katex td,
-        .prose-${proseTheme} .katex th {
-          border: none !important;
-          background: transparent !important;
-        }
-        .prose-${proseTheme} .katex-display {
-          display: block !important;
-          margin: 1em 0 !important;
-        }
-        .prose-${proseTheme} .katex table {
-          display: table !important;
-          border-collapse: collapse !important;
-          border-spacing: 0 !important;
-        }
-      `}</style>
-			<ReactMarkdown
-				remarkPlugins={REMARK_PLUGINS}
-				rehypePlugins={REHYPE_PLUGINS}
-				components={components}
+		<article className="w-full">
+			<header
+				className="mb-10 max-w-[65ch] pb-6"
+				style={{
+					borderBottom: `1px solid ${theme.borderLight ?? `${theme.accent}1A`}`,
+				}}
 			>
-				{content}
-			</ReactMarkdown>
-		</div>
+				<h1
+					id={headingId(title)}
+					className="scroll-mt-24 text-xl font-bold tracking-tight mb-2"
+					style={{ color: theme.text }}
+				>
+					{title}
+				</h1>
+				{date && (
+					<time
+						dateTime={date}
+						className="text-xs font-mono"
+						style={{ color: theme.textSec ?? theme.accent, opacity: 0.55 }}
+					>
+						{date}
+					</time>
+				)}
+			</header>
+			<div
+				className={`markdown-prose w-full max-w-none prose prose-${proseTheme}${dark ? " dark" : ""}`}
+				style={markdownStyle}
+			>
+				<ReactMarkdown
+					remarkPlugins={REMARK_PLUGINS}
+					rehypePlugins={REHYPE_PLUGINS}
+					components={components}
+				>
+					{renderedContent}
+				</ReactMarkdown>
+			</div>
+		</article>
 	);
 }

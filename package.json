@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && pnpm check:markdown && pnpm check:sidebar && vite build",
+    "check:markdown": "node scripts/check-markdown-renderer.mjs",
+    "check:sidebar": "node scripts/check-notes-sidebar.mjs",
     "lint": "biome check --write src/",
     "format": "biome format --write src/",
     "preview": "vite preview"

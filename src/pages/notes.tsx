@@ -1,12 +1,18 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { SectionTitle } from "../components";
 import {
 	type NestedFileNode,
 	type NestedTreeNode,
 	type NoteContent,
 	type NoteLinkTarget,
-	directoryHasContent,
-	expandedKeysForFile,
+	type NoteSuggestion,
+	type SearchResult,
 	getInitialExpandedKeys,
 	getNote,
 	getSidebarTree,
@@ -17,11 +23,21 @@ import {
 	searchNotes,
 } from "../notes";
 import { MarkdownPreview } from "../notes-renderer";
+import {
+	revealFileInExpandedKeys,
+	toggleExpandedKey,
+} from "../notes/sidebar-state";
 import type { Section, Theme, ThemeMode } from "../themes";
 
 /* ---- Reading Progress SliderTrack ---- */
 const NUM_SEGMENTS = 60;
+const SEGMENT_IDS = Array.from(
+	{ length: NUM_SEGMENTS },
+	(_, index) => `progress-segment-${index}`,
+);
 const sidebarTree = getSidebarTree();
+const SIDEBAR_BRANCH_TRANSITION_MS = 180;
+const SIDEBAR_BRANCH_UNMOUNT_BUFFER_MS = 80;
 
 function SliderTrack({
 	progress,
@@ -31,22 +47,31 @@ function SliderTrack({
 	const trackRef = useRef<HTMLDivElement>(null);
 	const [dragging, setDragging] = useState(false);
 
-	const scrollToRatio = useCallback((ratio: number) => {
-		const docHeight =
-			document.documentElement.scrollHeight - window.innerHeight;
-		window.scrollTo({
-			top: ratio * docHeight,
-			behavior: dragging ? "auto" : "smooth",
-		});
-	}, [dragging]);
+	const scrollToRatio = useCallback(
+		(ratio: number) => {
+			const docHeight =
+				document.documentElement.scrollHeight - window.innerHeight;
+			window.scrollTo({
+				top: ratio * docHeight,
+				behavior: dragging ? "auto" : "smooth",
+			});
+		},
+		[dragging],
+	);
 
-	const handleStart = useCallback((clientY: number) => {
-		if (!trackRef.current) return;
-		const rect = trackRef.current.getBoundingClientRect();
-		const ratio = Math.max(0, Math.min((clientY - rect.top) / rect.height, 1));
-		scrollToRatio(ratio);
-		setDragging(true);
-	}, [scrollToRatio]);
+	const handleStart = useCallback(
+		(clientY: number) => {
+			if (!trackRef.current) return;
+			const rect = trackRef.current.getBoundingClientRect();
+			const ratio = Math.max(
+				0,
+				Math.min((clientY - rect.top) / rect.height, 1),
+			);
+			scrollToRatio(ratio);
+			setDragging(true);
+		},
+		[scrollToRatio],
+	);
 
 	useEffect(() => {
 		if (!dragging) return;
@@ -71,12 +96,12 @@ function SliderTrack({
 			className="flex flex-col items-center gap-[2px] cursor-pointer py-1"
 			onMouseDown={(e) => handleStart(e.clientY)}
 		>
-			{Array.from({ length: NUM_SEGMENTS }).map((_, i) => {
+			{SEGMENT_IDS.map((segmentId, i) => {
 				const dist = Math.abs(i - currentIdx);
 				const isCurrent = i === currentIdx;
 				return (
 					<div
-						key={i}
+						key={segmentId}
 						className="rounded-full transition-all duration-150 ease-out"
 						style={{
 							width: "16px",
@@ -88,6 +113,90 @@ function SliderTrack({
 					/>
 				);
 			})}
+		</div>
+	);
+}
+
+function CollapsibleBranch({
+	expanded,
+	id,
+	children,
+}: {
+	expanded: boolean;
+	id: string;
+	children: ReactNode;
+}) {
+	const [mounted, setMounted] = useState(expanded);
+	const [visible, setVisible] = useState(expanded);
+	const mountedRef = useRef(expanded);
+	const animationFrameRef = useRef<number | null>(null);
+	const unmountTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	useEffect(() => {
+		if (animationFrameRef.current !== null) {
+			cancelAnimationFrame(animationFrameRef.current);
+			animationFrameRef.current = null;
+		}
+		if (unmountTimerRef.current !== null) {
+			clearTimeout(unmountTimerRef.current);
+			unmountTimerRef.current = null;
+		}
+
+		if (expanded) {
+			if (!mountedRef.current) {
+				mountedRef.current = true;
+				setMounted(true);
+				setVisible(false);
+			}
+			animationFrameRef.current = requestAnimationFrame(() => {
+				animationFrameRef.current = null;
+				setVisible(true);
+			});
+		} else if (mountedRef.current) {
+			setVisible(false);
+			unmountTimerRef.current = setTimeout(() => {
+				mountedRef.current = false;
+				setMounted(false);
+				unmountTimerRef.current = null;
+			}, SIDEBAR_BRANCH_TRANSITION_MS + SIDEBAR_BRANCH_UNMOUNT_BUFFER_MS);
+		}
+
+		return () => {
+			if (animationFrameRef.current !== null) {
+				cancelAnimationFrame(animationFrameRef.current);
+			}
+			if (unmountTimerRef.current !== null) {
+				clearTimeout(unmountTimerRef.current);
+			}
+		};
+	}, [expanded]);
+
+	if (!mounted && !expanded) return null;
+
+	return (
+		<div
+			id={id}
+			className="notes-sidebar-branch"
+			data-expanded={visible}
+			aria-hidden={!visible}
+			inert={!visible}
+			onTransitionEnd={(event) => {
+				if (
+					event.target !== event.currentTarget ||
+					event.propertyName !== "grid-template-rows" ||
+					expanded
+				) {
+					return;
+				}
+				if (unmountTimerRef.current !== null) {
+					clearTimeout(unmountTimerRef.current);
+					unmountTimerRef.current = null;
+				}
+				mountedRef.current = false;
+				setMounted(false);
+			}}
+		>
+			<div className="notes-sidebar-branch-clip">{children}</div>
 		</div>
 	);
 }
@@ -110,7 +219,7 @@ function SidebarNode({
 	selectedFile: string | null;
 	onOpen: (file: string) => void;
 }) {
-	const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+	const [hoveredFile, setHoveredFile] = useState<string | null>(null);
 	const expanded = expandedKeys.has(node.key);
 
 	const fileChildren: NestedFileNode[] = [];
@@ -120,95 +229,278 @@ function SidebarNode({
 		else fileChildren.push(c);
 	}
 
-	const hasContent = directoryHasContent(node);
+	const hasChildren = node.children.length > 0;
+	const selectedIndex = Boolean(
+		selectedFile && node.indexFile && selectedFile === node.indexFile,
+	);
+	const branchId = `notes-branch-${encodeURIComponent(node.key)
+		.replace(/%/g, "")
+		.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
 
 	return (
-		<div style={{ marginLeft: depth > 0 ? 12 : 0 }}>
+		<div style={{ marginLeft: depth > 0 ? 8 : 0 }}>
 			<div
-				className="flex items-center gap-1.5 w-full py-1.5 text-left cursor-pointer rounded-r transition-colors duration-150"
+				className="group flex w-full items-center rounded-lg transition-colors duration-150"
 				style={{
-					backgroundColor:
-						selectedFile && node.indexFile && selectedFile === node.indexFile
-							? theme.accentLight
-							: "transparent",
+					backgroundColor: selectedIndex ? theme.accentLight : "transparent",
 				}}
-				onClick={() => {
-					if (hasContent) onToggle(node.key);
-					if (node.indexFile) onOpen(node.indexFile);
+				onMouseEnter={(event) => {
+					if (!selectedIndex) {
+						event.currentTarget.style.backgroundColor = `${theme.accentLight}60`;
+					}
+				}}
+				onMouseLeave={(event) => {
+					if (!selectedIndex)
+						event.currentTarget.style.backgroundColor = "transparent";
 				}}
 			>
-				<svg
-					className="w-2.5 h-2.5 transition-transform duration-200 ease-out shrink-0"
-					style={{
-						transform: expanded ? "rotate(90deg)" : "rotate(0deg)",
-						color: theme.accent,
-						opacity: hasContent ? 1 : 0.15,
-					}}
-					viewBox="0 0 16 16"
-					fill="none"
-					stroke="currentColor"
-					strokeWidth="1.5"
-				>
-					<path d="M6 4l4 4-4 4" />
-				</svg>
-				<span
-					className="text-xs font-semibold uppercase tracking-wider truncate"
-					style={{
-						color: theme.text,
-						fontSize: depth > 0 ? "0.6rem" : undefined,
+				<button
+					type="button"
+					className="flex min-w-0 flex-1 items-center gap-2 px-2 py-1.5 text-left"
+					aria-expanded={hasChildren ? expanded : undefined}
+					aria-controls={hasChildren ? branchId : undefined}
+					onClick={() => {
+						if (hasChildren) onToggle(node.key);
+						else if (node.indexFile) onOpen(node.indexFile);
 					}}
 				>
-					{node.title}
-				</span>
-			</div>
-			<div
-				className="overflow-hidden"
-				style={{
-					transition: "max-height 0.4s ease-out, opacity 0.3s ease-out",
-					maxHeight: expanded ? "800px" : "0px",
-					opacity: expanded ? 1 : 0,
-				}}
-			>
-				{fileChildren.length > 0 && (
-					<div
-						style={{ borderLeft: `1px solid ${theme.border}`, marginLeft: 10 }}
+					<svg
+						aria-hidden="true"
+						className="notes-sidebar-chevron h-2.5 w-2.5 shrink-0 transition-transform duration-150 ease-out"
+						style={{
+							transform: expanded ? "rotate(90deg)" : "rotate(0deg)",
+							color: theme.accent,
+							opacity: hasChildren ? 1 : 0.15,
+						}}
+						viewBox="0 0 16 16"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="1.5"
 					>
-						{fileChildren.map((f, i) => (
-							<div
-								key={f.file}
-								className="py-1 pl-3 pr-2 cursor-pointer text-sm transition-colors duration-200 rounded-r"
+						<path d="M6 4l4 4-4 4" />
+					</svg>
+					<span
+						className={`truncate text-xs ${depth === 0 ? "font-semibold" : "font-medium"}`}
+						style={{ color: theme.text }}
+					>
+						{node.title}
+					</span>
+					<span
+						className="ml-auto text-[10px] tabular-nums"
+						style={{ color: theme.textSec, opacity: 0.45 }}
+					>
+						{node.noteCount}
+					</span>
+				</button>
+				{node.indexFile && (
+					<button
+						type="button"
+						aria-label={`打开“${node.title}”分类概览`}
+						title="打开分类概览"
+						className="mr-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-md opacity-50 transition-opacity duration-150 hover:opacity-100"
+						style={{
+							color: theme.accent,
+							opacity: selectedIndex ? 1 : undefined,
+						}}
+						onClick={() => onOpen(node.indexFile as string)}
+					>
+						<svg
+							aria-hidden="true"
+							className="h-3 w-3"
+							viewBox="0 0 16 16"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="1.25"
+						>
+							<rect x="3.25" y="2.25" width="9.5" height="11.5" rx="1.25" />
+							<path d="M5.75 5.5h4.5M5.75 8h4.5M5.75 10.5h2.75" />
+						</svg>
+					</button>
+				)}
+			</div>
+			{hasChildren && (
+				<CollapsibleBranch expanded={expanded} id={branchId}>
+					<div
+						className="ml-2 border-l pl-1"
+						style={{ borderColor: theme.border }}
+					>
+						{dirChildren.map((d) => (
+							<SidebarNode
+								key={d.key}
+								node={d}
+								theme={theme}
+								depth={depth + 1}
+								expandedKeys={expandedKeys}
+								onToggle={onToggle}
+								selectedFile={selectedFile}
+								onOpen={onOpen}
+							/>
+						))}
+						{fileChildren.map((file) => (
+							<button
+								type="button"
+								key={file.file}
+								className="w-full rounded-r py-1 pl-3 pr-2 text-left text-xs leading-5 transition-colors duration-150"
 								style={{
 									backgroundColor:
-										selectedFile === f.file
+										selectedFile === file.file
 											? theme.accentLight
-											: hoveredIdx === i
+											: hoveredFile === file.file
 												? `${theme.accentLight}60`
 												: "transparent",
-									color: selectedFile === f.file ? theme.text : theme.textSec,
+									color:
+										selectedFile === file.file ? theme.text : theme.textSec,
 								}}
-								onClick={() => onOpen(f.file)}
-								onMouseEnter={() => setHoveredIdx(i)}
-								onMouseLeave={() => setHoveredIdx(null)}
+								onClick={() => onOpen(file.file)}
+								onMouseEnter={() => setHoveredFile(file.file)}
+								onMouseLeave={() => setHoveredFile(null)}
 							>
-								{f.title}
-							</div>
+								{file.title}
+							</button>
 						))}
 					</div>
-				)}
-				{dirChildren.map((d) => (
+				</CollapsibleBranch>
+			)}
+		</div>
+	);
+}
+
+function SidebarCatalog({
+	theme,
+	searchQuery,
+	searchFocused,
+	suggestions,
+	searchResults,
+	expandedKeys,
+	selectedFile,
+	onSearchQueryChange,
+	onSearchFocusedChange,
+	onToggle,
+	onOpen,
+}: {
+	theme: Theme;
+	searchQuery: string;
+	searchFocused: boolean;
+	suggestions: NoteSuggestion[];
+	searchResults: SearchResult[];
+	expandedKeys: Set<string>;
+	selectedFile: string | null;
+	onSearchQueryChange: (query: string) => void;
+	onSearchFocusedChange: (focused: boolean) => void;
+	onToggle: (key: string) => void;
+	onOpen: (file: string, options?: { query?: string }) => void;
+}) {
+	return (
+		<>
+			<div
+				data-notes-search-header="true"
+				className="notes-sidebar-search-header -mx-1 px-1 pb-3"
+				style={{ backgroundColor: theme.bg }}
+			>
+				<div className="relative">
+					<input
+						type="search"
+						aria-label="搜索笔记"
+						placeholder="搜索笔记..."
+						className="w-full rounded-xl px-3 py-2 text-sm outline-none transition-all duration-200"
+						style={{
+							backgroundColor: theme.bgDeep,
+							border: `1px solid ${searchFocused ? theme.accent : theme.border}`,
+							color: theme.text,
+						}}
+						value={searchQuery}
+						onChange={(event) => onSearchQueryChange(event.target.value)}
+						onFocus={() => onSearchFocusedChange(true)}
+						onBlur={() => setTimeout(() => onSearchFocusedChange(false), 200)}
+					/>
+					{suggestions.length > 0 && (
+						<div
+							className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-xl"
+							style={{
+								backgroundColor: theme.bgDeep,
+								border: `1px solid ${theme.border}`,
+								boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+							}}
+						>
+							{suggestions.map((suggestion, index) => (
+								<button
+									type="button"
+									key={suggestion.file}
+									className="block w-full px-3 py-2 text-left text-sm transition-colors duration-100"
+									style={{
+										backgroundColor:
+											index === 0 ? theme.accentLight : "transparent",
+										color: theme.textSec,
+									}}
+									onMouseDown={(event) => event.preventDefault()}
+									onClick={() =>
+										onOpen(suggestion.file, { query: searchQuery })
+									}
+								>
+									{suggestion.title}
+								</button>
+							))}
+						</div>
+					)}
+				</div>
+			</div>
+
+			{searchQuery ? (
+				<div
+					className="mb-3 rounded-xl p-2"
+					style={{
+						backgroundColor: theme.bgDeep,
+						border: `1px solid ${theme.border}`,
+					}}
+				>
+					<p
+						className="mb-1 px-1 text-[10px] uppercase tracking-wider"
+						style={{ color: theme.textSec, opacity: 0.5 }}
+					>
+						{searchResults.length} 条结果
+					</p>
+					{searchResults.length > 0 ? (
+						searchResults.slice(0, 8).map((result) => (
+							<button
+								type="button"
+								key={result.file}
+								className="block w-full rounded px-2 py-1.5 text-left transition-colors duration-100"
+								style={{ color: theme.textSec }}
+								onClick={() => onOpen(result.file, { query: searchQuery })}
+								onMouseEnter={(event) => {
+									event.currentTarget.style.backgroundColor = theme.accentLight;
+								}}
+								onMouseLeave={(event) => {
+									event.currentTarget.style.backgroundColor = "transparent";
+								}}
+							>
+								<span className="block text-sm">{result.title}</span>
+								<span className="block truncate text-[10px] opacity-50">
+									{result.category}
+								</span>
+							</button>
+						))
+					) : (
+						<p className="px-2 py-3 text-xs" style={{ color: theme.textSec }}>
+							没有匹配的笔记
+						</p>
+					)}
+				</div>
+			) : (
+				sidebarTree.map((node) => (
 					<SidebarNode
-						key={d.key}
-						node={d}
+						key={node.key}
+						node={node}
 						theme={theme}
-						depth={depth + 1}
+						depth={0}
 						expandedKeys={expandedKeys}
 						onToggle={onToggle}
 						selectedFile={selectedFile}
 						onOpen={onOpen}
 					/>
-				))}
-			</div>
-		</div>
+				))
+			)}
+		</>
 	);
 }
 
@@ -287,14 +579,9 @@ export default function NotesPage({
 		return () => clearTimeout(timer);
 	}, [pendingAnchor]);
 
-	const toggleKey = (key: string) => {
-		setExpandedKeys((prev) => {
-			const next = new Set(prev);
-			if (next.has(key)) next.delete(key);
-			else next.add(key);
-			return next;
-		});
-	};
+	const toggleKey = useCallback((key: string) => {
+		setExpandedKeys((previous) => toggleExpandedKey(previous, key));
+	}, []);
 
 	const openNote = useCallback(
 		(
@@ -327,7 +614,7 @@ export default function NotesPage({
 			setSearchQuery("");
 			setSearchFocused(false);
 			if (file !== "./wiki.md" && options.syncSidebar !== false) {
-				setExpandedKeys(expandedKeysForFile(file));
+				setExpandedKeys((previous) => revealFileInExpandedKeys(previous, file));
 			}
 
 			const pendingTarget = options.anchor || options.query || null;
@@ -372,95 +659,22 @@ export default function NotesPage({
 	return (
 		<div>
 			<div
-				className="hidden md:flex md:flex-col fixed left-8 top-32 bottom-0 w-56 z-10 overflow-y-auto"
+				className="fixed bottom-0 left-8 top-32 z-10 hidden w-56 flex-col overflow-y-auto pb-6 md:flex"
 				style={{ color: theme.textSec }}
 			>
-				<div className="relative mb-3">
-					<input
-						type="text"
-						placeholder="搜索笔记..."
-						className="w-full px-3 py-2 text-sm rounded-xl outline-none transition-all duration-200"
-						style={{
-							backgroundColor: theme.bgDeep,
-							border: `1px solid ${searchFocused ? theme.accent : theme.border}`,
-							color: theme.text,
-						}}
-						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
-						onFocus={() => setSearchFocused(true)}
-						onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
-					/>
-					{suggestions.length > 0 && (
-						<div
-							className="absolute top-full left-0 right-0 mt-1 rounded-xl overflow-hidden z-50"
-							style={{
-								backgroundColor: theme.bgDeep,
-								border: `1px solid ${theme.border}`,
-								boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-							}}
-						>
-							{suggestions.map((s, i) => (
-								<div
-									key={s.file}
-									className="px-3 py-2 text-sm cursor-pointer transition-colors duration-100"
-									style={{
-										backgroundColor:
-											i === 0 ? theme.accentLight : "transparent",
-										color: theme.textSec,
-									}}
-									onMouseDown={() => openNote(s.file, { query: searchQuery })}
-								>
-									{s.title}
-								</div>
-							))}
-						</div>
-					)}
-				</div>
-				{searchQuery && searchResults.length > 0 && (
-					<div
-						className="mb-3 rounded-xl p-2"
-						style={{
-							backgroundColor: theme.bgDeep,
-							border: `1px solid ${theme.border}`,
-						}}
-					>
-						<p
-							className="text-[10px] uppercase tracking-wider mb-1 px-1"
-							style={{ color: theme.textSec, opacity: 0.4 }}
-						>
-							{searchResults.length} 条结果
-						</p>
-						{searchResults.slice(0, 8).map((r) => (
-							<div
-								key={r.file}
-								className="px-2 py-1.5 text-sm cursor-pointer rounded transition-colors duration-100"
-								style={{ color: theme.textSec }}
-								onClick={() => openNote(r.file, { query: searchQuery })}
-								onMouseEnter={(e) => {
-									e.currentTarget.style.backgroundColor = theme.accentLight;
-								}}
-								onMouseLeave={(e) => {
-									e.currentTarget.style.backgroundColor = "transparent";
-								}}
-							>
-								{r.title}
-							</div>
-						))}
-					</div>
-				)}
-				{!searchQuery &&
-					sidebarTree.map((node) => (
-						<SidebarNode
-							key={node.key}
-							node={node}
-							theme={theme}
-							depth={0}
-							expandedKeys={expandedKeys}
-							onToggle={toggleKey}
-							selectedFile={selectedNote?.file || null}
-							onOpen={openNote}
-						/>
-					))}
+				<SidebarCatalog
+					theme={theme}
+					searchQuery={searchQuery}
+					searchFocused={searchFocused}
+					suggestions={suggestions}
+					searchResults={searchResults}
+					expandedKeys={expandedKeys}
+					selectedFile={selectedNote?.file ?? null}
+					onSearchQueryChange={setSearchQuery}
+					onSearchFocusedChange={setSearchFocused}
+					onToggle={toggleKey}
+					onOpen={openNote}
+				/>
 			</div>
 
 			{selectedNote && (
@@ -483,6 +697,7 @@ export default function NotesPage({
 									}}
 								>
 									<svg
+										aria-hidden="true"
 										className="w-3 h-3"
 										style={{ color: theme.textSec }}
 										viewBox="0 0 16 16"
@@ -513,6 +728,7 @@ export default function NotesPage({
 							}}
 						>
 							<svg
+								aria-hidden="true"
 								className="w-3 h-3"
 								style={{ color: theme.textSec }}
 								viewBox="0 0 16 16"
@@ -553,18 +769,20 @@ export default function NotesPage({
 					<div
 						className="mt-8 max-w-4xl"
 						style={{
-							animation: "fade-up 0.6s ease-out both",
-							animationDelay: "150ms",
+							animation: "fade-up 0.25s ease-out both",
+							animationDelay: "0ms",
 						}}
 					>
 						<button
 							type="button"
-							className="md:hidden flex items-center justify-between w-full py-3 px-4 rounded-xl mb-2"
+							className="mb-2 flex w-full items-center justify-between rounded-xl px-4 py-3 md:hidden"
+							aria-expanded={mobileSidebarOpen}
+							aria-controls="mobile-notes-catalog"
 							style={{
 								backgroundColor: theme.bgDeep,
 								border: `1px solid ${theme.border}`,
 							}}
-							onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+							onClick={() => setMobileSidebarOpen((open) => !open)}
 						>
 							<span
 								className="text-xs font-semibold uppercase tracking-wider"
@@ -573,6 +791,7 @@ export default function NotesPage({
 								笔记分类
 							</span>
 							<svg
+								aria-hidden="true"
 								className="w-3 h-3 transition-transform duration-200 ease-out"
 								style={{
 									transform: mobileSidebarOpen
@@ -588,65 +807,36 @@ export default function NotesPage({
 								<path d="M6 4l4 4-4 4" />
 							</svg>
 						</button>
-						<div className={mobileSidebarOpen ? "block mb-6" : "hidden"}>
-							<div className="relative mb-3">
-								<input
-									type="text"
-									placeholder="搜索笔记..."
-									className="w-full px-3 py-2 text-sm rounded-xl outline-none transition-all duration-200"
-									style={{
-										backgroundColor: theme.bgDeep,
-										border: `1px solid ${searchFocused ? theme.accent : theme.border}`,
-										color: theme.text,
-									}}
-									value={searchQuery}
-									onChange={(e) => setSearchQuery(e.target.value)}
-									onFocus={() => setSearchFocused(true)}
-									onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+						{mobileSidebarOpen && (
+							<div id="mobile-notes-catalog" className="mb-6 md:hidden">
+								<SidebarCatalog
+									theme={theme}
+									searchQuery={searchQuery}
+									searchFocused={searchFocused}
+									suggestions={suggestions}
+									searchResults={searchResults}
+									expandedKeys={expandedKeys}
+									selectedFile={selectedNote?.file ?? null}
+									onSearchQueryChange={setSearchQuery}
+									onSearchFocusedChange={setSearchFocused}
+									onToggle={toggleKey}
+									onOpen={openNote}
 								/>
 							</div>
-							{!searchQuery &&
-								sidebarTree.map((node) => (
-									<SidebarNode
-										key={node.key}
-										node={node}
-										theme={theme}
-										depth={0}
-										expandedKeys={expandedKeys}
-										onToggle={toggleKey}
-										selectedFile={selectedNote?.file || null}
-										onOpen={openNote}
-									/>
-								))}
-						</div>
+						)}
 
 						{selectedNote ? (
 							<div
 								key={selectedNote.file}
 								style={{
-									animation: "fade-up 0.5s ease-out both",
+									animation: "fade-up 0.25s ease-out both",
 									animationDelay: "0ms",
 								}}
 							>
-								<div
-									className="mb-10 pb-6"
-									style={{ borderBottom: `1px solid ${theme.borderLight}` }}
-								>
-									<h3
-										className="text-xl font-bold tracking-tight mb-2"
-										style={{ color: theme.text }}
-									>
-										{selectedNote.title}
-									</h3>
-									<span
-										className="text-xs font-mono"
-										style={{ color: theme.textSec, opacity: 0.4 }}
-									>
-										{selectedNote.date}
-									</span>
-								</div>
 								<div data-note-content>
 									<MarkdownPreview
+										title={selectedNote.title}
+										date={selectedNote.date}
 										content={selectedNote.content}
 										theme={theme}
 										isDark={mode === "dark"}

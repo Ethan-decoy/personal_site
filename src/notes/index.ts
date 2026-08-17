@@ -6,6 +6,15 @@ const rawModules = import.meta.glob("./**/*.md", {
 
 const WIKI_FILE = "./wiki.md";
 const INDEX_FILE_SUFFIX = "/_index.md";
+const DIRECTORY_LABELS: Record<string, string> = {
+	ai: "AI",
+	books: "书籍",
+	cpp: "C++",
+	math: "数学",
+	philosophy: "哲学",
+	robotics: "机器人",
+	ros2: "ROS 2",
+};
 
 interface Frontmatter {
 	title: string;
@@ -31,6 +40,7 @@ export interface NestedFileNode {
 export interface NestedTreeNode {
 	key: string;
 	title: string;
+	noteCount: number;
 	children: (NestedTreeNode | NestedFileNode)[];
 	isDir: true;
 	indexFile?: string;
@@ -64,7 +74,7 @@ interface DirectoryBuilder {
 interface NotesIndex {
 	sidebarTree: NestedTreeNode[];
 	notesByFile: Record<string, NoteContent>;
-	directoryIndexes: Record<string, string>;
+	directoryTitles: Record<string, string>;
 	visibleFiles: string[];
 	isEmpty: boolean;
 }
@@ -112,6 +122,24 @@ function normalizeFileKey(file: string): string {
 	return normalized.startsWith("./") ? normalized : `./${normalized}`;
 }
 
+function isPrivateNoteFile(file: string): boolean {
+	const directories = normalizeFileKey(file)
+		.replace(/^\.\//, "")
+		.split("/")
+		.slice(0, -1);
+	return directories.some((segment) => segment.startsWith("_"));
+}
+
+function fallbackDirectoryTitle(segment: string): string {
+	if (DIRECTORY_LABELS[segment.toLowerCase()]) {
+		return DIRECTORY_LABELS[segment.toLowerCase()];
+	}
+
+	return segment
+		.replace(/[-_]+/g, " ")
+		.replace(/\b[a-z]/g, (character) => character.toUpperCase());
+}
+
 function directoryKeyForIndexFile(file: string): string {
 	return file.replace(/^\.\//, "").replace(/\/_index\.md$/, "");
 }
@@ -137,6 +165,19 @@ function compareFiles(a: NestedFileNode, b: NestedFileNode): number {
 	return a.title.localeCompare(b.title);
 }
 
+const directoryCollator = new Intl.Collator("en", {
+	numeric: true,
+	sensitivity: "base",
+});
+
+function compareDirectories(a: NestedTreeNode, b: NestedTreeNode): number {
+	const aParts = a.key.split("/");
+	const bParts = b.key.split("/");
+	const aSegment = aParts[aParts.length - 1] ?? a.key;
+	const bSegment = bParts[bParts.length - 1] ?? b.key;
+	return directoryCollator.compare(aSegment, bSegment);
+}
+
 function isNestedTreeNode(
 	node: NestedTreeNode | NestedFileNode,
 ): node is NestedTreeNode {
@@ -146,6 +187,7 @@ function isNestedTreeNode(
 function buildNotesIndex(): NotesIndex {
 	const notesByFile: Record<string, NoteContent> = {};
 	const directoryIndexes: Record<string, string> = {};
+	const directoryTitles: Record<string, string> = {};
 	const visibleFiles: string[] = [];
 	const root: DirectoryBuilder = { key: "", title: "", dirs: {}, files: [] };
 
@@ -162,7 +204,7 @@ function buildNotesIndex(): NotesIndex {
 			directoryIndexes[directoryKeyForIndexFile(file)] = file;
 			continue;
 		}
-		if (file === WIKI_FILE) continue;
+		if (file === WIKI_FILE || isPrivateNoteFile(file)) continue;
 
 		visibleFiles.push(file);
 		const parts = file.replace(/^\.\//, "").split("/");
@@ -172,7 +214,7 @@ function buildNotesIndex(): NotesIndex {
 			if (!current.dirs[key]) {
 				current.dirs[key] = {
 					key,
-					title: parts[i],
+					title: fallbackDirectoryTitle(parts[i]),
 					dirs: {},
 					files: [],
 				};
@@ -192,12 +234,17 @@ function buildNotesIndex(): NotesIndex {
 		const indexFile = directoryIndexes[builder.key];
 		const dirChildren = Object.values(builder.dirs)
 			.map(toTreeNode)
-			.sort((a, b) => a.title.localeCompare(b.title));
+			.sort(compareDirectories);
 		const fileChildren = [...builder.files].sort(compareFiles);
+		const title = indexFile ? notesByFile[indexFile].title : builder.title;
+		directoryTitles[builder.key] = title;
 
 		return {
 			key: builder.key,
-			title: indexFile ? notesByFile[indexFile].title : builder.title,
+			title,
+			noteCount:
+				fileChildren.length +
+				dirChildren.reduce((total, child) => total + child.noteCount, 0),
 			children: [...dirChildren, ...fileChildren],
 			isDir: true,
 			indexFile,
@@ -206,12 +253,12 @@ function buildNotesIndex(): NotesIndex {
 
 	const sidebarTree = Object.values(root.dirs)
 		.map(toTreeNode)
-		.sort((a, b) => a.title.localeCompare(b.title));
+		.sort(compareDirectories);
 
 	return {
 		sidebarTree,
 		notesByFile,
-		directoryIndexes,
+		directoryTitles,
 		visibleFiles,
 		isEmpty: visibleFiles.length === 0,
 	};
@@ -228,10 +275,7 @@ export function isNotesEmpty(): boolean {
 }
 
 export function getInitialExpandedKeys(): Set<string> {
-	const keys = new Set<string>();
-	const firstNode = notesIndex.sidebarTree[0];
-	if (firstNode) keys.add(firstNode.key);
-	return keys;
+	return new Set();
 }
 
 export function getNote(file: string): NoteContent | null {
@@ -245,10 +289,6 @@ export function expandedKeysForFile(file: string): Set<string> {
 		keys.add(parts.slice(0, i + 1).join("/"));
 	}
 	return keys;
-}
-
-export function directoryHasContent(node: NestedTreeNode): boolean {
-	return node.children.length > 0 || Boolean(node.indexFile);
 }
 
 export function isDirectoryNode(
@@ -269,8 +309,18 @@ export function searchNotes(query: string): SearchResult[] {
 		const bodyMatch = raw.toLowerCase().includes(q);
 
 		if (titleMatch || bodyMatch) {
+			const directoryKey = directoryKeyForFile(file);
+			const segments = directoryKey ? directoryKey.split("/") : [];
 			const category =
-				directoryKeyForFile(file).replace(/\//g, " > ") || "other";
+				segments
+					.map((_, index) => {
+						const key = segments.slice(0, index + 1).join("/");
+						return (
+							notesIndex.directoryTitles[key] ??
+							fallbackDirectoryTitle(segments[index])
+						);
+					})
+					.join(" › ") || "其他";
 			results.push({
 				title: note.title,
 				date: note.date,

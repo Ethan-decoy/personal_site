@@ -12,6 +12,26 @@ const BLINK_LOG_VARIANCE = Math.log(
 const BLINK_LOG_SIGMA = Math.sqrt(BLINK_LOG_VARIANCE);
 const BLINK_LOG_MU = Math.log(BLINK_INTERVAL_MEAN_MS) - BLINK_LOG_VARIANCE / 2;
 
+const HOME_COLOR_ROLES: Record<
+	ThemeMode,
+	{
+		inkMuted: string;
+		accentInk: string;
+		markOpacity: number;
+	}
+> = {
+	light: {
+		inkMuted: "#42574E",
+		accentInk: "#2F5A4E",
+		markOpacity: 0.105,
+	},
+	dark: {
+		inkMuted: "#94A79D",
+		accentInk: "#7FB69F",
+		markOpacity: 0.18,
+	},
+};
+
 function sampleBlinkInterval() {
 	const firstUniform = Math.max(Math.random(), Number.EPSILON);
 	const secondUniform = Math.random();
@@ -21,7 +41,13 @@ function sampleBlinkInterval() {
 	return Math.round(Math.exp(BLINK_LOG_MU + BLINK_LOG_SIGMA * standardNormal));
 }
 
-function SmileyAvatar({ theme, mode }: { theme: Theme; mode: ThemeMode }) {
+function SmileyAvatar({
+	accent,
+	opacity,
+}: {
+	accent: string;
+	opacity: number;
+}) {
 	const faceRef = useRef<HTMLDivElement>(null);
 	const eyesRef = useRef<HTMLDivElement>(null);
 	const eyeShapeRef = useRef<HTMLDivElement>(null);
@@ -168,7 +194,7 @@ function SmileyAvatar({ theme, mode }: { theme: Theme; mode: ThemeMode }) {
 			className="relative h-[280px] w-[280px] pointer-events-none transition-opacity duration-300 lg:h-[400px] lg:w-[400px]"
 			style={{
 				transform: "rotate(6deg)",
-				opacity: mode === "dark" ? 0.14 : 0.105,
+				opacity,
 			}}
 		>
 			<div
@@ -176,7 +202,7 @@ function SmileyAvatar({ theme, mode }: { theme: Theme; mode: ThemeMode }) {
 				style={{
 					WebkitMask: mask,
 					mask,
-					backgroundColor: theme.accent,
+					backgroundColor: accent,
 					clipPath: "inset(48% 0 0)",
 				}}
 			/>
@@ -187,7 +213,7 @@ function SmileyAvatar({ theme, mode }: { theme: Theme; mode: ThemeMode }) {
 					style={{
 						WebkitMask: mask,
 						mask,
-						backgroundColor: theme.accent,
+						backgroundColor: accent,
 						clipPath: "inset(0 0 52% 0)",
 						transformOrigin: "50% 39%",
 					}}
@@ -206,6 +232,7 @@ export default function HomePage({
 	mode?: ThemeMode;
 }) {
 	const { t } = useI18n();
+	const homeColors = HOME_COLOR_ROLES[mode];
 	return (
 		<div className="relative flex min-h-[calc(100svh-4rem)] flex-col justify-center overflow-hidden py-24 md:min-h-[calc(100svh-5rem)] md:py-20">
 			<div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 w-full relative z-10">
@@ -213,7 +240,7 @@ export default function HomePage({
 					<div className="motion-safe:[animation:fade-up_350ms_ease-out_both]">
 						<p
 							className="text-[13px] font-semibold tracking-[0.13em]"
-							style={{ color: theme.accent }}
+							style={{ color: homeColors.accentInk }}
 						>
 							{t("home.role")}
 						</p>
@@ -228,7 +255,7 @@ export default function HomePage({
 							<div>
 								<p
 									className="text-[11px] font-semibold tracking-[0.16em]"
-									style={{ color: theme.textSec }}
+									style={{ color: homeColors.inkMuted }}
 								>
 									{t("home.focusLabel")}
 								</p>
@@ -242,7 +269,7 @@ export default function HomePage({
 							<div>
 								<p
 									className="text-[11px] font-semibold tracking-[0.16em]"
-									style={{ color: theme.textSec }}
+									style={{ color: homeColors.inkMuted }}
 								>
 									{t("home.nowLabel")}
 								</p>
@@ -273,7 +300,10 @@ export default function HomePage({
 					</div>
 
 					<div className="hidden items-center justify-center pt-6 motion-safe:[animation:fade-in_450ms_ease-out_80ms_both] md:-ml-6 md:flex lg:-ml-12 lg:pt-8">
-						<SmileyAvatar theme={theme} mode={mode} />
+						<SmileyAvatar
+							accent={theme.accent}
+							opacity={homeColors.markOpacity}
+						/>
 					</div>
 				</div>
 			</div>

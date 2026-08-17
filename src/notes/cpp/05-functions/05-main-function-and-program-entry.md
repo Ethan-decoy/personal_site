@@ -3,11 +3,11 @@ title: main 与程序入口（The Main Function and Program Entry）
 date: 2026-08-14
 ---
 
-# `main` 与程序入口（The Main Function and Program Entry）
+# main 与程序入口（The Main Function and Program Entry）
 
 普通函数调用总是由某个正在执行的位置发起，而整个程序必须有一个进入主体的起点。在通常运行于操作系统之上的托管环境（hosted environment）中，C++ 将名为 `main` 的特殊函数指定为程序入口。
 
-## `main` 函数的基本形式
+## main 函数的基本形式
 
 不接收命令行参数的基本形式是：
 

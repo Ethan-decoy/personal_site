@@ -3,7 +3,7 @@ title: 返回值与 return 语句（Return Values and the Return Statement）
 date: 2026-08-14
 ---
 
-# 返回值与 `return` 语句（Return Values and the Return Statement）
+# 返回值与 return 语句（Return Values and the Return Statement）
 
 形参与实参解决了数据怎样进入函数。函数体完成计算以后，还需要把结果交还给调用位置；返回类型与 `return` 语句共同描述这一过程。
 

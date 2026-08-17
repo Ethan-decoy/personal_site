@@ -1,6 +1,6 @@
-import { type ReactNode } from "react";
-import { type Section, type Theme } from "./themes";
+import type { ReactNode } from "react";
 import { useI18n } from "./i18n";
+import type { Section, Theme } from "./themes";
 
 export function SectionTitle({
 	children,
@@ -52,7 +52,7 @@ export function NavBar({
 
 	return (
 		<nav
-			className="fixed top-0 left-0 right-0 z-40"
+			className="fixed top-0 left-0 right-0 z-40 motion-safe:transition-colors motion-safe:duration-300 motion-safe:ease-out"
 			style={{ backgroundColor: `${theme.bg}ee`, backdropFilter: "blur(12px)" }}
 		>
 			<div className="max-w-5xl mx-auto flex items-center justify-between px-4 md:px-8 py-4">

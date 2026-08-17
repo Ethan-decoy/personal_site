@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useI18n } from "../i18n";
-import type { Section, Theme } from "../themes";
+import type { Section, Theme, ThemeMode } from "../themes";
 
 // Primary-gaze measurements: 6.4 ± 2.4 s between blinks (PMID: 12137399).
 // Empirical inter-blink intervals follow a log-normal distribution (PMID: 20944934).
@@ -21,7 +21,7 @@ function sampleBlinkInterval() {
 	return Math.round(Math.exp(BLINK_LOG_MU + BLINK_LOG_SIGMA * standardNormal));
 }
 
-function SmileyAvatar({ theme }: { theme: Theme }) {
+function SmileyAvatar({ theme, mode }: { theme: Theme; mode: ThemeMode }) {
 	const faceRef = useRef<HTMLDivElement>(null);
 	const eyesRef = useRef<HTMLDivElement>(null);
 	const eyeShapeRef = useRef<HTMLDivElement>(null);
@@ -165,8 +165,11 @@ function SmileyAvatar({ theme }: { theme: Theme }) {
 	return (
 		<div
 			ref={faceRef}
-			className="relative h-[280px] w-[280px] opacity-10 pointer-events-none lg:h-[400px] lg:w-[400px]"
-			style={{ transform: "rotate(6deg)" }}
+			className="relative h-[280px] w-[280px] pointer-events-none transition-opacity duration-300 lg:h-[400px] lg:w-[400px]"
+			style={{
+				transform: "rotate(6deg)",
+				opacity: mode === "dark" ? 0.14 : 0.105,
+			}}
 		>
 			<div
 				className="absolute inset-0"
@@ -196,7 +199,12 @@ function SmileyAvatar({ theme }: { theme: Theme }) {
 
 export default function HomePage({
 	theme,
-}: { theme: Theme; onNavigate: (s: Section) => void }) {
+	mode = "light",
+}: {
+	theme: Theme;
+	onNavigate: (s: Section) => void;
+	mode?: ThemeMode;
+}) {
 	const { t } = useI18n();
 	return (
 		<div className="relative flex min-h-[calc(100svh-4rem)] flex-col justify-center overflow-hidden py-24 md:min-h-[calc(100svh-5rem)] md:py-20">
@@ -247,8 +255,11 @@ export default function HomePage({
 										className="relative flex h-2.5 w-2.5 shrink-0 items-center justify-center"
 									>
 										<span
-											className="absolute inline-flex h-full w-full rounded-full opacity-75 motion-safe:animate-ping"
-											style={{ backgroundColor: theme.accent }}
+											className="absolute inline-flex h-full w-full rounded-full motion-safe:animate-ping"
+											style={{
+												backgroundColor: theme.accent,
+												opacity: mode === "dark" ? 0.5 : 0.65,
+											}}
 										/>
 										<span
 											className="relative inline-flex h-2 w-2 rounded-full"
@@ -262,7 +273,7 @@ export default function HomePage({
 					</div>
 
 					<div className="hidden items-center justify-center pt-6 motion-safe:[animation:fade-in_450ms_ease-out_80ms_both] md:-ml-6 md:flex lg:-ml-12 lg:pt-8">
-						<SmileyAvatar theme={theme} />
+						<SmileyAvatar theme={theme} mode={mode} />
 					</div>
 				</div>
 			</div>

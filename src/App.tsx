@@ -1,19 +1,19 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Footer, LangToggle, NavBar, ThemeToggle } from "./components";
+import { useI18n } from "./i18n";
+import { I18nProvider } from "./i18n/index";
+import AboutPage from "./pages/about";
+import ContactPage from "./pages/contact";
+import HomePage from "./pages/home";
+import NotesPage from "./pages/notes";
+import ProjectsPage from "./pages/projects";
+import { ThemeModeProvider, useThemeMode } from "./theme-mode";
 import {
-	type ThemeKey,
 	type Section,
+	type ThemeKey,
 	type ThemeMode,
 	getTheme,
 } from "./themes";
-import { NavBar, Footer, LangToggle, ThemeToggle } from "./components";
-import { useI18n } from "./i18n";
-import { I18nProvider } from "./i18n/index";
-import { ThemeModeProvider, useThemeMode } from "./theme-mode";
-import HomePage from "./pages/home";
-import AboutPage from "./pages/about";
-import ProjectsPage from "./pages/projects";
-import NotesPage from "./pages/notes";
-import ContactPage from "./pages/contact";
 
 type AboutView = "personal" | "work";
 
@@ -72,7 +72,7 @@ function AppInner() {
 
 	return (
 		<div
-			className="min-h-screen flex flex-col"
+			className="min-h-screen flex flex-col motion-safe:transition-colors motion-safe:duration-300 motion-safe:ease-out"
 			style={{ backgroundColor: theme.bg, color: theme.text }}
 		>
 			<NavBar theme={theme} active={active} onNavigate={navigate} />

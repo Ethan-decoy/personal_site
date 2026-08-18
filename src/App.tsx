@@ -12,6 +12,7 @@ import {
 	type Section,
 	type ThemeKey,
 	type ThemeMode,
+	getAboutTheme,
 	getTheme,
 } from "./themes";
 
@@ -46,7 +47,10 @@ function AppInner() {
 	const { mode, setMode } = useThemeMode();
 	const [active, setActive] = useState<Section>("home");
 	const [aboutView, setAboutView] = useState<AboutView>("work");
-	const theme = getTheme(sectionTheme[active], mode);
+	const theme =
+		active === "about"
+			? getAboutTheme(aboutView, mode)
+			: getTheme(sectionTheme[active], mode);
 	const Page = sectionMap[active];
 
 	useEffect(() => {
@@ -82,7 +86,12 @@ function AppInner() {
 			</div>
 			<main className="flex-1">
 				{active === "about" ? (
-					<Page theme={theme} onNavigate={navigate} aboutView={aboutView} />
+					<Page
+						theme={theme}
+						onNavigate={navigate}
+						aboutView={aboutView}
+						mode={mode}
+					/>
 				) : (
 					<Page theme={theme} onNavigate={navigate} mode={mode} />
 				)}

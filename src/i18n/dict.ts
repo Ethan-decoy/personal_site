@@ -163,31 +163,36 @@ export const dict = {
 		zh: "擅长从数学推导到 C++ 实现的全链路开发，并在实际产线中验证算法的稳定性与精度。",
 		en: "Skilled in full-chain development from mathematical derivation to C++ implementation, validating algorithm stability and accuracy in real production lines.",
 	},
+	"about.work.profile": { zh: "职业概览", en: "Profile" },
+	"about.work.kicker": {
+		zh: "3D 视觉研发",
+		en: "3D Vision R&D",
+	},
+	"about.work.positioning": {
+		zh: "从数学推导、算法实现到实机验证与产品集成，专注于将三维视觉方法转化为稳定、可落地的工程系统。",
+		en: "Working from mathematical derivation and algorithm implementation through machine validation and product integration, focused on turning 3D vision methods into stable, production-ready engineering systems.",
+	},
+	"about.work.quickView": { zh: "履历索引", en: "Profile sections" },
+	"about.work.scopeNote": {
+		zh: "部分项目受保密约束，页面仅描述本人职责与可公开的技术范围。",
+		en: "Some projects are confidential; this page only describes my responsibilities and publicly shareable technical scope.",
+	},
 
-	"about.exp": { zh: "经验", en: "Experience" },
+	"about.exp": { zh: "工程经历", en: "Experience" },
 	"about.exp.role": { zh: "图像算法工程师", en: "Image Algorithm Engineer" },
 	"about.exp.company": {
-		zh: "深圳市振华兴智能",
-		en: "Shenzhen Zhenhuaxing Intelligent",
+		zh: "VCTA",
+		en: "VCTA",
 	},
 	"about.exp.period": { zh: "2025 — 至今", en: "2025 — Present" },
 	"about.exp.d0": {
-		zh: "主导工业 AOI 宽量程三维测量算法升级，完成技术方案、标定链路、C++/CUDA 重建、实机验证与产品集成，解决既有方案在扩展工作范围后的精度与稳定性问题。",
-		en: "Led the upgrade of a wide-range 3D measurement algorithm for industrial AOI, delivering the technical design, calibration pipeline, C++/CUDA reconstruction, machine validation, and product integration while resolving accuracy and stability issues after the working range was extended.",
+		zh: "主导工业 AOI 宽量程三维测量方案升级，针对工作范围扩展后的精度与稳定性问题，完成技术方案、标定链路、C++/CUDA 重建、实机验证与产品集成。",
+		en: "Led an industrial AOI wide-range 3D measurement upgrade focused on accuracy and stability after extending the working range, spanning technical design, calibration, C++/CUDA reconstruction, machine validation, and product integration.",
 	},
-	"about.exp.d1": {
-		zh: "独立负责点云构建模块：结构光、理论推导及实现、工程调试",
-		en: "Independently responsible for point cloud construction module: structured light, theoretical derivation and implementation, engineering debugging",
-	},
-	"about.exp.d2": {
-		zh: "基于 Qt Widgets 构建上位机界面",
-		en: "Built host computer UI using Qt Widgets",
-	},
-
-	"about.skills": { zh: "能力", en: "Skills" },
-	"about.skills.lang": { zh: "编程语言", en: "Languages" },
-	"about.skills.libs": { zh: "框架与库", en: "Frameworks & Libraries" },
-	"about.skills.domains": { zh: "涉及领域", en: "Domains" },
+	"about.skills": { zh: "技术能力", en: "Technical Skills" },
+	"about.skills.lang": { zh: "核心语言", en: "Core Language" },
+	"about.skills.libs": { zh: "工程工具", en: "Engineering Stack" },
+	"about.skills.domains": { zh: "专业方向", en: "Domains" },
 	"about.skills.domains.0": { zh: "机器视觉", en: "Machine Vision" },
 	"about.skills.domains.1": {
 		zh: "点云重建",
@@ -204,7 +209,6 @@ export const dict = {
 		en: "Want to learn more about my tech stack and project experience?",
 	},
 	"about.cta.btn": { zh: "联系我", en: "Contact me" },
-
 	// Projects
 	"projects.title": { zh: "项目", en: "Projects" },
 	"projects.activity.eyebrow": { zh: "GitHub 活动", en: "GitHub activity" },

@@ -149,3 +149,61 @@ export type Theme = (typeof themes)[ThemeKey]["light"];
 export function getTheme(key: ThemeKey, mode: ThemeMode = "light"): Theme {
 	return themes[key][mode];
 }
+
+const aboutPersonalSurface: Record<
+	ThemeMode,
+	Pick<Theme, "bg" | "bgDeep" | "bgCard" | "border" | "borderLight">
+> = {
+	light: {
+		bg: "#F8F3EA",
+		bgDeep: "#F0E9DF",
+		bgCard: "#F4EEE5",
+		border: "rgba(71, 56, 43, 0.12)",
+		borderLight: "rgba(71, 56, 43, 0.07)",
+	},
+	dark: {
+		bg: "#1A1612",
+		bgDeep: "#211D19",
+		bgCard: "#1B1A17",
+		border: "rgba(226, 218, 207, 0.11)",
+		borderLight: "rgba(226, 218, 207, 0.06)",
+	},
+};
+
+const aboutWorkTheme: Record<ThemeMode, Theme> = {
+	light: {
+		name: "冷灰工作纸",
+		bg: "#F4F6F7",
+		bgDeep: "#E9EEF1",
+		bgCard: "#F1F4F5",
+		text: "#18232B",
+		textSec: "#586873",
+		accent: "#345E72",
+		accentHover: "#274B5D",
+		accentLight: "rgba(52, 94, 114, 0.09)",
+		border: "rgba(24, 35, 43, 0.13)",
+		borderLight: "rgba(24, 35, 43, 0.07)",
+	},
+	dark: {
+		name: "蓝黑工作面",
+		bg: "#10161B",
+		bgDeep: "#172128",
+		bgCard: "#141C22",
+		text: "#E4E9EC",
+		textSec: "#8F9CA5",
+		accent: "#7FAABE",
+		accentHover: "#9BC0D0",
+		accentLight: "rgba(127, 170, 190, 0.12)",
+		border: "rgba(228, 233, 236, 0.11)",
+		borderLight: "rgba(228, 233, 236, 0.06)",
+	},
+};
+
+export function getAboutTheme(
+	view: "personal" | "work",
+	mode: ThemeMode = "light",
+): Theme {
+	if (view === "work") return aboutWorkTheme[mode];
+	const theme = getTheme("sage", mode);
+	return { ...theme, ...aboutPersonalSurface[mode] };
+}

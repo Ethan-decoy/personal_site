@@ -73,6 +73,49 @@
 	}
 }
 
+.home-hero-frame {
+	max-width: 64rem;
+	/* Scale the 56px wide-layout gutter directly from its 1024px reference. */
+	padding-inline: min(3.5rem, 5.46875vw);
+}
+
+.home-hero-composition {
+	/* Preserve the wide-layout 88:400 title-to-avatar visual ratio. */
+	--home-title-size: clamp(3.75rem, 8.59375vw, 5.5rem);
+	--home-avatar-size: clamp(17.045455rem, 39.0625vw, 25rem);
+
+	position: relative;
+	max-width: 57rem;
+	margin-inline: auto;
+	isolation: isolate;
+}
+
+.home-hero-copy {
+	position: relative;
+	z-index: 1;
+	max-width: 32rem;
+}
+
+.home-hero-title {
+	font-size: var(--home-title-size);
+}
+
+.home-avatar-stage {
+	position: absolute;
+	inset-block-start: 50%;
+	inset-inline-end: 0;
+	z-index: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transform: translateY(-50%);
+}
+
+.home-avatar-mark {
+	width: var(--home-avatar-size);
+	height: var(--home-avatar-size);
+}
+
 @keyframes blink {
 	0%,
 	50% {

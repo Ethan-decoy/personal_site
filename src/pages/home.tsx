@@ -214,7 +214,7 @@ function SmileyAvatar({
 	return (
 		<div
 			ref={faceRef}
-			className="pointer-events-none relative h-56 w-56 transition-opacity duration-300 sm:h-64 sm:w-64 md:h-[280px] md:w-[280px] lg:h-[400px] lg:w-[400px]"
+			className="home-avatar-mark pointer-events-none relative transition-opacity duration-300"
 			style={{
 				transform: "rotate(6deg)",
 				opacity,
@@ -258,9 +258,9 @@ export default function HomePage({
 	const homeColors = HOME_COLOR_ROLES[mode];
 	return (
 		<div className="relative flex min-h-[calc(100svh-4rem)] flex-col justify-center overflow-hidden py-24 md:min-h-[calc(100svh-5rem)] md:py-20">
-			<div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 w-full relative z-10">
-				<div className="relative isolate grid grid-cols-1 items-center md:grid-cols-[minmax(0,25rem)_16rem] md:justify-center lg:grid-cols-[minmax(0,32rem)_25rem]">
-					<div className="relative z-10 motion-safe:[animation:fade-up_350ms_ease-out_both]">
+			<div className="home-hero-frame relative z-10 mx-auto w-full">
+				<div className="home-hero-composition">
+					<div className="home-hero-copy motion-safe:[animation:fade-up_350ms_ease-out_both]">
 						<p
 							className="text-[13px] font-semibold tracking-[0.13em]"
 							style={{ color: homeColors.accentInk }}
@@ -268,7 +268,7 @@ export default function HomePage({
 							{t("home.role")}
 						</p>
 						<h1
-							className="mt-6 text-6xl font-semibold leading-none tracking-[-0.045em] md:text-7xl lg:text-[5.5rem]"
+							className="home-hero-title mt-6 font-semibold leading-none tracking-[-0.045em]"
 							style={{ color: theme.text }}
 						>
 							{t("home.name")}
@@ -322,7 +322,7 @@ export default function HomePage({
 						</div>
 					</div>
 
-					<div className="absolute right-2 top-8 z-0 flex items-center justify-center motion-safe:[animation:fade-in_450ms_ease-out_80ms_both] sm:right-[8%] sm:top-6 md:static md:z-auto md:-ml-6 md:pt-6 lg:-ml-12 lg:pt-8">
+					<div className="home-avatar-stage motion-safe:[animation:fade-in_450ms_ease-out_80ms_both]">
 						<SmileyAvatar
 							accent={theme.accent}
 							opacity={homeColors.markOpacity}

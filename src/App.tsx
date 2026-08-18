@@ -1,32 +1,18 @@
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Footer, LangToggle, NavBar, ThemeToggle } from "./components";
 import { useI18n } from "./i18n";
 import { I18nProvider } from "./i18n/index";
-import AboutPage from "./pages/about";
+import AboutPage, { type WorkSectionId } from "./pages/about";
 import ContactPage from "./pages/contact";
 import HomePage from "./pages/home";
 import NotesPage from "./pages/notes";
 import ProjectsPage from "./pages/projects";
 import { ThemeModeProvider, useThemeMode } from "./theme-mode";
-import {
-	type Section,
-	type ThemeKey,
-	type ThemeMode,
-	getAboutTheme,
-	getTheme,
-} from "./themes";
+import { type Section, type ThemeKey, getAboutTheme, getTheme } from "./themes";
 
 type AboutView = "personal" | "work";
 
-const sectionMap: Record<
-	Section,
-	React.FC<{
-		theme: ReturnType<typeof getTheme>;
-		onNavigate: (s: Section, sub?: AboutView) => void;
-		aboutView?: AboutView;
-		mode?: ThemeMode;
-	}>
-> = {
+const sectionMap = {
 	home: HomePage,
 	about: AboutPage,
 	projects: ProjectsPage,
@@ -47,11 +33,11 @@ function AppInner() {
 	const { mode, setMode } = useThemeMode();
 	const [active, setActive] = useState<Section>("home");
 	const [aboutView, setAboutView] = useState<AboutView>("work");
+	const [workSection, setWorkSection] = useState<WorkSectionId>("experience");
 	const theme =
 		active === "about"
 			? getAboutTheme(aboutView, mode)
 			: getTheme(sectionTheme[active], mode);
-	const Page = sectionMap[active];
 
 	useEffect(() => {
 		const hash = window.location.hash.replace("#", "");
@@ -74,6 +60,22 @@ function AppInner() {
 		window.scrollTo({ top: 0 });
 	};
 
+	let pageContent: ReactNode;
+	if (active === "about") {
+		pageContent = (
+			<AboutPage
+				theme={theme}
+				onNavigate={navigate}
+				aboutView={aboutView}
+				workSection={workSection}
+				onWorkSectionChange={setWorkSection}
+			/>
+		);
+	} else {
+		const Page = sectionMap[active];
+		pageContent = <Page theme={theme} onNavigate={navigate} mode={mode} />;
+	}
+
 	return (
 		<div
 			className="min-h-screen flex flex-col motion-safe:transition-colors motion-safe:duration-300 motion-safe:ease-out"
@@ -84,18 +86,7 @@ function AppInner() {
 				<ThemeToggle mode={mode} setMode={setMode} theme={theme} />
 				<LangToggle locale={locale} setLocale={setLocale} theme={theme} />
 			</div>
-			<main className="flex-1">
-				{active === "about" ? (
-					<Page
-						theme={theme}
-						onNavigate={navigate}
-						aboutView={aboutView}
-						mode={mode}
-					/>
-				) : (
-					<Page theme={theme} onNavigate={navigate} mode={mode} />
-				)}
-			</main>
+			<main className="flex-1">{pageContent}</main>
 			<Footer theme={theme} onNavigate={navigate} />
 		</div>
 	);

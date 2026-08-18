@@ -163,7 +163,6 @@ export const dict = {
 		zh: "擅长从数学推导到 C++ 实现的全链路开发，并在实际产线中验证算法的稳定性与精度。",
 		en: "Skilled in full-chain development from mathematical derivation to C++ implementation, validating algorithm stability and accuracy in real production lines.",
 	},
-	"about.work.profile": { zh: "职业概览", en: "Profile" },
 	"about.work.kicker": {
 		zh: "3D 视觉研发",
 		en: "3D Vision R&D",

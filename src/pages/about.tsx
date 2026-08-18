@@ -449,17 +449,21 @@ function AboutFaceTransition({
 		if (!plane || window.matchMedia("(prefers-reduced-motion: reduce)").matches)
 			return;
 
-		const direction = view === "personal" ? -1 : 1;
-		const animation = plane.animate(
-			[
-				{
+		const enteringWork = view === "work";
+		const initialFrame = enteringWork
+			? {
+					opacity: 0.42,
+					transform: "scale(0.997)",
+				}
+			: {
 					opacity: 0.28,
-					transform: `perspective(1400px) rotateY(${direction * 6}deg) translateX(${direction * -6}px) scale(0.995)`,
-				},
-				{ opacity: 1, transform: "none" },
-			],
+					transform:
+						"perspective(1400px) rotateY(-6deg) translateX(6px) scale(0.995)",
+				};
+		const animation = plane.animate(
+			[initialFrame, { opacity: 1, transform: "none" }],
 			{
-				duration: 340,
+				duration: enteringWork ? 200 : 340,
 				easing: "cubic-bezier(0.22, 0.61, 0.36, 1)",
 			},
 		);
@@ -471,7 +475,7 @@ function AboutFaceTransition({
 		<div
 			ref={planeRef}
 			style={{
-				transformOrigin: view === "personal" ? "left center" : "right center",
+				transformOrigin: view === "personal" ? "left center" : "center top",
 			}}
 		>
 			{view === "work" ? front : back}
@@ -480,14 +484,18 @@ function AboutFaceTransition({
 }
 
 const workSectionOrder = ["experience", "skills"] as const;
-type WorkSectionId = (typeof workSectionOrder)[number];
+export type WorkSectionId = (typeof workSectionOrder)[number];
 
 function EditorialWorkProfile({
 	theme,
 	skills,
+	activeSection,
+	onActiveSectionChange,
 }: {
 	theme: Theme;
 	skills: { label: string; items: string[] }[];
+	activeSection: WorkSectionId;
+	onActiveSectionChange: (section: WorkSectionId) => void;
 }) {
 	const { t } = useI18n();
 	const experience = {
@@ -496,8 +504,6 @@ function EditorialWorkProfile({
 		period: t("about.exp.period"),
 		summary: t("about.exp.d0"),
 	};
-	const [activeSection, setActiveSection] =
-		useState<WorkSectionId>("experience");
 	const sectionLabels: Record<WorkSectionId, string> = {
 		experience: t("about.exp"),
 		skills: t("about.skills"),
@@ -517,13 +523,15 @@ function EditorialWorkProfile({
 		const tabList = tabListRef.current;
 		const activeLabel = tabLabelRefs.current[activeSection];
 		if (!tabList || !activeLabel) return;
+		const activeTab = activeLabel.closest<HTMLButtonElement>("[role=tab]");
+		if (!activeTab) return;
 
 		const updateIndicator = () => {
-			const listRect = tabList.getBoundingClientRect();
-			const labelRect = activeLabel.getBoundingClientRect();
+			// Layout offsets stay stable while AboutFaceTransition transforms the plane.
+			// Client rects include that animation and leave a stale indicator position.
 			setTabIndicator({
-				left: labelRect.left - listRect.left,
-				width: labelRect.width,
+				left: activeTab.offsetLeft + activeLabel.offsetLeft,
+				width: activeLabel.offsetWidth,
 				ready: true,
 			});
 		};
@@ -563,204 +571,195 @@ function EditorialWorkProfile({
 
 		event.preventDefault();
 		const nextSection = workSectionOrder[nextIndex];
-		setActiveSection(nextSection);
+		onActiveSectionChange(nextSection);
 		requestAnimationFrame(() => {
 			document.getElementById(`work-tab-${nextSection}`)?.focus();
 		});
 	};
 
 	return (
-		<section className="grid gap-6 md:grid-cols-[7.5rem_minmax(0,1fr)] md:gap-10">
-			<header>
-				<h3
-					className="text-[10px] font-semibold uppercase tracking-[0.14em] md:pt-1"
-					style={{ color: theme.textSec }}
-				>
-					{t("about.work.profile")}
-				</h3>
-			</header>
-			<div>
-				<p
-					className="font-mono text-[10px] font-medium uppercase tracking-[0.13em] sm:text-[11px]"
-					style={{ color: theme.accent }}
-				>
-					{t("about.work.kicker")}
-				</p>
-				<h4
-					className="mt-3 text-[clamp(2rem,5vw,3.5rem)] font-semibold leading-[1.08] tracking-[-0.035em]"
-					style={{ color: theme.text }}
-				>
-					{experience.role}
-				</h4>
-				<p
-					className="mt-6 max-w-2xl text-[15px] leading-[1.85] sm:text-base"
-					style={{ color: theme.textSec }}
-				>
-					{t("about.work.positioning")}
-				</p>
+		<section>
+			<p
+				className="font-mono text-[10px] font-medium uppercase tracking-[0.13em] sm:text-[11px]"
+				style={{ color: theme.accent }}
+			>
+				{t("about.work.kicker")}
+			</p>
+			<h3
+				className="mt-3 text-[clamp(2rem,5vw,3.5rem)] font-semibold leading-[1.08] tracking-[-0.035em]"
+				style={{ color: theme.text }}
+			>
+				{experience.role}
+			</h3>
+			<p
+				className="mt-6 max-w-2xl text-[15px] leading-[1.85] sm:text-base"
+				style={{ color: theme.textSec }}
+			>
+				{t("about.work.positioning")}
+			</p>
 
-				<div
-					ref={tabListRef}
-					role="tablist"
-					aria-label={t("about.work.quickView")}
-					aria-orientation="horizontal"
-					className="relative mt-11 grid grid-cols-2 border-b"
-					style={{ borderColor: theme.border }}
-				>
-					{workSectionOrder.map((sectionId) => {
-						const active = sectionId === activeSection;
-						return (
-							<button
-								key={sectionId}
-								id={`work-tab-${sectionId}`}
-								type="button"
-								role="tab"
-								aria-selected={active}
-								aria-controls={`work-panel-${sectionId}`}
-								tabIndex={active ? 0 : -1}
-								onPointerEnter={(event) => {
-									if (event.pointerType !== "touch")
-										setActiveSection(sectionId);
-								}}
-								onFocus={() => setActiveSection(sectionId)}
-								onClick={() => setActiveSection(sectionId)}
-								onKeyDown={(event) => handleSectionKeyDown(event, sectionId)}
-								className="relative flex w-full min-w-0 cursor-pointer items-center justify-center whitespace-nowrap rounded-[2px] px-1 pt-1 pb-4 text-[13px] font-medium outline-none transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 motion-reduce:transition-none sm:text-[15px]"
-								style={{
-									color: active ? theme.text : theme.textSec,
-									outlineColor: theme.accent,
+			<div
+				ref={tabListRef}
+				role="tablist"
+				aria-label={t("about.work.quickView")}
+				aria-orientation="horizontal"
+				className="relative mt-11 grid grid-cols-2 border-b"
+				style={{ borderColor: theme.border }}
+			>
+				{workSectionOrder.map((sectionId) => {
+					const active = sectionId === activeSection;
+					return (
+						<button
+							key={sectionId}
+							id={`work-tab-${sectionId}`}
+							type="button"
+							role="tab"
+							aria-selected={active}
+							aria-controls={`work-panel-${sectionId}`}
+							tabIndex={active ? 0 : -1}
+							onPointerEnter={(event) => {
+								if (event.pointerType !== "touch")
+									onActiveSectionChange(sectionId);
+							}}
+							onFocus={() => onActiveSectionChange(sectionId)}
+							onClick={() => onActiveSectionChange(sectionId)}
+							onKeyDown={(event) => handleSectionKeyDown(event, sectionId)}
+							className="relative flex w-full min-w-0 cursor-pointer items-center justify-center whitespace-nowrap rounded-[2px] px-1 pt-1 pb-4 text-[13px] font-medium outline-none transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 motion-reduce:transition-none sm:text-[15px]"
+							style={{
+								color: active ? theme.text : theme.textSec,
+								outlineColor: theme.accent,
+							}}
+						>
+							<span
+								ref={(node) => {
+									tabLabelRefs.current[sectionId] = node;
 								}}
 							>
-								<span
-									ref={(node) => {
-										tabLabelRefs.current[sectionId] = node;
-									}}
-								>
-									{sectionLabels[sectionId]}
-								</span>
-							</button>
-						);
-					})}
+								{sectionLabels[sectionId]}
+							</span>
+						</button>
+					);
+				})}
+				{tabIndicator.ready && (
 					<span
 						aria-hidden="true"
-						className="pointer-events-none absolute -bottom-px h-[2px] transition-[left,width,opacity] duration-[280ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] motion-reduce:transition-none"
+						className="pointer-events-none absolute -bottom-px h-[2px] transition-[left,width] duration-[280ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] motion-reduce:transition-none"
 						style={{
 							left: tabIndicator.left,
 							width: tabIndicator.width,
-							opacity: tabIndicator.ready ? 1 : 0,
 							backgroundColor: theme.accent,
 						}}
 					/>
-				</div>
+				)}
+			</div>
 
-				<div aria-live="polite" className="mt-9 grid">
-					{workSectionOrder.map((sectionId) => {
-						const active = sectionId === activeSection;
-						return (
-							<section
-								key={sectionId}
-								id={`work-panel-${sectionId}`}
-								role="tabpanel"
-								aria-labelledby={`work-tab-${sectionId}`}
-								aria-hidden={!active}
-								className={`col-start-1 row-start-1 transition-[opacity,transform] duration-200 ease-out motion-reduce:translate-y-0 motion-reduce:transition-none ${
-									active
-										? "translate-y-0 opacity-100"
-										: "translate-y-1.5 opacity-0"
-								}`}
-								style={{
-									pointerEvents: active ? "auto" : "none",
-									zIndex: active ? 1 : 0,
-								}}
-							>
-								{sectionId === "experience" && (
-									<div>
-										<article className="pb-2">
-											<div className="grid gap-5 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-8">
-												<div>
-													<p
-														className="font-mono text-[11px] leading-5"
-														style={{ color: theme.accent }}
-													>
-														{experience.period}
-													</p>
-													<p
-														className="mt-1.5 text-xs leading-5"
-														style={{ color: theme.textSec }}
-													>
-														{experience.company}
-													</p>
-												</div>
-												<div>
-													<h5
-														className="text-lg font-semibold leading-6"
-														style={{ color: theme.text }}
-													>
-														{experience.role}
-													</h5>
-													<p
-														className="mt-6 border-y py-5 text-sm leading-[1.8]"
-														style={{
-															color: theme.textSec,
-															borderColor: theme.borderLight,
-														}}
-													>
-														{experience.summary}
-													</p>
-												</div>
-											</div>
-										</article>
-										<div className="mt-4 flex max-w-2xl items-start gap-3">
-											<span
-												aria-hidden="true"
-												className="mt-[0.6rem] h-px w-6 shrink-0"
-												style={{ backgroundColor: theme.accent }}
-											/>
-											<p
-												className="text-[11px] leading-[1.7]"
-												style={{ color: theme.textSec }}
-											>
-												{t("about.work.scopeNote")}
-											</p>
-										</div>
-									</div>
-								)}
-
-								{sectionId === "skills" && (
-									<div>
-										{skills.map((category) => (
-											<div
-												key={category.label}
-												className="grid gap-3 py-5 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-8"
-												style={{
-													borderBottom: `1px solid ${theme.border}`,
-												}}
-											>
+			<div aria-live="polite" className="mt-9 grid">
+				{workSectionOrder.map((sectionId) => {
+					const active = sectionId === activeSection;
+					return (
+						<section
+							key={sectionId}
+							id={`work-panel-${sectionId}`}
+							role="tabpanel"
+							aria-labelledby={`work-tab-${sectionId}`}
+							aria-hidden={!active}
+							className={`col-start-1 row-start-1 transition-[opacity,transform] duration-200 ease-out motion-reduce:translate-y-0 motion-reduce:transition-none ${
+								active
+									? "translate-y-0 opacity-100"
+									: "translate-y-1.5 opacity-0"
+							}`}
+							style={{
+								pointerEvents: active ? "auto" : "none",
+								zIndex: active ? 1 : 0,
+							}}
+						>
+							{sectionId === "experience" && (
+								<div>
+									<article className="pb-2">
+										<div className="grid gap-5 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-8">
+											<div>
 												<p
-													className="text-[11px] font-medium uppercase tracking-[0.08em]"
+													className="font-mono text-[11px] leading-5"
 													style={{ color: theme.accent }}
 												>
-													{category.label}
+													{experience.period}
 												</p>
-												<div className="flex flex-wrap gap-x-5 gap-y-2">
-													{category.items.map((item) => (
-														<span
-															key={item}
-															className="text-sm font-medium leading-5"
-															style={{ color: theme.text }}
-														>
-															{item}
-														</span>
-													))}
-												</div>
+												<p
+													className="mt-1.5 text-xs leading-5"
+													style={{ color: theme.textSec }}
+												>
+													{experience.company}
+												</p>
 											</div>
-										))}
+											<div>
+												<h4
+													className="text-lg font-semibold leading-6"
+													style={{ color: theme.text }}
+												>
+													{experience.role}
+												</h4>
+												<p
+													className="mt-6 border-y py-5 text-sm leading-[1.8]"
+													style={{
+														color: theme.textSec,
+														borderColor: theme.borderLight,
+													}}
+												>
+													{experience.summary}
+												</p>
+											</div>
+										</div>
+									</article>
+									<div className="mt-4 flex max-w-2xl items-start gap-3">
+										<span
+											aria-hidden="true"
+											className="mt-[0.6rem] h-px w-6 shrink-0"
+											style={{ backgroundColor: theme.accent }}
+										/>
+										<p
+											className="text-[11px] leading-[1.7]"
+											style={{ color: theme.textSec }}
+										>
+											{t("about.work.scopeNote")}
+										</p>
 									</div>
-								)}
-							</section>
-						);
-					})}
-				</div>
+								</div>
+							)}
+
+							{sectionId === "skills" && (
+								<div>
+									{skills.map((category) => (
+										<div
+											key={category.label}
+											className="grid gap-3 py-5 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-8"
+											style={{
+												borderBottom: `1px solid ${theme.border}`,
+											}}
+										>
+											<p
+												className="text-[11px] font-medium uppercase tracking-[0.08em]"
+												style={{ color: theme.accent }}
+											>
+												{category.label}
+											</p>
+											<div className="flex flex-wrap gap-x-5 gap-y-2">
+												{category.items.map((item) => (
+													<span
+														key={item}
+														className="text-sm font-medium leading-5"
+														style={{ color: theme.text }}
+													>
+														{item}
+													</span>
+												))}
+											</div>
+										</div>
+									))}
+								</div>
+							)}
+						</section>
+					);
+				})}
 			</div>
 		</section>
 	);
@@ -770,10 +769,14 @@ export default function AboutPage({
 	theme,
 	onNavigate,
 	aboutView,
+	workSection,
+	onWorkSectionChange,
 }: {
 	theme: Theme;
 	onNavigate: (s: Section, sub?: AboutView) => void;
 	aboutView?: AboutView;
+	workSection: WorkSectionId;
+	onWorkSectionChange: (section: WorkSectionId) => void;
 }) {
 	const { t } = useI18n();
 	const view = aboutView ?? "work";
@@ -871,7 +874,14 @@ export default function AboutPage({
 			/>
 			<AboutFaceTransition
 				view={view}
-				front={<EditorialWorkProfile theme={theme} skills={skills} />}
+				front={
+					<EditorialWorkProfile
+						theme={theme}
+						skills={skills}
+						activeSection={workSection}
+						onActiveSectionChange={onWorkSectionChange}
+					/>
+				}
 				back={
 					<PersonalProfile
 						theme={theme}

@@ -61,6 +61,9 @@ function SmileyAvatar({
 		const gazeQuery = window.matchMedia(
 			"(min-width: 768px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)",
 		);
+		const motionQuery = window.matchMedia(
+			"(prefers-reduced-motion: no-preference)",
+		);
 		let centerX = 0;
 		let centerY = 0;
 		let currentX = 0;
@@ -70,6 +73,7 @@ function SmileyAvatar({
 		let frameId: number | null = null;
 		let blinkTimer: number | null = null;
 		let tracking = false;
+		let blinking = false;
 
 		const updateCenter = () => {
 			const bounds = face.getBoundingClientRect();
@@ -138,6 +142,22 @@ function SmileyAvatar({
 			scheduleBlink();
 		};
 
+		const startBlinking = () => {
+			if (blinking) return;
+			blinking = true;
+			eyeShape.addEventListener("animationend", handleBlinkEnd);
+			scheduleBlink();
+		};
+
+		const stopBlinking = () => {
+			if (!blinking) return;
+			blinking = false;
+			eyeShape.removeEventListener("animationend", handleBlinkEnd);
+			if (blinkTimer !== null) window.clearTimeout(blinkTimer);
+			blinkTimer = null;
+			eyeShape.classList.remove("home-avatar-eyes-blinking");
+		};
+
 		const startTracking = () => {
 			if (tracking) return;
 			tracking = true;
@@ -147,8 +167,6 @@ function SmileyAvatar({
 			window.addEventListener("resize", updateCenter);
 			window.addEventListener("scroll", updateCenter, { passive: true });
 			window.addEventListener("blur", returnToCenter);
-			eyeShape.addEventListener("animationend", handleBlinkEnd);
-			scheduleBlink();
 		};
 
 		const stopTracking = () => {
@@ -159,17 +177,13 @@ function SmileyAvatar({
 			window.removeEventListener("resize", updateCenter);
 			window.removeEventListener("scroll", updateCenter);
 			window.removeEventListener("blur", returnToCenter);
-			eyeShape.removeEventListener("animationend", handleBlinkEnd);
-			if (blinkTimer !== null) window.clearTimeout(blinkTimer);
 			if (frameId !== null) window.cancelAnimationFrame(frameId);
-			blinkTimer = null;
 			frameId = null;
 			currentX = 0;
 			currentY = 0;
 			targetX = 0;
 			targetY = 0;
 			eyes.style.transform = "translate3d(0, 0, 0)";
-			eyeShape.classList.remove("home-avatar-eyes-blinking");
 		};
 
 		const syncTracking = () => {
@@ -177,12 +191,21 @@ function SmileyAvatar({
 			else stopTracking();
 		};
 
+		const syncBlinking = () => {
+			if (motionQuery.matches) startBlinking();
+			else stopBlinking();
+		};
+
 		gazeQuery.addEventListener("change", syncTracking);
+		motionQuery.addEventListener("change", syncBlinking);
 		syncTracking();
+		syncBlinking();
 
 		return () => {
 			gazeQuery.removeEventListener("change", syncTracking);
+			motionQuery.removeEventListener("change", syncBlinking);
 			stopTracking();
+			stopBlinking();
 		};
 	}, []);
 
@@ -191,7 +214,7 @@ function SmileyAvatar({
 	return (
 		<div
 			ref={faceRef}
-			className="relative h-[280px] w-[280px] pointer-events-none transition-opacity duration-300 lg:h-[400px] lg:w-[400px]"
+			className="pointer-events-none relative h-56 w-56 transition-opacity duration-300 sm:h-64 sm:w-64 md:h-[280px] md:w-[280px] lg:h-[400px] lg:w-[400px]"
 			style={{
 				transform: "rotate(6deg)",
 				opacity,
@@ -236,8 +259,8 @@ export default function HomePage({
 	return (
 		<div className="relative flex min-h-[calc(100svh-4rem)] flex-col justify-center overflow-hidden py-24 md:min-h-[calc(100svh-5rem)] md:py-20">
 			<div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 w-full relative z-10">
-				<div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(0,25rem)_16rem] md:justify-center md:gap-0 lg:grid-cols-[minmax(0,32rem)_25rem]">
-					<div className="motion-safe:[animation:fade-up_350ms_ease-out_both]">
+				<div className="relative isolate grid grid-cols-1 items-center md:grid-cols-[minmax(0,25rem)_16rem] md:justify-center lg:grid-cols-[minmax(0,32rem)_25rem]">
+					<div className="relative z-10 motion-safe:[animation:fade-up_350ms_ease-out_both]">
 						<p
 							className="text-[13px] font-semibold tracking-[0.13em]"
 							style={{ color: homeColors.accentInk }}
@@ -299,7 +322,7 @@ export default function HomePage({
 						</div>
 					</div>
 
-					<div className="hidden items-center justify-center pt-6 motion-safe:[animation:fade-in_450ms_ease-out_80ms_both] md:-ml-6 md:flex lg:-ml-12 lg:pt-8">
+					<div className="absolute right-2 top-8 z-0 flex items-center justify-center motion-safe:[animation:fade-in_450ms_ease-out_80ms_both] sm:right-[8%] sm:top-6 md:static md:z-auto md:-ml-6 md:pt-6 lg:-ml-12 lg:pt-8">
 						<SmileyAvatar
 							accent={theme.accent}
 							opacity={homeColors.markOpacity}

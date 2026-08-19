@@ -831,39 +831,6 @@ export interface ThemeColors {
 	borderLight?: string;
 }
 
-function normalizeDocumentTitle(value: string): string {
-	return value
-		.normalize("NFKC")
-		.replace(/<[^>]*>/g, "")
-		.replace(/[`*_~[\]()]/g, "")
-		.replace(/[^\p{L}\p{N}]+/gu, "")
-		.toLocaleLowerCase();
-}
-
-function withoutDuplicateLeadingTitle(content: string, title: string): string {
-	const heading = /^\uFEFF?\s*#\s+([^\r\n]+)\r?\n?/.exec(content);
-	if (!heading) return content;
-
-	const headingText = heading[1].replace(/\s+#+\s*$/, "").trim();
-	if (normalizeDocumentTitle(headingText) !== normalizeDocumentTitle(title)) {
-		return content;
-	}
-
-	return content.slice(heading[0].length).replace(/^\s*\r?\n/, "");
-}
-
-function headingId(value: string): string | undefined {
-	const slug = value
-		.normalize("NFKC")
-		.trim()
-		.toLocaleLowerCase()
-		.replace(/<[^>]*>/g, "")
-		.replace(/[^\p{L}\p{N}\s_-]/gu, "")
-		.replace(/\s+/g, "-")
-		.replace(/-+/g, "-");
-	return slug || undefined;
-}
-
 function markdownThemeVariables(
 	theme: ThemeColors,
 	dark: boolean,
@@ -901,16 +868,12 @@ function markdownThemeVariables(
 }
 
 export function MarkdownPreview({
-	title,
-	date,
 	content,
 	theme,
 	isDark,
 	resolveNoteHref,
 	onNoteOpen,
 }: {
-	title: string;
-	date?: string;
 	content: string;
 	theme: ThemeColors;
 	isDark?: boolean;
@@ -921,10 +884,6 @@ export function MarkdownPreview({
 	const components = useMemo(
 		() => makeComponents(dark, theme, { resolveNoteHref, onNoteOpen }),
 		[dark, theme, resolveNoteHref, onNoteOpen],
-	);
-	const renderedContent = useMemo(
-		() => withoutDuplicateLeadingTitle(content, title),
-		[content, title],
 	);
 
 	const proseThemeMap: Record<string, string> = {
@@ -947,29 +906,6 @@ export function MarkdownPreview({
 
 	return (
 		<article className="w-full">
-			<header
-				className="mb-10 max-w-[65ch] pb-6"
-				style={{
-					borderBottom: `1px solid ${theme.borderLight ?? `${theme.accent}1A`}`,
-				}}
-			>
-				<h1
-					id={headingId(title)}
-					className="scroll-mt-24 text-xl font-bold tracking-tight mb-2"
-					style={{ color: theme.text }}
-				>
-					{title}
-				</h1>
-				{date && (
-					<time
-						dateTime={date}
-						className="text-xs font-mono"
-						style={{ color: theme.textSec ?? theme.accent, opacity: 0.55 }}
-					>
-						{date}
-					</time>
-				)}
-			</header>
 			<div
 				className={`markdown-prose w-full max-w-none prose prose-${proseTheme}${dark ? " dark" : ""}`}
 				style={markdownStyle}
@@ -979,7 +915,7 @@ export function MarkdownPreview({
 					rehypePlugins={REHYPE_PLUGINS}
 					components={components}
 				>
-					{renderedContent}
+					{content}
 				</ReactMarkdown>
 			</div>
 		</article>

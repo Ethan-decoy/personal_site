@@ -835,8 +835,6 @@ export default function NotesPage({
 							>
 								<div data-note-content>
 									<MarkdownPreview
-										title={selectedNote.title}
-										date={selectedNote.date}
 										content={selectedNote.content}
 										theme={theme}
 										isDark={mode === "dark"}

@@ -15,8 +15,6 @@ try {
 	const title = "Markdown renderer fixture";
 	const html = renderToStaticMarkup(
 		React.createElement(MarkdownPreview, {
-			title,
-			date: "2026-08-17",
 			content: [
 				`# ${title}`,
 				"",
@@ -45,8 +43,8 @@ try {
 
 	const checks = [
 		{
-			name: "document metadata is rendered by the Markdown module",
-			pass: /<time[^>]*datetime="2026-08-17"[^>]*>/i.test(html),
+			name: "the Markdown module does not synthesize a metadata header",
+			pass: !html.includes("<header") && !html.includes("<time"),
 		},
 		{
 			name: "the canonical document title is rendered exactly once",

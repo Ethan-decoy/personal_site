@@ -8,8 +8,17 @@ import {
 } from "react";
 import { useI18n } from "../i18n";
 import type { Section, Theme } from "../themes";
+import PersonalLifePrototype from "./about-personal-prototype";
 
 type AboutView = "personal" | "work";
+
+type AboutTransitionPhase = "idle" | "exiting" | "entering";
+
+// 转场原型：验证“原位收笔、冷暖换色、内容显影”能否统一工作与生活两种气质。
+const ABOUT_EXIT_DURATION = 90;
+const ABOUT_PERSONAL_ENTRY_DURATION = 230;
+const ABOUT_WORK_ENTRY_DURATION = 190;
+const ABOUT_THEME_SETTLE_DURATION = 300;
 
 type FavoriteItem = {
 	label: string;
@@ -345,10 +354,12 @@ function AboutViewHeader({
 	view,
 	theme,
 	onSwitch,
+	isSwitching,
 }: {
 	view: AboutView;
 	theme: Theme;
 	onSwitch: () => void;
+	isSwitching: boolean;
 }) {
 	const { t } = useI18n();
 	const [inkVisible, setInkVisible] = useState(false);
@@ -378,19 +389,19 @@ function AboutViewHeader({
 	return (
 		<header className="mb-12 flex items-center gap-4">
 			<h2
-				className="shrink-0 text-2xl font-bold tracking-tight"
+				className="shrink-0 text-2xl font-bold tracking-tight motion-safe:transition-colors motion-safe:duration-300 motion-safe:ease-out"
 				style={{ color: theme.text }}
 			>
 				{t("about.title")}
 			</h2>
 			<div
 				aria-hidden="true"
-				className="h-px min-w-4 flex-1"
+				className="h-px min-w-4 flex-1 motion-safe:transition-colors motion-safe:duration-300 motion-safe:ease-out"
 				style={{ backgroundColor: theme.borderLight }}
 			/>
 			<div className="flex shrink-0 items-center gap-3">
 				<span
-					className="text-xs font-medium tracking-[0.04em]"
+					className="text-xs font-medium tracking-[0.04em] motion-safe:transition-colors motion-safe:duration-300 motion-safe:ease-out"
 					style={{ color: theme.textSec }}
 					aria-live="polite"
 				>
@@ -399,13 +410,16 @@ function AboutViewHeader({
 				<button
 					type="button"
 					onClick={onSwitch}
+					disabled={isSwitching}
 					onPointerEnter={(event) => {
 						if (event.pointerType === "touch") return;
 						setInkVisible(true);
 					}}
 					onPointerLeave={() => setInkVisible(false)}
 					onPointerCancel={() => setInkVisible(false)}
-					className="relative isolate flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full outline-none focus-visible:outline-2 focus-visible:outline-offset-4"
+					className={`relative isolate flex h-10 w-10 items-center justify-center overflow-hidden rounded-full outline-none motion-safe:transition-colors motion-safe:duration-300 motion-safe:ease-out focus-visible:outline-2 focus-visible:outline-offset-4 ${
+						isSwitching ? "cursor-default" : "cursor-pointer"
+					}`}
 					style={{
 						color: theme.accent,
 						backgroundColor: theme.bg,
@@ -418,14 +432,20 @@ function AboutViewHeader({
 					</span>
 					<span
 						aria-hidden="true"
-						className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-full transition-[clip-path] duration-[420ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] motion-reduce:transition-none"
+						className="pointer-events-none absolute inset-0 z-10 overflow-hidden rounded-full transition-[clip-path] duration-[420ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] motion-reduce:transition-none"
 						style={{
-							backgroundColor: theme.accent,
-							color: theme.bg,
 							clipPath: `circle(${inkVisible ? "160%" : "0"} at center)`,
 						}}
 					>
-						{switchIcon}
+						<span
+							className="flex h-full w-full items-center justify-center rounded-full motion-safe:transition-colors motion-safe:duration-300 motion-safe:ease-out"
+							style={{
+								backgroundColor: theme.accent,
+								color: theme.bg,
+							}}
+						>
+							{switchIcon}
+						</span>
 					</span>
 				</button>
 			</div>
@@ -437,45 +457,41 @@ function AboutFaceTransition({
 	view,
 	front,
 	back,
+	phase,
+	isSwitching,
 }: {
 	view: AboutView;
 	front: ReactNode;
 	back: ReactNode;
+	phase: AboutTransitionPhase;
+	isSwitching: boolean;
 }) {
-	const planeRef = useRef<HTMLDivElement>(null);
-
-	useEffect(() => {
-		const plane = planeRef.current;
-		if (!plane || window.matchMedia("(prefers-reduced-motion: reduce)").matches)
-			return;
-
-		const enteringWork = view === "work";
-		const initialFrame = enteringWork
-			? {
-					opacity: 0.42,
-					transform: "scale(0.997)",
-				}
-			: {
-					opacity: 0.28,
-					transform:
-						"perspective(1400px) rotateY(-6deg) translateX(6px) scale(0.995)",
-				};
-		const animation = plane.animate(
-			[initialFrame, { opacity: 1, transform: "none" }],
-			{
-				duration: enteringWork ? 200 : 340,
-				easing: "cubic-bezier(0.22, 0.61, 0.36, 1)",
-			},
-		);
-		animation.onfinish = () => animation.cancel();
-		return () => animation.cancel();
-	}, [view]);
+	const entryDuration =
+		view === "personal"
+			? ABOUT_PERSONAL_ENTRY_DURATION
+			: ABOUT_WORK_ENTRY_DURATION;
+	const isVisible = phase === "idle";
 
 	return (
 		<div
-			ref={planeRef}
+			aria-busy={isSwitching}
+			data-about-transition={phase}
+			data-about-view={view}
 			style={{
-				transformOrigin: view === "personal" ? "left center" : "center top",
+				opacity: isVisible ? 1 : 0,
+				pointerEvents: isSwitching ? "none" : undefined,
+				transitionDuration:
+					phase === "exiting"
+						? `${ABOUT_EXIT_DURATION}ms`
+						: phase === "entering"
+							? "0ms"
+							: `${entryDuration}ms`,
+				transitionProperty: "opacity",
+				transitionTimingFunction:
+					phase === "exiting"
+						? "cubic-bezier(0.4, 0, 1, 1)"
+						: "cubic-bezier(0.22, 0.61, 0.36, 1)",
+				willChange: isSwitching ? "opacity" : "auto",
 			}}
 		>
 			{view === "work" ? front : back}
@@ -780,6 +796,71 @@ export default function AboutPage({
 }) {
 	const { t } = useI18n();
 	const view = aboutView ?? "work";
+	const [transitionPhase, setTransitionPhase] =
+		useState<AboutTransitionPhase>("idle");
+	const [isViewSwitching, setIsViewSwitching] = useState(false);
+	const switchInFlightRef = useRef(false);
+	const pendingViewRef = useRef<AboutView | null>(null);
+	const switchTimerRef = useRef<number | null>(null);
+	const finishTimerRef = useRef<number | null>(null);
+	const entryFrameRef = useRef<number | null>(null);
+
+	useEffect(
+		() => () => {
+			if (switchTimerRef.current !== null)
+				window.clearTimeout(switchTimerRef.current);
+			if (finishTimerRef.current !== null)
+				window.clearTimeout(finishTimerRef.current);
+			if (entryFrameRef.current !== null)
+				window.cancelAnimationFrame(entryFrameRef.current);
+			switchInFlightRef.current = false;
+			pendingViewRef.current = null;
+		},
+		[],
+	);
+
+	useLayoutEffect(() => {
+		if (pendingViewRef.current !== view) return;
+
+		setTransitionPhase("entering");
+		entryFrameRef.current = window.requestAnimationFrame(() => {
+			entryFrameRef.current = null;
+			setTransitionPhase("idle");
+
+			const entryDuration =
+				view === "personal"
+					? ABOUT_PERSONAL_ENTRY_DURATION
+					: ABOUT_WORK_ENTRY_DURATION;
+			finishTimerRef.current = window.setTimeout(
+				() => {
+					finishTimerRef.current = null;
+					pendingViewRef.current = null;
+					switchInFlightRef.current = false;
+					setIsViewSwitching(false);
+				},
+				Math.max(entryDuration, ABOUT_THEME_SETTLE_DURATION),
+			);
+		});
+	}, [view]);
+
+	const switchAboutView = () => {
+		if (switchInFlightRef.current) return;
+
+		const nextView = view === "work" ? "personal" : "work";
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+			onNavigate("about", nextView);
+			return;
+		}
+
+		switchInFlightRef.current = true;
+		pendingViewRef.current = nextView;
+		setIsViewSwitching(true);
+		setTransitionPhase("exiting");
+		switchTimerRef.current = window.setTimeout(() => {
+			switchTimerRef.current = null;
+			onNavigate("about", nextView);
+		}, ABOUT_EXIT_DURATION);
+	};
 	const principleGroups = [
 		{
 			title: t("about.personal.group.together"),
@@ -862,18 +943,34 @@ export default function AboutPage({
 			],
 		},
 	];
+	const personalLayoutProps: PersonalLayoutProps = {
+		theme,
+		lifeCards,
+		quickStats,
+		principleGroups,
+		valuesTitle: t("about.personal.values.title"),
+		lifeLabel: t("about.life"),
+		inspirationAlt: t("about.personal.inspiration.alt"),
+		inspirationCaption: t("about.personal.inspiration.caption"),
+		favoritesTitle: t("about.favorites"),
+		moviesTitle: t("about.favorites.movies"),
+		musicTitle: t("about.favorites.music"),
+		movie: favoriteMovie,
+		song: favoriteSong,
+	};
 
 	return (
 		<div className="max-w-5xl mx-auto px-4 pt-16 pb-10 sm:px-6 sm:pt-24 sm:pb-12 md:px-8 md:pt-32 md:pb-12">
 			<AboutViewHeader
 				view={view}
 				theme={theme}
-				onSwitch={() =>
-					onNavigate("about", view === "work" ? "personal" : "work")
-				}
+				onSwitch={switchAboutView}
+				isSwitching={isViewSwitching}
 			/>
 			<AboutFaceTransition
 				view={view}
+				phase={transitionPhase}
+				isSwitching={isViewSwitching}
 				front={
 					<EditorialWorkProfile
 						theme={theme}
@@ -883,21 +980,11 @@ export default function AboutPage({
 					/>
 				}
 				back={
-					<PersonalProfile
-						theme={theme}
-						lifeCards={lifeCards}
-						quickStats={quickStats}
-						principleGroups={principleGroups}
-						valuesTitle={t("about.personal.values.title")}
-						lifeLabel={t("about.life")}
-						inspirationAlt={t("about.personal.inspiration.alt")}
-						inspirationCaption={t("about.personal.inspiration.caption")}
-						favoritesTitle={t("about.favorites")}
-						moviesTitle={t("about.favorites.movies")}
-						musicTitle={t("about.favorites.music")}
-						movie={favoriteMovie}
-						song={favoriteSong}
-					/>
+					import.meta.env.DEV ? (
+						<PersonalLifePrototype {...personalLayoutProps} />
+					) : (
+						<PersonalProfile {...personalLayoutProps} />
+					)
 				}
 			/>
 		</div>

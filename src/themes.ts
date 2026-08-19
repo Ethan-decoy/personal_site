@@ -150,23 +150,32 @@ export function getTheme(key: ThemeKey, mode: ThemeMode = "light"): Theme {
 	return themes[key][mode];
 }
 
-const aboutPersonalSurface: Record<
-	ThemeMode,
-	Pick<Theme, "bg" | "bgDeep" | "bgCard" | "border" | "borderLight">
-> = {
+const aboutPersonalTheme: Record<ThemeMode, Theme> = {
 	light: {
-		bg: "#F8F3EA",
-		bgDeep: "#F0E9DF",
-		bgCard: "#F4EEE5",
-		border: "rgba(71, 56, 43, 0.12)",
-		borderLight: "rgba(71, 56, 43, 0.07)",
+		name: "暖灰生活纸",
+		bg: "#F7F1E8",
+		bgDeep: "#EEE4D8",
+		bgCard: "#F3EBE1",
+		text: "#2A2521",
+		textSec: "#6D625A",
+		accent: "#915444",
+		accentHover: "#774033",
+		accentLight: "rgba(145, 84, 68, 0.10)",
+		border: "rgba(42, 37, 33, 0.13)",
+		borderLight: "rgba(42, 37, 33, 0.07)",
 	},
 	dark: {
-		bg: "#1A1612",
-		bgDeep: "#211D19",
-		bgCard: "#1B1A17",
-		border: "rgba(226, 218, 207, 0.11)",
-		borderLight: "rgba(226, 218, 207, 0.06)",
+		name: "暮色生活页",
+		bg: "#171412",
+		bgDeep: "#211B18",
+		bgCard: "#1D1916",
+		text: "#ECE3D8",
+		textSec: "#A99A8E",
+		accent: "#D08A72",
+		accentHover: "#E0A18D",
+		accentLight: "rgba(208, 138, 114, 0.12)",
+		border: "rgba(236, 227, 216, 0.12)",
+		borderLight: "rgba(236, 227, 216, 0.06)",
 	},
 };
 
@@ -204,6 +213,5 @@ export function getAboutTheme(
 	mode: ThemeMode = "light",
 ): Theme {
 	if (view === "work") return aboutWorkTheme[mode];
-	const theme = getTheme("sage", mode);
-	return { ...theme, ...aboutPersonalSurface[mode] };
+	return aboutPersonalTheme[mode];
 }

@@ -260,7 +260,7 @@ export default function HomePage({
 		<div className="relative flex min-h-[calc(100svh-4rem)] flex-col justify-center overflow-hidden py-24 md:min-h-[calc(100svh-5rem)] md:py-20">
 			<div className="home-hero-frame relative z-10 mx-auto w-full">
 				<div className="home-hero-composition">
-					<div className="home-hero-copy motion-safe:[animation:fade-up_350ms_ease-out_both]">
+					<div className="home-hero-copy motion-safe:[animation:fade-in_280ms_ease-out_both]">
 						<p
 							className="text-[13px] font-semibold tracking-[0.13em]"
 							style={{ color: homeColors.accentInk }}
@@ -322,7 +322,7 @@ export default function HomePage({
 						</div>
 					</div>
 
-					<div className="home-avatar-stage motion-safe:[animation:fade-in_450ms_ease-out_80ms_both]">
+					<div className="home-avatar-stage motion-safe:[animation:fade-in_360ms_ease-out_40ms_both]">
 						<SmileyAvatar
 							accent={theme.accent}
 							opacity={homeColors.markOpacity}

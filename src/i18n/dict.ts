@@ -38,6 +38,13 @@ export const dict = {
 	"about.title": { zh: "关于", en: "About" },
 
 	// About - personal
+	"about.personal.index": { zh: "生活索引", en: "Life index" },
+	"about.personal.tab.beliefs": { zh: "相信", en: "Beliefs" },
+	"about.personal.tab.doing": { zh: "做", en: "Doing" },
+	"about.personal.tab.playing": { zh: "玩", en: "Playing" },
+	"about.personal.tab.watching": { zh: "看", en: "Watching" },
+	"about.personal.tab.listening": { zh: "听", en: "Listening" },
+	"about.personal.back": { zh: "返回", en: "Back" },
 	"about.personal.principle.commonGoal": {
 		zh: "我们可以完全不同，但必须真正朝着共同目标前进。",
 		en: "We can be completely different, but we must genuinely move toward a shared goal.",
@@ -70,10 +77,6 @@ export const dict = {
 		zh: "暂时停下，不等于放弃方向。",
 		en: "A temporary pause is not the same as abandoning the path forward.",
 	},
-	"about.personal.values.title": {
-		zh: "个人价值观",
-		en: "Personal values",
-	},
 	"about.personal.group.together": {
 		zh: "与人同行",
 		en: "Working with others",
@@ -86,15 +89,10 @@ export const dict = {
 		zh: "边界与成长",
 		en: "Limits & growth",
 	},
-	"about.personal.inspiration.alt": {
-		zh: "钱学森与袁隆平的线描画",
-		en: "Line-art portrait of Qian Xuesen and Yuan Longping",
-	},
 	"about.personal.inspiration.caption": {
 		zh: "为人民服务",
 		en: "为人民服务",
 	},
-	"about.favorites": { zh: "喜欢", en: "Favorites" },
 	"about.favorites.movies": { zh: "电影", en: "Films" },
 	"about.favorites.music": { zh: "音乐", en: "Music" },
 	"about.favorites.movie.pursuit": {
@@ -126,11 +124,6 @@ export const dict = {
 		zh: "愿意改变，就是好事。",
 		en: "Being willing to change is a good thing.",
 	},
-	"about.life.racing": { zh: "模拟竞速", en: "Sim racing" },
-	"about.life.racing.d": {
-		zh: "更好的走线，更快的入弯。",
-		en: "Better racing lines, faster corner entries.",
-	},
 	"about.life.personalDev": { zh: "个人开发", en: "Personal projects" },
 	"about.life.personalDev.d": {
 		zh: "把零散的想法做成可以运行、可以持续改进的东西。",
@@ -141,18 +134,6 @@ export const dict = {
 		zh: "散步是整理思绪的最佳方式。",
 		en: "Walking is the best way to sort out thoughts.",
 	},
-
-	"about.location": { zh: "位置", en: "Location" },
-	"about.location.v": { zh: "中国大陆", en: "Mainland China" },
-	"about.language": { zh: "语言", en: "Language" },
-	"about.language.v": {
-		zh: "中文（母语），English（B1）",
-		en: "Chinese (native), English (B1)",
-	},
-
-	"about.current": { zh: "当前", en: "Currently" },
-	"about.current.v": SHARED.currentFocus,
-
 	// About - work
 	"about.bio": { zh: "简介", en: "Bio" },
 	"about.bio.p1": {

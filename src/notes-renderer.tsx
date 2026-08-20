@@ -84,56 +84,60 @@ hljs.registerLanguage("cmake", (hljs) => ({
 /* ---- Code highlighter themes ---- */
 const HLJS_THEMES = {
 	light: {
-		bg: "#F5F0EB",
-		text: "#2D2A24",
-		comment: "#8C8378",
-		keyword: "#8B5A7C",
-		string: "#5B7A3A",
-		number: "#B85A2E",
-		function: "#3A6B8C",
-		class_: "#8C6B3A",
-		type: "#8C6B3A",
-		builtIn: "#A03A5A",
-		variable: "#2D2A24",
-		templateVar: "#A03A5A",
-		attr: "#B85A2E",
-		meta: "#8C8378",
-		metaKeyword: "#8B5A7C",
-		metaString: "#5B7A3A",
-		punctuation: "#6B6358",
-		operator: "#6B6358",
-		bullet: "#3A8C6B",
-		link: "#3A6B8C",
-		deletion: "#A03A5A",
-		addition: "#5B7A3A",
-		border: "rgba(45, 36, 24, 0.12)",
-		langBar: "rgba(45, 36, 24, 0.35)",
+		bg: "#F8FAFC",
+		headerBg: "#D5E1E9",
+		text: "#1F2328",
+		comment: "#4B5560",
+		keyword: "#A31525",
+		string: "#075B1D",
+		number: "#864000",
+		function: "#004C9E",
+		class_: "#6F36B3",
+		type: "#6F36B3",
+		builtIn: "#6F36B3",
+		variable: "#1F2328",
+		templateVar: "#6F36B3",
+		attr: "#864000",
+		meta: "#4B5560",
+		metaKeyword: "#A31525",
+		metaString: "#075B1D",
+		punctuation: "#3F4850",
+		operator: "#3F4850",
+		bullet: "#005A50",
+		link: "#004C9E",
+		deletion: "#A31525",
+		addition: "#075B1D",
+		border: "#718A9B",
+		langBar: "#293E4B",
+		shadow: "none",
 	},
 	dark: {
-		bg: "#1E1E2E",
-		text: "#CDD6F4",
-		comment: "#8A90AA",
-		keyword: "#CBA6F7",
-		string: "#A6E3A1",
-		number: "#FAB387",
-		function: "#89B4FA",
-		class_: "#F9E2AF",
-		type: "#F9E2AF",
-		builtIn: "#F38BA8",
-		variable: "#CDD6F4",
-		templateVar: "#F38BA8",
-		attr: "#FAB387",
-		meta: "#585B70",
-		metaKeyword: "#CBA6F7",
-		metaString: "#A6E3A1",
-		punctuation: "#9399B2",
-		operator: "#9399B2",
-		bullet: "#89DCEB",
-		link: "#89B4FA",
-		deletion: "#F38BA8",
-		addition: "#A6E3A1",
-		border: "rgba(255,255,255,0.06)",
-		langBar: "rgba(255,255,255,0.35)",
+		bg: "#16232D",
+		headerBg: "#0D171F",
+		text: "#F0F6FC",
+		comment: "#A7B1BB",
+		keyword: "#FF8A82",
+		string: "#7EE787",
+		number: "#FFA657",
+		function: "#79C0FF",
+		class_: "#D2A8FF",
+		type: "#D2A8FF",
+		builtIn: "#D2A8FF",
+		variable: "#F0F6FC",
+		templateVar: "#D2A8FF",
+		attr: "#FFA657",
+		meta: "#A7B1BB",
+		metaKeyword: "#FF8A82",
+		metaString: "#7EE787",
+		punctuation: "#C9D1D9",
+		operator: "#C9D1D9",
+		bullet: "#56D4C2",
+		link: "#79C0FF",
+		deletion: "#FF8A82",
+		addition: "#7EE787",
+		border: "#526877",
+		langBar: "#A7B1BB",
+		shadow: "none",
 	},
 };
 
@@ -341,6 +345,183 @@ function InlineCode({ className, children }: CodeElementProps) {
 	);
 }
 
+type CopyStatus = "idle" | "copied" | "error";
+
+function CodeBlockCopyIcon({ status }: { status: CopyStatus }) {
+	if (status === "copied") {
+		return (
+			<svg
+				aria-hidden="true"
+				className="markdown-code-copy-icon"
+				fill="none"
+				focusable="false"
+				viewBox="0 0 24 24"
+			>
+				<path
+					d="m5 12 4 4L19 6"
+					stroke="currentColor"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					strokeWidth="1.8"
+				/>
+			</svg>
+		);
+	}
+
+	if (status === "error") {
+		return (
+			<svg
+				aria-hidden="true"
+				className="markdown-code-copy-icon"
+				fill="none"
+				focusable="false"
+				viewBox="0 0 24 24"
+			>
+				<path
+					d="m7 7 10 10M17 7 7 17"
+					stroke="currentColor"
+					strokeLinecap="round"
+					strokeWidth="1.8"
+				/>
+			</svg>
+		);
+	}
+
+	return (
+		<svg
+			aria-hidden="true"
+			className="markdown-code-copy-icon"
+			fill="none"
+			focusable="false"
+			viewBox="0 0 24 24"
+		>
+			<rect
+				height="13"
+				rx="2"
+				stroke="currentColor"
+				strokeWidth="1.7"
+				width="13"
+				x="8"
+				y="8"
+			/>
+			<path
+				d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"
+				stroke="currentColor"
+				strokeLinecap="round"
+				strokeWidth="1.7"
+			/>
+		</svg>
+	);
+}
+
+async function writeCodeToClipboard(value: string): Promise<void> {
+	if (navigator.clipboard && window.isSecureContext) {
+		try {
+			await navigator.clipboard.writeText(value);
+			return;
+		} catch {
+			// Fall through for browsers that expose Clipboard API but deny access.
+		}
+	}
+
+	const activeElement =
+		document.activeElement instanceof HTMLElement
+			? document.activeElement
+			: null;
+	const textArea = document.createElement("textarea");
+	textArea.value = value;
+	textArea.setAttribute("readonly", "");
+	textArea.style.position = "fixed";
+	textArea.style.left = "-9999px";
+	textArea.style.top = "-9999px";
+	document.body.appendChild(textArea);
+
+	let copied = false;
+	try {
+		textArea.select();
+		textArea.setSelectionRange(0, value.length);
+		copied = document.execCommand("copy");
+	} finally {
+		textArea.remove();
+		activeElement?.focus({ preventScroll: true });
+	}
+
+	if (!copied) throw new Error("Unable to copy code");
+}
+
+function CodeBlockCopyButton({ value }: { value: string }) {
+	const [status, setStatus] = useState<CopyStatus>("idle");
+	const resetTimer = useRef<number | null>(null);
+
+	useEffect(
+		() => () => {
+			if (resetTimer.current !== null) {
+				window.clearTimeout(resetTimer.current);
+			}
+		},
+		[],
+	);
+
+	async function handleCopy() {
+		if (resetTimer.current !== null) {
+			window.clearTimeout(resetTimer.current);
+		}
+
+		try {
+			await writeCodeToClipboard(value);
+			setStatus("copied");
+		} catch {
+			setStatus("error");
+		}
+
+		resetTimer.current = window.setTimeout(() => {
+			setStatus("idle");
+			resetTimer.current = null;
+		}, 1800);
+	}
+
+	return (
+		<>
+			<button
+				aria-label={status === "error" ? "重新复制代码" : "复制代码"}
+				className="markdown-code-copy"
+				data-copy-state={status}
+				onClick={handleCopy}
+				type="button"
+			>
+				<CodeBlockCopyIcon status={status} />
+			</button>
+			<output aria-atomic="true" className="sr-only">
+				{status === "copied"
+					? "代码已复制"
+					: status === "error"
+						? "复制失败，请重试"
+						: ""}
+			</output>
+		</>
+	);
+}
+
+function CodeBlockFrame({
+	value,
+	language,
+	children,
+}: {
+	value: string;
+	language?: string;
+	children: ReactNode;
+}) {
+	return (
+		<figure className="not-prose markdown-code-block syntax-theme-ocean">
+			<figcaption className="markdown-code-toolbar">
+				<span className="markdown-code-language">{language || "text"}</span>
+				<CodeBlockCopyButton value={value} />
+			</figcaption>
+			{children}
+		</figure>
+	);
+}
+
 function findCodeElement(
 	children: ReactNode,
 ): ReactElement<CodeElementProps> | null {
@@ -380,11 +561,11 @@ function MarkdownCodeBlock({
 
 	if (!lang) {
 		return (
-			<figure className="not-prose markdown-code-block hljs-theme-catppuccin">
+			<CodeBlockFrame value={value}>
 				<pre>
 					<code>{value}</code>
 				</pre>
-			</figure>
+			</CodeBlockFrame>
 		);
 	}
 
@@ -413,8 +594,7 @@ function AsyncCodeBlock({
 	const hljsHtml = highlightWithFallback(value, lang);
 
 	return (
-		<figure className="not-prose markdown-code-block hljs-theme-catppuccin">
-			<figcaption className="markdown-code-language">{lang}</figcaption>
+		<CodeBlockFrame language={lang} value={value}>
 			<pre>
 				<code
 					className={className}
@@ -422,7 +602,7 @@ function AsyncCodeBlock({
 					dangerouslySetInnerHTML={{ __html: html || hljsHtml }}
 				/>
 			</pre>
-		</figure>
+		</CodeBlockFrame>
 	);
 }
 
@@ -843,8 +1023,10 @@ function markdownThemeVariables(
 		"--markdown-term-border": `${theme.accent}${dark ? "40" : "33"}`,
 		"--markdown-term-bg": `${theme.accent}${dark ? "1A" : "0F"}`,
 		"--syntax-bg": syntax.bg,
+		"--syntax-header-bg": syntax.headerBg,
 		"--syntax-text": syntax.text,
 		"--syntax-border": syntax.border,
+		"--syntax-shadow": syntax.shadow,
 		"--syntax-label": syntax.langBar,
 		"--syntax-comment": syntax.comment,
 		"--syntax-keyword": syntax.keyword,
@@ -889,8 +1071,8 @@ export function MarkdownPreview({
 	const proseThemeMap: Record<string, string> = {
 		浅棕米白: "earth",
 		深棕暗色: "earth",
-		深蓝黑: "ocean",
-		深海暗蓝: "ocean",
+		日光工程手稿: "ocean",
+		石墨深海: "ocean",
 		青瓷米白: "sage",
 		青瓷暗色: "sage",
 		浅青绿: "sage",

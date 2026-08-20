@@ -363,42 +363,42 @@ body {
 	--tw-prose-td-borders: rgba(232, 221, 208, 0.1);
 }
 
-/* ocean (深蓝黑) */
+/* ocean (日光工程手稿 / 石墨深海) */
 .prose-ocean {
-	--tw-prose-body: #0f1b2d;
-	--tw-prose-headings: #0f1b2d;
-	--tw-prose-lead: #4a5d73;
-	--tw-prose-links: #1b3a5c;
-	--tw-prose-bold: #0f1b2d;
-	--tw-prose-counters: #4a5d73;
-	--tw-prose-bullets: #4a5d73;
-	--tw-prose-hr: rgba(15, 27, 45, 0.2);
-	--tw-prose-quotes: #4a5d73;
-	--tw-prose-quote-borders: rgba(27, 58, 92, 0.4);
-	--tw-prose-captions: #4a5d73;
-	--tw-prose-code: #1b3a5c;
-	--tw-prose-pre-code: #d4d4d4;
+	--tw-prose-body: #172436;
+	--tw-prose-headings: #172436;
+	--tw-prose-lead: #546577;
+	--tw-prose-links: #2f5d7c;
+	--tw-prose-bold: #172436;
+	--tw-prose-counters: #546577;
+	--tw-prose-bullets: #546577;
+	--tw-prose-hr: rgba(23, 36, 54, 0.12);
+	--tw-prose-quotes: #546577;
+	--tw-prose-quote-borders: rgba(47, 93, 124, 0.4);
+	--tw-prose-captions: #546577;
+	--tw-prose-code: #2f5d7c;
+	--tw-prose-pre-code: #1f2328;
 	--tw-prose-pre-bg: transparent;
-	--tw-prose-th-borders: rgba(15, 27, 45, 0.12);
-	--tw-prose-td-borders: rgba(15, 27, 45, 0.12);
+	--tw-prose-th-borders: rgba(23, 36, 54, 0.12);
+	--tw-prose-td-borders: rgba(23, 36, 54, 0.12);
 }
 .prose-ocean.dark {
-	--tw-prose-body: #e0e6ed;
-	--tw-prose-headings: #e0e6ed;
-	--tw-prose-lead: #7a8fa3;
-	--tw-prose-links: #58a6d0;
-	--tw-prose-bold: #e0e6ed;
-	--tw-prose-counters: #7a8fa3;
-	--tw-prose-bullets: #7a8fa3;
-	--tw-prose-hr: rgba(224, 230, 237, 0.08);
-	--tw-prose-quotes: #7a8fa3;
-	--tw-prose-quote-borders: rgba(88, 166, 208, 0.4);
-	--tw-prose-captions: #7a8fa3;
-	--tw-prose-code: #58a6d0;
-	--tw-prose-pre-code: #c8d4de;
+	--tw-prose-body: #d8dee5;
+	--tw-prose-headings: #d8dee5;
+	--tw-prose-lead: #adb9c4;
+	--tw-prose-links: #8cbbd2;
+	--tw-prose-bold: #d8dee5;
+	--tw-prose-counters: #adb9c4;
+	--tw-prose-bullets: #adb9c4;
+	--tw-prose-hr: rgba(216, 222, 229, 0.08);
+	--tw-prose-quotes: #adb9c4;
+	--tw-prose-quote-borders: rgba(140, 187, 210, 0.4);
+	--tw-prose-captions: #adb9c4;
+	--tw-prose-code: #8cbbd2;
+	--tw-prose-pre-code: #f0f6fc;
 	--tw-prose-pre-bg: transparent;
-	--tw-prose-th-borders: rgba(224, 230, 237, 0.08);
-	--tw-prose-td-borders: rgba(224, 230, 237, 0.08);
+	--tw-prose-th-borders: rgba(216, 222, 229, 0.12);
+	--tw-prose-td-borders: rgba(216, 222, 229, 0.12);
 }
 
 /* sage (青瓷米白) */
@@ -531,23 +531,95 @@ body {
 	color: var(--syntax-text);
 	background: var(--syntax-bg);
 	border: 1px solid var(--syntax-border);
-	border-radius: 12px;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+	border-radius: 8px;
+	box-shadow: var(--syntax-shadow);
 	margin: 1.5rem 0;
 	overflow: hidden;
 }
 
-.markdown-code-language {
+.markdown-code-toolbar {
 	display: flex;
 	align-items: center;
-	min-height: 2rem;
-	padding: 0.5rem 1.25rem;
+	justify-content: space-between;
+	gap: 1rem;
+	min-height: 2.5rem;
+	padding: 0.25rem 0.45rem 0.25rem 1.25rem;
 	border-bottom: 1px solid var(--syntax-border);
+	background: var(--syntax-header-bg);
+}
+
+.markdown-code-language {
+	min-width: 0;
+	overflow: hidden;
 	font-family: var(--font-mono);
 	font-size: 0.7rem;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 	color: var(--syntax-label);
+}
+
+.markdown-code-copy {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	min-width: 2rem;
+	min-height: 2rem;
+	padding: 0;
+	border: 1px solid color-mix(in srgb, var(--syntax-label) 18%, transparent);
+	border-radius: 6px;
+	color: var(--syntax-label);
+	background: color-mix(in srgb, var(--syntax-label) 4%, transparent);
+	font-family: inherit;
+	font-size: 0.72rem;
+	font-weight: 500;
+	line-height: 1;
+	cursor: pointer;
+	transition: color 140ms ease-out, border-color 140ms ease-out,
+		background-color 140ms ease-out;
+}
+
+.markdown-code-copy-icon {
+	width: 0.9rem;
+	height: 0.9rem;
+	flex: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.markdown-code-copy:hover {
+		border-color: color-mix(in srgb, var(--syntax-label) 36%, transparent);
+		background: color-mix(in srgb, var(--syntax-label) 10%, transparent);
+	}
+}
+
+.markdown-code-copy:active {
+	background: color-mix(in srgb, var(--syntax-label) 14%, transparent);
+}
+
+.markdown-code-copy:focus-visible {
+	outline: 2px solid var(--syntax-function);
+	outline-offset: 1px;
+}
+
+.markdown-code-copy[data-copy-state="copied"] {
+	color: var(--syntax-addition);
+	border-color: color-mix(in srgb, var(--syntax-addition) 42%, transparent);
+	background: color-mix(in srgb, var(--syntax-addition) 9%, transparent);
+}
+
+.markdown-code-copy[data-copy-state="error"] {
+	color: var(--syntax-deletion);
+	border-color: color-mix(in srgb, var(--syntax-deletion) 42%, transparent);
+	background: color-mix(in srgb, var(--syntax-deletion) 9%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.markdown-code-copy {
+		transition: none;
+	}
 }
 
 .markdown-code-block pre {
@@ -574,10 +646,11 @@ body {
 
 .markdown-code-block :where(.hljs-comment, .hljs-quote) {
 	color: var(--syntax-comment);
-	font-style: italic;
+	font-style: normal;
 }
 .markdown-code-block :where(.hljs-keyword, .hljs-selector-tag) {
 	color: var(--syntax-keyword);
+	font-weight: 500;
 }
 .markdown-code-block :where(.hljs-string, .hljs-template-tag) {
 	color: var(--syntax-string);
@@ -591,9 +664,11 @@ body {
 }
 .markdown-code-block .hljs-title.class_ {
 	color: var(--syntax-class);
+	font-weight: 500;
 }
 .markdown-code-block .hljs-type {
 	color: var(--syntax-type);
+	font-weight: 500;
 }
 .markdown-code-block :where(.hljs-built_in, .hljs-builtin-name) {
 	color: var(--syntax-builtin);
@@ -682,10 +757,10 @@ body {
 }
 .prose-ocean a:hover {
 	text-decoration: underline;
-	color: #0f2540;
+	color: #244a65;
 }
 .prose-ocean.dark a:hover {
-	color: #79bde0;
+	color: #a4cadb;
 }
 .prose-sage a {
 	text-decoration: none;

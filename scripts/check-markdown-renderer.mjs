@@ -24,6 +24,10 @@ try {
 				"const answer = 42;",
 				"```",
 				"",
+				"```",
+				"plain text",
+				"```",
+				"",
 				"| Item | Value |",
 				"| --- | --- |",
 				"| answer | 42 |",
@@ -63,12 +67,20 @@ try {
 			pass: html.includes("markdown-inline-code"),
 		},
 		{
-			name: "a fenced block produces exactly one pre element",
-			pass: (html.match(/<pre\b/g) ?? []).length === 1,
+			name: "each rendered fenced block produces exactly one pre element",
+			pass: (html.match(/<pre\b/g) ?? []).length === 2,
 		},
 		{
 			name: "pre never contains a block wrapper",
 			pass: !/<pre[^>]*>\s*<(?:div|figure)\b/.test(html),
+		},
+		{
+			name: "language and plain fenced blocks expose copy controls",
+			pass:
+				(html.match(/class="markdown-code-copy"/g) ?? []).length === 2 &&
+				(html.match(/<pre\b[^>]*>[\s\S]*?<\/pre>/g) ?? []).every(
+					(block) => !block.includes("markdown-code-copy"),
+				),
 		},
 		{
 			name: "custom code blocks opt out of prose styling",

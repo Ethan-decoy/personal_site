@@ -8,7 +8,15 @@ import {
 } from "react";
 import { useI18n } from "../i18n";
 import type { Section, Theme } from "../themes";
-import PersonalLifePage from "./about-personal";
+import PersonalLifePage, {
+	type EntertainmentSectionId,
+	type PersonalSectionId,
+} from "./about-personal";
+
+export type {
+	EntertainmentSectionId,
+	PersonalSectionId,
+} from "./about-personal";
 
 type AboutView = "personal" | "work";
 
@@ -457,12 +465,20 @@ export default function AboutPage({
 	aboutView,
 	workSection,
 	onWorkSectionChange,
+	personalSection,
+	onPersonalSectionChange,
+	entertainmentSection,
+	onEntertainmentSectionChange,
 }: {
 	theme: Theme;
 	onNavigate: (s: Section, sub?: AboutView) => void;
 	aboutView?: AboutView;
 	workSection: WorkSectionId;
 	onWorkSectionChange: (section: WorkSectionId) => void;
+	personalSection: PersonalSectionId;
+	onPersonalSectionChange: (section: PersonalSectionId) => void;
+	entertainmentSection: EntertainmentSectionId;
+	onEntertainmentSectionChange: (section: EntertainmentSectionId) => void;
 }) {
 	const { t } = useI18n();
 	const view = aboutView ?? "work";
@@ -567,7 +583,15 @@ export default function AboutPage({
 						onActiveSectionChange={onWorkSectionChange}
 					/>
 				}
-				back={<PersonalLifePage theme={theme} />}
+				back={
+					<PersonalLifePage
+						theme={theme}
+						activeSection={personalSection}
+						onActiveSectionChange={onPersonalSectionChange}
+						entertainmentSection={entertainmentSection}
+						onEntertainmentSectionChange={onEntertainmentSectionChange}
+					/>
+				}
 			/>
 		</div>
 	);

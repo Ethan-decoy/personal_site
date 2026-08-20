@@ -2,7 +2,11 @@ import { type ReactNode, useEffect, useState } from "react";
 import { Footer, LangToggle, NavBar, ThemeToggle } from "./components";
 import { useI18n } from "./i18n";
 import { I18nProvider } from "./i18n/index";
-import AboutPage, { type WorkSectionId } from "./pages/about";
+import AboutPage, {
+	type EntertainmentSectionId,
+	type PersonalSectionId,
+	type WorkSectionId,
+} from "./pages/about";
 import ContactPage from "./pages/contact";
 import HomePage from "./pages/home";
 import NotesPage from "./pages/notes";
@@ -34,6 +38,10 @@ function AppInner() {
 	const [active, setActive] = useState<Section>("home");
 	const [aboutView, setAboutView] = useState<AboutView>("work");
 	const [workSection, setWorkSection] = useState<WorkSectionId>("experience");
+	const [personalSection, setPersonalSection] =
+		useState<PersonalSectionId>("beliefs");
+	const [entertainmentSection, setEntertainmentSection] =
+		useState<EntertainmentSectionId>("playing");
 	const theme =
 		active === "about"
 			? getAboutTheme(aboutView, mode)
@@ -69,6 +77,10 @@ function AppInner() {
 				aboutView={aboutView}
 				workSection={workSection}
 				onWorkSectionChange={setWorkSection}
+				personalSection={personalSection}
+				onPersonalSectionChange={setPersonalSection}
+				entertainmentSection={entertainmentSection}
+				onEntertainmentSectionChange={setEntertainmentSection}
 			/>
 		);
 	} else {

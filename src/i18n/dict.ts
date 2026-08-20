@@ -40,11 +40,26 @@ export const dict = {
 	// About - personal
 	"about.personal.index": { zh: "生活索引", en: "Life index" },
 	"about.personal.tab.beliefs": { zh: "相信", en: "Beliefs" },
-	"about.personal.tab.doing": { zh: "做", en: "Doing" },
-	"about.personal.tab.playing": { zh: "玩", en: "Playing" },
-	"about.personal.tab.watching": { zh: "看", en: "Watching" },
-	"about.personal.tab.listening": { zh: "听", en: "Listening" },
+	"about.personal.tab.recent": { zh: "近来", en: "Lately" },
+	"about.personal.tab.entertainment": { zh: "娱乐", en: "Leisure" },
+	"about.personal.entertainment.index": {
+		zh: "娱乐索引",
+		en: "Leisure index",
+	},
+	"about.personal.tab.playing": { zh: "在玩", en: "Playing" },
+	"about.personal.tab.watching": { zh: "在看", en: "Watching" },
+	"about.personal.tab.listening": { zh: "在听", en: "Listening" },
 	"about.personal.back": { zh: "返回", en: "Back" },
+	"about.personal.recent.label": { zh: "近来记录", en: "Recent notes" },
+	"about.personal.recent.wish": {
+		zh: "已经到了该认真看待这些愿望的年纪。",
+		en: "I have reached the age when these wishes deserve to be taken seriously.",
+	},
+	"about.personal.recent.cat": { zh: "爱猫", en: "Beloved cat" },
+	"about.personal.recent.cat.alt": {
+		zh: "一只灰猫端坐着望向镜头，画面底部露出红色椅背",
+		en: "A grey cat sits facing the camera, with the top of a red chair visible below.",
+	},
 	"about.personal.principle.commonGoal": {
 		zh: "我们可以完全不同，但必须真正朝着共同目标前进。",
 		en: "We can be completely different, but we must genuinely move toward a shared goal.",
@@ -114,25 +129,6 @@ export const dict = {
 	"about.favorites.song.ferrari.artist": {
 		zh: "Bebe Rexha",
 		en: "Bebe Rexha",
-	},
-	"about.life": { zh: "兴趣与实践", en: "Interests & pursuits" },
-	"about.life.lifelongLearner": {
-		zh: "终身学习者",
-		en: "Lifelong learner",
-	},
-	"about.life.lifelongLearner.d": {
-		zh: "愿意改变，就是好事。",
-		en: "Being willing to change is a good thing.",
-	},
-	"about.life.personalDev": { zh: "个人开发", en: "Personal projects" },
-	"about.life.personalDev.d": {
-		zh: "把零散的想法做成可以运行、可以持续改进的东西。",
-		en: "Turning rough ideas into working things that can keep evolving.",
-	},
-	"about.life.walking": { zh: "城市漫步", en: "City walking" },
-	"about.life.walking.d": {
-		zh: "散步是整理思绪的最佳方式。",
-		en: "Walking is the best way to sort out thoughts.",
 	},
 	// About - work
 	"about.bio": { zh: "简介", en: "Bio" },

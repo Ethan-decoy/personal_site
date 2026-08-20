@@ -1,4 +1,4 @@
-// 正式生活页：以“相信”为中轴，通过索引切换承载不同的生活切面。
+// 正式生活页：近来记录当下，相信承载价值，娱乐收纳正在玩的、看的与听的。
 import {
 	type CSSProperties,
 	type KeyboardEvent as ReactKeyboardEvent,
@@ -15,7 +15,9 @@ const SERVE_PEOPLE_RED = "#D52B1E";
 type PersonalLifeLabels = {
 	index: string;
 	beliefs: string;
-	doing: string;
+	recent: string;
+	entertainment: string;
+	entertainmentIndex: string;
 	playing: string;
 	watching: string;
 	listening: string;
@@ -57,13 +59,61 @@ function ServePeopleMark({
 	);
 }
 
-type ReadingSection =
-	| "beliefs"
-	| "doing"
-	| "playing"
-	| "watching"
-	| "listening";
+export type PersonalSectionId = "recent" | "beliefs" | "entertainment";
+export type EntertainmentSectionId = "playing" | "watching" | "listening";
+type LifePanelId =
+	| Exclude<PersonalSectionId, "entertainment">
+	| EntertainmentSectionId;
 type BeliefsLayer = "overview" | "service";
+
+const personalSectionOrder: readonly PersonalSectionId[] = [
+	"recent",
+	"beliefs",
+	"entertainment",
+];
+const entertainmentSectionOrder: readonly EntertainmentSectionId[] = [
+	"playing",
+	"watching",
+	"listening",
+];
+
+function isEntertainmentPanel(
+	panel: LifePanelId,
+): panel is EntertainmentSectionId {
+	return entertainmentSectionOrder.includes(panel as EntertainmentSectionId);
+}
+
+function focusAdjacentTab<T extends string>(
+	event: ReactKeyboardEvent<HTMLButtonElement>,
+	current: T,
+	order: readonly T[],
+	tabRefs: Record<T, HTMLButtonElement | null>,
+) {
+	const currentIndex = order.indexOf(current);
+	let nextIndex: number | undefined;
+
+	switch (event.key) {
+		case "ArrowLeft":
+			nextIndex = (currentIndex - 1 + order.length) % order.length;
+			break;
+		case "ArrowRight":
+			nextIndex = (currentIndex + 1) % order.length;
+			break;
+		case "Home":
+			nextIndex = 0;
+			break;
+		case "End":
+			nextIndex = order.length - 1;
+			break;
+		default:
+			return;
+	}
+
+	event.preventDefault();
+	const next = order[nextIndex];
+	if (!next) return;
+	requestAnimationFrame(() => tabRefs[next]?.focus());
+}
 
 type MagneticPoster = {
 	accent: string;
@@ -449,7 +499,96 @@ function GamePosterCarousel({
 	);
 }
 
-function LifeReadingIndex({
+type RecentLifeContent = {
+	label: string;
+	wish: {
+		dateTime: string;
+		dateLabel: string;
+		text: string;
+	};
+	cat: {
+		alt: string;
+		dateTime: string;
+		dateLabel: string;
+		src: string;
+		title: string;
+	};
+};
+
+function RecentLifeNotes({
+	theme,
+	content,
+}: {
+	theme: Theme;
+	content: RecentLifeContent;
+}) {
+	return (
+		<ol
+			aria-label={content.label}
+			className="mx-auto grid w-full max-w-4xl gap-y-14 md:gap-y-20 lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] lg:items-start lg:gap-x-[clamp(3.5rem,7vw,6.5rem)] lg:gap-y-0"
+		>
+			<li className="flex min-h-[16rem] items-center sm:min-h-[19rem] lg:min-h-[30rem] lg:items-end lg:pb-[12%]">
+				<article className="max-w-[28rem]">
+					<time
+						dateTime={content.wish.dateTime}
+						className="font-mono text-[10px] font-medium tracking-[0.13em] sm:text-[11px]"
+						style={{ color: theme.accent }}
+					>
+						{content.wish.dateLabel}
+					</time>
+					<p
+						className="mt-6 text-[clamp(1.75rem,4.5vw,2.75rem)] font-medium leading-[1.42] tracking-[-0.035em]"
+						style={{ color: theme.text }}
+					>
+						{content.wish.text}
+					</p>
+				</article>
+			</li>
+
+			<li className="w-full max-w-[31rem] sm:ml-auto lg:ml-0 lg:justify-self-end">
+				<article>
+					<figure>
+						<div
+							className="aspect-square w-full overflow-hidden rounded-[2px]"
+							style={{
+								backgroundColor: theme.bgDeep,
+								border: `1px solid ${theme.borderLight}`,
+							}}
+						>
+							<img
+								src={`${import.meta.env.BASE_URL}${content.cat.src}`}
+								alt={content.cat.alt}
+								className="block h-full w-full object-cover"
+								width={960}
+								height={960}
+								loading="lazy"
+								decoding="async"
+								draggable={false}
+							/>
+						</div>
+						<figcaption className="mt-4 flex items-baseline justify-between gap-6">
+							<p
+								className="text-base font-medium tracking-[-0.01em] sm:text-lg"
+								style={{ color: theme.text }}
+							>
+								{content.cat.title}
+							</p>
+							<time
+								dateTime={content.cat.dateTime}
+								className="shrink-0 font-mono text-[10px] font-medium tracking-[0.13em] sm:text-[11px]"
+								style={{ color: theme.textSec }}
+							>
+								{content.cat.dateLabel}
+							</time>
+						</figcaption>
+					</figure>
+				</article>
+			</li>
+		</ol>
+	);
+}
+
+function LifePrimaryIndex({
 	theme,
 	label,
 	sections,
@@ -460,15 +599,15 @@ function LifeReadingIndex({
 }: {
 	theme: Theme;
 	label: string;
-	sections: { id: ReadingSection; label: string }[];
-	active: ReadingSection;
-	onActivate: (section: ReadingSection) => void;
+	sections: { id: PersonalSectionId; label: string }[];
+	active: PersonalSectionId;
+	onActivate: (section: PersonalSectionId) => void;
 	onKeyDown: (
 		event: ReactKeyboardEvent<HTMLButtonElement>,
-		section: ReadingSection,
+		section: PersonalSectionId,
 	) => void;
 	onTabRef: (
-		section: ReadingSection,
+		section: PersonalSectionId,
 		element: HTMLButtonElement | null,
 	) => void;
 }) {
@@ -477,7 +616,7 @@ function LifeReadingIndex({
 			role="tablist"
 			aria-label={label}
 			data-index-treatment="wash"
-			className="grid w-full grid-cols-5 pb-8"
+			className="grid w-full grid-cols-3 pb-8"
 		>
 			{sections.map((section) => {
 				const selected = active === section.id;
@@ -495,7 +634,7 @@ function LifeReadingIndex({
 						ref={(element) => onTabRef(section.id, element)}
 						onClick={() => onActivate(section.id)}
 						onKeyDown={(event) => onKeyDown(event, section.id)}
-						className={`flex min-h-10 min-w-0 w-[92%] cursor-pointer items-center justify-center justify-self-center rounded-full px-1 text-xs tracking-[0.045em] outline-none transition-[background-color,color] duration-[180ms] ease-out focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none sm:w-[86%] sm:text-[13px] ${
+						className={`flex min-h-10 min-w-0 w-[88%] max-w-[13rem] cursor-pointer items-center justify-center justify-self-center rounded-full px-2 text-xs tracking-[0.045em] outline-none transition-[background-color,color] duration-[180ms] ease-out focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none sm:w-[78%] sm:text-[13px] ${
 							selected || anchor ? "font-semibold" : "font-medium"
 						} ${
 							selected
@@ -520,12 +659,93 @@ function LifeReadingIndex({
 	);
 }
 
-export default function PersonalLifePage({ theme }: { theme: Theme }) {
+function EntertainmentIndex({
+	theme,
+	label,
+	sections,
+	active,
+	onActivate,
+	onKeyDown,
+	onTabRef,
+}: {
+	theme: Theme;
+	label: string;
+	sections: { id: EntertainmentSectionId; label: string }[];
+	active: EntertainmentSectionId;
+	onActivate: (section: EntertainmentSectionId) => void;
+	onKeyDown: (
+		event: ReactKeyboardEvent<HTMLButtonElement>,
+		section: EntertainmentSectionId,
+	) => void;
+	onTabRef: (
+		section: EntertainmentSectionId,
+		element: HTMLButtonElement | null,
+	) => void;
+}) {
+	return (
+		<div
+			role="tablist"
+			aria-label={label}
+			className="mx-auto grid w-full max-w-sm grid-cols-3 gap-2"
+		>
+			{sections.map((section) => {
+				const selected = active === section.id;
+
+				return (
+					<button
+						key={section.id}
+						id={`life-entertainment-tab-${section.id}`}
+						type="button"
+						role="tab"
+						aria-selected={selected}
+						aria-controls="life-entertainment-panel"
+						tabIndex={selected ? 0 : -1}
+						ref={(element) => onTabRef(section.id, element)}
+						onClick={() => onActivate(section.id)}
+						onKeyDown={(event) => onKeyDown(event, section.id)}
+						className={`flex min-h-9 min-w-0 cursor-pointer items-center justify-center rounded-full px-3 text-[11px] font-medium tracking-[0.06em] outline-none transition-[background-color,color] duration-[180ms] ease-out focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none sm:text-xs ${
+							selected
+								? "bg-[var(--life-subindex-active)] text-[var(--life-subindex-accent)]"
+								: "bg-transparent text-[var(--life-subindex-idle)] hover:bg-[var(--life-subindex-hover)] hover:text-[var(--life-subindex-accent)] focus-visible:bg-[var(--life-subindex-hover)] focus-visible:text-[var(--life-subindex-accent)]"
+						}`}
+						style={
+							{
+								"--life-subindex-active": theme.bgDeep,
+								"--life-subindex-hover": theme.bgCard,
+								"--life-subindex-accent": theme.accent,
+								"--life-subindex-idle": theme.textSec,
+								outlineColor: theme.accent,
+							} as CSSProperties
+						}
+					>
+						<span className="truncate">{section.label}</span>
+					</button>
+				);
+			})}
+		</div>
+	);
+}
+
+export default function PersonalLifePage({
+	theme,
+	activeSection,
+	onActiveSectionChange,
+	entertainmentSection,
+	onEntertainmentSectionChange,
+}: {
+	theme: Theme;
+	activeSection: PersonalSectionId;
+	onActiveSectionChange: (section: PersonalSectionId) => void;
+	entertainmentSection: EntertainmentSectionId;
+	onEntertainmentSectionChange: (section: EntertainmentSectionId) => void;
+}) {
 	const { t } = useI18n();
 	const labels: PersonalLifeLabels = {
 		index: t("about.personal.index"),
 		beliefs: t("about.personal.tab.beliefs"),
-		doing: t("about.personal.tab.doing"),
+		recent: t("about.personal.tab.recent"),
+		entertainment: t("about.personal.tab.entertainment"),
+		entertainmentIndex: t("about.personal.entertainment.index"),
 		playing: t("about.personal.tab.playing"),
 		watching: t("about.personal.tab.watching"),
 		listening: t("about.personal.tab.listening"),
@@ -556,22 +776,22 @@ export default function PersonalLifePage({ theme }: { theme: Theme }) {
 			],
 		},
 	];
-	const doingLead = {
-		title: t("about.life.personalDev"),
-		desc: t("about.life.personalDev.d"),
-	};
-	const doingSupporting = [
-		{
-			title: t("about.life.lifelongLearner"),
-			desc: t("about.life.lifelongLearner.d"),
-		},
-		{
-			title: t("about.life.walking"),
-			desc: t("about.life.walking.d"),
-		},
-	];
-	const lifeLabel = t("about.life");
 	const inspirationCaption = t("about.personal.inspiration.caption");
+	const recentContent: RecentLifeContent = {
+		label: t("about.personal.recent.label"),
+		wish: {
+			dateTime: "2026-08-16",
+			dateLabel: "2026 · 08 · 16",
+			text: t("about.personal.recent.wish"),
+		},
+		cat: {
+			alt: t("about.personal.recent.cat.alt"),
+			dateTime: "2026-08-07",
+			dateLabel: "2026 · 08 · 07",
+			src: "assets/recent/cat-portrait.jpg",
+			title: t("about.personal.recent.cat"),
+		},
+	};
 	const moviesTitle = t("about.favorites.movies");
 	const musicTitle = t("about.favorites.music");
 	const movie = {
@@ -589,37 +809,57 @@ export default function PersonalLifePage({ theme }: { theme: Theme }) {
 		width: 1200,
 		height: 1200,
 	};
-	const [active, setActive] = useState<ReadingSection>("beliefs");
-	const [displayed, setDisplayed] = useState<ReadingSection>("beliefs");
+	const targetPanel: LifePanelId =
+		activeSection === "entertainment" ? entertainmentSection : activeSection;
+	const [displayedPanel, setDisplayedPanel] =
+		useState<LifePanelId>(targetPanel);
 	const [beliefsLayer, setBeliefsLayer] = useState<BeliefsLayer>("overview");
 	const [panelVisible, setPanelVisible] = useState(true);
 	const panelRef = useRef<HTMLElement>(null);
 	const initialPanelRef = useRef(true);
-	const tabRefs = useRef<Record<ReadingSection, HTMLButtonElement | null>>({
+	const primaryTabRefs = useRef<
+		Record<PersonalSectionId, HTMLButtonElement | null>
+	>({
+		recent: null,
 		beliefs: null,
-		doing: null,
+		entertainment: null,
+	});
+	const entertainmentTabRefs = useRef<
+		Record<EntertainmentSectionId, HTMLButtonElement | null>
+	>({
 		playing: null,
 		watching: null,
 		listening: null,
 	});
-	const sections: { id: ReadingSection; label: string }[] = [
-		{ id: "doing", label: labels.doing },
-		{ id: "playing", label: labels.playing },
+	const primarySections: { id: PersonalSectionId; label: string }[] = [
+		{ id: "recent", label: labels.recent },
 		{ id: "beliefs", label: labels.beliefs },
+		{ id: "entertainment", label: labels.entertainment },
+	];
+	const entertainmentSections: {
+		id: EntertainmentSectionId;
+		label: string;
+	}[] = [
+		{ id: "playing", label: labels.playing },
 		{ id: "watching", label: labels.watching },
 		{ id: "listening", label: labels.listening },
 	];
+	const displayedPrimarySection: PersonalSectionId = isEntertainmentPanel(
+		displayedPanel,
+	)
+		? "entertainment"
+		: displayedPanel;
 
-	const activate = (section: ReadingSection) => {
+	const activatePrimarySection = (section: PersonalSectionId) => {
 		if (
 			section === "beliefs" &&
-			section === active &&
+			section === activeSection &&
 			beliefsLayer === "service"
 		) {
 			setBeliefsLayer("overview");
 			return;
 		}
-		if (section !== active) setActive(section);
+		if (section !== activeSection) onActiveSectionChange(section);
 	};
 
 	const showBeliefsLayer = (layer: BeliefsLayer) => {
@@ -634,53 +874,47 @@ export default function PersonalLifePage({ theme }: { theme: Theme }) {
 		});
 	};
 
-	const handleTabKeyDown = (
+	const handlePrimaryTabKeyDown = (
 		event: ReactKeyboardEvent<HTMLButtonElement>,
-		sectionId: ReadingSection,
+		sectionId: PersonalSectionId,
 	) => {
-		const currentIndex = sections.findIndex(
-			(section) => section.id === sectionId,
+		focusAdjacentTab(
+			event,
+			sectionId,
+			personalSectionOrder,
+			primaryTabRefs.current,
 		);
-		let nextIndex: number | undefined;
-
-		switch (event.key) {
-			case "ArrowLeft":
-				nextIndex = (currentIndex - 1 + sections.length) % sections.length;
-				break;
-			case "ArrowRight":
-				nextIndex = (currentIndex + 1) % sections.length;
-				break;
-			case "Home":
-				nextIndex = 0;
-				break;
-			case "End":
-				nextIndex = sections.length - 1;
-				break;
-			default:
-				return;
-		}
-
-		event.preventDefault();
-		const next = sections[nextIndex]?.id;
-		if (!next) return;
-		requestAnimationFrame(() => tabRefs.current[next]?.focus());
 	};
+	const handleEntertainmentTabKeyDown = (
+		event: ReactKeyboardEvent<HTMLButtonElement>,
+		sectionId: EntertainmentSectionId,
+	) =>
+		focusAdjacentTab(
+			event,
+			sectionId,
+			entertainmentSectionOrder,
+			entertainmentTabRefs.current,
+		);
 
 	useEffect(() => {
-		if (active === displayed) return;
+		if (targetPanel === displayedPanel) return;
 		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-			setDisplayed(active);
+			setDisplayedPanel(targetPanel);
 			setPanelVisible(true);
 			return;
 		}
 
 		setPanelVisible(false);
-		const timeout = window.setTimeout(() => setDisplayed(active), 110);
+		const timeout = window.setTimeout(
+			() => setDisplayedPanel(targetPanel),
+			110,
+		);
 		return () => window.clearTimeout(timeout);
-	}, [active, displayed]);
+	}, [targetPanel, displayedPanel]);
 
 	useLayoutEffect(() => {
-		if (panelRef.current) panelRef.current.dataset.activeSection = displayed;
+		if (panelRef.current)
+			panelRef.current.dataset.activeSection = displayedPanel;
 		if (initialPanelRef.current) {
 			initialPanelRef.current = false;
 			return;
@@ -692,23 +926,23 @@ export default function PersonalLifePage({ theme }: { theme: Theme }) {
 
 		const frame = requestAnimationFrame(() => setPanelVisible(true));
 		return () => cancelAnimationFrame(frame);
-	}, [displayed]);
+	}, [displayedPanel]);
 
 	useEffect(() => {
-		if (displayed !== "beliefs") setBeliefsLayer("overview");
-	}, [displayed]);
+		if (displayedPanel !== "beliefs") setBeliefsLayer("overview");
+	}, [displayedPanel]);
 
 	return (
 		<div className="pb-20">
-			<LifeReadingIndex
+			<LifePrimaryIndex
 				theme={theme}
 				label={labels.index}
-				sections={sections}
-				active={active}
-				onActivate={activate}
-				onKeyDown={handleTabKeyDown}
+				sections={primarySections}
+				active={activeSection}
+				onActivate={activatePrimarySection}
+				onKeyDown={handlePrimaryTabKeyDown}
 				onTabRef={(section, element) => {
-					tabRefs.current[section] = element;
+					primaryTabRefs.current[section] = element;
 				}}
 			/>
 
@@ -716,254 +950,235 @@ export default function PersonalLifePage({ theme }: { theme: Theme }) {
 				ref={panelRef}
 				id="life-panel"
 				role="tabpanel"
-				aria-labelledby={`life-tab-${displayed}`}
-				aria-busy={active !== displayed}
+				aria-labelledby={`life-tab-${displayedPrimarySection}`}
+				aria-busy={targetPanel !== displayedPanel}
 				aria-live="polite"
-				data-active-section={displayed}
-				className="mt-9 min-h-[31rem] transition-opacity ease-out motion-reduce:transition-none sm:mt-11"
-				style={{
-					opacity: panelVisible ? 1 : 0,
-					transitionDuration: panelVisible ? "240ms" : "110ms",
-				}}
+				data-active-section={displayedPanel}
+				className="mt-9 min-h-[31rem] sm:mt-11"
 			>
-				{displayed === "beliefs" && beliefsLayer === "overview" && (
-					<div className="mx-auto max-w-3xl">
-						<div>
-							{principleGroups.map((group) => (
-								<section
-									key={group.title}
-									className="grid gap-4 border-t py-6 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-8 sm:py-7"
-									style={{ borderColor: theme.border }}
-								>
-									<h3
-										className="text-[15px] font-medium leading-7 sm:text-base"
-										style={{ color: theme.accent }}
-									>
-										{group.title}
-									</h3>
-									<div className="space-y-3">
-										{group.items.map((item) => (
-											<p
-												key={item}
-												className="text-[15px] leading-[1.8] sm:text-[17px]"
-												style={{ color: theme.textSec }}
-											>
-												{item}
-											</p>
-										))}
-									</div>
-								</section>
-							))}
-						</div>
-
-						<button
-							type="button"
-							aria-label={inspirationCaption}
-							onClick={() => showBeliefsLayer("service")}
-							className="mx-auto mt-12 block aspect-[1629/513] w-[clamp(10rem,26vw,13rem)] cursor-pointer rounded-sm opacity-90 outline-none transition-opacity duration-200 ease-out hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-4 active:opacity-80 motion-reduce:transition-none"
-							style={{ outlineColor: SERVE_PEOPLE_RED }}
-						>
-							<ServePeopleMark
-								color={SERVE_PEOPLE_RED}
-								className="block h-full w-full"
-							/>
-						</button>
-					</div>
+				{displayedPrimarySection === "entertainment" && (
+					<EntertainmentIndex
+						theme={theme}
+						label={labels.entertainmentIndex}
+						sections={entertainmentSections}
+						active={entertainmentSection}
+						onActivate={onEntertainmentSectionChange}
+						onKeyDown={handleEntertainmentTabKeyDown}
+						onTabRef={(section, element) => {
+							entertainmentTabRefs.current[section] = element;
+						}}
+					/>
 				)}
 
-				{displayed === "beliefs" && beliefsLayer === "service" && (
-					<div className="mx-auto max-w-3xl">
-						<section
-							lang="zh-CN"
-							className="flex min-h-[31rem] flex-col px-4 py-8 sm:px-8 sm:py-10"
-						>
-							<h2 className="sr-only">{inspirationCaption}</h2>
-							<div className="mx-auto flex w-full max-w-[38rem] flex-1 flex-col">
-								<blockquote cite="https://dangjian.people.com.cn/n/2013/0313/c117092-20778945.html">
-									<div
-										className="space-y-1 text-[15px] font-normal leading-[1.7] tracking-[0.06em] sm:text-base sm:tracking-[0.08em]"
-										style={{ color: theme.text }}
-									>
-										<p className="indent-[2em]">
-											世界是你们的，也是我们的，但是归根结底是你们的。
-										</p>
-										<p className="indent-[2em]">
-											你们青年人朝气蓬勃，正在兴旺时期，好像早晨八、九点钟的太阳。
-										</p>
-										<p className="indent-[2em]">希望寄托在你们身上。</p>
-										<p className="indent-[2em]">
-											世界是你们的。中国的前途是属于你们的。
-										</p>
-									</div>
-								</blockquote>
-								<button
-									type="button"
-									aria-label={labels.back}
-									onClick={() => showBeliefsLayer("overview")}
-									className="mx-auto mt-auto flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border outline-none transition-colors duration-150 ease-out hover:bg-[var(--belief-back-hover-bg)] hover:text-[var(--belief-back-hover-color)] focus-visible:outline-2 focus-visible:outline-offset-4 motion-reduce:transition-none"
-									style={
-										{
-											"--belief-back-hover-bg": theme.bgDeep,
-											"--belief-back-hover-color": theme.text,
-											backgroundColor: theme.bgCard,
-											borderColor: theme.border,
-											color: theme.textSec,
-											outlineColor: theme.accent,
-										} as CSSProperties
-									}
-								>
-									<svg
-										aria-hidden="true"
-										viewBox="0 0 24 24"
-										fill="none"
-										className="h-4 w-4"
-									>
-										<path
-											d="M19 12H5m6-6-6 6 6 6"
-											stroke="currentColor"
-											strokeWidth="1.6"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-										/>
-									</svg>
-								</button>
-							</div>
-						</section>
-					</div>
-				)}
+				<div
+					id={
+						displayedPrimarySection === "entertainment"
+							? "life-entertainment-panel"
+							: undefined
+					}
+					role={
+						displayedPrimarySection === "entertainment" ? "tabpanel" : undefined
+					}
+					aria-labelledby={
+						displayedPrimarySection === "entertainment"
+							? `life-entertainment-tab-${displayedPanel}`
+							: undefined
+					}
+					className={`transition-opacity ease-out motion-reduce:transition-none ${
+						displayedPrimarySection === "entertainment" ? "mt-8" : ""
+					}`}
+					style={{
+						opacity: panelVisible ? 1 : 0,
+						transitionDuration: panelVisible ? "240ms" : "110ms",
+					}}
+				>
+					{displayedPanel === "recent" && (
+						<RecentLifeNotes theme={theme} content={recentContent} />
+					)}
 
-				{displayed === "doing" && (
-					<div className="grid min-h-[31rem] gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-12">
-						<article
-							className="flex min-h-[24rem] flex-col justify-between p-6 sm:p-9 lg:min-h-[31rem]"
-							style={{
-								backgroundColor: theme.bgDeep,
-								border: `1px solid ${theme.borderLight}`,
-							}}
-						>
-							<p
-								className="text-[10px] font-semibold tracking-[0.16em] sm:text-[11px]"
-								style={{ color: theme.accent }}
-							>
-								{lifeLabel}
-							</p>
+					{displayedPanel === "beliefs" && beliefsLayer === "overview" && (
+						<div className="mx-auto max-w-3xl">
 							<div>
+								{principleGroups.map((group) => (
+									<section
+										key={group.title}
+										className="grid gap-4 border-t py-6 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-8 sm:py-7"
+										style={{ borderColor: theme.border }}
+									>
+										<h3
+											className="text-[15px] font-medium leading-7 sm:text-base"
+											style={{ color: theme.accent }}
+										>
+											{group.title}
+										</h3>
+										<div className="space-y-3">
+											{group.items.map((item) => (
+												<p
+													key={item}
+													className="text-[15px] leading-[1.8] sm:text-[17px]"
+													style={{ color: theme.textSec }}
+												>
+													{item}
+												</p>
+											))}
+										</div>
+									</section>
+								))}
+							</div>
+
+							<button
+								type="button"
+								aria-label={inspirationCaption}
+								onClick={() => showBeliefsLayer("service")}
+								className="mx-auto mt-12 block aspect-[1629/513] w-[clamp(10rem,26vw,13rem)] cursor-pointer rounded-sm opacity-90 outline-none transition-opacity duration-200 ease-out hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-4 active:opacity-80 motion-reduce:transition-none"
+								style={{ outlineColor: SERVE_PEOPLE_RED }}
+							>
+								<ServePeopleMark
+									color={SERVE_PEOPLE_RED}
+									className="block h-full w-full"
+								/>
+							</button>
+						</div>
+					)}
+
+					{displayedPanel === "beliefs" && beliefsLayer === "service" && (
+						<div className="mx-auto max-w-3xl">
+							<section
+								lang="zh-CN"
+								className="flex min-h-[31rem] flex-col px-4 py-8 sm:px-8 sm:py-10"
+							>
+								<h2 className="sr-only">{inspirationCaption}</h2>
+								<div className="mx-auto flex w-full max-w-[38rem] flex-1 flex-col">
+									<blockquote cite="https://dangjian.people.com.cn/n/2013/0313/c117092-20778945.html">
+										<div
+											className="space-y-1 text-[15px] font-normal leading-[1.7] tracking-[0.06em] sm:text-base sm:tracking-[0.08em]"
+											style={{ color: theme.text }}
+										>
+											<p className="indent-[2em]">
+												世界是你们的，也是我们的，但是归根结底是你们的。
+											</p>
+											<p className="indent-[2em]">
+												你们青年人朝气蓬勃，正在兴旺时期，好像早晨八、九点钟的太阳。
+											</p>
+											<p className="indent-[2em]">希望寄托在你们身上。</p>
+											<p className="indent-[2em]">
+												世界是你们的。中国的前途是属于你们的。
+											</p>
+										</div>
+									</blockquote>
+									<button
+										type="button"
+										aria-label={labels.back}
+										onClick={() => showBeliefsLayer("overview")}
+										className="mx-auto mt-auto flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border outline-none transition-colors duration-150 ease-out hover:bg-[var(--belief-back-hover-bg)] hover:text-[var(--belief-back-hover-color)] focus-visible:outline-2 focus-visible:outline-offset-4 motion-reduce:transition-none"
+										style={
+											{
+												"--belief-back-hover-bg": theme.bgDeep,
+												"--belief-back-hover-color": theme.text,
+												backgroundColor: theme.bgCard,
+												borderColor: theme.border,
+												color: theme.textSec,
+												outlineColor: theme.accent,
+											} as CSSProperties
+										}
+									>
+										<svg
+											aria-hidden="true"
+											viewBox="0 0 24 24"
+											fill="none"
+											className="h-4 w-4"
+										>
+											<path
+												d="M19 12H5m6-6-6 6 6 6"
+												stroke="currentColor"
+												strokeWidth="1.6"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+											/>
+										</svg>
+									</button>
+								</div>
+							</section>
+						</div>
+					)}
+
+					{displayedPanel === "playing" && (
+						<GamePosterCarousel theme={theme} label={labels.playing} />
+					)}
+
+					{displayedPanel === "watching" && (
+						<figure className="grid min-h-[31rem] gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-end lg:gap-16">
+							<div
+								className="flex min-h-[31rem] items-center justify-center p-5 sm:p-8"
+								style={{
+									backgroundColor: theme.bgDeep,
+									border: `1px solid ${theme.borderLight}`,
+								}}
+							>
+								<img
+									src={`${import.meta.env.BASE_URL}${movie.src}`}
+									alt={movie.label}
+									className="block h-auto w-full max-w-[18rem] rounded-[2px]"
+									width={movie.width}
+									height={movie.height}
+								/>
+							</div>
+							<figcaption className="pb-2 lg:pb-10">
+								<p
+									className="text-[10px] font-semibold tracking-[0.16em] sm:text-[11px]"
+									style={{ color: theme.accent }}
+								>
+									{moviesTitle}
+								</p>
 								<h2
-									className="text-[clamp(3rem,8vw,6.4rem)] font-semibold leading-[0.93] tracking-[-0.06em]"
+									className="mt-6 max-w-2xl text-[clamp(2.8rem,8vw,6.3rem)] font-semibold leading-[0.98] tracking-[-0.06em]"
 									style={{ color: theme.text }}
 								>
-									{doingLead?.title}
+									{movie.title}
 								</h2>
+							</figcaption>
+						</figure>
+					)}
+
+					{displayedPanel === "listening" && (
+						<figure className="grid min-h-[31rem] gap-10 lg:grid-cols-[minmax(0,6fr)_minmax(0,6fr)] lg:items-end lg:gap-16">
+							<figcaption className="order-2 pb-2 lg:order-1 lg:pb-10">
 								<p
-									className="mt-6 max-w-lg text-sm leading-[1.85] sm:text-base"
-									style={{ color: theme.textSec }}
+									className="text-[10px] font-semibold tracking-[0.16em] sm:text-[11px]"
+									style={{ color: theme.accent }}
 								>
-									{doingLead?.desc}
+									{musicTitle}
 								</p>
-							</div>
-						</article>
-
-						<div className="flex flex-col justify-end">
-							{doingSupporting.map((item) => (
-								<article
-									key={item.title}
-									className="border-t py-7 first:pt-6 lg:py-9"
-									style={{ borderColor: theme.border }}
+								<h2
+									className="mt-6 text-[clamp(3.4rem,10vw,7.4rem)] font-semibold leading-[0.9] tracking-[-0.065em]"
+									style={{ color: theme.text }}
 								>
-									<h3
-										className="text-2xl font-medium tracking-[-0.03em]"
-										style={{ color: theme.text }}
-									>
-										{item.title}
-									</h3>
-									<p
-										className="mt-3 max-w-md text-sm leading-[1.8]"
-										style={{ color: theme.textSec }}
-									>
-										{item.desc}
+									{song.title}
+								</h2>
+								{song.credit && (
+									<p className="mt-3 text-sm" style={{ color: theme.textSec }}>
+										{song.credit}
 									</p>
-								</article>
-							))}
-						</div>
-					</div>
-				)}
-
-				{displayed === "playing" && (
-					<GamePosterCarousel theme={theme} label={labels.playing} />
-				)}
-
-				{displayed === "watching" && (
-					<figure className="grid min-h-[31rem] gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-end lg:gap-16">
-						<div
-							className="flex min-h-[31rem] items-center justify-center p-5 sm:p-8"
-							style={{
-								backgroundColor: theme.bgDeep,
-								border: `1px solid ${theme.borderLight}`,
-							}}
-						>
-							<img
-								src={`${import.meta.env.BASE_URL}${movie.src}`}
-								alt={movie.label}
-								className="block h-auto w-full max-w-[18rem] rounded-[2px]"
-								width={movie.width}
-								height={movie.height}
-							/>
-						</div>
-						<figcaption className="pb-2 lg:pb-10">
-							<p
-								className="text-[10px] font-semibold tracking-[0.16em] sm:text-[11px]"
-								style={{ color: theme.accent }}
+								)}
+							</figcaption>
+							<div
+								className="order-1 flex min-h-[24rem] items-center justify-center p-5 sm:p-8 lg:order-2 lg:min-h-[31rem]"
+								style={{
+									backgroundColor: theme.bgDeep,
+									border: `1px solid ${theme.borderLight}`,
+								}}
 							>
-								{moviesTitle}
-							</p>
-							<h2
-								className="mt-6 max-w-2xl text-[clamp(2.8rem,8vw,6.3rem)] font-semibold leading-[0.98] tracking-[-0.06em]"
-								style={{ color: theme.text }}
-							>
-								{movie.title}
-							</h2>
-						</figcaption>
-					</figure>
-				)}
-
-				{displayed === "listening" && (
-					<figure className="grid min-h-[31rem] gap-10 lg:grid-cols-[minmax(0,6fr)_minmax(0,6fr)] lg:items-end lg:gap-16">
-						<figcaption className="order-2 pb-2 lg:order-1 lg:pb-10">
-							<p
-								className="text-[10px] font-semibold tracking-[0.16em] sm:text-[11px]"
-								style={{ color: theme.accent }}
-							>
-								{musicTitle}
-							</p>
-							<h2
-								className="mt-6 text-[clamp(3.4rem,10vw,7.4rem)] font-semibold leading-[0.9] tracking-[-0.065em]"
-								style={{ color: theme.text }}
-							>
-								{song.title}
-							</h2>
-							{song.credit && (
-								<p className="mt-3 text-sm" style={{ color: theme.textSec }}>
-									{song.credit}
-								</p>
-							)}
-						</figcaption>
-						<div
-							className="order-1 flex min-h-[24rem] items-center justify-center p-5 sm:p-8 lg:order-2 lg:min-h-[31rem]"
-							style={{
-								backgroundColor: theme.bgDeep,
-								border: `1px solid ${theme.borderLight}`,
-							}}
-						>
-							<img
-								src={`${import.meta.env.BASE_URL}${song.src}`}
-								alt={song.label}
-								className="block h-auto w-full max-w-[26rem] rounded-[2px]"
-								width={song.width}
-								height={song.height}
-							/>
-						</div>
-					</figure>
-				)}
+								<img
+									src={`${import.meta.env.BASE_URL}${song.src}`}
+									alt={song.label}
+									className="block h-auto w-full max-w-[26rem] rounded-[2px]"
+									width={song.width}
+									height={song.height}
+								/>
+							</div>
+						</figure>
+					)}
+				</div>
 			</section>
 		</div>
 	);

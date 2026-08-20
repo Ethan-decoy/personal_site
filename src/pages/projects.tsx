@@ -90,6 +90,12 @@ function GitHubContributions({ theme }: { theme: Theme }) {
 		"--github-contribution-level-4": `${theme.text}D1`,
 		"--github-contribution-border": theme.borderLight,
 		"--github-contribution-accent": theme.accent,
+		"--github-profile-surface": theme.bg,
+		"--github-profile-border": theme.borderLight,
+		"--github-profile-ink": `${theme.text}73`,
+		"--github-profile-hover-surface": theme.bgDeep,
+		"--github-profile-hover-border": theme.border,
+		"--github-profile-hover-ink": theme.textSec,
 	} as CSSProperties;
 	const rangeLabel = `${formatDate(calendar.from, locale)} — ${formatDate(
 		calendar.to,
@@ -117,7 +123,7 @@ function GitHubContributions({ theme }: { theme: Theme }) {
 			className="border-y py-5 sm:py-6"
 			style={calendarStyle}
 		>
-			<header className="flex items-start justify-between gap-6">
+			<header className="flex items-start justify-between gap-4 sm:gap-6">
 				<div className="min-w-0">
 					<div className="flex flex-wrap items-center gap-x-3 gap-y-1">
 						<p
@@ -150,19 +156,18 @@ function GitHubContributions({ theme }: { theme: Theme }) {
 					href={`https://github.com/${calendar.username}`}
 					target="_blank"
 					rel="noreferrer"
-					className="group mt-1 inline-flex shrink-0 items-center gap-1.5 text-xs font-medium transition-colors duration-150"
-					style={{ color: theme.textSec }}
+					className="group mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--github-profile-border)] bg-[var(--github-profile-surface)] text-[var(--github-profile-ink)] transition-[background-color,border-color,color] duration-200 ease-out hover:border-[var(--github-profile-hover-border)] hover:bg-[var(--github-profile-hover-surface)] hover:text-[var(--github-profile-hover-ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--github-contribution-accent)] motion-reduce:transition-none"
 				>
-					{t("projects.activity.open")}
+					<span className="sr-only">
+						{`${t("projects.activity.open")} · ${calendar.username}`}
+					</span>
 					<svg
 						aria-hidden="true"
-						className="h-3 w-3 transition-transform duration-150 group-hover:translate-x-0.5"
+						className="h-4 w-4 transition-transform duration-200 ease-out group-hover:-translate-y-px group-hover:translate-x-px motion-reduce:transform-none motion-reduce:transition-none"
 						viewBox="0 0 16 16"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="1.5"
+						fill="currentColor"
 					>
-						<path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" />
+						<path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1Z" />
 					</svg>
 				</a>
 			</header>

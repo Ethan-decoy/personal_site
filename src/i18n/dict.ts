@@ -108,27 +108,27 @@ export const dict = {
 		zh: "为人民服务",
 		en: "为人民服务",
 	},
-	"about.favorites.movies": { zh: "电影", en: "Films" },
+	"about.favorites.series": { zh: "剧集", en: "Series" },
 	"about.favorites.music": { zh: "音乐", en: "Music" },
-	"about.favorites.movie.pursuit": {
-		zh: "电影《当幸福来敲门》海报",
-		en: "Poster for The Pursuit of Happyness",
+	"about.favorites.series.modernFamily": {
+		zh: "剧集《Modern Family》海报",
+		en: "Poster for Modern Family",
 	},
-	"about.favorites.movie.pursuit.title": {
-		zh: "当幸福来敲门",
-		en: "The Pursuit of Happyness",
+	"about.favorites.series.modernFamily.title": {
+		zh: "Modern Family",
+		en: "Modern Family",
 	},
-	"about.favorites.song.ferrari": {
-		zh: "Bebe Rexha《Ferrari》歌曲封面",
-		en: "Cover for Ferrari by Bebe Rexha",
+	"about.favorites.song.homeToMama": {
+		zh: "Justin Bieber 与 Cody Simpson《Home to Mama》歌曲封面",
+		en: "Cover for Home to Mama by Justin Bieber and Cody Simpson",
 	},
-	"about.favorites.song.ferrari.title": {
-		zh: "Ferrari",
-		en: "Ferrari",
+	"about.favorites.song.homeToMama.title": {
+		zh: "Home to Mama",
+		en: "Home to Mama",
 	},
-	"about.favorites.song.ferrari.artist": {
-		zh: "Bebe Rexha",
-		en: "Bebe Rexha",
+	"about.favorites.song.homeToMama.artist": {
+		zh: "Justin Bieber · Cody Simpson",
+		en: "Justin Bieber · Cody Simpson",
 	},
 	// About - work
 	"about.bio": { zh: "简介", en: "Bio" },

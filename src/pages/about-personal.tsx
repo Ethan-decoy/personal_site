@@ -329,7 +329,6 @@ function GamePosterCarousel({
 }) {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [transition, setTransition] = useState<MagneticTransition | null>(null);
-	const [isPointerInside, setIsPointerInside] = useState(false);
 	const [hasKeyboardFocusWithin, setHasKeyboardFocusWithin] = useState(false);
 	const [isInViewport, setIsInViewport] = useState(true);
 	const figureRef = useRef<HTMLElement>(null);
@@ -373,10 +372,7 @@ function GamePosterCarousel({
 	};
 
 	const autoplayPaused =
-		transition !== null ||
-		isPointerInside ||
-		hasKeyboardFocusWithin ||
-		!isInViewport;
+		transition !== null || hasKeyboardFocusWithin || !isInViewport;
 
 	useEffect(() => {
 		if (
@@ -418,8 +414,6 @@ function GamePosterCarousel({
 			className="mx-auto w-full max-w-4xl"
 			aria-label={`${label} · 游戏艺术轮转海报`}
 			data-source={current.sourceUrl}
-			onPointerEnter={() => setIsPointerInside(true)}
-			onPointerLeave={() => setIsPointerInside(false)}
 			onPointerDownCapture={() => setHasKeyboardFocusWithin(false)}
 			onFocusCapture={(event) =>
 				setHasKeyboardFocusWithin(
@@ -792,22 +786,22 @@ export default function PersonalLifePage({
 			title: t("about.personal.recent.cat"),
 		},
 	};
-	const moviesTitle = t("about.favorites.movies");
+	const seriesTitle = t("about.favorites.series");
 	const musicTitle = t("about.favorites.music");
-	const movie = {
-		label: t("about.favorites.movie.pursuit"),
-		title: t("about.favorites.movie.pursuit.title"),
-		src: "assets/favorites/movie-the-pursuit-of-happyness.jpg",
-		width: 1000,
-		height: 1500,
+	const series = {
+		label: t("about.favorites.series.modernFamily"),
+		title: t("about.favorites.series.modernFamily.title"),
+		src: "assets/favorites/series-modern-family.jpg",
+		width: 1200,
+		height: 1600,
 	};
 	const song = {
-		label: t("about.favorites.song.ferrari"),
-		title: t("about.favorites.song.ferrari.title"),
-		credit: t("about.favorites.song.ferrari.artist"),
-		src: "assets/favorites/song-ferrari-bebe-rexha.jpg",
-		width: 1200,
-		height: 1200,
+		label: t("about.favorites.song.homeToMama"),
+		title: t("about.favorites.song.homeToMama.title"),
+		credit: t("about.favorites.song.homeToMama.artist"),
+		src: "assets/favorites/song-home-to-mama-justin-bieber-cody-simpson.jpg",
+		width: 640,
+		height: 640,
 	};
 	const targetPanel: LifePanelId =
 		activeSection === "entertainment" ? entertainmentSection : activeSection;
@@ -1116,11 +1110,11 @@ export default function PersonalLifePage({
 								}}
 							>
 								<img
-									src={`${import.meta.env.BASE_URL}${movie.src}`}
-									alt={movie.label}
+									src={`${import.meta.env.BASE_URL}${series.src}`}
+									alt={series.label}
 									className="block h-auto w-full max-w-[18rem] rounded-[2px]"
-									width={movie.width}
-									height={movie.height}
+									width={series.width}
+									height={series.height}
 								/>
 							</div>
 							<figcaption className="pb-2 lg:pb-10">
@@ -1128,13 +1122,13 @@ export default function PersonalLifePage({
 									className="text-[10px] font-semibold tracking-[0.16em] sm:text-[11px]"
 									style={{ color: theme.accent }}
 								>
-									{moviesTitle}
+									{seriesTitle}
 								</p>
 								<h2
 									className="mt-6 max-w-2xl text-[clamp(2.8rem,8vw,6.3rem)] font-semibold leading-[0.98] tracking-[-0.06em]"
 									style={{ color: theme.text }}
 								>
-									{movie.title}
+									{series.title}
 								</h2>
 							</figcaption>
 						</figure>

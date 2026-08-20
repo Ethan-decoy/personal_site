@@ -154,14 +154,48 @@ const MAGNETIC_PIXEL_SPREAD_MS = 280;
 const MAGNETIC_PIXEL_DURATION_MS = MAGNETIC_PIXEL_SPREAD_MS;
 const MAGNETIC_AUTOPLAY_DELAY_MS = 6_000;
 
+type PosterImageCacheEntry = {
+	image: HTMLImageElement;
+	promise: Promise<HTMLImageElement>;
+};
+
+type NetworkAwareNavigator = Navigator & {
+	connection?: {
+		effectiveType?: string;
+		saveData?: boolean;
+	};
+};
+
+type IdleAwareWindow = Window & {
+	requestIdleCallback?: (
+		callback: () => void,
+		options?: { timeout: number },
+	) => number;
+	cancelIdleCallback?: (handle: number) => void;
+};
+
+const posterImageCache = new Map<string, PosterImageCacheEntry>();
+
 function resolvePosterSrc(poster: MagneticPoster) {
 	return `${import.meta.env.BASE_URL}${poster.src}`;
 }
 
-function loadPosterImage(poster: MagneticPoster) {
-	return new Promise<HTMLImageElement>((resolve, reject) => {
-		const image = new Image();
-		image.decoding = "async";
+function loadPosterImage(
+	poster: MagneticPoster,
+	priority: "auto" | "low" = "auto",
+) {
+	const source = resolvePosterSrc(poster);
+	const cached = posterImageCache.get(source);
+	if (cached) {
+		if (priority === "auto" && cached.image.fetchPriority === "low")
+			cached.image.fetchPriority = "auto";
+		return cached.promise;
+	}
+
+	const image = new Image();
+	image.decoding = "async";
+	image.fetchPriority = priority;
+	const promise = new Promise<HTMLImageElement>((resolve, reject) => {
 		image.addEventListener(
 			"load",
 			() => {
@@ -177,8 +211,73 @@ function loadPosterImage(poster: MagneticPoster) {
 			() => reject(new Error(`Unable to load poster: ${poster.title}`)),
 			{ once: true },
 		);
-		image.src = resolvePosterSrc(poster);
 	});
+	const entry = { image, promise };
+	posterImageCache.set(source, entry);
+	void promise.catch(() => {
+		if (posterImageCache.get(source) === entry) posterImageCache.delete(source);
+	});
+	image.src = source;
+	return promise;
+}
+
+function scheduleGamePosterWarmup() {
+	const connection = (navigator as NetworkAwareNavigator).connection;
+	if (
+		connection?.saveData ||
+		connection?.effectiveType === "slow-2g" ||
+		connection?.effectiveType === "2g"
+	) {
+		return () => undefined;
+	}
+
+	const idleWindow = window as IdleAwareWindow;
+	const pendingImages = new Set<HTMLImageElement>();
+	let cancelled = false;
+	let idleHandle: number | undefined;
+	let timeoutHandle: number | undefined;
+
+	const warmup = () => {
+		if (cancelled || document.visibilityState !== "visible") return;
+		for (const poster of MAGNETIC_POSTERS) {
+			const image = new Image();
+			image.decoding = "async";
+			image.fetchPriority = "low";
+			const release = () => pendingImages.delete(image);
+			image.addEventListener("load", release, { once: true });
+			image.addEventListener("error", release, { once: true });
+			pendingImages.add(image);
+			image.src = resolvePosterSrc(poster);
+		}
+	};
+
+	const schedule = () => {
+		if (cancelled) return;
+		if (idleWindow.requestIdleCallback) {
+			idleHandle = idleWindow.requestIdleCallback(warmup, { timeout: 2_500 });
+			return;
+		}
+		timeoutHandle = window.setTimeout(warmup, 1_200);
+	};
+
+	if (document.readyState === "complete") schedule();
+	else window.addEventListener("load", schedule, { once: true });
+
+	return () => {
+		cancelled = true;
+		window.removeEventListener("load", schedule);
+		if (idleHandle !== undefined) idleWindow.cancelIdleCallback?.(idleHandle);
+		if (timeoutHandle !== undefined) window.clearTimeout(timeoutHandle);
+		for (const image of pendingImages) image.src = "";
+		pendingImages.clear();
+	};
+}
+
+function clearGamePosterImageCache() {
+	for (const { image } of posterImageCache.values()) {
+		if (!image.complete) image.src = "";
+	}
+	posterImageCache.clear();
 }
 
 function fillRandomSwitchPoints(points: Uint8Array) {
@@ -329,6 +428,7 @@ function GamePosterCarousel({
 }) {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [transition, setTransition] = useState<MagneticTransition | null>(null);
+	const [postersReady, setPostersReady] = useState(false);
 	const [hasKeyboardFocusWithin, setHasKeyboardFocusWithin] = useState(false);
 	const [isInViewport, setIsInViewport] = useState(true);
 	const figureRef = useRef<HTMLElement>(null);
@@ -347,15 +447,18 @@ function GamePosterCarousel({
 	}, []);
 
 	useEffect(() => {
-		const adjacentIndexes = new Set([
-			(currentIndex - 1 + MAGNETIC_POSTERS.length) % MAGNETIC_POSTERS.length,
-			(currentIndex + 1) % MAGNETIC_POSTERS.length,
-		]);
-		for (const index of adjacentIndexes) {
-			const poster = MAGNETIC_POSTERS[index];
-			if (poster) void loadPosterImage(poster).catch(() => undefined);
-		}
-	}, [currentIndex]);
+		let cancelled = false;
+		void Promise.all(
+			MAGNETIC_POSTERS.map((poster) => loadPosterImage(poster, "low")),
+		)
+			.then(() => {
+				if (!cancelled) setPostersReady(true);
+			})
+			.catch(() => undefined);
+		return () => {
+			cancelled = true;
+		};
+	}, []);
 
 	const selectPoster = (nextIndex: number) => {
 		if (transition || nextIndex === currentIndex) return;
@@ -372,7 +475,10 @@ function GamePosterCarousel({
 	};
 
 	const autoplayPaused =
-		transition !== null || hasKeyboardFocusWithin || !isInViewport;
+		!postersReady ||
+		transition !== null ||
+		hasKeyboardFocusWithin ||
+		!isInViewport;
 
 	useEffect(() => {
 		if (
@@ -889,6 +995,14 @@ export default function PersonalLifePage({
 			entertainmentSectionOrder,
 			entertainmentTabRefs.current,
 		);
+
+	useEffect(() => {
+		const cancelWarmup = scheduleGamePosterWarmup();
+		return () => {
+			cancelWarmup();
+			clearGamePosterImageCache();
+		};
+	}, []);
 
 	useEffect(() => {
 		if (targetPanel === displayedPanel) return;

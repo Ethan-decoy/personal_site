@@ -83,12 +83,14 @@ hljs.registerLanguage("cmake", (hljs) => ({
 }));
 
 /* ---- Code highlighter themes ---- */
-const HLJS_THEMES = {
+// Syntax roles follow the familiar VS Code Light+/Dark+ convention. Comment
+// greens are luminance-calibrated to the Notes backgrounds for small web text.
+export const HLJS_THEMES = {
 	light: {
 		bg: "#F8FAFC",
 		headerBg: "#D5E1E9",
 		text: "#1F2328",
-		comment: "#4B5560",
+		comment: "#006400",
 		keyword: "#A31525",
 		string: "#075B1D",
 		number: "#864000",
@@ -116,7 +118,7 @@ const HLJS_THEMES = {
 		bg: "#16232D",
 		headerBg: "#0D171F",
 		text: "#F0F6FC",
-		comment: "#A7B1BB",
+		comment: "#84BA70",
 		keyword: "#FF8A82",
 		string: "#7EE787",
 		number: "#FFA657",

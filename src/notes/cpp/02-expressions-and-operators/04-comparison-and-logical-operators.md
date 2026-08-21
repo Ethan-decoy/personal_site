@@ -18,7 +18,7 @@ date: 2026-08-12
 | `>` | 大于 |
 | `>=` | 大于或等于 |
 
-比较表达式产生 `bool` 类型的结果：关系成立时得到 `true`，不成立时得到 `false`。
+**比较表达式产生 `bool` 类型的结果：关系成立时得到 `true`，不成立时得到 `false`。**
 
 ```cpp
 int remaining{9};
@@ -29,13 +29,13 @@ bool available{remaining > 0};                 // true
 bool within_capacity{remaining <= capacity};   // true
 ```
 
-比较只产生判断结果，不会修改参与比较的对象。执行这些表达式后，`remaining` 仍为 `9`，`capacity` 仍为 `12`。
+**比较只产生判断结果，不会修改参与比较的对象。**执行这些表达式后，`remaining` 仍为 `9`，`capacity` 仍为 `12`。
 
 `==` 和 `!=` 称为相等性运算符（equality operators）；`<`、`<=`、`>` 和 `>=` 称为关系运算符（relational operators）。两类运算符都会产生 `bool` 结果。相关规则可参阅 [C++ 工作草案中的相等性运算符](https://eel.is/c%2B%2Bdraft/expr.eq) 与[关系运算符](https://eel.is/c%2B%2Bdraft/expr.rel)。
 
 ### 算术类型之间的比较
 
-比较运算符的两个操作数都是算术类型时，会在比较之前执行通常算术转换，使参与比较的值采用共同类型。比较表达式本身的结果仍然是 `bool`。
+**比较运算符的两个操作数都是算术类型时，会在比较之前执行通常算术转换，使参与比较的值采用共同类型。比较表达式本身的结果仍然是 `bool`。**
 
 ```cpp
 int item_count{3};
@@ -57,7 +57,7 @@ bool smaller{adjustment < count};  // false
 
 `int` 与 `unsigned int` 具有相同的转换等级，因此共同类型是 `unsigned int`。参与比较的 `-1` 转换为 `unsigned int` 的最大可表示值，比较实际得到 `false`。
 
-这不是比较运算符对负数采用了特殊规则，而是比较发生前的共同类型转换改变了参与比较的值。[C++ 工作草案中的关系运算符](https://eel.is/c%2B%2Bdraft/expr.rel) 和[相等性运算符](https://eel.is/c%2B%2Bdraft/expr.eq) 都规定算术操作数需要先执行通常算术转换。
+**这不是比较运算符对负数采用了特殊规则，而是比较发生前的共同类型转换改变了参与比较的值。**[C++ 工作草案中的关系运算符](https://eel.is/c%2B%2Bdraft/expr.rel) 和[相等性运算符](https://eel.is/c%2B%2Bdraft/expr.eq) 都规定算术操作数需要先执行通常算术转换。
 
 ## 逻辑运算符（Logical Operators）
 
@@ -86,7 +86,7 @@ bool inside{position >= 0 && position < limit};   // true
 bool outside{position < 0 || position >= limit};  // false
 ```
 
-这些逻辑运算符都产生 `bool` 类型的结果。其真值关系可以表示为：
+**这些逻辑运算符都产生 `bool` 类型的结果。**其真值关系可以表示为：
 
 | `left` | `right` | `left && right` | `left \|\| right` |
 |---|---|---|---|
@@ -103,11 +103,11 @@ bool second{2 && 5};  // true
 bool third{0 || 3};   // true
 ```
 
-实际代码通常直接组合 `bool` 对象或结果为 `bool` 的比较表达式，以清楚表达每个条件的含义。相关规则可参阅 [C++ 工作草案中的逻辑非运算符](https://eel.is/c%2B%2Bdraft/expr.unary.op)、[逻辑与运算符](https://eel.is/c%2B%2Bdraft/expr.log.and) 与[逻辑或运算符](https://eel.is/c%2B%2Bdraft/expr.log.or)。
+**实际代码通常直接组合 `bool` 对象或结果为 `bool` 的比较表达式，以清楚表达每个条件的含义。**相关规则可参阅 [C++ 工作草案中的逻辑非运算符](https://eel.is/c%2B%2Bdraft/expr.unary.op)、[逻辑与运算符](https://eel.is/c%2B%2Bdraft/expr.log.and) 与[逻辑或运算符](https://eel.is/c%2B%2Bdraft/expr.log.or)。
 
 ### 短路求值（Short-Circuit Evaluation）
 
-`&&` 和 `||` 保证先求值左操作数，并根据左侧结果决定是否求值右操作数。这种行为称为短路求值（short-circuit evaluation）。
+**`&&` 和 `||` 保证先求值左操作数，并根据左侧结果决定是否求值右操作数。**这种行为称为短路求值（short-circuit evaluation）。
 
 ### 组合比较表达式
 
@@ -122,7 +122,7 @@ bool inside{
 };
 ```
 
-`&&` 的两个操作数分别是完整的比较表达式。这里的括号并非语法所必需，但能够直接表明表达式由两个独立判断组成。
+**`&&` 的两个操作数分别是完整的比较表达式。**这里的括号并非语法所必需，但能够直接表明表达式由两个独立判断组成。
 
 数学中的连续比较不能直接写入 C++：
 
@@ -136,7 +136,7 @@ bool inside{0 <= position < limit};
 bool inside{(0 <= position) < limit};
 ```
 
-`0 <= position` 先产生 `bool` 结果，随后这个 `false` 或 `true` 又分别以 `0` 或 `1` 参与第二次比较。它并不表示“`position` 同时不小于 `0` 且小于 `limit`”。
+`0 <= position` 先产生 `bool` 结果，随后这个 `false` 或 `true` 又分别以 `0` 或 `1` 参与第二次比较。**它并不表示“`position` 同时不小于 `0` 且小于 `limit`”。**
 
 相等性比较同样不能连写：
 

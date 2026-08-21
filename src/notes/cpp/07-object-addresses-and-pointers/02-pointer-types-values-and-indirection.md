@@ -5,26 +5,26 @@ date: 2026-08-19
 
 # 指针类型、指针值与间接访问
 
-对象的地址能够定位对象所占存储的起点，但程序还需要一种能够保存这段定位关系的值。C++ 的指针类型（pointer type）用于表示这种关系；指针对象则可以在程序运行期间保存并更换相应的指针值。
+对象的地址能够定位对象所占存储的起点，但程序还需要一种能够保存这段定位关系的值。**C++ 的指针类型（pointer type）用于表示这种关系；指针对象则可以在程序运行期间保存并更换相应的指针值。**
 
 ```cpp
 int engine_temperature{78};
 int* temperature_pointer{&engine_temperature};
 ```
 
-第二行没有复制 `engine_temperature`，也没有把整数 `78` 当成地址。它创建了另一个对象 `temperature_pointer`，并让这个新对象保存一个指向 `engine_temperature` 的指针值。
+**第二行没有复制 `engine_temperature`，也没有把整数 `78` 当成地址。它创建了另一个对象 `temperature_pointer`，并让这个新对象保存一个指向 `engine_temperature` 的指针值。**
 
 ## 从对象地址得到指针值
 
-在当前讨论的内建类型中，前缀一元 `&` 是取地址运算符（address-of operator）：
+在当前讨论的内建类型中，**前缀一元 `&` 是取地址运算符（address-of operator）：**
 
 ```cpp
 &engine_temperature
 ```
 
-它的操作数是 `engine_temperature`。对这个表达式求值，会产生一个指向该对象的指针值；由于目标对象的类型是 `int`，结果的类型是 `int*`，读作“指向 `int` 的指针”。
+**它的操作数是 `engine_temperature`。对这个表达式求值，会产生一个指向该对象的指针值；由于目标对象的类型是 `int`，结果的类型是 `int*`，读作“指向 `int` 的指针”。**
 
-取地址运算不会读取 `engine_temperature` 当前保存的 `78`，不会复制它的对象表示，也不会在原对象旁边额外创建地址。对象原本就占用一段能够被定位的存储；`&engine_temperature` 产生的是在 C++ 类型系统中指向该对象的值。
+**取地址运算不会读取 `engine_temperature` 当前保存的 `78`，不会复制它的对象表示，也不会在原对象旁边额外创建地址。对象原本就占用一段能够被定位的存储；`&engine_temperature` 产生的是在 C++ 类型系统中指向该对象的值。**
 
 ```text
 engine_temperature
@@ -35,13 +35,13 @@ engine_temperature
     指向 engine_temperature 的 int* 值
 ```
 
-指针值不是写在源码中的对象名称。名称 `engine_temperature` 由编译器解析，而指针值可以在程序运行期间保存、复制和改变，使代码能够在不直接写出目标名称的位置继续找到同一个对象。
+**指针值不是写在源码中的对象名称。名称 `engine_temperature` 由编译器解析，而指针值可以在程序运行期间保存、复制和改变，使代码能够在不直接写出目标名称的位置继续找到同一个对象。**
 
 ## 指针对象、指针值与目标对象
 
-`temperature_pointer` 是一个指针对象（pointer object）。与 `int` 对象保存整数值类似，它具有自己的类型、存储、生命周期和当前值；只是它当前保存的是指针值（pointer value）。
+**`temperature_pointer` 是一个指针对象（pointer object）。与 `int` 对象保存整数值类似，它具有自己的类型、存储、生命周期和当前值；只是它当前保存的是指针值（pointer value）。**
 
-当一个指针值指向某个对象时，该对象常称为被指向对象（pointee）。下面三个概念必须分别理解：
+**当一个指针值指向某个对象时，该对象常称为被指向对象（pointee）。下面三个概念必须分别理解：**
 
 - `engine_temperature` 是类型为 `int` 的被指向对象；
 - `temperature_pointer` 是类型为 `int*` 的指针对象；
@@ -58,7 +58,7 @@ engine_temperature
 └────────────────────────┘                  └────────────────────────┘
 ```
 
-`0x1000` 与 `0x2000` 只是帮助观察关系的假设地址。重点是：指针对象自己的存储位置，与它保存的指针值所标识的位置不是同一件事。`temperature_pointer` 位于右侧，却可以保存指向左侧对象的值。
+`0x1000` 与 `0x2000` 只是帮助观察关系的假设地址。重点是：**指针对象自己的存储位置，与它保存的指针值所标识的位置不是同一件事。`temperature_pointer` 位于右侧，却可以保存指向左侧对象的值。**
 
 ## 指针类型包含目标类型
 
@@ -72,14 +72,14 @@ double room_pressure{101.3};
 double* pressure_pointer{&room_pressure};
 ```
 
-`count_pointer` 的类型是 `int*`，`pressure_pointer` 的类型是 `double*`。`int*` 与 `double*` 是不同的指针类型；目标类型不是对地址附加的注释，而是指针类型自身的一部分。
+`count_pointer` 的类型是 `int*`，`pressure_pointer` 的类型是 `double*`。`int*` 与 `double*` 是不同的指针类型；**目标类型不是对地址附加的注释，而是指针类型自身的一部分。**
 
 ```cpp
 double room_pressure{101.3};
 int* wrong_pointer{&room_pressure}; // 错误：double* 不能直接初始化 int*
 ```
 
-目标类型决定程序通过指针间接访问时准备指定哪种对象，并让编译器能够检查明显不相容的指向关系。它仍不能单独证明某次间接访问一定成立；本篇示例中的指针值都直接取自类型匹配且仍然存在的对象。
+目标类型决定程序通过指针间接访问时准备指定哪种对象，并让编译器能够检查明显不相容的指向关系。**它仍不能单独证明某次间接访问一定成立；本篇示例中的指针值都直接取自类型匹配且仍然存在的对象。**
 
 ## 声明中的星号
 
@@ -95,7 +95,7 @@ int* temperature_pointer{&engine_temperature};
 | `*temperature_pointer` | 指针声明符 | 声明名称 `temperature_pointer` 为指针对象 |
 | `{&engine_temperature}` | 初始化式 | 用指向 `engine_temperature` 的值初始化指针对象 |
 
-在声明语法中，`*` 属于指针声明符（pointer declarator）。它参与说明被声明名称的类型，不会对某个指针值执行运算，也不会访问被指向对象。
+**在声明语法中，`*` 属于指针声明符（pointer declarator）。它参与说明被声明名称的类型，不会对某个指针值执行运算，也不会访问被指向对象。**
 
 空格不决定星号的语法含义，下面三种写法声明的是相同类型：
 
@@ -114,7 +114,7 @@ int second_value{20};
 int* first_pointer{&first_value}, second_copy{second_value};
 ```
 
-这一行中，`first_pointer` 是 `int*` 指针对象，`second_copy` 却是普通 `int` 对象。星号只属于 `first_pointer` 的声明符。每行只声明一个对象，可以直接消除这种歧义：
+这一行中，`first_pointer` 是 `int*` 指针对象，`second_copy` 却是普通 `int` 对象。**星号只属于 `first_pointer` 的声明符。每行只声明一个对象，可以直接消除这种歧义：**
 
 ```cpp
 int* first_pointer{&first_value};
@@ -123,7 +123,7 @@ int* second_pointer{&second_value};
 
 ## 表达式中的星号
 
-当一元 `*` 出现在表达式中并作用于指针值时，它是间接运算符（indirection operator），工程交流中也常称为解引用运算符（dereference operator）：
+**当一元 `*` 出现在表达式中并作用于指针值时，它是间接运算符（indirection operator），工程交流中也常称为解引用运算符（dereference operator）：**
 
 ```cpp
 int engine_temperature{78};
@@ -134,7 +134,7 @@ int temperature_snapshot{*temperature_pointer};
 
 求值 `temperature_pointer` 会取得它当前保存的指针值；`*temperature_pointer` 再通过这个值指定它所指向的 `int` 对象，也就是原来的 `engine_temperature`。
 
-这里最重要的不是把 `*` 背成“读取指针所指向的值”。`*temperature_pointer` 首先指定一个已经存在的对象，是否读取这个对象的当前值取决于整个表达式怎样使用它：
+这里最重要的不是把 `*` 背成“读取指针所指向的值”。**`*temperature_pointer` 首先指定一个已经存在的对象，是否读取这个对象的当前值取决于整个表达式怎样使用它：**
 
 ```cpp
 int temperature_snapshot{*temperature_pointer}; // 读取目标对象的 78
@@ -149,11 +149,11 @@ int temperature_snapshot{*temperature_pointer}; // 读取目标对象的 78
 | `temperature_pointer` | `int*` | 仍然指向 `engine_temperature` |
 | `temperature_snapshot` | `int` | 保存此前读取的副本 `78` |
 
-间接访问没有创建第二个 `engine_temperature`。直接写对象名称和通过指针使用 `*`，只是指定同一个对象的两条不同路径。
+**间接访问没有创建第二个 `engine_temperature`。直接写对象名称和通过指针使用 `*`，只是指定同一个对象的两条不同路径。**
 
 ## 同一个星号的不同语法角色
 
-`*` 的意义由完整语法结构决定，不能脱离位置单独判断：
+**`*` 的意义由完整语法结构决定，不能脱离位置单独判断：**
 
 | 完整形式 | 所在语境 | `*` 的作用 |
 | --- | --- | --- |
@@ -161,7 +161,7 @@ int temperature_snapshot{*temperature_pointer}; // 读取目标对象的 78
 | `*pointer_name` | 一元表达式 | 间接运算，通过指针值指定目标对象 |
 | `left * right` | 二元表达式 | 乘法运算，计算两个操作数的乘积 |
 
-因此，不能把声明 `int* pointer_name` 解释成“先有 `pointer_name`，再对它解引用”。声明正在引入这个名称，此处的星号属于声明语法；只有表达式中的一元 `*pointer_name` 才执行间接访问。
+因此，**不能把声明 `int* pointer_name` 解释成“先有 `pointer_name`，再对它解引用”。声明正在引入这个名称，此处的星号属于声明语法；只有表达式中的一元 `*pointer_name` 才执行间接访问。**
 
 ## 取地址与间接访问的关系
 
@@ -183,7 +183,7 @@ temperature_pointer 指针对象
 再次指定 engine_temperature 对象
 ```
 
-在当前示例的前提下，`*(&engine_temperature)` 指定的仍然是 `engine_temperature`：
+**在当前示例的前提下，`*(&engine_temperature)` 指定的仍然是 `engine_temperature`：**
 
 ```cpp
 *(&engine_temperature) = 82;
@@ -210,7 +210,7 @@ selected_limit ───────┐
 copied_selection ─────┘
 ```
 
-复制的是指针值，也就是当前的指向关系；没有复制被指向的 `int` 对象。通过任意一个指针修改目标，另一条路径再次读取时都能观察到同一个对象的新值：
+**复制的是指针值，也就是当前的指向关系；没有复制被指向的 `int` 对象。通过任意一个指针修改目标，另一条路径再次读取时都能观察到同一个对象的新值：**
 
 ```cpp
 *copied_selection = 6;
@@ -232,18 +232,18 @@ int* copied_selection{selected_limit};
 selected_limit = &evening_limit;
 ```
 
-赋值只替换 `selected_limit` 当前保存的指针值，不会移动或复制任何 `int` 对象，也不会自动修改 `copied_selection`：
+**赋值只替换 `selected_limit` 当前保存的指针值，不会移动或复制任何 `int` 对象，也不会自动修改 `copied_selection`：**
 
 | 时刻 | `selected_limit` 指向 | `copied_selection` 指向 |
 | --- | --- | --- |
 | 完成复制后 | `morning_limit` | `morning_limit` |
 | 重新赋值后 | `evening_limit` | `morning_limit` |
 
-这与普通对象的初始化和赋值模型一致：初始化创建新的指针对象，赋值改变已有指针对象保存的值。指针的特殊之处在于，它的值表达的是与另一个对象之间的指向关系。
+这与普通对象的初始化和赋值模型一致：**初始化创建新的指针对象，赋值改变已有指针对象保存的值。指针的特殊之处在于，它的值表达的是与另一个对象之间的指向关系。**
 
 ## 指针不是普通整数
 
-调试器经常把指针值显示成类似 `0x000001F4A1201000` 的十六进制文本，但指针类型与整数类型是不同的类型类别。指针值的表示（value representation）由实现定义，C++ 不要求所有平台使用相同的位宽或编码方式。
+调试器经常把指针值显示成类似 `0x000001F4A1201000` 的十六进制文本，**但指针类型与整数类型是不同的类型类别。指针值的表示（value representation）由实现定义，C++ 不要求所有平台使用相同的位宽或编码方式。**
 
 因此，不能仅凭 `int*` 推断：
 
@@ -252,13 +252,13 @@ selected_limit = &evening_limit;
 - 不同目标类型的指针具有相同表示；
 - 地址的打印结果包含判断间接访问是否成立所需的全部信息。
 
-当指针值指向对象时，它表示该对象的地址，但 C++ 同时通过指针类型和对象规则约束如何使用这个值。把指针简单记成“装地址的整数变量”，会丢失最重要的类型与对象语义。
+当指针值指向对象时，它表示该对象的地址，但 C++ 同时通过指针类型和对象规则约束如何使用这个值。**把指针简单记成“装地址的整数变量”，会丢失最重要的类型与对象语义。**
 
 ## 裸指针这一称呼
 
-使用 `T*` 形式声明的内建指针（built-in pointer），在工程交流中常称为裸指针（raw pointer）。`raw` 不是 C++ 关键字，也不会形成另一种类型；`int*` 的语言类型仍然是“指向 `int` 的指针”。
+使用 `T*` 形式声明的内建指针（built-in pointer），在工程交流中常称为裸指针（raw pointer）。**`raw` 不是 C++ 关键字，也不会形成另一种类型；`int*` 的语言类型仍然是“指向 `int` 的指针”。**
 
-“裸指针”只是在需要与其他封装形式区分时使用的工程称呼，不能代替对具体目标类型、指针值和被指向对象的分析。
+**“裸指针”只是在需要与其他封装形式区分时使用的工程称呼，不能代替对具体目标类型、指针值和被指向对象的分析。**
 
 ## 核心结论
 

@@ -1,32 +1,4 @@
-export const themes = {
-	earth: {
-		light: {
-			name: "浅棕米白",
-			bg: "#F8F3EA",
-			bgDeep: "#F0E8D8",
-			bgCard: "#F5EDE0",
-			text: "#2D2418",
-			textSec: "#7A6B5A",
-			accent: "#9B7B5A",
-			accentHover: "#7E6045",
-			accentLight: "rgba(155, 123, 90, 0.08)",
-			border: "rgba(45, 36, 24, 0.12)",
-			borderLight: "rgba(45, 36, 24, 0.06)",
-		},
-		dark: {
-			name: "深棕暗色",
-			bg: "#1A1612",
-			bgDeep: "#241E18",
-			bgCard: "#221D16",
-			text: "#E8DDD0",
-			textSec: "#9A8B7A",
-			accent: "#C4A67D",
-			accentHover: "#D4BC99",
-			accentLight: "rgba(196, 166, 125, 0.12)",
-			border: "rgba(232, 221, 208, 0.10)",
-			borderLight: "rgba(232, 221, 208, 0.05)",
-		},
-	},
+const themes = {
 	ocean: {
 		light: {
 			name: "日光工程手稿",
@@ -137,34 +109,6 @@ export const themes = {
 			accentLight: "rgba(240, 246, 252, 0.08)",
 			border: "rgba(240, 246, 252, 0.14)",
 			borderLight: "rgba(240, 246, 252, 0.10)",
-		},
-	},
-	black: {
-		light: {
-			name: "黑",
-			bg: "#F5F0E8",
-			bgDeep: "#EDE7DB",
-			bgCard: "#E8E2D6",
-			text: "#0A0A0A",
-			textSec: "#555555",
-			accent: "#0A0A0A",
-			accentHover: "#222222",
-			accentLight: "rgba(10, 10, 10, 0.08)",
-			border: "rgba(10, 10, 10, 0.15)",
-			borderLight: "rgba(10, 10, 10, 0.06)",
-		},
-		dark: {
-			name: "极夜黑",
-			bg: "#0A0A0A",
-			bgDeep: "#141414",
-			bgCard: "#111111",
-			text: "#E0E0E0",
-			textSec: "#888888",
-			accent: "#E0E0E0",
-			accentHover: "#CCCCCC",
-			accentLight: "rgba(224, 224, 224, 0.08)",
-			border: "rgba(224, 224, 224, 0.12)",
-			borderLight: "rgba(224, 224, 224, 0.06)",
 		},
 	},
 };

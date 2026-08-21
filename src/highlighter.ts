@@ -280,8 +280,3 @@ export async function highlight(
 
 	return html;
 }
-
-/* 预加载指定语言的 WASM（可在空闲时调用） */
-export async function preloadLanguage(lang: string): Promise<void> {
-	await getLanguage(lang);
-}

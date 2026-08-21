@@ -22,20 +22,6 @@ export function SectionTitle({
 	);
 }
 
-export function Tag({
-	children,
-	theme,
-}: { children: ReactNode; theme: Theme }) {
-	return (
-		<span
-			className="px-3 py-1.5 rounded-lg text-xs font-medium tracking-wide"
-			style={{ backgroundColor: theme.accentLight, color: theme.accent }}
-		>
-			{children}
-		</span>
-	);
-}
-
 export function NavBar({
 	theme,
 	active,

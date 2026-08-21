@@ -668,7 +668,7 @@ interface PlotPoint {
 	y: number | null;
 }
 
-export interface PlotModel {
+interface PlotModel {
 	points: PlotPoint[];
 	yMin: number;
 	yMax: number;
@@ -712,7 +712,7 @@ function getPlotYRange(values: number[]): [number, number] | null {
 	return [yMin, yMax];
 }
 
-export function buildPlotModel(
+function buildPlotModel(
 	fnExpr: string,
 	xMin: number,
 	xMax: number,
@@ -1005,8 +1005,7 @@ function makeComponents(
 }
 
 /* ---- Main renderer ---- */
-export interface ThemeColors {
-	name: string;
+interface ThemeColors {
 	accent: string;
 	text?: string;
 	textSec?: string;
@@ -1070,28 +1069,12 @@ export function MarkdownPreview({
 		[dark, theme, resolveNoteHref, onNoteOpen],
 	);
 
-	const proseThemeMap: Record<string, string> = {
-		浅棕米白: "earth",
-		深棕暗色: "earth",
-		日光工程手稿: "ocean",
-		石墨深海: "ocean",
-		青瓷米白: "sage",
-		青瓷暗色: "sage",
-		浅青绿: "sage",
-		暗青墨绿: "sage",
-		"GitHub Light": "black",
-		"GitHub Dark": "black",
-		黑: "black",
-		极夜黑: "black",
-	};
-	const proseTheme = proseThemeMap[theme.name] || "earth";
-
 	const markdownStyle = markdownThemeVariables(theme, dark);
 
 	return (
 		<article className="w-full">
 			<div
-				className={`markdown-prose w-full max-w-none prose prose-${proseTheme}${dark ? " dark" : ""}`}
+				className={`markdown-prose w-full max-w-none prose prose-ocean${dark ? " dark" : ""}`}
 				style={markdownStyle}
 			>
 				<ReactMarkdown

@@ -56,7 +56,6 @@ function readInitialRoute(): { section: Section; aboutView: AboutView } {
 
 const sectionMap = {
 	home: HomePage,
-	about: AboutPage,
 	projects: ProjectsPage,
 	notes: NotesPage,
 	contact: ContactPage,

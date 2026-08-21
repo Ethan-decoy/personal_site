@@ -12,14 +12,6 @@
 		"Noto Sans SC", sans-serif;
 	--font-mono: "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
 
-	/* 配色方案 C — 浅棕米白（默认） */
-	--color-bg: #f8f3ea;
-	--color-bg-deep: #f0e8d8;
-	--color-text: #2d2418;
-	--color-text-sec: #7a6b5a;
-	--color-accent: #9b7b5a;
-	--color-accent-hover: #7e6045;
-
 	/* 动效 */
 	--default-transition-duration: 200ms;
 }
@@ -387,29 +379,6 @@ body {
 	}
 }
 
-/* 笔记页引用块样式 — typora 风格 */
-.note-quote {
-	border-left: 3px solid var(--color-accent);
-	background: var(--color-accent-light, rgba(0, 0, 0, 0.02));
-	padding: 12px 16px;
-	margin: 8px 0;
-	border-radius: 0 8px 8px 0;
-}
-.note-quote p {
-	color: var(--color-text) !important;
-	font-style: italic;
-	font-size: 1rem;
-	line-height: 1.625;
-}
-.note-quote .quote-en {
-	color: var(--color-text-sec) !important;
-	font-style: normal;
-	font-size: 0.875rem;
-	line-height: 1.5;
-	margin-top: 2px;
-	display: block;
-}
-
 /* 隐藏导航栏滚动条 */
 ::-webkit-scrollbar {
 	display: none;
@@ -531,46 +500,7 @@ body {
 	}
 }
 
-/* ==================== Prose Theme Overrides ==================== */
-/* Tailwind @tailwindcss/typography 配色主题 — 与 App.tsx 主题系统同步 */
-
-/* earth (浅棕米白) */
-.prose-earth {
-	--tw-prose-body: #2d2418;
-	--tw-prose-headings: #2d2418;
-	--tw-prose-lead: #7a6b5a;
-	--tw-prose-links: #9b7b5a;
-	--tw-prose-bold: #2d2418;
-	--tw-prose-counters: #7a6b5a;
-	--tw-prose-bullets: #7a6b5a;
-	--tw-prose-hr: rgba(45, 36, 24, 0.08);
-	--tw-prose-quotes: #7a6b5a;
-	--tw-prose-quote-borders: rgba(155, 123, 90, 0.4);
-	--tw-prose-captions: #7a6b5a;
-	--tw-prose-code: #9b7b5a;
-	--tw-prose-pre-code: #e8dfd0;
-	--tw-prose-pre-bg: transparent;
-	--tw-prose-th-borders: rgba(45, 36, 24, 0.12);
-	--tw-prose-td-borders: rgba(45, 36, 24, 0.12);
-}
-.prose-earth.dark {
-	--tw-prose-body: #e8ddd0;
-	--tw-prose-headings: #e8ddd0;
-	--tw-prose-lead: #9a8b7a;
-	--tw-prose-links: #c4a67d;
-	--tw-prose-bold: #e8ddd0;
-	--tw-prose-counters: #9a8b7a;
-	--tw-prose-bullets: #9a8b7a;
-	--tw-prose-hr: rgba(232, 221, 208, 0.08);
-	--tw-prose-quotes: #9a8b7a;
-	--tw-prose-quote-borders: rgba(196, 166, 125, 0.4);
-	--tw-prose-captions: #9a8b7a;
-	--tw-prose-code: #c4a67d;
-	--tw-prose-pre-code: #d4c8b8;
-	--tw-prose-pre-bg: transparent;
-	--tw-prose-th-borders: rgba(232, 221, 208, 0.1);
-	--tw-prose-td-borders: rgba(232, 221, 208, 0.1);
-}
+/* ==================== Notes Prose Theme ==================== */
 
 /* ocean (日光工程手稿 / 石墨深海) */
 .prose-ocean {
@@ -608,82 +538,6 @@ body {
 	--tw-prose-pre-bg: transparent;
 	--tw-prose-th-borders: rgba(216, 222, 229, 0.12);
 	--tw-prose-td-borders: rgba(216, 222, 229, 0.12);
-}
-
-/* sage (青瓷米白) */
-.prose-sage {
-	--tw-prose-body: #182820;
-	--tw-prose-headings: #182820;
-	--tw-prose-lead: #53685f;
-	--tw-prose-links: #3f7465;
-	--tw-prose-bold: #182820;
-	--tw-prose-counters: #53685f;
-	--tw-prose-bullets: #53685f;
-	--tw-prose-hr: rgba(24, 40, 32, 0.08);
-	--tw-prose-quotes: #53685f;
-	--tw-prose-quote-borders: rgba(63, 116, 101, 0.4);
-	--tw-prose-captions: #53685f;
-	--tw-prose-code: #3f7465;
-	--tw-prose-pre-code: #d8e7de;
-	--tw-prose-pre-bg: transparent;
-	--tw-prose-th-borders: rgba(24, 40, 32, 0.12);
-	--tw-prose-td-borders: rgba(24, 40, 32, 0.12);
-}
-.prose-sage.dark {
-	--tw-prose-body: #e2e9e4;
-	--tw-prose-headings: #e2e9e4;
-	--tw-prose-lead: #91a49a;
-	--tw-prose-links: #7fb69f;
-	--tw-prose-bold: #e2e9e4;
-	--tw-prose-counters: #91a49a;
-	--tw-prose-bullets: #91a49a;
-	--tw-prose-hr: rgba(221, 233, 226, 0.08);
-	--tw-prose-quotes: #91a49a;
-	--tw-prose-quote-borders: rgba(127, 182, 159, 0.4);
-	--tw-prose-captions: #91a49a;
-	--tw-prose-code: #7fb69f;
-	--tw-prose-pre-code: #cfe2d8;
-	--tw-prose-pre-bg: transparent;
-	--tw-prose-th-borders: rgba(221, 233, 226, 0.08);
-	--tw-prose-td-borders: rgba(221, 233, 226, 0.08);
-}
-
-/* black (黑) */
-.prose-black {
-	--tw-prose-body: #1a1a1a;
-	--tw-prose-headings: #1a1a1a;
-	--tw-prose-lead: #666;
-	--tw-prose-links: #333;
-	--tw-prose-bold: #1a1a1a;
-	--tw-prose-counters: #666;
-	--tw-prose-bullets: #666;
-	--tw-prose-hr: rgba(0, 0, 0, 0.08);
-	--tw-prose-quotes: #666;
-	--tw-prose-quote-borders: rgba(0, 0, 0, 0.3);
-	--tw-prose-captions: #666;
-	--tw-prose-code: #333;
-	--tw-prose-pre-code: #e8e8e8;
-	--tw-prose-pre-bg: transparent;
-	--tw-prose-th-borders: rgba(0, 0, 0, 0.12);
-	--tw-prose-td-borders: rgba(0, 0, 0, 0.12);
-}
-.prose-black.dark {
-	--tw-prose-body: #e0e0e0;
-	--tw-prose-headings: #e0e0e0;
-	--tw-prose-lead: #888888;
-	--tw-prose-links: #e0e0e0;
-	--tw-prose-bold: #e0e0e0;
-	--tw-prose-counters: #888888;
-	--tw-prose-bullets: #888888;
-	--tw-prose-hr: rgba(224, 224, 224, 0.08);
-	--tw-prose-quotes: #888888;
-	--tw-prose-quote-borders: rgba(224, 224, 224, 0.3);
-	--tw-prose-captions: #888888;
-	--tw-prose-code: #e0e0e0;
-	--tw-prose-pre-code: #d0d0d0;
-	--tw-prose-pre-bg: transparent;
-	--tw-prose-th-borders: rgba(224, 224, 224, 0.12);
-	--tw-prose-td-borders: rgba(224, 224, 224, 0.12);
 }
 
 /* ==================== Markdown document ==================== */
@@ -949,17 +803,6 @@ body {
 }
 
 /* Prose links — no underline by default, underline on hover. Heading anchor links excluded. */
-.prose-earth a {
-	text-decoration: none;
-	transition: color 0.15s ease-out;
-}
-.prose-earth a:hover {
-	text-decoration: underline;
-	color: #7e6045;
-}
-.prose-earth.dark a:hover {
-	color: #d4bc99;
-}
 .prose-ocean a {
 	text-decoration: none;
 	transition: color 0.15s ease-out;
@@ -970,26 +813,4 @@ body {
 }
 .prose-ocean.dark a:hover {
 	color: #a4cadb;
-}
-.prose-sage a {
-	text-decoration: none;
-	transition: color 0.15s ease-out;
-}
-.prose-sage a:hover {
-	text-decoration: underline;
-	color: #315c50;
-}
-.prose-sage.dark a:hover {
-	color: #9cc9b7;
-}
-.prose-black a {
-	text-decoration: none;
-	transition: color 0.15s ease-out;
-}
-.prose-black a:hover {
-	text-decoration: underline;
-	color: #000;
-}
-.prose-black.dark a:hover {
-	color: #cccccc;
 }

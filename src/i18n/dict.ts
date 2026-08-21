@@ -131,15 +131,6 @@ export const dict = {
 		en: "Justin Bieber · Cody Simpson",
 	},
 	// About - work
-	"about.bio": { zh: "简介", en: "Bio" },
-	"about.bio.p1": {
-		zh: "图像算法工程师，专注于 3D-AOI 工业视觉与点云处理。",
-		en: "Image algorithm engineer specializing in 3D-AOI industrial vision and point cloud processing.",
-	},
-	"about.bio.p2": {
-		zh: "擅长从数学推导到 C++ 实现的全链路开发，并在实际产线中验证算法的稳定性与精度。",
-		en: "Skilled in full-chain development from mathematical derivation to C++ implementation, validating algorithm stability and accuracy in real production lines.",
-	},
 	"about.work.kicker": {
 		zh: "3D 视觉研发",
 		en: "3D Vision R&D",
@@ -179,12 +170,6 @@ export const dict = {
 		zh: "相位测量轮廓术",
 		en: "Phase Measurement Profilometry",
 	},
-
-	"about.cta": {
-		zh: "想要进一步了解我的技术栈与项目经验？",
-		en: "Want to learn more about my tech stack and project experience?",
-	},
-	"about.cta.btn": { zh: "联系我", en: "Contact me" },
 	// Projects
 	"projects.title": { zh: "项目", en: "Projects" },
 	"projects.activity.eyebrow": { zh: "GitHub 活动", en: "GitHub activity" },
@@ -216,8 +201,4 @@ export const dict = {
 
 	// Footer
 	"footer.contact": { zh: "联系", en: "Contact" },
-
-	// Language toggle
-	"lang.zh": { zh: "中文", en: "中文" },
-	"lang.en": { zh: "英文", en: "English" },
 };

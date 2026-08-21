@@ -743,7 +743,7 @@ export default function NotesPage({
 				</div>
 			)}
 
-			<div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-24 md:py-32">
+			<div className="section-page-frame pb-16 sm:pb-24 md:pb-32">
 				<SectionTitle theme={theme}>笔记</SectionTitle>
 				{isNotesEmpty() ? (
 					<div

@@ -65,7 +65,7 @@ function AboutViewHeader({
 	);
 
 	return (
-		<header className="mb-12 flex items-center gap-4">
+		<header className="mb-12 flex min-h-10 items-center gap-4">
 			<h2
 				className="shrink-0 text-2xl font-bold tracking-tight motion-safe:transition-colors motion-safe:duration-300 motion-safe:ease-out"
 				style={{ color: theme.text }}
@@ -564,7 +564,7 @@ export default function AboutPage({
 		},
 	];
 	return (
-		<div className="max-w-5xl mx-auto px-4 pt-16 pb-10 sm:px-6 sm:pt-24 sm:pb-12 md:px-8 md:pt-32 md:pb-12">
+		<div className="section-page-frame pb-10 sm:pb-12 md:pb-12">
 			<AboutViewHeader
 				view={view}
 				theme={theme}

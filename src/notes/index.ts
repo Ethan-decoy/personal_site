@@ -1,8 +1,12 @@
-const rawModules = import.meta.glob("./**/*.md", {
-	eager: true,
-	query: "?raw",
-	import: "default",
-}) as Record<string, string>;
+import noteManifest from "virtual:notes-manifest";
+
+const rawModuleLoaders = import.meta.glob<string>(
+	["./**/*.md", "!./**/_*/**"],
+	{
+		query: "?raw",
+		import: "default",
+	},
+);
 
 const WIKI_FILE = "./wiki.md";
 const INDEX_FILE_SUFFIX = "/_index.md";
@@ -16,16 +20,14 @@ const DIRECTORY_LABELS: Record<string, string> = {
 	ros2: "ROS 2",
 };
 
-interface Frontmatter {
+interface NoteMetadata {
+	file: string;
 	title: string;
 	date: string;
 	order?: number;
 }
 
-export interface NoteContent {
-	file: string;
-	title: string;
-	date: string;
+export interface NoteContent extends NoteMetadata {
 	content: string;
 }
 
@@ -73,29 +75,10 @@ interface DirectoryBuilder {
 
 interface NotesIndex {
 	sidebarTree: NestedTreeNode[];
-	notesByFile: Record<string, NoteContent>;
+	notesByFile: Record<string, NoteMetadata>;
 	directoryTitles: Record<string, string>;
 	visibleFiles: string[];
 	isEmpty: boolean;
-}
-
-function parseFrontmatter(raw: string): Frontmatter {
-	const m = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/);
-	if (!m) return { title: "", date: "" };
-	const fm = Object.fromEntries(
-		m[1].split("\n").map((line) => {
-			const idx = line.indexOf(":");
-			return idx === -1
-				? [line.trim(), ""]
-				: [line.slice(0, idx).trim(), line.slice(idx + 1).trim()];
-		}),
-	);
-	const order = fm.order !== undefined ? Number(fm.order) : undefined;
-	return {
-		title: fm.title || "",
-		date: fm.date || "",
-		order: Number.isNaN(order) ? undefined : order,
-	};
 }
 
 function parseMarkdownBody(raw: string): string {
@@ -120,14 +103,6 @@ function isIndexFile(file: string): boolean {
 function normalizeFileKey(file: string): string {
 	const normalized = file.replace(/\\/g, "/").replace(/^\/+/, "");
 	return normalized.startsWith("./") ? normalized : `./${normalized}`;
-}
-
-function isPrivateNoteFile(file: string): boolean {
-	const directories = normalizeFileKey(file)
-		.replace(/^\.\//, "")
-		.split("/")
-		.slice(0, -1);
-	return directories.some((segment) => segment.startsWith("_"));
 }
 
 function fallbackDirectoryTitle(segment: string): string {
@@ -185,26 +160,27 @@ function isNestedTreeNode(
 }
 
 function buildNotesIndex(): NotesIndex {
-	const notesByFile: Record<string, NoteContent> = {};
+	const notesByFile: Record<string, NoteMetadata> = {};
 	const directoryIndexes: Record<string, string> = {};
 	const directoryTitles: Record<string, string> = {};
 	const visibleFiles: string[] = [];
 	const root: DirectoryBuilder = { key: "", title: "", dirs: {}, files: [] };
 
-	for (const [file, raw] of Object.entries(rawModules)) {
-		const fm = parseFrontmatter(raw);
+	for (const manifestRecord of noteManifest) {
+		const file = normalizeFileKey(manifestRecord.file);
+		const title = manifestRecord.title || fallbackTitle(file);
 		notesByFile[file] = {
 			file,
-			title: fm.title || fallbackTitle(file),
-			date: fm.date,
-			content: parseMarkdownBody(raw),
+			title,
+			date: manifestRecord.date,
+			order: manifestRecord.order,
 		};
 
 		if (isIndexFile(file)) {
 			directoryIndexes[directoryKeyForIndexFile(file)] = file;
 			continue;
 		}
-		if (file === WIKI_FILE || isPrivateNoteFile(file)) continue;
+		if (file === WIKI_FILE) continue;
 
 		visibleFiles.push(file);
 		const parts = file.replace(/^\.\//, "").split("/");
@@ -222,9 +198,9 @@ function buildNotesIndex(): NotesIndex {
 			current = current.dirs[key];
 		}
 		current.files.push({
-			title: fm.title || fallbackTitle(file),
-			date: fm.date,
-			order: fm.order,
+			title,
+			date: manifestRecord.date,
+			order: manifestRecord.order,
 			file,
 			filename: fileName(file),
 		});
@@ -278,8 +254,28 @@ export function getInitialExpandedKeys(): Set<string> {
 	return new Set();
 }
 
-export function getNote(file: string): NoteContent | null {
-	return notesIndex.notesByFile[normalizeFileKey(file)] ?? null;
+const noteContentCache = new Map<string, Promise<NoteContent | null>>();
+
+export function loadNote(file: string): Promise<NoteContent | null> {
+	const normalizedFile = normalizeFileKey(file);
+	const cached = noteContentCache.get(normalizedFile);
+	if (cached) return cached;
+
+	const metadata = notesIndex.notesByFile[normalizedFile];
+	const loadRaw = rawModuleLoaders[normalizedFile];
+	if (!metadata || !loadRaw) return Promise.resolve(null);
+
+	const promise = loadRaw()
+		.then((raw) => ({
+			...metadata,
+			content: parseMarkdownBody(raw),
+		}))
+		.catch((error) => {
+			noteContentCache.delete(normalizedFile);
+			throw error;
+		});
+	noteContentCache.set(normalizedFile, promise);
+	return promise;
 }
 
 export function expandedKeysForFile(file: string): Set<string> {
@@ -297,16 +293,33 @@ export function isDirectoryNode(
 	return isNestedTreeNode(node);
 }
 
-export function searchNotes(query: string): SearchResult[] {
+let searchBodyIndexPromise: Promise<Map<string, string>> | null = null;
+
+function loadSearchBodyIndex(): Promise<Map<string, string>> {
+	searchBodyIndexPromise ??= import("virtual:notes-search-index")
+		.then(
+			({ default: entries }) =>
+				new Map(
+					entries.map((entry) => [normalizeFileKey(entry.file), entry.body]),
+				),
+		)
+		.catch((error) => {
+			searchBodyIndexPromise = null;
+			throw error;
+		});
+	return searchBodyIndexPromise;
+}
+
+export async function searchNotes(query: string): Promise<SearchResult[]> {
 	if (!query.trim()) return [];
 	const q = query.toLowerCase().trim();
 	const results: SearchResult[] = [];
+	const searchBodyIndex = await loadSearchBodyIndex();
 
 	for (const file of notesIndex.visibleFiles) {
 		const note = notesIndex.notesByFile[file];
-		const raw = rawModules[file] || "";
 		const titleMatch = note.title.toLowerCase().includes(q);
-		const bodyMatch = raw.toLowerCase().includes(q);
+		const bodyMatch = searchBodyIndex.get(file)?.includes(q) ?? false;
 
 		if (titleMatch || bodyMatch) {
 			const directoryKey = directoryKeyForFile(file);

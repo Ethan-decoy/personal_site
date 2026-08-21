@@ -41,6 +41,11 @@ try {
 	const tree = notes.getSidebarTree();
 	const allDirectories = directories(tree);
 	const allFiles = files(tree);
+	const sampleFile = allFiles[0];
+	const loadedSample = sampleFile ? await notes.loadNote(sampleFile.file) : null;
+	const sampleSearchResults = sampleFile
+		? await notes.searchNotes(sampleFile.title)
+		: [];
 	const indexedDirectory = allDirectories.find(
 		(node) => node.indexFile && node.children.length > 0,
 	);
@@ -83,6 +88,25 @@ try {
 	});
 
 	const checks = [
+		{
+			name: "the initial catalog contains metadata instead of note bodies",
+			pass:
+				!sampleFile ||
+				!("content" in notes.notesIndex.notesByFile[sampleFile.file]),
+		},
+		{
+			name: "a note body remains available through the lazy loader",
+			pass:
+				!sampleFile ||
+				(loadedSample?.file === sampleFile.file &&
+					typeof loadedSample.content === "string"),
+		},
+		{
+			name: "the deferred full-text index preserves title search",
+			pass:
+				!sampleFile ||
+				sampleSearchResults.some((result) => result.file === sampleFile.file),
+		},
 		{
 			name: "an expanded indexed directory stays collapsed after one row click",
 			pass: !afterDirectoryRowClick.has(indexedDirectory.key),

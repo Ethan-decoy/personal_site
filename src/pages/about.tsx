@@ -17,6 +17,7 @@ export type {
 	EntertainmentSectionId,
 	PersonalSectionId,
 } from "./about-personal";
+export { preloadPersonalImages } from "./about-personal";
 
 type AboutView = "personal" | "work";
 

@@ -33,7 +33,8 @@ import swift from "highlight.js/lib/languages/swift";
 import ts from "highlight.js/lib/languages/typescript";
 import xml from "highlight.js/lib/languages/xml";
 import yaml from "highlight.js/lib/languages/yaml";
-import { highlight as tsHighlight } from "./highlighter";
+
+const loadTreeSitterHighlighter = () => import("./highlighter");
 
 /* ---- highlight.js language registrations ---- */
 hljs.registerLanguage("typescript", ts);
@@ -581,7 +582,8 @@ function AsyncCodeBlock({
 
 	useEffect(() => {
 		let cancelled = false;
-		tsHighlight(value, lang)
+		void loadTreeSitterHighlighter()
+			.then(({ highlight }) => highlight(value, lang))
 			.then((result) => {
 				if (!cancelled && result) setHtml(result);
 			})

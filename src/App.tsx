@@ -1,20 +1,58 @@
-import { type ReactNode, useEffect, useState } from "react";
+import {
+	type ReactNode,
+	Suspense,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { Footer, LangToggle, NavBar, ThemeToggle } from "./components";
 import { useI18n } from "./i18n";
 import { I18nProvider } from "./i18n/index";
-import AboutPage, {
-	type EntertainmentSectionId,
-	type PersonalSectionId,
-	type WorkSectionId,
+import {
+	AboutPage,
+	ContactPage,
+	HomePage,
+	NotesPage,
+	ProjectsPage,
+	preloadSection,
+	scheduleCommonPagePreload,
+} from "./page-modules";
+import type {
+	EntertainmentSectionId,
+	PersonalSectionId,
+	WorkSectionId,
 } from "./pages/about";
-import ContactPage from "./pages/contact";
-import HomePage from "./pages/home";
-import NotesPage from "./pages/notes";
-import ProjectsPage from "./pages/projects";
 import { ThemeModeProvider, useThemeMode } from "./theme-mode";
 import { type Section, type ThemeKey, getAboutTheme, getTheme } from "./themes";
 
 type AboutView = "personal" | "work";
+
+const sections: readonly Section[] = [
+	"home",
+	"about",
+	"projects",
+	"notes",
+	"contact",
+];
+
+function isSection(value: string): value is Section {
+	return sections.includes(value as Section);
+}
+
+function isAboutView(value: string | undefined): value is AboutView {
+	return value === "work" || value === "personal";
+}
+
+function readInitialRoute(): { section: Section; aboutView: AboutView } {
+	const [rawSection, rawAboutView] = window.location.hash
+		.replace(/^#/, "")
+		.split("/");
+	return {
+		section: isSection(rawSection) ? rawSection : "home",
+		aboutView: isAboutView(rawAboutView) ? rawAboutView : "work",
+	};
+}
 
 const sectionMap = {
 	home: HomePage,
@@ -35,38 +73,51 @@ const sectionTheme: Record<Section, ThemeKey> = {
 function AppInner() {
 	const { locale, setLocale } = useI18n();
 	const { mode, setMode } = useThemeMode();
-	const [active, setActive] = useState<Section>("home");
-	const [aboutView, setAboutView] = useState<AboutView>("work");
+	const [initialRoute] = useState(readInitialRoute);
+	const [active, setActive] = useState<Section>(initialRoute.section);
+	const [aboutView, setAboutView] = useState<AboutView>(initialRoute.aboutView);
 	const [workSection, setWorkSection] = useState<WorkSectionId>("experience");
 	const [personalSection, setPersonalSection] =
 		useState<PersonalSectionId>("beliefs");
 	const [entertainmentSection, setEntertainmentSection] =
 		useState<EntertainmentSectionId>("playing");
+	const navigationRequestRef = useRef(0);
 	const theme =
 		active === "about"
 			? getAboutTheme(aboutView, mode)
 			: getTheme(sectionTheme[active], mode);
 
-	useEffect(() => {
-		const hash = window.location.hash.replace("#", "");
-		if (!hash) return;
-		const [section, sub] = hash.split("/") as [Section, AboutView?];
-		if (sectionMap[section]) {
-			setActive(section);
-			if (section === "about" && sub) setAboutView(sub);
-		}
+	useEffect(() => scheduleCommonPagePreload(), []);
+
+	const prefetch = useCallback((section: Section) => {
+		void preloadSection(section).catch(() => undefined);
 	}, []);
 
-	const navigate = (s: Section, sub?: AboutView) => {
-		setActive(s);
-		if (s === "about" && sub) {
-			setAboutView(sub);
-			window.history.replaceState(null, "", `#${s}/${sub}`);
-		} else {
-			window.history.replaceState(null, "", `#${s}`);
+	const navigate = useCallback((section: Section, sub?: AboutView) => {
+		const requestId = ++navigationRequestRef.current;
+		const commitNavigation = () => {
+			if (requestId !== navigationRequestRef.current) return;
+			setActive(section);
+			if (section === "about" && isAboutView(sub)) setAboutView(sub);
+			window.history.replaceState(
+				null,
+				"",
+				section === "about" && isAboutView(sub)
+					? `#${section}/${sub}`
+					: `#${section}`,
+			);
+			window.scrollTo({ top: 0 });
+		};
+
+		if (section === "home") {
+			commitNavigation();
+			return;
 		}
-		window.scrollTo({ top: 0 });
-	};
+
+		void preloadSection(section)
+			.then(commitNavigation)
+			.catch(() => undefined);
+	}, []);
 
 	let pageContent: ReactNode;
 	if (active === "about") {
@@ -93,13 +144,28 @@ function AppInner() {
 			className="min-h-screen flex flex-col motion-safe:transition-colors motion-safe:duration-300 motion-safe:ease-out"
 			style={{ backgroundColor: theme.bg, color: theme.text }}
 		>
-			<NavBar theme={theme} active={active} onNavigate={navigate} />
+			<NavBar
+				theme={theme}
+				active={active}
+				onNavigate={navigate}
+				onPrefetch={prefetch}
+			/>
 			<div className="fixed top-[18px] right-5 z-50 flex items-center gap-2">
 				<ThemeToggle mode={mode} setMode={setMode} theme={theme} />
 				<LangToggle locale={locale} setLocale={setLocale} theme={theme} />
 			</div>
-			<main className="flex-1">{pageContent}</main>
-			<Footer theme={theme} onNavigate={navigate} />
+			<main className="flex-1">
+				<Suspense
+					fallback={
+						<div aria-busy="true" className="min-h-[calc(100svh-4.75rem)]">
+							<span className="sr-only">Loading page</span>
+						</div>
+					}
+				>
+					{pageContent}
+				</Suspense>
+			</main>
+			<Footer theme={theme} onNavigate={navigate} onPrefetch={prefetch} />
 		</div>
 	);
 }

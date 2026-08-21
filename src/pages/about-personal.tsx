@@ -8,9 +8,26 @@ import {
 	useState,
 } from "react";
 import { useI18n } from "../i18n";
+import {
+	type ImageLoadPriority,
+	prepareImage,
+	scheduleImageWarmup,
+} from "../image-resources";
 import type { Theme } from "../themes";
 
 const SERVE_PEOPLE_RED = "#D52B1E";
+
+const PERSONAL_IMAGE_PATHS = {
+	recent: "assets/recent/cat-portrait.jpg",
+	beliefs: "assets/mao-style-serve-the-people.png",
+	watching: "assets/favorites/series-modern-family.jpg",
+	listening:
+		"assets/favorites/song-home-to-mama-justin-bieber-cody-simpson.jpg",
+} as const;
+
+function resolvePersonalImage(path: string) {
+	return `${import.meta.env.BASE_URL}${path}`;
+}
 
 type PersonalLifeLabels = {
 	index: string;
@@ -35,7 +52,7 @@ function ServePeopleMark({
 	opacity?: number;
 	label?: string;
 }) {
-	const captionMask = `${import.meta.env.BASE_URL}assets/mao-style-serve-the-people.png`;
+	const captionMask = resolvePersonalImage(PERSONAL_IMAGE_PATHS.beliefs);
 
 	return (
 		<span
@@ -154,130 +171,52 @@ const MAGNETIC_PIXEL_SPREAD_MS = 280;
 const MAGNETIC_PIXEL_DURATION_MS = MAGNETIC_PIXEL_SPREAD_MS;
 const MAGNETIC_AUTOPLAY_DELAY_MS = 6_000;
 
-type PosterImageCacheEntry = {
-	image: HTMLImageElement;
-	promise: Promise<HTMLImageElement>;
-};
-
-type NetworkAwareNavigator = Navigator & {
-	connection?: {
-		effectiveType?: string;
-		saveData?: boolean;
-	};
-};
-
-type IdleAwareWindow = Window & {
-	requestIdleCallback?: (
-		callback: () => void,
-		options?: { timeout: number },
-	) => number;
-	cancelIdleCallback?: (handle: number) => void;
-};
-
-const posterImageCache = new Map<string, PosterImageCacheEntry>();
-
 function resolvePosterSrc(poster: MagneticPoster) {
 	return `${import.meta.env.BASE_URL}${poster.src}`;
 }
 
 function loadPosterImage(
 	poster: MagneticPoster,
-	priority: "auto" | "low" = "auto",
+	priority: ImageLoadPriority = "auto",
 ) {
-	const source = resolvePosterSrc(poster);
-	const cached = posterImageCache.get(source);
-	if (cached) {
-		if (priority === "auto" && cached.image.fetchPriority === "low")
-			cached.image.fetchPriority = "auto";
-		return cached.promise;
-	}
-
-	const image = new Image();
-	image.decoding = "async";
-	image.fetchPriority = priority;
-	const promise = new Promise<HTMLImageElement>((resolve, reject) => {
-		image.addEventListener(
-			"load",
-			() => {
-				void image
-					.decode()
-					.catch(() => undefined)
-					.finally(() => resolve(image));
-			},
-			{ once: true },
-		);
-		image.addEventListener(
-			"error",
-			() => reject(new Error(`Unable to load poster: ${poster.title}`)),
-			{ once: true },
-		);
-	});
-	const entry = { image, promise };
-	posterImageCache.set(source, entry);
-	void promise.catch(() => {
-		if (posterImageCache.get(source) === entry) posterImageCache.delete(source);
-	});
-	image.src = source;
-	return promise;
+	return prepareImage(resolvePosterSrc(poster), priority);
 }
 
-function scheduleGamePosterWarmup() {
-	const connection = (navigator as NetworkAwareNavigator).connection;
-	if (
-		connection?.saveData ||
-		connection?.effectiveType === "slow-2g" ||
-		connection?.effectiveType === "2g"
-	) {
-		return () => undefined;
+const PERSONAL_PANEL_IMAGES: Partial<Record<LifePanelId, string>> = {
+	recent: resolvePersonalImage(PERSONAL_IMAGE_PATHS.recent),
+	beliefs: resolvePersonalImage(PERSONAL_IMAGE_PATHS.beliefs),
+	watching: resolvePersonalImage(PERSONAL_IMAGE_PATHS.watching),
+	listening: resolvePersonalImage(PERSONAL_IMAGE_PATHS.listening),
+};
+
+function preparePersonalPanel(panel: LifePanelId): Promise<void> {
+	if (panel === "playing") {
+		const [currentPoster, ...upcomingPosters] = MAGNETIC_POSTERS;
+		for (const poster of upcomingPosters) {
+			void loadPosterImage(poster, "low").catch(() => undefined);
+		}
+		return currentPoster
+			? loadPosterImage(currentPoster, "high").then(() => undefined)
+			: Promise.resolve();
 	}
 
-	const idleWindow = window as IdleAwareWindow;
-	const pendingImages = new Set<HTMLImageElement>();
-	let cancelled = false;
-	let idleHandle: number | undefined;
-	let timeoutHandle: number | undefined;
-
-	const warmup = () => {
-		if (cancelled || document.visibilityState !== "visible") return;
-		for (const poster of MAGNETIC_POSTERS) {
-			const image = new Image();
-			image.decoding = "async";
-			image.fetchPriority = "low";
-			const release = () => pendingImages.delete(image);
-			image.addEventListener("load", release, { once: true });
-			image.addEventListener("error", release, { once: true });
-			pendingImages.add(image);
-			image.src = resolvePosterSrc(poster);
-		}
-	};
-
-	const schedule = () => {
-		if (cancelled) return;
-		if (idleWindow.requestIdleCallback) {
-			idleHandle = idleWindow.requestIdleCallback(warmup, { timeout: 2_500 });
-			return;
-		}
-		timeoutHandle = window.setTimeout(warmup, 1_200);
-	};
-
-	if (document.readyState === "complete") schedule();
-	else window.addEventListener("load", schedule, { once: true });
-
-	return () => {
-		cancelled = true;
-		window.removeEventListener("load", schedule);
-		if (idleHandle !== undefined) idleWindow.cancelIdleCallback?.(idleHandle);
-		if (timeoutHandle !== undefined) window.clearTimeout(timeoutHandle);
-		for (const image of pendingImages) image.src = "";
-		pendingImages.clear();
-	};
+	const source = PERSONAL_PANEL_IMAGES[panel];
+	return source
+		? prepareImage(source, "high").then(() => undefined)
+		: Promise.resolve();
 }
 
-function clearGamePosterImageCache() {
-	for (const { image } of posterImageCache.values()) {
-		if (!image.complete) image.src = "";
-	}
-	posterImageCache.clear();
+let personalImageWarmupStarted = false;
+
+export function preloadPersonalImages(): void {
+	if (personalImageWarmupStarted) return;
+	personalImageWarmupStarted = true;
+	scheduleImageWarmup([
+		...Object.values(PERSONAL_PANEL_IMAGES).filter((source): source is string =>
+			Boolean(source),
+		),
+		...MAGNETIC_POSTERS.map(resolvePosterSrc),
+	]);
 }
 
 function fillRandomSwitchPoints(points: Uint8Array) {
@@ -410,6 +349,7 @@ function MagneticPixelField({
 				className="absolute inset-0 block h-full w-full object-cover"
 				width={1440}
 				height={810}
+				decoding="async"
 			/>
 			<canvas
 				ref={canvasRef}
@@ -661,8 +601,8 @@ function RecentLifeNotes({
 								className="block h-full w-full object-cover"
 								width={960}
 								height={960}
-								loading="lazy"
 								decoding="async"
+								fetchPriority="high"
 								draggable={false}
 							/>
 						</div>
@@ -696,6 +636,7 @@ function LifePrimaryIndex({
 	onActivate,
 	onKeyDown,
 	onTabRef,
+	onPrepare,
 }: {
 	theme: Theme;
 	label: string;
@@ -710,6 +651,7 @@ function LifePrimaryIndex({
 		section: PersonalSectionId,
 		element: HTMLButtonElement | null,
 	) => void;
+	onPrepare: (section: PersonalSectionId) => void;
 }) {
 	return (
 		<div
@@ -732,6 +674,9 @@ function LifePrimaryIndex({
 						aria-controls="life-panel"
 						tabIndex={selected ? 0 : -1}
 						ref={(element) => onTabRef(section.id, element)}
+						onPointerEnter={() => onPrepare(section.id)}
+						onFocus={() => onPrepare(section.id)}
+						onTouchStart={() => onPrepare(section.id)}
 						onClick={() => onActivate(section.id)}
 						onKeyDown={(event) => onKeyDown(event, section.id)}
 						className={`flex min-h-10 min-w-0 w-[88%] max-w-[13rem] cursor-pointer items-center justify-center justify-self-center rounded-full px-2 text-xs tracking-[0.045em] outline-none transition-[background-color,color] duration-[180ms] ease-out focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none sm:w-[78%] sm:text-[13px] ${
@@ -767,6 +712,7 @@ function EntertainmentIndex({
 	onActivate,
 	onKeyDown,
 	onTabRef,
+	onPrepare,
 }: {
 	theme: Theme;
 	label: string;
@@ -781,6 +727,7 @@ function EntertainmentIndex({
 		section: EntertainmentSectionId,
 		element: HTMLButtonElement | null,
 	) => void;
+	onPrepare: (section: EntertainmentSectionId) => void;
 }) {
 	return (
 		<div
@@ -801,6 +748,9 @@ function EntertainmentIndex({
 						aria-controls="life-entertainment-panel"
 						tabIndex={selected ? 0 : -1}
 						ref={(element) => onTabRef(section.id, element)}
+						onPointerEnter={() => onPrepare(section.id)}
+						onFocus={() => onPrepare(section.id)}
+						onTouchStart={() => onPrepare(section.id)}
 						onClick={() => onActivate(section.id)}
 						onKeyDown={(event) => onKeyDown(event, section.id)}
 						className={`flex min-h-9 min-w-0 cursor-pointer items-center justify-center rounded-full px-3 text-[11px] font-medium tracking-[0.06em] outline-none transition-[background-color,color] duration-[180ms] ease-out focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none sm:text-xs ${
@@ -888,7 +838,7 @@ export default function PersonalLifePage({
 			alt: t("about.personal.recent.cat.alt"),
 			dateTime: "2026-08-07",
 			dateLabel: "2026 · 08 · 07",
-			src: "assets/recent/cat-portrait.jpg",
+			src: PERSONAL_IMAGE_PATHS.recent,
 			title: t("about.personal.recent.cat"),
 		},
 	};
@@ -897,7 +847,7 @@ export default function PersonalLifePage({
 	const series = {
 		label: t("about.favorites.series.modernFamily"),
 		title: t("about.favorites.series.modernFamily.title"),
-		src: "assets/favorites/series-modern-family.jpg",
+		src: PERSONAL_IMAGE_PATHS.watching,
 		width: 1200,
 		height: 1600,
 	};
@@ -905,7 +855,7 @@ export default function PersonalLifePage({
 		label: t("about.favorites.song.homeToMama"),
 		title: t("about.favorites.song.homeToMama.title"),
 		credit: t("about.favorites.song.homeToMama.artist"),
-		src: "assets/favorites/song-home-to-mama-justin-bieber-cody-simpson.jpg",
+		src: PERSONAL_IMAGE_PATHS.listening,
 		width: 640,
 		height: 640,
 	};
@@ -917,6 +867,7 @@ export default function PersonalLifePage({
 	const [panelVisible, setPanelVisible] = useState(true);
 	const panelRef = useRef<HTMLElement>(null);
 	const initialPanelRef = useRef(true);
+	const initialTargetPanelRef = useRef(targetPanel);
 	const primaryTabRefs = useRef<
 		Record<PersonalSectionId, HTMLButtonElement | null>
 	>({
@@ -997,27 +948,37 @@ export default function PersonalLifePage({
 		);
 
 	useEffect(() => {
-		const cancelWarmup = scheduleGamePosterWarmup();
-		return () => {
-			cancelWarmup();
-			clearGamePosterImageCache();
-		};
+		void preparePersonalPanel(initialTargetPanelRef.current).catch(
+			() => undefined,
+		);
+		preloadPersonalImages();
 	}, []);
 
 	useEffect(() => {
 		if (targetPanel === displayedPanel) return;
-		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-			setDisplayedPanel(targetPanel);
-			setPanelVisible(true);
-			return;
-		}
+		let cancelled = false;
+		let timeout: number | undefined;
 
-		setPanelVisible(false);
-		const timeout = window.setTimeout(
-			() => setDisplayedPanel(targetPanel),
-			110,
-		);
-		return () => window.clearTimeout(timeout);
+		void preparePersonalPanel(targetPanel)
+			.catch(() => undefined)
+			.then(() => {
+				if (cancelled) return;
+				if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+					setDisplayedPanel(targetPanel);
+					setPanelVisible(true);
+					return;
+				}
+
+				setPanelVisible(false);
+				timeout = window.setTimeout(() => {
+					if (!cancelled) setDisplayedPanel(targetPanel);
+				}, 110);
+			});
+
+		return () => {
+			cancelled = true;
+			if (timeout !== undefined) window.clearTimeout(timeout);
+		};
 	}, [targetPanel, displayedPanel]);
 
 	useLayoutEffect(() => {
@@ -1048,6 +1009,11 @@ export default function PersonalLifePage({
 				sections={primarySections}
 				active={activeSection}
 				onActivate={activatePrimarySection}
+				onPrepare={(section) =>
+					preparePersonalPanel(
+						section === "entertainment" ? entertainmentSection : section,
+					)
+				}
 				onKeyDown={handlePrimaryTabKeyDown}
 				onTabRef={(section, element) => {
 					primaryTabRefs.current[section] = element;
@@ -1071,6 +1037,7 @@ export default function PersonalLifePage({
 						sections={entertainmentSections}
 						active={entertainmentSection}
 						onActivate={onEntertainmentSectionChange}
+						onPrepare={preparePersonalPanel}
 						onKeyDown={handleEntertainmentTabKeyDown}
 						onTabRef={(section, element) => {
 							entertainmentTabRefs.current[section] = element;
@@ -1229,6 +1196,8 @@ export default function PersonalLifePage({
 									className="block h-auto w-full max-w-[18rem] rounded-[2px]"
 									width={series.width}
 									height={series.height}
+									decoding="async"
+									fetchPriority="high"
 								/>
 							</div>
 							<figcaption className="pb-2 lg:pb-10">
@@ -1282,6 +1251,8 @@ export default function PersonalLifePage({
 									className="block h-auto w-full max-w-[26rem] rounded-[2px]"
 									width={song.width}
 									height={song.height}
+									decoding="async"
+									fetchPriority="high"
 								/>
 							</div>
 						</figure>

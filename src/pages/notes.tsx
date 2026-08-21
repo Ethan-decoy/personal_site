@@ -1,5 +1,7 @@
 import {
 	type ReactNode,
+	Suspense,
+	lazy,
 	useCallback,
 	useEffect,
 	useRef,
@@ -14,15 +16,14 @@ import {
 	type NoteSuggestion,
 	type SearchResult,
 	getInitialExpandedKeys,
-	getNote,
 	getSidebarTree,
 	getSuggestions,
 	isDirectoryNode,
 	isNotesEmpty,
+	loadNote,
 	resolveNoteHref as resolveCatalogNoteHref,
 	searchNotes,
 } from "../notes";
-import { MarkdownPreview } from "../notes-renderer";
 import {
 	revealFileInExpandedKeys,
 	toggleExpandedKey,
@@ -38,6 +39,18 @@ const SEGMENT_IDS = Array.from(
 const sidebarTree = getSidebarTree();
 const SIDEBAR_BRANCH_TRANSITION_MS = 180;
 const SIDEBAR_BRANCH_UNMOUNT_BUFFER_MS = 80;
+const loadMarkdownRenderer = () => import("../notes-renderer");
+const MarkdownPreview = lazy(() =>
+	loadMarkdownRenderer().then(({ MarkdownPreview: Preview }) => ({
+		default: Preview,
+	})),
+);
+
+function preloadNoteReader(file: string): Promise<void> {
+	return Promise.all([loadNote(file), loadMarkdownRenderer()]).then(
+		() => undefined,
+	);
+}
 
 function SliderTrack({
 	progress,
@@ -210,6 +223,7 @@ function SidebarNode({
 	onToggle,
 	selectedFile,
 	onOpen,
+	onPrefetch,
 }: {
 	node: NestedTreeNode;
 	theme: Theme;
@@ -218,6 +232,7 @@ function SidebarNode({
 	onToggle: (key: string) => void;
 	selectedFile: string | null;
 	onOpen: (file: string) => void;
+	onPrefetch: (file: string) => void;
 }) {
 	const [hoveredFile, setHoveredFile] = useState<string | null>(null);
 	const expanded = expandedKeys.has(node.key);
@@ -259,6 +274,12 @@ function SidebarNode({
 					className="flex min-w-0 flex-1 items-center gap-2 px-2 py-1.5 text-left"
 					aria-expanded={hasChildren ? expanded : undefined}
 					aria-controls={hasChildren ? branchId : undefined}
+					onPointerEnter={() => {
+						if (!hasChildren && node.indexFile) onPrefetch(node.indexFile);
+					}}
+					onFocus={() => {
+						if (!hasChildren && node.indexFile) onPrefetch(node.indexFile);
+					}}
 					onClick={() => {
 						if (hasChildren) onToggle(node.key);
 						else if (node.indexFile) onOpen(node.indexFile);
@@ -302,6 +323,9 @@ function SidebarNode({
 							color: theme.accent,
 							opacity: selectedIndex ? 1 : undefined,
 						}}
+						onPointerEnter={() => onPrefetch(node.indexFile as string)}
+						onFocus={() => onPrefetch(node.indexFile as string)}
+						onTouchStart={() => onPrefetch(node.indexFile as string)}
 						onClick={() => onOpen(node.indexFile as string)}
 					>
 						<svg
@@ -334,6 +358,7 @@ function SidebarNode({
 								onToggle={onToggle}
 								selectedFile={selectedFile}
 								onOpen={onOpen}
+								onPrefetch={onPrefetch}
 							/>
 						))}
 						{fileChildren.map((file) => (
@@ -352,7 +377,12 @@ function SidebarNode({
 										selectedFile === file.file ? theme.text : theme.textSec,
 								}}
 								onClick={() => onOpen(file.file)}
-								onMouseEnter={() => setHoveredFile(file.file)}
+								onPointerEnter={() => {
+									onPrefetch(file.file);
+									setHoveredFile(file.file);
+								}}
+								onFocus={() => onPrefetch(file.file)}
+								onTouchStart={() => onPrefetch(file.file)}
 								onMouseLeave={() => setHoveredFile(null)}
 							>
 								{file.title}
@@ -371,24 +401,28 @@ function SidebarCatalog({
 	searchFocused,
 	suggestions,
 	searchResults,
+	searchLoading,
 	expandedKeys,
 	selectedFile,
 	onSearchQueryChange,
 	onSearchFocusedChange,
 	onToggle,
 	onOpen,
+	onPrefetch,
 }: {
 	theme: Theme;
 	searchQuery: string;
 	searchFocused: boolean;
 	suggestions: NoteSuggestion[];
 	searchResults: SearchResult[];
+	searchLoading: boolean;
 	expandedKeys: Set<string>;
 	selectedFile: string | null;
 	onSearchQueryChange: (query: string) => void;
 	onSearchFocusedChange: (focused: boolean) => void;
 	onToggle: (key: string) => void;
 	onOpen: (file: string, options?: { query?: string }) => void;
+	onPrefetch: (file: string) => void;
 }) {
 	return (
 		<>
@@ -433,6 +467,9 @@ function SidebarCatalog({
 										color: theme.textSec,
 									}}
 									onMouseDown={(event) => event.preventDefault()}
+									onPointerEnter={() => onPrefetch(suggestion.file)}
+									onFocus={() => onPrefetch(suggestion.file)}
+									onTouchStart={() => onPrefetch(suggestion.file)}
 									onClick={() =>
 										onOpen(suggestion.file, { query: searchQuery })
 									}
@@ -457,15 +494,22 @@ function SidebarCatalog({
 						className="mb-1 px-1 text-[10px] uppercase tracking-wider"
 						style={{ color: theme.textSec, opacity: 0.5 }}
 					>
-						{searchResults.length} 条结果
+						{searchLoading ? "搜索中…" : `${searchResults.length} 条结果`}
 					</p>
-					{searchResults.length > 0 ? (
+					{searchLoading ? (
+						<p className="px-2 py-3 text-xs" style={{ color: theme.textSec }}>
+							正在准备全文索引
+						</p>
+					) : searchResults.length > 0 ? (
 						searchResults.slice(0, 8).map((result) => (
 							<button
 								type="button"
 								key={result.file}
 								className="block w-full rounded px-2 py-1.5 text-left transition-colors duration-100"
 								style={{ color: theme.textSec }}
+								onPointerEnter={() => onPrefetch(result.file)}
+								onFocus={() => onPrefetch(result.file)}
+								onTouchStart={() => onPrefetch(result.file)}
 								onClick={() => onOpen(result.file, { query: searchQuery })}
 								onMouseEnter={(event) => {
 									event.currentTarget.style.backgroundColor = theme.accentLight;
@@ -497,6 +541,7 @@ function SidebarCatalog({
 						onToggle={onToggle}
 						selectedFile={selectedFile}
 						onOpen={onOpen}
+						onPrefetch={onPrefetch}
 					/>
 				))
 			)}
@@ -514,6 +559,8 @@ export default function NotesPage({
 	const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 	const [selectedNote, setSelectedNote] = useState<NoteContent | null>(null);
 	const currentNoteFile = useRef<string | null>(null);
+	const noteRequestRef = useRef(0);
+	const [noteLoading, setNoteLoading] = useState(false);
 	const [backToSource, setBackToSource] = useState<{
 		file: string;
 		scrollY: number;
@@ -524,8 +571,39 @@ export default function NotesPage({
 	}, [selectedNote]);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [searchFocused, setSearchFocused] = useState(false);
+	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+	const [searchLoading, setSearchLoading] = useState(false);
 	const [showBackTop, setShowBackTop] = useState(false);
 	const [progress, setProgress] = useState(0);
+
+	useEffect(() => {
+		let cancelled = false;
+		if (!searchQuery.trim()) {
+			setSearchResults([]);
+			setSearchLoading(false);
+			return;
+		}
+
+		setSearchResults([]);
+		setSearchLoading(true);
+		const timer = window.setTimeout(() => {
+			void searchNotes(searchQuery)
+				.then((results) => {
+					if (!cancelled) setSearchResults(results);
+				})
+				.catch(() => {
+					if (!cancelled) setSearchResults([]);
+				})
+				.finally(() => {
+					if (!cancelled) setSearchLoading(false);
+				});
+		}, 120);
+
+		return () => {
+			cancelled = true;
+			window.clearTimeout(timer);
+		};
+	}, [searchQuery]);
 
 	useEffect(() => {
 		const onScroll = () => {
@@ -594,46 +672,62 @@ export default function NotesPage({
 				syncSidebar?: boolean;
 			} = {},
 		) => {
-			const note = getNote(file);
-			if (!note) return;
-
-			if (
-				options.rememberSource &&
-				currentNoteFile.current &&
-				currentNoteFile.current !== file
-			) {
-				setBackToSource({
-					file: currentNoteFile.current,
-					scrollY: window.scrollY,
-				});
-			} else {
-				setBackToSource(null);
-			}
-
-			setSelectedNote(note);
-			setSearchQuery("");
+			const requestId = ++noteRequestRef.current;
+			const sourceFile = currentNoteFile.current;
+			const sourceScrollY = window.scrollY;
+			setNoteLoading(true);
 			setSearchFocused(false);
-			if (file !== "./wiki.md" && options.syncSidebar !== false) {
-				setExpandedKeys((previous) => revealFileInExpandedKeys(previous, file));
-			}
 
-			const pendingTarget = options.anchor || options.query || null;
-			if (pendingTarget) {
-				setPendingAnchor(pendingTarget);
-				return;
-			}
+			void Promise.all([loadNote(file), loadMarkdownRenderer()])
+				.then(([note]) => {
+					if (requestId !== noteRequestRef.current || !note) return;
 
-			if (options.restoreScrollY !== undefined) {
-				requestAnimationFrame(() =>
-					window.scrollTo({ top: options.restoreScrollY, behavior: "smooth" }),
-				);
-				return;
-			}
+					if (options.rememberSource && sourceFile && sourceFile !== file) {
+						setBackToSource({
+							file: sourceFile,
+							scrollY: sourceScrollY,
+						});
+					} else {
+						setBackToSource(null);
+					}
 
-			window.scrollTo({ top: 0, behavior: "instant" });
+					setSelectedNote(note);
+					setSearchQuery("");
+					if (file !== "./wiki.md" && options.syncSidebar !== false) {
+						setExpandedKeys((previous) =>
+							revealFileInExpandedKeys(previous, file),
+						);
+					}
+
+					const pendingTarget = options.anchor || options.query || null;
+					if (pendingTarget) {
+						setPendingAnchor(pendingTarget);
+						return;
+					}
+
+					if (options.restoreScrollY !== undefined) {
+						requestAnimationFrame(() =>
+							window.scrollTo({
+								top: options.restoreScrollY,
+								behavior: "smooth",
+							}),
+						);
+						return;
+					}
+
+					window.scrollTo({ top: 0, behavior: "instant" });
+				})
+				.catch(() => undefined)
+				.finally(() => {
+					if (requestId === noteRequestRef.current) setNoteLoading(false);
+				});
 		},
 		[],
 	);
+
+	const prefetchNote = useCallback((file: string) => {
+		void preloadNoteReader(file).catch(() => undefined);
+	}, []);
 
 	const selectedNoteFile = selectedNote?.file ?? null;
 	const resolveMarkdownNoteHref = useCallback(
@@ -654,7 +748,6 @@ export default function NotesPage({
 
 	const suggestions =
 		searchFocused && searchQuery ? getSuggestions(searchQuery) : [];
-	const searchResults = searchQuery ? searchNotes(searchQuery) : [];
 
 	return (
 		<div>
@@ -668,12 +761,14 @@ export default function NotesPage({
 					searchFocused={searchFocused}
 					suggestions={suggestions}
 					searchResults={searchResults}
+					searchLoading={searchLoading}
 					expandedKeys={expandedKeys}
 					selectedFile={selectedNote?.file ?? null}
 					onSearchQueryChange={setSearchQuery}
 					onSearchFocusedChange={setSearchFocused}
 					onToggle={toggleKey}
 					onOpen={openNote}
+					onPrefetch={prefetchNote}
 				/>
 			</div>
 
@@ -815,12 +910,14 @@ export default function NotesPage({
 									searchFocused={searchFocused}
 									suggestions={suggestions}
 									searchResults={searchResults}
+									searchLoading={searchLoading}
 									expandedKeys={expandedKeys}
 									selectedFile={selectedNote?.file ?? null}
 									onSearchQueryChange={setSearchQuery}
 									onSearchFocusedChange={setSearchFocused}
 									onToggle={toggleKey}
 									onOpen={openNote}
+									onPrefetch={prefetchNote}
 								/>
 							</div>
 						)}
@@ -833,14 +930,16 @@ export default function NotesPage({
 									animationDelay: "0ms",
 								}}
 							>
-								<div data-note-content>
-									<MarkdownPreview
-										content={selectedNote.content}
-										theme={theme}
-										isDark={mode === "dark"}
-										resolveNoteHref={resolveMarkdownNoteHref}
-										onNoteOpen={openMarkdownNote}
-									/>
+								<div data-note-content aria-busy={noteLoading}>
+									<Suspense fallback={null}>
+										<MarkdownPreview
+											content={selectedNote.content}
+											theme={theme}
+											isDark={mode === "dark"}
+											resolveNoteHref={resolveMarkdownNoteHref}
+											onNoteOpen={openMarkdownNote}
+										/>
+									</Suspense>
 								</div>
 							</div>
 						) : (
@@ -849,7 +948,7 @@ export default function NotesPage({
 									className="text-sm"
 									style={{ color: theme.textSec, opacity: 0.3 }}
 								>
-									选择一篇笔记开始阅读
+									{noteLoading ? "正在准备笔记" : "选择一篇笔记开始阅读"}
 								</p>
 							</div>
 						)}

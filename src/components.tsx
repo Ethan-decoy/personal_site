@@ -40,7 +40,13 @@ export function NavBar({
 	theme,
 	active,
 	onNavigate,
-}: { theme: Theme; active: Section; onNavigate: (s: Section) => void }) {
+	onPrefetch,
+}: {
+	theme: Theme;
+	active: Section;
+	onNavigate: (s: Section) => void;
+	onPrefetch?: (s: Section) => void;
+}) {
 	const { t } = useI18n();
 	const links: { key: Section; label: string }[] = [
 		{ key: "home", label: t("nav.home") },
@@ -70,6 +76,9 @@ export function NavBar({
 					{links.map((l) => (
 						<button
 							key={l.key}
+							onPointerEnter={() => onPrefetch?.(l.key)}
+							onFocus={() => onPrefetch?.(l.key)}
+							onTouchStart={() => onPrefetch?.(l.key)}
 							className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ease-out relative whitespace-nowrap shrink-0"
 							style={{
 								color: active === l.key ? theme.text : theme.textSec,
@@ -205,7 +214,12 @@ export function ThemeToggle({
 export function Footer({
 	theme,
 	onNavigate,
-}: { theme: Theme; onNavigate: (s: Section) => void }) {
+	onPrefetch,
+}: {
+	theme: Theme;
+	onNavigate: (s: Section) => void;
+	onPrefetch?: (s: Section) => void;
+}) {
 	const { t } = useI18n();
 	return (
 		<footer
@@ -220,6 +234,8 @@ export function Footer({
 					className="text-xs font-medium transition-all duration-200 ease-out cursor-pointer"
 					style={{ color: theme.textSec }}
 					onClick={() => onNavigate("contact")}
+					onPointerEnter={() => onPrefetch?.("contact")}
+					onFocus={() => onPrefetch?.("contact")}
 					onMouseEnter={(e) => {
 						e.currentTarget.style.color = theme.accent;
 					}}

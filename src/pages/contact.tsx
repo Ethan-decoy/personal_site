@@ -1,109 +1,141 @@
-import { useState, useEffect } from "react";
-import { type Section, type Theme } from "../themes";
-import { SectionTitle } from "../components";
+import { type CSSProperties, useEffect, useState } from "react";
 import { useI18n } from "../i18n";
+import type { Section, Theme, ThemeMode } from "../themes";
+
+const TYPE_SPEED_MS = 20;
+const TYPE_PUNCTUATION_PAUSE_MS = 36;
+const TYPE_START_DELAY_MS = 460;
+
+function nextCharacterDelay(character: string): number {
+	return /[./@-]/.test(character) ? TYPE_PUNCTUATION_PAUSE_MS : TYPE_SPEED_MS;
+}
 
 function TypingText({
 	text,
-	className,
-	style,
 	delay = 0,
-	cursorColor = "#333",
 }: {
 	text: string;
-	className?: string;
-	style?: React.CSSProperties;
 	delay?: number;
-	cursorColor?: string;
 }) {
 	const [visible, setVisible] = useState(0);
+	const [started, setStarted] = useState(false);
+
 	useEffect(() => {
-		const startTimer = setTimeout(() => {
-			let i = 0;
-			const timer = setInterval(() => {
-				i++;
-				setVisible(i);
-				if (i >= text.length) clearInterval(timer);
-			}, 20);
-			return () => clearInterval(timer);
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+			setVisible(text.length);
+			setStarted(false);
+			return;
+		}
+
+		setVisible(0);
+		setStarted(false);
+		let typingTimer: number | null = null;
+		const startTimer = window.setTimeout(() => {
+			setStarted(true);
+			let nextIndex = 0;
+
+			const revealNext = () => {
+				nextIndex += 1;
+				setVisible(nextIndex);
+				if (nextIndex < text.length) {
+					typingTimer = window.setTimeout(
+						revealNext,
+						nextCharacterDelay(text[nextIndex - 1]),
+					);
+				}
+			};
+
+			revealNext();
 		}, delay);
-		return () => clearTimeout(startTimer);
-	}, [text.length, delay]);
+
+		return () => {
+			window.clearTimeout(startTimer);
+			if (typingTimer !== null) window.clearTimeout(typingTimer);
+		};
+	}, [delay, text]);
+
+	const caretVisible = started && visible < text.length;
+
 	return (
-		<span className={className} style={style}>
+		<span aria-hidden="true" className="contact-typing-line">
 			{text.slice(0, visible)}
-			{visible < text.length && (
-				<span
-					className="inline-block w-2 h-[1.2em] align-text-bottom"
-					style={{
-						backgroundColor: cursorColor,
-						marginLeft: "1px",
-						animation: "blink 1s step-end infinite",
-					}}
-				/>
-			)}
+			<span
+				className="contact-typing-caret"
+				data-visible={caretVisible ? "true" : "false"}
+			/>
 		</span>
 	);
 }
 
 export default function ContactPage({
 	theme,
-}: { theme: Theme; onNavigate: (s: Section) => void }) {
+}: {
+	theme: Theme;
+	onNavigate: (s: Section) => void;
+	mode?: ThemeMode;
+}) {
 	const { t } = useI18n();
+	const contactStyle = {
+		"--contact-text": theme.text,
+		"--contact-text-sec": theme.textSec,
+		"--contact-accent": theme.accent,
+		"--contact-accent-hover": theme.accentHover,
+		"--contact-border": theme.border,
+	} as CSSProperties;
+	const channels = [
+		{
+			label: t("contact.email"),
+			value: "decoy.thievish318@passinbox.com",
+			href: "mailto:decoy.thievish318@passinbox.com",
+			external: false,
+		},
+		{
+			label: t("contact.github"),
+			value: "github.com/Ethan-decoy",
+			href: "https://github.com/Ethan-decoy",
+			external: true,
+		},
+	] as const;
+
 	return (
-		<div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-24 md:py-32">
-			<SectionTitle theme={theme}>{t("contact.title")}</SectionTitle>
-			<div
-				className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 mt-8"
-				style={{
-					animation: "fade-up 0.6s ease-out both",
-					animationDelay: "150ms",
-				}}
-			>
-				<div className="space-y-5 max-w-md" style={{ color: theme.textSec }}>
-					<p className="text-base leading-relaxed">{t("contact.desc")}</p>
-				</div>
-				<div className="space-y-8">
-					{[
-						{
-							label: t("contact.email"),
-							value: "decoy.thievish318@passinbox.com",
-							href: "mailto:decoy.thievish318@passinbox.com",
-						},
-						{
-							label: t("contact.github"),
-							value: "github.com/Ethan-decoy",
-							href: "https://github.com/Ethan-decoy",
-						},
-					].map((item) => (
-						<div key={item.label}>
-							<p
-								className="text-xs font-semibold tracking-wider uppercase mb-2"
-								style={{ color: theme.textSec, opacity: 0.5 }}
-							>
-								{item.label}
-							</p>
-							<a
-								href={item.href}
-								className="text-base leading-relaxed transition-all duration-200 ease-out"
-								style={{
-									color: theme.accent,
-									fontFamily:
-										"'JetBrains Mono', 'Fira Code', Menlo, Consolas, monospace",
-								}}
-								onMouseEnter={(e) => {
-									e.currentTarget.style.color = theme.accentHover;
-								}}
-								onMouseLeave={(e) => {
-									e.currentTarget.style.color = theme.accent;
-								}}
-							>
-								<TypingText text={item.value} cursorColor={theme.accent} />
-							</a>
-						</div>
-					))}
+		<section
+			aria-labelledby="contact-heading"
+			className="contact-page"
+			style={contactStyle}
+		>
+			<div className="contact-shell">
+				<div className="contact-composition">
+					<header className="contact-page-heading">
+						<h1 id="contact-heading">{t("contact.title")}</h1>
+					</header>
+
+					<div className="contact-body">
+						<p className="contact-intro">{t("contact.desc")}</p>
+
+						<ul className="contact-channels">
+							{channels.map((item) => (
+								<li key={item.href}>
+									<a
+										aria-label={`${item.label}: ${item.value}`}
+										className="contact-channel"
+										href={item.href}
+										rel={item.external ? "noreferrer" : undefined}
+										target={item.external ? "_blank" : undefined}
+									>
+										<span className="contact-channel-label">{item.label}</span>
+										<span className="contact-channel-value">
+											<TypingText
+												delay={TYPE_START_DELAY_MS}
+												text={item.value}
+											/>
+										</span>
+									</a>
+								</li>
+							))}
+						</ul>
+					</div>
 				</div>
 			</div>
-		</div>
+		</section>
 	);
 }

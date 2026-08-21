@@ -29,7 +29,7 @@ const sectionTheme: Record<Section, ThemeKey> = {
 	about: "sage",
 	projects: "github",
 	notes: "ocean",
-	contact: "black",
+	contact: "contact",
 };
 
 function AppInner() {

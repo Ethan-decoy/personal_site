@@ -208,8 +208,8 @@ export const dict = {
 	// Contact
 	"contact.title": { zh: "联系", en: "Contact" },
 	"contact.desc": {
-		zh: "如果你想聊聊技术、合作想法，或者只是想打个招呼，欢迎联系。",
-		en: "If you'd like to chat about tech, collaboration ideas, or just say hello, feel free to reach out.",
+		zh: "技术交流、合作想法，或只是简单打个招呼，都欢迎来信。",
+		en: "Technical conversations, collaboration ideas, or simply saying hello are all welcome.",
 	},
 	"contact.email": { zh: "邮箱", en: "Email" },
 	"contact.github": { zh: "GitHub", en: "GitHub" },

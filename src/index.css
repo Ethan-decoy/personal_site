@@ -116,17 +116,6 @@
 	height: var(--home-avatar-size);
 }
 
-@keyframes blink {
-	0%,
-	50% {
-		opacity: 1;
-	}
-	51%,
-	100% {
-		opacity: 0;
-	}
-}
-
 body {
 	font-family: var(--font-sans);
 }
@@ -150,6 +139,204 @@ body {
 	.section-page-frame {
 		padding-inline: 2rem;
 		padding-top: 8rem;
+	}
+}
+
+@keyframes contact-caret-blink {
+	0%,
+	48% {
+		opacity: 1;
+	}
+	49%,
+	100% {
+		opacity: 0;
+	}
+}
+
+@keyframes contact-ink-resolve {
+	from {
+		opacity: 0;
+		filter: blur(1.5px);
+	}
+	to {
+		opacity: 1;
+		filter: blur(0);
+	}
+}
+
+.contact-page {
+	display: flex;
+	width: 100%;
+	min-height: calc(100svh - 4.75rem);
+	align-items: center;
+	padding: clamp(4.75rem, 12vh, 7rem) clamp(1.25rem, 5vw, 2rem)
+		clamp(7rem, 16vh, 10rem);
+}
+
+.contact-shell {
+	width: 100%;
+	max-width: 64rem;
+	margin-inline: auto;
+}
+
+.contact-composition {
+	display: grid;
+	gap: clamp(2.5rem, 8vw, 4rem);
+}
+
+.contact-page-heading {
+	animation: contact-ink-resolve 320ms cubic-bezier(0.22, 0.61, 0.36, 1) 40ms
+		both;
+}
+
+.contact-page-heading h1 {
+	color: var(--contact-text);
+	font-size: clamp(2.25rem, 8vw, 3rem);
+	font-weight: 600;
+	letter-spacing: -0.045em;
+	line-height: 1;
+}
+
+.contact-body {
+	min-width: 0;
+	max-width: 40rem;
+}
+
+.contact-intro {
+	max-width: 30rem;
+	color: var(--contact-text-sec);
+	font-size: clamp(0.94rem, 1.8vw, 1rem);
+	line-height: 1.9;
+	animation: contact-ink-resolve 320ms cubic-bezier(0.22, 0.61, 0.36, 1) 80ms
+		both;
+}
+
+.contact-channels {
+	margin-top: clamp(2.5rem, 7vw, 3.5rem);
+	border-top: 1px solid var(--contact-border);
+	list-style: none;
+	animation: contact-ink-resolve 340ms cubic-bezier(0.22, 0.61, 0.36, 1) 120ms
+		both;
+}
+
+.contact-channel {
+	display: grid;
+	min-height: 4.9rem;
+	grid-template-columns: minmax(0, 1fr);
+	align-content: center;
+	gap: 0.38rem;
+	border-bottom: 1px solid var(--contact-border);
+	color: var(--contact-accent);
+	text-decoration: none;
+	transition: border-color 180ms ease-out;
+}
+
+.contact-channel-label {
+	color: var(--contact-text-sec);
+	font-size: clamp(0.86rem, 1.6vw, 0.96rem);
+	font-weight: 600;
+	line-height: 1.4;
+	letter-spacing: -0.01em;
+	transition: color 180ms ease-out;
+}
+
+.contact-channel-value {
+	min-width: 0;
+	min-height: 1.5em;
+	overflow-wrap: anywhere;
+	color: var(--contact-accent);
+	font-family: var(--font-mono);
+	font-size: clamp(0.8rem, 2.3vw, 1.08rem);
+	font-weight: 500;
+	line-height: 1.55;
+	letter-spacing: -0.018em;
+	transition: color 180ms ease-out;
+}
+
+.contact-typing-line {
+	display: inline;
+}
+
+.contact-typing-caret {
+	display: inline-block;
+	width: 0.42em;
+	height: 1.02em;
+	margin-left: 0.08em;
+	vertical-align: -0.14em;
+	background: currentColor;
+	animation: contact-caret-blink 1s step-end infinite;
+}
+
+/* 常驻的零宽光标固定基线，避免打字开始时标签发生纵向跳动。 */
+.contact-typing-caret[data-visible="false"] {
+	width: 0;
+	margin-left: 0;
+	visibility: hidden;
+	animation: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.contact-channel:hover {
+		border-bottom-color: color-mix(
+			in srgb,
+			var(--contact-accent) 38%,
+			transparent
+		);
+	}
+
+	.contact-channel:hover .contact-channel-label {
+		color: var(--contact-text);
+	}
+
+	.contact-channel:hover .contact-channel-value {
+		color: var(--contact-accent-hover);
+	}
+}
+
+.contact-channel:focus-visible {
+	border-radius: 2px;
+	outline: 2px solid var(--contact-accent);
+	outline-offset: 3px;
+}
+
+@media (min-width: 640px) {
+	.contact-channel {
+		min-height: 5.15rem;
+		grid-template-columns: 6rem minmax(0, 1fr);
+		align-items: baseline;
+		gap: 1.35rem;
+	}
+}
+
+@media (min-width: 900px) {
+	.contact-composition {
+		grid-template-columns: minmax(11rem, 3fr) minmax(0, 7fr);
+		align-items: start;
+		gap: clamp(4rem, 8vw, 7rem);
+	}
+
+	.contact-page-heading {
+		padding-top: 0.15rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.contact-page-heading,
+	.contact-intro,
+	.contact-channels {
+		animation: none !important;
+		filter: none;
+	}
+
+	.contact-channel,
+	.contact-channel-label,
+	.contact-channel-value {
+		transition: none;
+	}
+
+	.contact-typing-caret {
+		display: none;
+		animation: none;
 	}
 }
 

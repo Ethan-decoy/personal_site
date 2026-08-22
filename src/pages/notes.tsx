@@ -395,7 +395,7 @@ function SidebarNode({
 	);
 }
 
-function SidebarCatalog({
+export function SidebarCatalog({
 	theme,
 	searchQuery,
 	searchFocused,
@@ -424,6 +424,16 @@ function SidebarCatalog({
 	onOpen: (file: string, options?: { query?: string }) => void;
 	onPrefetch: (file: string) => void;
 }) {
+	const mergedSearchItems: (NoteSuggestion & { category?: string })[] = [
+		...searchResults,
+		...suggestions.filter(
+			(suggestion) =>
+				!searchResults.some((result) => result.file === suggestion.file),
+		),
+	];
+	const visibleSearchItems = mergedSearchItems.slice(0, 8);
+	const showSearchResults = searchFocused && Boolean(searchQuery.trim());
+
 	return (
 		<>
 			<div
@@ -447,8 +457,9 @@ function SidebarCatalog({
 						onFocus={() => onSearchFocusedChange(true)}
 						onBlur={() => setTimeout(() => onSearchFocusedChange(false), 200)}
 					/>
-					{suggestions.length > 0 && (
+					{showSearchResults && (
 						<div
+							data-notes-search-results="combined"
 							className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-xl"
 							style={{
 								backgroundColor: theme.bgDeep,
@@ -456,95 +467,79 @@ function SidebarCatalog({
 								boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
 							}}
 						>
-							{suggestions.map((suggestion, index) => (
-								<button
-									type="button"
-									key={suggestion.file}
-									className="block w-full px-3 py-2 text-left text-sm transition-colors duration-100"
-									style={{
-										backgroundColor:
-											index === 0 ? theme.accentLight : "transparent",
-										color: theme.textSec,
-									}}
-									onMouseDown={(event) => event.preventDefault()}
-									onPointerEnter={() => onPrefetch(suggestion.file)}
-									onFocus={() => onPrefetch(suggestion.file)}
-									onTouchStart={() => onPrefetch(suggestion.file)}
-									onClick={() =>
-										onOpen(suggestion.file, { query: searchQuery })
-									}
+							<p
+								className="px-3 pb-1 pt-2 text-[10px] uppercase tracking-wider"
+								style={{ color: theme.textSec, opacity: 0.5 }}
+							>
+								{searchLoading
+									? "搜索中…"
+									: `${mergedSearchItems.length} 条结果`}
+							</p>
+							{visibleSearchItems.length > 0 ? (
+								visibleSearchItems.map((result, index) => (
+									<button
+										type="button"
+										key={result.file}
+										data-notes-search-result={result.file}
+										className="block w-full px-3 py-2 text-left transition-colors duration-100"
+										style={{
+											backgroundColor:
+												index === 0 ? theme.accentLight : "transparent",
+											color: theme.textSec,
+										}}
+										onPointerEnter={() => onPrefetch(result.file)}
+										onFocus={() => onPrefetch(result.file)}
+										onTouchStart={() => onPrefetch(result.file)}
+										onClick={() => onOpen(result.file, { query: searchQuery })}
+										onMouseEnter={(event) => {
+											event.currentTarget.style.backgroundColor =
+												theme.accentLight;
+										}}
+										onMouseLeave={(event) => {
+											event.currentTarget.style.backgroundColor = "transparent";
+										}}
+									>
+										<span className="block text-sm">{result.title}</span>
+										{result.category && (
+											<span className="block truncate text-[10px] opacity-50">
+												{result.category}
+											</span>
+										)}
+									</button>
+								))
+							) : searchLoading ? (
+								<p
+									className="px-3 pb-3 text-xs"
+									style={{ color: theme.textSec }}
 								>
-									{suggestion.title}
-								</button>
-							))}
+									正在准备全文索引
+								</p>
+							) : (
+								<p
+									className="px-3 pb-3 text-xs"
+									style={{ color: theme.textSec }}
+								>
+									没有匹配的笔记
+								</p>
+							)}
 						</div>
 					)}
 				</div>
 			</div>
 
-			{searchQuery ? (
-				<div
-					className="mb-3 rounded-xl p-2"
-					style={{
-						backgroundColor: theme.bgDeep,
-						border: `1px solid ${theme.border}`,
-					}}
-				>
-					<p
-						className="mb-1 px-1 text-[10px] uppercase tracking-wider"
-						style={{ color: theme.textSec, opacity: 0.5 }}
-					>
-						{searchLoading ? "搜索中…" : `${searchResults.length} 条结果`}
-					</p>
-					{searchLoading ? (
-						<p className="px-2 py-3 text-xs" style={{ color: theme.textSec }}>
-							正在准备全文索引
-						</p>
-					) : searchResults.length > 0 ? (
-						searchResults.slice(0, 8).map((result) => (
-							<button
-								type="button"
-								key={result.file}
-								className="block w-full rounded px-2 py-1.5 text-left transition-colors duration-100"
-								style={{ color: theme.textSec }}
-								onPointerEnter={() => onPrefetch(result.file)}
-								onFocus={() => onPrefetch(result.file)}
-								onTouchStart={() => onPrefetch(result.file)}
-								onClick={() => onOpen(result.file, { query: searchQuery })}
-								onMouseEnter={(event) => {
-									event.currentTarget.style.backgroundColor = theme.accentLight;
-								}}
-								onMouseLeave={(event) => {
-									event.currentTarget.style.backgroundColor = "transparent";
-								}}
-							>
-								<span className="block text-sm">{result.title}</span>
-								<span className="block truncate text-[10px] opacity-50">
-									{result.category}
-								</span>
-							</button>
-						))
-					) : (
-						<p className="px-2 py-3 text-xs" style={{ color: theme.textSec }}>
-							没有匹配的笔记
-						</p>
-					)}
-				</div>
-			) : (
-				sidebarTree.map((node) => (
-					<SidebarNode
-						key={node.key}
-						node={node}
-						theme={theme}
-						depth={0}
-						expandedKeys={expandedKeys}
-						onToggle={onToggle}
-						selectedFile={selectedFile}
-						onOpen={onOpen}
-						onPrefetch={onPrefetch}
-					/>
-				))
-			)}
+			{sidebarTree.map((node) => (
+				<SidebarNode
+					key={node.key}
+					node={node}
+					theme={theme}
+					depth={0}
+					expandedKeys={expandedKeys}
+					onToggle={onToggle}
+					selectedFile={selectedFile}
+					onOpen={onOpen}
+					onPrefetch={onPrefetch}
+				/>
+			))}
 		</>
 	);
 }

@@ -24,6 +24,19 @@ function files(nodes) {
 	]);
 }
 
+function findElement(node, predicate) {
+	if (Array.isArray(node)) {
+		for (const child of node) {
+			const match = findElement(child, predicate);
+			if (match) return match;
+		}
+		return null;
+	}
+	if (!React.isValidElement(node)) return null;
+	if (predicate(node)) return node;
+	return findElement(node.props.children, predicate);
+}
+
 try {
 	const [sidebarCss, notesPageSource] = await Promise.all([
 		readFile(new URL("../src/index.css", import.meta.url), "utf8"),
@@ -32,7 +45,7 @@ try {
 	const loadStarted = performance.now();
 	const notes = await vite.ssrLoadModule("/src/notes/index.ts");
 	const indexLoadMs = performance.now() - loadStarted;
-	const [{ default: NotesPage }, { getTheme }, sidebarState] =
+	const [{ default: NotesPage, SidebarCatalog }, { getTheme }, sidebarState] =
 		await Promise.all([
 			vite.ssrLoadModule("/src/pages/notes.tsx"),
 			vite.ssrLoadModule("/src/themes.ts"),
@@ -42,7 +55,9 @@ try {
 	const allDirectories = directories(tree);
 	const allFiles = files(tree);
 	const sampleFile = allFiles[0];
-	const loadedSample = sampleFile ? await notes.loadNote(sampleFile.file) : null;
+	const loadedSample = sampleFile
+		? await notes.loadNote(sampleFile.file)
+		: null;
 	const sampleSearchResults = sampleFile
 		? await notes.searchNotes(sampleFile.title)
 		: [];
@@ -79,6 +94,43 @@ try {
 			onNavigate: () => {},
 		}),
 	);
+	const searchQuery = sampleFile?.title ?? "C++";
+	const searchCatalogProps = {
+		theme: getTheme("ocean", "light"),
+		searchQuery,
+		searchFocused: true,
+		suggestions: notes.getSuggestions(searchQuery),
+		searchResults: sampleSearchResults,
+		searchLoading: false,
+		expandedKeys: new Set(),
+		selectedFile: null,
+		onSearchQueryChange: () => {},
+		onSearchFocusedChange: () => {},
+		onToggle: () => {},
+		onOpen: () => {},
+		onPrefetch: () => {},
+	};
+	const searchCatalogHtml = renderToStaticMarkup(
+		React.createElement(SidebarCatalog, searchCatalogProps),
+	);
+	const searchCatalogTree = SidebarCatalog(searchCatalogProps);
+	const searchResultButton = findElement(
+		searchCatalogTree,
+		(element) => element.props["data-notes-search-result"] === sampleFile?.file,
+	);
+	let searchResultMouseDownPrevented = false;
+	searchResultButton?.props.onMouseDown?.({
+		preventDefault: () => {
+			searchResultMouseDownPrevented = true;
+		},
+	});
+	const searchResultSurfaceCount = (
+		searchCatalogHtml.match(/data-notes-search-results=/g) ?? []
+	).length;
+	const sampleSearchResultOccurrences = sampleFile
+		? searchCatalogHtml.split(`data-notes-search-result="${sampleFile.file}"`)
+				.length - 1
+		: 0;
 	const initialRenderMs = performance.now() - renderStarted;
 	const topLevelTitleOccurrences =
 		initialHtml.split(`>${tree[0]?.title}<`).length - 1;
@@ -176,6 +228,18 @@ try {
 				sidebarCss.includes("top: 4.5rem") &&
 				sidebarCss.includes("top: 0"),
 		},
+		{
+			name: "one search query mounts exactly one result surface",
+			pass: searchResultSurfaceCount === 1,
+		},
+		{
+			name: "overlapping title and full-text matches mount one result row",
+			pass: !sampleFile || sampleSearchResultOccurrences === 1,
+		},
+		{
+			name: "selecting a search result allows the input to lose native focus",
+			pass: Boolean(searchResultButton) && !searchResultMouseDownPrevented,
+		},
 	];
 
 	console.log(
@@ -193,6 +257,10 @@ try {
 					indexLoadMs: Number(indexLoadMs.toFixed(1)),
 					initialRenderMs: Number(initialRenderMs.toFixed(1)),
 					initialHtmlBytes: Buffer.byteLength(initialHtml),
+					searchResultSurfaceCount,
+					sampleSearchResultOccurrences,
+					searchResultButtonFound: Boolean(searchResultButton),
+					searchResultMouseDownPrevented,
 					topLevelTitleOccurrences,
 					topLevel: tree.map((node) => ({
 						key: node.key,

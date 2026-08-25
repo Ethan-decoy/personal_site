@@ -98,7 +98,7 @@ double precise_pressure{measured_pressure};
 
 **这是整数类型转换结果的定义，不是有符号整数算术溢出的规则；有符号整数运算的数学结果超出结果类型的表示范围时，行为仍然未定义，参见[有符号整数溢出](../02-expressions-and-operators/02-arithmetic-and-usual-arithmetic-conversions.md#有符号整数溢出)。**
 
-`bool` 采用专门的转换规则：**整数 `0` 转换为 `false`，任何非零整数转换为 `true`；反向转换时，`false` 产生 `0`，`true` 产生 `1`。**
+`bool` 采用标准布尔转换。第一章已经建立算术零值与非零值转换为 `bool` 的结果；反向转换时，`false` 产生整数 `0`，`true` 产生整数 `1`。
 
 整数符号属性不同所造成的结果，已经在[算术运算与通常算术转换](../02-expressions-and-operators/02-arithmetic-and-usual-arithmetic-conversions.md#有符号与无符号类型共同运算)中结合表达式说明。
 
@@ -120,7 +120,7 @@ double precise_pressure{measured_pressure};
 
 ## 条件语境中的布尔转换
 
-**`if`、`while`、`for` 和 `do-while` 的条件需要产生布尔判断。对于算术类型，零转换为 `false`，非零值转换为 `true`；这次转换只产生条件使用的 `bool` 值，不会修改原对象或改变其类型，参见[条件表达式](../04-control-flow/01-conditional-statements.md#条件表达式)。逻辑运算符 `!`、`&&` 和 `||` 的操作数也会采用相应的布尔转换，参见[逻辑运算符](../02-expressions-and-operators/04-comparison-and-logical-operators.md#逻辑运算符logical-operators)。**
+**`if`、`while`、`for` 和 `do-while` 的条件会把相应表达式按布尔语境求值；需要时，这个语境产生一个供条件使用的 `bool` 值，不会修改原对象或改变其类型。**条件表达式参见[条件语句](../04-control-flow/01-conditional-statements.md#条件表达式)，逻辑运算符 `!`、`&&` 和 `||` 参见[比较与逻辑运算](../02-expressions-and-operators/04-comparison-and-logical-operators.md#逻辑运算符logical-operators)。
 
 ## 允许转换不等于保留信息
 

@@ -1,8 +1,8 @@
 ---
 title: 附章
-date: 2026-08-11
+date: 2026-08-25
 ---
 
 # 附章
 
-- [浮点数的表示与运算（Floating-Point Representation and Arithmetic）](01-floating-point-representation-and-arithmetic.md)
+1. [二进制浮点数的表示（Binary Floating-Point Representation）](01-binary-floating-point-representation.md)

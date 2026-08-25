@@ -1,60 +1,58 @@
 ---
 title: 变量、声明与初始化（Variables, Declarations, and Initialization）
-date: 2026-08-11
+date: 2026-08-25
 ---
 
 # 变量、声明与初始化（Variables, Declarations, and Initialization）
 
 ## 变量（Variable）
 
-程序运行时实际存在并保存数据的是对象，而源代码需要通过名称来指代它。先从最常见的情况开始：一条声明引入一个具有名称的对象。**这个对象称为变量（variable），代码中用来指代它的名称称为变量名（variable name）。**
+程序经常需要在后续代码中继续找到同一个对象。最直接的方式，是在声明对象时为它引入一个名称。
 
-### 变量名与标识符（Variable Names and Identifiers）
+```cpp
+double front_left_pressure{2.5};
+```
 
-在 C++ 源代码中，变量名由标识符（identifier）表示。**为了先建立一套简单、通用的写法，可以使用英文字母、数字和下划线组成标识符，但第一个字符不能是数字：**
+本章只讨论最常见的一类变量（variable）：**由声明引入，并能够通过名称直接指代的对象。**这里的对象是变量，`front_left_pressure` 是变量名（variable name）；名称用于找到对象，本身不是对象保存的值。
+
+## 变量名与标识符（Variable Names and Identifiers）
+
+在 C++ 源代码中，变量名由标识符（identifier）表示。由英文字母、数字和下划线组成的标识符能够满足本章需求，但第一个字符不能是数字：
 
 ```text
 front_left_pressure  合法
 pressure2            合法
 rear_tire_pressure   合法
 
-2ndPressure          不合法：以数字开头
+2nd_pressure         不合法：以数字开头
 front-left-pressure  不合法：包含连字符
 ```
 
-**标识符不能使用 C++ 关键字（keyword），**例如 `double`、`int`、`class` 和 `return` 都已经具有语言规定的含义，不能再作为变量名。
+标识符不能使用 C++ 关键字（keyword），例如 `double`、`int`、`class` 和 `return` 已经具有语言规定的含义。C++ 区分大小写，因此 `pressure`、`Pressure` 和 `PRESSURE` 是三个不同的标识符。
 
-C++ 区分大小写，因此 `pressure`、`Pressure` 和 `PRESSURE` 是三个不同的标识符。现代 C++ 也允许符合规则的 Unicode 字符出现在标识符中，但当前笔记统一使用英文标识符。
-
-C++ 还为编译器和标准库保留了部分以下划线开头或包含双下划线的标识符。为了避开这些与使用位置有关的规则，自定义变量名不以下划线开头，也不包含双下划线。
-
-语法合法只表示编译器能够接受这个名称，并不代表它足够清晰。如何让变量名准确表达数据含义，属于后面的编码习惯。
-
-> 随着后续内容引入更多需要命名的程序元素，笔记会在相应位置继续补充适合它们的命名习惯；这里先只讨论变量名。
+C++ 允许符合相应规则的 Unicode 字符出现在标识符中，但本笔记统一使用英文标识符。语言还为实现、编译器和标准库保留了部分以下划线开头或包含双下划线的名称；自定义名称不以下划线开头，也不包含双下划线，可以避开这些容易误用的保留规则。
 
 ## 声明（Declaration）
 
-**声明（declaration）是 C++ 用来向程序引入名称并说明其含义的语法结构。**对于当前讨论的变量，声明的基本结构可以写成：
+**本章使用的变量声明（declaration）向程序引入变量名，并说明这个变量具有怎样的类型。**它的基本结构可以写成：
 
 ```text
 data_type variable_name;
 ```
 
-其中的单词只是表示各部分作用的占位名称，并不是能够直接编译的 C++ 代码。例如：
+例如：
 
 ```cpp
 double front_left_pressure;
 ```
 
-整个 `double front_left_pressure;` 是一条变量声明。它说明 `front_left_pressure` 是变量名，其数据类型是 `double`。
+整个 `double front_left_pressure;` 是一条声明：`double` 指定对象的数据类型，`front_left_pressure` 是声明引入的名称。这条声明同时是定义（definition）：它不仅引入名称，还实际定义了相应对象。**声明是更广的概念；每个定义都是声明，但并非每个声明都是定义。**
 
-**最后的 `;` 是分号（semicolon），用于明确标记这条声明的结束。C++ 通常将换行视为普通空白，因此不能依靠换行结束声明，分号是这条声明不可缺少的语法组成部分。**
-
-这条声明没有显式提供初始化器。实际编写代码时，通常应当让变量在创建时就具有明确的初始值。
+最后的 `;` 是分号（semicolon），用于明确标记这条声明的结束。C++ 通常将换行视为普通空白，不能依靠换行结束声明。
 
 ## 初始化（Initialization）
 
-为了让变量从创建开始就具有明确的状态，可以在变量声明中加入初始化器（initializer）：
+变量声明可以带有初始化器（initializer）：
 
 ```text
 data_type variable_name{initial_value};
@@ -63,88 +61,81 @@ data_type variable_name{initial_value};
 例如：
 
 ```cpp
-double front_left_pressure{2.0};
+double front_left_pressure{2.5};
 ```
 
-整个 `double front_left_pressure{2.0};` 仍然是一条变量声明，但这条声明包含初始化器 `{2.0}`。其中，`2.0` 是提供给变量的初始值。
+**对象创建过程中，根据声明形式与初始化器建立初始状态的过程称为初始化（initialization）。**这里的 `{2.5}` 是初始化器，初始值是 `2.5`。初始化完成后，`front_left_pressure` 已经处于可以表达左前轮气压的明确状态。
 
-**变量创建时，根据初始化器建立其初始状态的过程称为初始化（initialization）。**初始化完成后，`front_left_pressure` 保存的值就是 `2.0`。
+把花括号初始化器直接写在变量名之后，称为直接列表初始化（direct-list-initialization）。C++ 还具有其他初始化形式；本章统一采用这种写法，不在第一次创建变量时横向展开全部语法分类。
 
-这里使用花括号，并将初始化器直接写在变量名之后，因此这种形式称为直接列表初始化（direct-list-initialization）。**初始化是变量创建过程的一部分，并不是变量创建之后再执行的另一项操作。**
+**初始化属于对象开始存在的过程，不是对象创建完成后再执行的一次赋值。**
 
-### 由已有对象初始化新对象
+## 初始化与赋值（Initialization and Assignment）
 
-初始化器不必是直接写在源代码中的数值，也可以使用另一个对象当前保存的值：
+初始化器可以读取另一个对象当前保存的值：
 
 ```cpp
 int starting_count{12};
 int remaining_count{starting_count};
 ```
 
-执行第二行时，`starting_count` 提供当时保存的 `int` 值 `12`，这个值用于初始化新对象 `remaining_count`。**两条声明结束后，程序中存在两个彼此独立的 `int` 对象；它们最初保存相同的值，却不是同一个对象。**
+执行第二行时，`starting_count` 提供当时保存的 `int` 值 `12`，这个值用于初始化新对象 `remaining_count`。两条声明结束后，程序中存在两个彼此独立的对象；它们最初具有相同的值，却不是同一个对象。
 
 ```cpp
 remaining_count = 9;
 ```
 
-这次赋值只修改 `remaining_count`。最终，`starting_count` 仍然保存 `12`，`remaining_count` 保存 `9`。对于这里的 `int` 对象，初始化读取的是源对象当时的值，并不会在两个对象之间建立自动同步的关系。
+这次操作是赋值（assignment）：它改变已经存在的 `remaining_count`，不会创建新对象，也不会改变对象的类型。最终，`starting_count` 仍然保存 `12`，`remaining_count` 保存 `9`。
 
-### 没有显式初始化器时
+**在这里的 `int` 对象初始化中，新对象取得源对象当时的值，随后彼此独立；赋值只改变已经存在的对象。**这种数值初始化不会在两个对象之间建立自动同步关系。
 
-考虑下面的代码：
+## 为对象提供明确的初始状态
+
+下面的声明没有显式初始化器：
 
 ```cpp
 double front_left_pressure;
-double recorded_pressure{front_left_pressure};
 ```
 
-对于这里讨论的普通局部变量，第一行虽然创建了 `front_left_pressure`，却没有为它提供明确的初始值；**它不会因此自动保存 `0.0`。**第二行试图读取这个尚无确定值的对象，因而不能被安全使用。
+这段代码在语法上成立，却没有表达程序希望对象从什么值开始。**省略初始化器不能被普遍理解为“自动初始化为零”；具体初始状态取决于对象类型和声明所处的上下文。**在能够确定初始状态时，应当把初始化器直接写在声明中：
 
-运行时可能偶然观察到某个不可预测的数值，但将它称为“随机初始值”并不准确。程序并没有按照随机规则生成一个合法值；真正的问题是，它读取了一个尚未建立确定值的对象。
+```cpp
+double front_left_pressure{2.5};
+```
+
+这样，变量从生命周期开始就具有明确含义，也不会留下“对象已经存在，但当前是否可以读取”这一额外状态。
 
 ## 基本编码习惯
 
-### 声明变量时立即初始化
-
-在能够确定初始状态时，应当把初始化器直接写在声明中：
-
-```cpp
-double front_left_pressure{2.0};
-```
-
-这样，变量从创建开始就具有明确的值，读者也能在同一处看到它的数据类型、名称和初始状态。**立即初始化从源头消除了变量已经存在、却还不能被安全读取的状态。**
-
 ### 让名称表达数据的含义
 
-**变量名不仅要符合标识符的语法规则，还应当让读者知道变量保存的是什么。**`value`、`data` 或 `x` 虽然都是合法名称，却无法说明其中保存的是轮胎气压、剩余数量还是其他数据；相比之下，`front_left_pressure` 能够直接表达这份数据描述的是左前轮气压。
+变量名不仅要符合标识符的语法规则，还应当让读者知道变量保存的是什么。`value`、`data` 或 `x` 虽然都是合法名称，却无法说明其中保存的是轮胎气压、剩余数量还是其他数据；`front_left_pressure` 能够直接表达数据的业务含义。
 
 ### 保持一致的命名风格
 
-变量名常常需要由多个单词共同表达含义，但标识符中不能包含空格。**C++ 并没有规定唯一的命名风格，**常见写法主要有：
+多个单词组成的变量名通常采用以下形式：
 
 | 风格 | 示例 | 组合方式 |
-|---|---|---|
+| --- | --- | --- |
 | 小驼峰命名法（lower camel case） | `frontLeftPressure` | 第一个单词小写，后续单词首字母大写 |
 | 蛇形命名法（snake case） | `front_left_pressure` | 所有单词小写，并使用下划线分隔 |
-| 大驼峰命名法（Pascal case） | `FrontLeftPressure` | 每个单词的首字母都大写 |
+| 大驼峰命名法（Pascal case） | `FrontLeftPressure` | 每个单词的首字母大写 |
 
-这些写法在语法上都合法，而且至今都在成熟的 C++ 生态中使用。Google 与 Chromium 的普通变量采用 `snake_case`，Qt 采用 `lowerCamelCase`，LLVM 则采用 `PascalCase`。这些选择分别属于各项目完整命名体系的一部分，不能脱离项目语境将其中一种称为唯一的现代写法。
-
-当前笔记的自有变量统一采用蛇形命名法，与 C++ 标准库的命名传统保持一致。[C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#nl10-prefer-underscore_style-names) 在没有其他约束时，也将 `underscore_style` 作为默认建议；进入已有项目时，则应优先遵循项目已经建立的命名规范。随着后续内容引入类型、函数和其他程序元素，笔记会再分别说明它们的命名规则。
+C++ 没有规定唯一的命名风格，成熟项目也采用不同约定。当前笔记的自有名称统一使用 `snake_case`，与 C++ 标准库的命名传统保持一致。[C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#nl10-prefer-underscore_style-names) 在没有既有项目规范时也建议优先使用 `underscore_style`；进入已有代码库时，应当遵循项目已经建立的规则。
 
 ### 每条声明只引入一个变量
 
-C++ 允许在一条声明中引入多个同类型变量：
+C++ 允许在一条声明中引入多个变量：
 
 ```cpp
-double front_left_pressure{2.0}, rear_left_pressure{2.1};
+double front_left_pressure{2.5}, rear_left_pressure{2.75};
 ```
 
-**但更清晰的写法是让每条声明只引入一个变量：**
+更清晰的写法是让每条声明只引入一个变量：
 
 ```cpp
-double front_left_pressure{2.0};
-double rear_left_pressure{2.1};
+double front_left_pressure{2.5};
+double rear_left_pressure{2.75};
 ```
 
-这样，每个变量的数据类型、名称和初始化器都独占一行，阅读、修改和代码审查会更加直接。随着后续章节引入更复杂的数据类型与声明形式，这项习惯也能避免多个声明符挤在同一行所产生的理解困难。
+每个变量的数据类型、名称和初始化器因而具有独立位置，阅读、修改和代码审查都更加直接。

@@ -13,3 +13,4 @@ date: 2026-08-19
 ## 附章
 
 1. [虚拟内存与地址转换（Virtual Memory and Address Translation）](deep-dives/01-virtual-memory-and-address-translation.md)
+2. [对象表示与字节序（Object Representation and Byte Order）](deep-dives/03-object-representation-and-byte-order.md)

@@ -12,6 +12,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
 import rehypeSlug from "rehype-slug";
+import remarkCjkFriendly from "remark-cjk-friendly/parseOnly";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import "katex/dist/katex.min.css";
@@ -143,104 +144,6 @@ export const HLJS_THEMES = {
 		shadow: "none",
 	},
 };
-
-/* ---- remark plugin: CJK emphasis ---- */
-interface MarkdownAstNode {
-	type?: string;
-	value?: unknown;
-	children?: MarkdownAstNode[];
-	[key: string]: unknown;
-}
-
-function isMarkdownAstNode(value: unknown): value is MarkdownAstNode {
-	return typeof value === "object" && value !== null;
-}
-
-function remarkCJKEmphasis() {
-	return (tree: unknown) => {
-		if (!isMarkdownAstNode(tree)) return;
-		for (const node of tree.children ?? []) {
-			processEmphasis(node);
-		}
-	};
-}
-
-function processEmphasis(node: MarkdownAstNode) {
-	const children = node.children;
-	if (!children || !Array.isArray(children) || children.length === 0) return;
-
-	const newChildren: MarkdownAstNode[] = [];
-	for (let i = 0; i < children.length; i++) {
-		const child = children[i];
-
-		if (child.type === "text" && typeof child.value === "string") {
-			let rest = child.value;
-			let processed = false;
-
-			while (rest.length > 0) {
-				const strongPos = rest.indexOf("**");
-				let emPos = -1;
-				for (let j = 0; j < rest.length - 1; j++) {
-					if (rest[j] === "*" && rest[j + 1] !== "*") {
-						emPos = j;
-						break;
-					}
-				}
-				if (emPos < 0 && rest.length > 0 && rest[rest.length - 1] === "*")
-					emPos = rest.length - 1;
-
-				if (strongPos >= 0 && (emPos < 0 || strongPos <= emPos)) {
-					const closePos = rest.indexOf("**", strongPos + 2);
-					if (closePos < 0) break;
-					if (strongPos > 0)
-						newChildren.push({ type: "text", value: rest.slice(0, strongPos) });
-					newChildren.push({
-						type: "strong",
-						children: [
-							{ type: "text", value: rest.slice(strongPos + 2, closePos) },
-						],
-					});
-					rest = rest.slice(closePos + 2);
-					processed = true;
-				} else if (emPos >= 0) {
-					let closePos = -1;
-					for (let j = emPos + 1; j < rest.length; j++) {
-						if (
-							rest[j] === "*" &&
-							(j + 1 >= rest.length || rest[j + 1] !== "*")
-						) {
-							closePos = j;
-							break;
-						}
-					}
-					if (closePos < 0) break;
-					if (emPos > 0)
-						newChildren.push({ type: "text", value: rest.slice(0, emPos) });
-					newChildren.push({
-						type: "emphasis",
-						children: [
-							{ type: "text", value: rest.slice(emPos + 1, closePos) },
-						],
-					});
-					rest = rest.slice(closePos + 1);
-					processed = true;
-				} else {
-					break;
-				}
-			}
-
-			if (processed) {
-				if (rest.length > 0) newChildren.push({ type: "text", value: rest });
-			} else {
-				newChildren.push(child);
-			}
-		} else {
-			newChildren.push(child);
-			processEmphasis(child);
-		}
-	}
-	node.children = newChildren;
-}
 
 /* ---- GitHub-style callout detection ---- */
 function makeCallouts(
@@ -925,7 +828,7 @@ function Plot({
 }
 
 /* ---- Stable plugin arrays (prevents ReactMarkdown re-processing) ---- */
-const REMARK_PLUGINS = [remarkMath, remarkGfm, remarkCJKEmphasis];
+const REMARK_PLUGINS = [remarkMath, remarkGfm, remarkCjkFriendly];
 const REHYPE_PLUGINS = [rehypeRaw, rehypeSlug, rehypeKatex];
 
 export interface NoteLinkTarget {

@@ -13,6 +13,10 @@ try {
 		"/src/notes-renderer.tsx",
 	);
 	const title = "Markdown renderer fixture";
+	const cjkStrongMarkdown =
+		"**在这里的 `int` 对象初始化中，新对象取得源对象当时的值，随后彼此独立；赋值只改变已经存在的对象。**这种数值初始化不会在两个对象之间建立自动同步关系。";
+	const cjkStrongHtml =
+		'<strong>在这里的 <code class="markdown-inline-code">int</code> 对象初始化中，新对象取得源对象当时的值，随后彼此独立；赋值只改变已经存在的对象。</strong>这种数值初始化不会在两个对象之间建立自动同步关系。';
 	const html = renderToStaticMarkup(
 		React.createElement(MarkdownPreview, {
 			content: [
@@ -40,6 +44,8 @@ try {
 				"```plot",
 				"sin(x)",
 				"```",
+				"",
+				cjkStrongMarkdown,
 			].join("\n"),
 			theme: { name: "fixture", accent: "#1B3A5C" },
 			isDark: false,
@@ -66,6 +72,10 @@ try {
 		{
 			name: "inline code has its own styling hook",
 			pass: html.includes("markdown-inline-code"),
+		},
+		{
+			name: "CJK strong emphasis supports nested inline code at a punctuation boundary",
+			pass: html.includes(cjkStrongHtml),
 		},
 		{
 			name: "each rendered fenced block produces exactly one pre element",

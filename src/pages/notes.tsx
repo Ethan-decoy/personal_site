@@ -438,7 +438,7 @@ export function SidebarCatalog({
 		<>
 			<div
 				data-notes-search-header="true"
-				className="notes-sidebar-search-header -mx-1 px-1 pb-3"
+				className="notes-sidebar-search-header -mx-1 px-1 pb-3 motion-safe:transition-colors motion-safe:duration-300 motion-safe:ease-out"
 				style={{ backgroundColor: theme.bg }}
 			>
 				<div className="relative">
@@ -446,7 +446,7 @@ export function SidebarCatalog({
 						type="search"
 						aria-label="搜索笔记"
 						placeholder="搜索笔记..."
-						className="w-full rounded-xl px-3 py-2 text-sm outline-none transition-all duration-200"
+						className="w-full rounded-xl px-3 py-2 text-sm outline-none motion-safe:transition-colors motion-safe:duration-300 motion-safe:ease-out"
 						style={{
 							backgroundColor: theme.bgDeep,
 							border: `1px solid ${searchFocused ? theme.accent : theme.border}`,

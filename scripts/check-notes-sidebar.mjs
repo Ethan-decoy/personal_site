@@ -37,6 +37,21 @@ function findElement(node, predicate) {
 	return findElement(node.props.children, predicate);
 }
 
+function usesGlobalThemeTransition(element) {
+	const classes = new Set(
+		String(element?.props.className ?? "")
+			.split(/\s+/)
+			.filter(Boolean),
+	);
+	return (
+		classes.has("motion-safe:transition-colors") &&
+		classes.has("motion-safe:duration-300") &&
+		classes.has("motion-safe:ease-out") &&
+		!classes.has("transition-all") &&
+		!classes.has("duration-200")
+	);
+}
+
 try {
 	const [sidebarCss, notesPageSource] = await Promise.all([
 		readFile(new URL("../src/index.css", import.meta.url), "utf8"),
@@ -114,6 +129,14 @@ try {
 		React.createElement(SidebarCatalog, searchCatalogProps),
 	);
 	const searchCatalogTree = SidebarCatalog(searchCatalogProps);
+	const searchHeader = findElement(
+		searchCatalogTree,
+		(element) => element.props["data-notes-search-header"] === "true",
+	);
+	const searchInput = findElement(
+		searchCatalogTree,
+		(element) => element.props["aria-label"] === "搜索笔记",
+	);
 	const searchResultButton = findElement(
 		searchCatalogTree,
 		(element) => element.props["data-notes-search-result"] === sampleFile?.file,
@@ -218,6 +241,14 @@ try {
 			pass:
 				sidebarCss.includes("@media (prefers-reduced-motion: reduce)") &&
 				sidebarCss.includes(".notes-sidebar-chevron"),
+		},
+		{
+			name: "the sticky search background follows the global theme transition",
+			pass: usesGlobalThemeTransition(searchHeader),
+		},
+		{
+			name: "the search field follows the global theme transition",
+			pass: usesGlobalThemeTransition(searchInput),
 		},
 		{
 			name: "the shared search header stays pinned above deep catalog branches",

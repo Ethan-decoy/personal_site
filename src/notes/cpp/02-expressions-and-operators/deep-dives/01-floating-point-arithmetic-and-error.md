@@ -5,7 +5,7 @@ date: 2026-08-25
 
 # 浮点运算、舍入与误差（Floating-Point Arithmetic, Rounding, and Error）
 
-[返回算术运算主线](../02-arithmetic-and-usual-arithmetic-conversions.md)
+[返回算术运算主线](../02-arithmetic-operations-and-result-types.md)
 
 C++23 并不只凭 `float` 或 `double` 的类型名称保证采用 IEEE 754，也不把所有表达式的中间精度与求值方式固定成同一种实现。本篇以当前主流 IEEE 754 二进制浮点实现为模型，解释有限精度怎样影响算术结果；字段编码与数值分类参见[二进制浮点数的表示](../../01-objects-types-and-variables/deep-dives/01-binary-floating-point-representation.md)。
 
@@ -362,4 +362,4 @@ binary32 拥有 24 bits 有效精度，因此从 `1.0` 向上的相邻间隔为�
 
 在恰好等于 `2` 的整数次幂的位置，上方与下方属于不同的指数区间，两侧间隔会相差一倍。这里所说的 ULP 采用从当前值到下一个更大可表示值的间隔，以避免边界处产生歧义。
 
-[返回算术运算主线](../02-arithmetic-and-usual-arithmetic-conversions.md)
+[返回算术运算主线](../02-arithmetic-operations-and-result-types.md)

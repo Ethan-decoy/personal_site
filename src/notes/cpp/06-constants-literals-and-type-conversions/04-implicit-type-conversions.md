@@ -68,14 +68,7 @@ int returned{whole_part(measurement)};          // 建立返回结果
 
 ### 整数提升（Integral Promotions）
 
-`bool` 可以提升为 `int`，其中 `false` 产生 `0`，`true` 产生 `1`。对于转换等级低于 `int` 的 `char`、`signed char`、`unsigned char`、`short` 和 `unsigned short`，如果 `int` 能够表示源类型的全部值，就提升为 `int`；否则提升为 `unsigned int`。
-
-```cpp
-char letter{'A'};
-int character_code{letter};
-```
-
-在常见实现中，`int` 能够表示 `char` 的全部可能值，因此这里通过整数提升产生相同数值的 `int` 结果。`letter` 对象及其类型都没有改变。
+整数提升的适用类型与目标类型决策已经在[通常算术转换](../02-expressions-and-operators/03-usual-arithmetic-conversions.md#整数提升integral-promotions)中建立。放在完整转换体系中看，关键区别是：语言把这些保留原值、面向更常用整数类型的转换归类为提升；运算符可以要求操作数先提升，再继续决定共同类型或执行运算。
 
 ### 浮点提升（Floating-Point Promotion）
 
@@ -96,11 +89,11 @@ double precise_pressure{measured_pressure};
 
 一个整数值转换到另一种整数类型时，如果目标类型能够表示原值，转换结果与原值相等。否则，C++23 以目标类型宽度对应的 $2^N$ 为模，得到与原值同余且能够由目标类型表示的唯一结果。
 
-**这是整数类型转换结果的定义，不是有符号整数算术溢出的规则；有符号整数运算的数学结果超出结果类型的表示范围时，行为仍然未定义，参见[有符号整数溢出](../02-expressions-and-operators/02-arithmetic-and-usual-arithmetic-conversions.md#有符号整数溢出)。**
+**这是整数类型转换结果的定义，不是有符号整数算术溢出的规则；有符号整数运算的数学结果超出结果类型的表示范围时，行为仍然未定义，参见[有符号整数溢出](../02-expressions-and-operators/02-arithmetic-operations-and-result-types.md#有符号整数溢出与无符号算术)。**
 
 `bool` 采用标准布尔转换。第一章已经建立算术零值与非零值转换为 `bool` 的结果；反向转换时，`false` 产生整数 `0`，`true` 产生整数 `1`。
 
-整数符号属性不同所造成的结果，已经在[算术运算与通常算术转换](../02-expressions-and-operators/02-arithmetic-and-usual-arithmetic-conversions.md#有符号与无符号类型共同运算)中结合表达式说明。
+整数符号属性不同所造成的结果，已经在[通常算术转换](../02-expressions-and-operators/03-usual-arithmetic-conversions.md#有符号与无符号整数共同运算)中结合表达式说明。
 
 ### 整数类型与浮点类型之间
 
@@ -116,11 +109,11 @@ double precise_pressure{measured_pressure};
 
 ## 通常算术转换中的隐式转换
 
-算术或比较运算的两个操作数类型不同时，相应运算符会通过通常算术转换（usual arithmetic conversions）确定共同类型，再把两个操作数的值转换到这个共同类型。**转换只影响本次运算使用的值，不会修改原对象或改变其类型。完整决策过程参见[算术运算与通常算术转换](../02-expressions-and-operators/02-arithmetic-and-usual-arithmetic-conversions.md#通常算术转换usual-arithmetic-conversions)。**
+算术或比较运算的两个操作数类型不同时，相应运算符会通过通常算术转换（usual arithmetic conversions）确定共同类型，再把两个操作数的值转换到这个共同类型。**转换只影响本次运算使用的值，不会修改原对象或改变其类型。完整决策过程参见[通常算术转换](../02-expressions-and-operators/03-usual-arithmetic-conversions.md)。**
 
 ## 条件语境中的布尔转换
 
-**`if`、`while`、`for` 和 `do-while` 的条件会把相应表达式按布尔语境求值；需要时，这个语境产生一个供条件使用的 `bool` 值，不会修改原对象或改变其类型。**条件表达式参见[条件语句](../04-control-flow/01-conditional-statements.md#条件表达式)，逻辑运算符 `!`、`&&` 和 `||` 参见[比较与逻辑运算](../02-expressions-and-operators/04-comparison-and-logical-operators.md#逻辑运算符logical-operators)。
+**`if`、`while`、`for` 和 `do-while` 的条件会把相应表达式按布尔语境求值；需要时，这个语境产生一个供条件使用的 `bool` 值，不会修改原对象或改变其类型。**条件表达式参见[条件语句](../04-control-flow/01-conditional-statements.md#条件表达式)，逻辑运算符 `!`、`&&` 和 `||` 参见[比较与逻辑运算](../02-expressions-and-operators/05-comparison-and-logical-operations.md#逻辑运算符logical-operators)。
 
 ## 允许转换不等于保留信息
 

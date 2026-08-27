@@ -1,151 +1,102 @@
 ---
-title: 形参与实参（Parameters and Arguments）
-date: 2026-08-14
+title: 参数与实参（Parameters and Arguments）
+date: 2026-08-27
 ---
 
-# 形参与实参（Parameters and Arguments）
+# 参数与实参（Parameters and Arguments）
 
-在[函数的结构与调用](01-function-structure-and-calls.md)中，函数定义与函数调用分别出现了两组内容：
+函数可以通过参数接收调用位置提供的数据。参数让同一项行为能够处理不同的输入，而不必把具体数值固定在函数体中。
+
+## 函数体中的输入对象
+
+下面的函数接收当前气压和变化量，并产生调整后的气压：
 
 ```cpp
-int add(int left, int right) {
-    return left + right;
+int calculate_adjusted_pressure_kpa(int pressure_kpa, int change_kpa) {
+    pressure_kpa += change_kpa;
+    return pressure_kpa;
+}
+```
+
+参数列表中的 `int pressure_kpa` 和 `int change_kpa` 是两个形参（parameter）声明。每次调用函数时，程序根据这两个声明分别建立并初始化属于本次调用的 `int` 对象；进入函数体之前，它们已经完成初始化。
+
+当前示例中，调用圆括号内用来向形参提供数据的表达式称为实参（argument）：
+
+```cpp
+int measured_pressure_kpa{210};
+
+int adjusted_pressure_kpa{calculate_adjusted_pressure_kpa(measured_pressure_kpa, 5)};
+```
+
+这里，实参表达式 `measured_pressure_kpa` 对应形参 `pressure_kpa`，字面量 `5` 对应形参 `change_kpa`。对应关系由它们在各自列表中的位置确定。
+
+**在当前按值传递（pass by value）的算术类型模型中，形参是函数边界内接收数据的新对象；实参是调用位置用来提供数据的表达式。**
+
+## 当前的按值传递模型
+
+当前示例中的两个形参都按值传递。调用发生时，每个实参产生的值分别初始化对应的形参对象：
+
+- `measured_pressure_kpa` 产生当前保存的值 `210`，用来初始化 `pressure_kpa`；
+- 字面量 `5` 产生 `int` 值 `5`，用来初始化 `change_kpa`。
+
+这两项描述的是实参与形参的对应关系，不表示它们必定按照列出的顺序求值。两个形参都完成初始化之后，函数体才开始执行。
+
+函数体中的赋值把形参 `pressure_kpa` 改为 `215`，不会修改调用位置的 `measured_pressure_kpa`。调用完成后，`measured_pressure_kpa == 210`，而 `adjusted_pressure_kpa == 215`。
+
+**对于当前按值传入的算术对象，形参与调用方对象彼此独立。函数读取的是调用时提供的值，而不是取得调用方对象本身。**
+
+## 实参不必是对象名称
+
+实参不必是已有对象的名称。字面量和计算表达式也可以提供形参所需的值：
+
+```cpp
+int measured_pressure_kpa{200};
+
+int adjusted_pressure_kpa{calculate_adjusted_pressure_kpa(measured_pressure_kpa + 10, 2 * 5)};
+```
+
+两个实参分别产生 `210` 和 `10`，对应的形参由这两个结果初始化，最终调用结果是 `220`。函数体只接触已经初始化完成的形参，不需要知道这些值来自对象、字面量还是其他表达式。
+
+当前函数声明了两个形参，因此调用时也必须按位置提供两个实参：
+
+```cpp
+calculate_adjusted_pressure_kpa(210, 5); // 正确
+calculate_adjusted_pressure_kpa(210);    // 错误：缺少一个实参
+```
+
+## 对应位置不规定求值先后
+
+实参与形参按照源码位置对应，但这不表示实参表达式必定从左向右求值。C++23 保证每个形参的初始化会完整发生在另一个形参的初始化之前，却不规定哪一个先发生。
+
+```cpp
+int encode_pair(int first_digit, int second_digit) {
+    return first_digit * 10 + second_digit;
 }
 
-int total{add(2, 3)};
+int counter{0};
+int encoded_value{encode_pair(++counter, ++counter)};
 ```
 
-定义中的 `left`、`right` 与调用中的 `2`、`3` 分别承担不同角色。
+进入 `encode_pair` 的函数体之前，两次自增都已经完成，因此 `counter == 2`。如果左侧实参先求值，两个形参分别得到 `1` 和 `2`，结果是 `12`；如果右侧实参先求值，两个形参分别得到 `2` 和 `1`，结果是 `21`。
 
-## 形参（Parameter）
-
-函数定义中，参数列表内声明的 `left` 和 `right` 称为形参（parameter）：
-
-```text
-int add(int left, int right)
-            ↑         ↑
-          形参       形参
-```
-
-每个形参都具有自己的数据类型和名称。对于这里的 `int left` 与 `int right`，**函数每次被调用时都会建立两个属于本次调用的 `int` 参数对象；函数体通过名称 `left` 和 `right` 使用它们。**
-
-## 实参（Argument）
-
-函数调用中，实参列表内的 `2` 和 `3` 称为实参（argument）：
-
-```text
-add(2, 3)
-    ↑  ↑
-  实参 实参
-```
-
-**实参通常是表达式，不必是一个已经命名的对象。**字面量、对象名称以及更大的表达式都可以出现在实参位置：
+这两次求值彼此具有先后，不会交错，因此在 C++23 中不构成未定义行为；**没有固定左右顺序，仍然意味着程序不能依赖其中某一个结果。**更清楚的写法是把相互影响的操作拆成独立的完整表达式：
 
 ```cpp
-int value{4};
+int counter{0};
 
-add(2, 3);           // 两个字面量表达式
-add(value, 3);       // 对象名称与字面量
-add(value + 1, 3);   // 加法表达式与字面量
+int first_digit{++counter};
+int second_digit{++counter};
+int encoded_value{encode_pair(first_digit, second_digit)};
 ```
 
-## 实参与形参的对应关系
+此时源码明确规定两次自增的先后，`encoded_value` 稳定地得到 `12`。
 
-**实参按照位置与形参对应：第一个实参对应第一个形参，第二个实参对应第二个形参，依此类推。**
+## 参数名称属于函数边界
 
-```cpp
-add(2, 3);
-```
+形参名称的作用域延伸到函数定义的末尾，因此可以在函数体中使用。相应函数定义之外的源码不能通过这个名称访问形参；同名形参出现在不同函数中，也属于彼此独立的作用域。
 
-在这次调用中，实参 `2` 对应形参 `left`，实参 `3` 对应形参 `right`。**所有实参都会在进入函数体之前完成求值，其结果用于初始化对应的形参。**
+对于当前的按值参数，每次调用都会创建本次调用所需的形参对象。调用者继续使用自己的对象和调用表达式产生的结果，形参名称不会成为调用者作用域中的新名称。**参数名称描述函数怎样理解输入，当前按值形参对象则只属于相应的一次调用。**
 
-对于固定参数列表、没有默认实参的函数，调用提供的实参数量需要与形参数量一致；每个实参也必须能够按照相应的初始化规则建立对应形参。
+按值传递算术对象时，参数名称应当说明函数体眼中的业务含义，实参表达式则应让调用位置清楚展示数据来源。带有相互影响副作用的实参应先拆开求值，避免把正确性建立在语言没有规定的左右顺序上。
 
-## 按值传递（Pass by Value）
-
-当形参写成 `int pressure` 这样的普通对象声明时，**实参求值所得的值用于初始化一个新的参数对象。这种基本传递方式称为按值传递（pass by value）。**
-
-```cpp
-int decrease_pressure(int pressure, int amount) {
-    pressure -= amount;
-    return pressure;
-}
-
-int original_pressure{240};
-int displayed_pressure{
-    decrease_pressure(original_pressure, 20)
-};
-```
-
-下面按照实参与形参的对应关系说明这次调用，不表示它们在运行时按照所列顺序求值：
-
-- 实参 `original_pressure` 求值得到 `int` 值 `240`，用于初始化新的参数对象 `pressure`；
-- 实参 `20` 用于初始化另一个参数对象 `amount`；
-- 所有参数初始化完成后，函数体将参数对象 `pressure` 修改为 `220`，随后返回这个值。
-
-调用结束后，`displayed_pressure` 保存 `220`，而调用者中的 `original_pressure` 仍然保存 `240`。**`pressure` 是由实参值初始化出来的独立对象，修改它不会自动修改提供原值的对象。这与此前“由已有对象初始化新对象”的模型一致。**
-
-**按值传递描述的是初始化一个独立参数对象，不应简单理解为源代码中必然发生某一种固定形式的物理复制。**
-
-## 实参与形参的类型
-
-**实参表达式的类型不必与形参类型字面相同，但它必须能够按照语言规则初始化相应形参。需要转换时，转换发生在建立参数对象的过程中：**
-
-```cpp
-int whole_pressure(int pressure) {
-    return pressure;
-}
-
-double measured_pressure{240.8};
-int displayed_pressure{
-    whole_pressure(measured_pressure)
-};
-```
-
-`measured_pressure` 产生 `double` 值，而形参 `pressure` 是 `int` 对象。转换发生在建立参数对象的过程中，具体规则参见[整数类型与浮点类型之间](../06-constants-literals-and-type-conversions/04-implicit-type-conversions.md#整数类型与浮点类型之间)。
-
-**外层的花括号初始化接收的是函数最终产生的 `int` 结果，不能阻止此前已经发生的实参到形参转换。**列表初始化只检查直接需要的转换，参见[列表初始化只检查直接需要的转换](../06-constants-literals-and-type-conversions/05-narrowing-and-explicit-type-conversions.md#列表初始化只检查直接需要的转换)。
-
-## 参数名称的作用域
-
-形参名称属于相应函数的参数作用域，可以在函数体中使用。调用函数的代码不能通过这个名称直接访问参数对象：
-
-```cpp
-int decrease_pressure(int pressure, int amount) {
-    pressure -= amount; // 可以使用本次调用的参数对象
-    return pressure;
-}
-
-int pressure{240};
-int result{decrease_pressure(pressure, 20)};
-```
-
-**调用者中的 `pressure` 与形参 `pressure` 恰好使用相同拼写，但它们是作用域不同的两个对象。函数体内的名称指向参数对象，调用位置的名称则指向调用者自己的对象。**
-
-每次调用都会拥有各自的按值参数对象；这些对象只服务于相应调用。
-
-## 多个实参的求值顺序
-
-所有实参都会在进入函数体前完成求值，**但 C++23 不保证多个实参按照源代码中从左到右的顺序求值。每个参数的初始化会完整完成，不会与另一个参数的初始化交错；究竟先完成哪一个，则没有固定顺序。**
-
-```cpp
-int difference(int left, int right) {
-    return left - right;
-}
-
-int value{1};
-int result{difference(value++, value++)};
-```
-
-如果左侧实参先求值，形参得到 `left == 1`、`right == 2`，结果为 `-1`；如果右侧实参先求值，则形参得到 `left == 2`、`right == 1`，结果为 `1`。两种情况下 `value` 最终都保存 `3`，但不能依赖 `result` 具体是哪一种。
-
-在 C++23 中，这两个参数初始化彼此具有确定的先后关系，只是顺序未指定，因此该示例不是由无序交错引起的未定义行为。它仍然难以阅读，**结果也没有由语言规则唯一确定。更清晰的写法是先把有状态变化的步骤分开：**
-
-```cpp
-int value{1};
-int left_value{value++};
-int right_value{value++};
-int result{difference(left_value, right_value)};
-```
-
-相关语言规则可参阅 C++23 工作草案中的[函数调用与参数初始化](https://timsong-cpp.github.io/cppwp/n4950/expr.call)及[函数参数作用域](https://timsong-cpp.github.io/cppwp/n4950/basic.scope.param)。
+相关语言规则可参阅 C++23 工作草案中的[函数调用](https://timsong-cpp.github.io/cppwp/n4950/expr.call)与[函数参数作用域](https://timsong-cpp.github.io/cppwp/n4950/basic.scope.param)。

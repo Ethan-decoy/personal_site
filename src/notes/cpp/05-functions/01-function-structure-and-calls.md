@@ -1,105 +1,72 @@
 ---
-title: 函数的结构与调用（Function Structure and Calls）
-date: 2026-08-14
+title: 函数定义与调用（Function Definitions and Calls）
+date: 2026-08-27
 ---
 
-# 函数的结构与调用（Function Structure and Calls）
+# 函数定义与调用（Function Definitions and Calls）
 
-## 将行为组织成函数
+此前的代码已经能够创建对象、求值表达式，并通过条件与循环改变执行过程。实际程序还需要把一组共同完成某项工作的语句，组织成可以明确调用的执行单元。C++ 使用函数（function）表达这样的单元。
 
-此前的代码已经能够创建对象、求值表达式，并通过条件与循环改变执行过程。实际程序还需要将一组共同完成某项工作的语句，组织成可以明确调用的执行单元。**C++ 使用函数（function）表达这样的单元。**
+## 把一段行为命名为函数
 
-**普通命名函数为一段行为提供名称，并明确这段行为需要哪些信息、能够产生什么结果。**使用函数的代码只需通过名称发起调用，不必在每个使用位置重新写出相同的实现。
+下面的函数产生一个默认气压上限：
 
-## 函数的基本结构
-
-普通命名函数的定义可以概括为：
-
-```text
-return_type function_name(parameter_list) {
-    statement_sequence
+```cpp
+int default_pressure_limit_kpa() {
+    return 220;
 }
 ```
 
-### 返回类型
+这是一条函数定义（function definition）。它由返回类型（return type）、函数名（function name）、参数列表（parameter list）和函数体（function body）组成：
 
-`return_type` 表示返回类型（return type）：函数正常完成一次调用时，能够向调用位置提供哪种类型的结果。例如，返回类型写作 `int`，表示函数产生一个 `int` 类型的结果。
+| 组成部分 | 当前示例 | 含义 |
+| --- | --- | --- |
+| 返回类型 | `int` | 函数调用产生的结果类型 |
+| 函数名 | `default_pressure_limit_kpa` | 标识这项可调用行为的名称 |
+| 参数列表 | `()` | 表示当前函数不接收输入数据 |
+| 函数体 | `{ ... }` | 调用时执行的复合语句 |
 
-**返回类型是函数对调用者公开的信息。调用者可以据此使用结果，而不必先了解函数体怎样完成计算。**
+函数体沿用已经建立的代码块模型，可以包含声明、表达式语句、选择语句和循环语句。定义末尾的右花括号已经结束整条函数定义，后面不再添加分号。
 
-### 函数名
+**函数不是保存语句的对象，定义函数也不会在源码出现的位置执行函数体。函数定义建立的是一项可以被调用的行为。**
 
-`function_name` 表示函数名（function name），用于指代并调用这个函数。函数名同样由标识符表示，需要遵守标识符规则，并优先采用能够表达行为的 `snake_case` 名称，例如 `add`、`calculate_pressure` 或 `is_pressure_valid`。
+## 调用才会进入函数体
 
-**函数名应当说明函数完成什么工作，而不是复述实现细节。随着程序逐渐扩大，一个准确的名称能够让调用代码直接呈现意图。**
-
-### 参数列表
-
-`parameter_list` 是参数列表（parameter list），位于函数名之后的一对圆括号中。它可以包含零个或多个参数声明，多个参数之间使用逗号分隔。**参数描述函数完成工作时需要由调用者提供的信息。**
-
-圆括号中没有任何参数声明时，表示函数不接收实参：
-
-```text
-function_name()
-```
-
-### 函数体
-
-花括号及其内部内容构成函数体（function body）。这里的一对花括号构成一条[复合语句](../03-blocks-scope-and-lifetime/01-compound-statements-block-scope-and-local-object-lifetime.md)，`statement_sequence` 表示其中由零条或多条完整语句组成的语句序列。
-
-函数体规定这项工作具体怎样完成。**右花括号 `}` 已经结束函数定义，因此普通函数定义之后不需要再写分号。**
-
-## 一个完整的函数定义
-
-下面的函数接收两个 `int`，并产生二者相加后的结果：
+在当前表达式语境中，函数名后写一对调用圆括号，就形成函数调用（function call）：
 
 ```cpp
-int add(int left, int right) {
-    return left + right;
-}
+int pressure_limit_kpa{default_pressure_limit_kpa()};
 ```
 
-将它与通用结构对应起来：
+`default_pressure_limit_kpa()` 是一条调用表达式。执行到这里时：
 
-| 代码 | 在函数定义中的作用 |
-|---|---|
-| `int` | 返回类型 |
-| `add` | 函数名 |
-| `int left, int right` | 参数列表 |
-| `{ return left + right; }` | 函数体 |
+1. 控制进入 `default_pressure_limit_kpa` 的函数体；
+2. `return` 语句（return statement）中的字面量 `220` 完成求值；
+3. 这个值建立本次调用的 `int` 结果，当前调用随后结束；
+4. 控制回到调用位置，调用结果用于初始化 `pressure_limit_kpa`。
 
-`return left + right;` 表示这次调用将产生两个参数相加后的结果。
+即使函数不接收输入，调用语法中的空圆括号也不能省略。它们表示这里正在发起一次调用，而不是只写出函数名称。
 
-函数体描述调用这个函数时需要执行的语句。**函数定义出现在源文件中，只是在定义一段行为，并不意味着其中的语句会按照书写位置立即执行。只有发生函数调用（function call）时，程序才会进入相应的函数体；函数执行结束后，再回到调用发生的位置继续执行。**
+**定义描述调用时做什么，调用才真正使执行路径进入函数体。**当前调用通过 `return` 正常完成后，外围表达式继续使用它产生的结果。
 
-## 调用函数
+## 函数调用也是表达式
 
-调用普通命名函数时，写出函数名以及紧随其后的一对圆括号：
-
-```text
-function_name(argument_list)
-```
-
-圆括号中的 `argument_list` 是实参列表（argument list），用于提供这次调用所需的信息。调用前面定义的 `add` 可以写作：
+调用结果可以直接参与更大的表达式：
 
 ```cpp
-add(2, 3)
+int warning_pressure_kpa{default_pressure_limit_kpa() - 20};
 ```
 
-整个 `add(2, 3)` 是一个函数调用表达式（function call expression）。**当程序执行到这个表达式时，控制流进入 `add` 的函数体；函数正常完成后，控制流回到调用发生的位置，并由调用表达式产生 `int` 结果 `5`。**
+调用先产生 `int` 值 `220`，减法再产生 `200`，最终用于初始化 `warning_pressure_kpa`。对于当前返回算术值的函数，**调用表达式的类型就是所调用函数声明的返回类型。**因此，这里的调用可以像其他 `int` 表达式一样参与算术运算。
 
-函数调用表达式可以继续作为其他语法结构的一部分。例如，在另一个函数体中，可以用它的结果初始化对象：
+同一个函数可以出现在多个调用表达式中。每次执行到调用时，函数体都会为这一次调用重新执行；函数定义本身不会被复制，也不会因曾经调用过一次而保存某条执行路径。
 
-```cpp
-int total{add(2, 3)};
-```
+## 让函数边界表达意图
 
-这里的分号结束整条变量声明。函数调用表达式本身是 `add(2, 3)`，不包含这个分号。如果将调用单独写成一条表达式语句，则同样需要由分号结束：
+函数的价值不只在于减少重复代码。名称能够说明一组语句共同完成什么，返回类型则形成调用者与函数体之间的边界。
 
-```cpp
-add(2, 3);
-```
+`default_pressure_limit_kpa` 同时说明结果的业务含义和单位。相比 `process`、`handle` 或 `value`，这样的名称让调用位置无需展开函数体也能理解正在取得什么。
 
-**函数定义与函数调用由此承担不同职责：定义描述一项行为，调用才要求程序执行这项行为。**
+**一个函数应当围绕一项能够被清楚命名的工作组织语句。**如果名称必须同时罗列许多彼此独立的动作，通常说明函数边界没有准确对应问题本身。
 
-相关语言规则可参阅 C++23 工作草案中的[函数声明符](https://timsong-cpp.github.io/cppwp/n4950/dcl.fct)、[函数定义](https://timsong-cpp.github.io/cppwp/n4950/dcl.fct.def.general)与[函数调用](https://timsong-cpp.github.io/cppwp/n4950/expr.call)。
+相关语言规则可参阅 C++23 工作草案中的[函数](https://timsong-cpp.github.io/cppwp/n4950/dcl.fct)、[函数定义](https://timsong-cpp.github.io/cppwp/n4950/dcl.fct.def.general)与[函数调用](https://timsong-cpp.github.io/cppwp/n4950/expr.call)。

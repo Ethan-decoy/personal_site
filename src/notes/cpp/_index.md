@@ -15,3 +15,4 @@ date: 2026-08-08
 6. [函数](05-functions/_index.md)
 7. [常量、字面量与类型转换](06-constants-literals-and-type-conversions/_index.md)
 8. [对象地址与指针](07-object-addresses-and-pointers/_index.md)
+9. [对象身份与左值引用](08-object-identity-and-lvalue-references/_index.md)

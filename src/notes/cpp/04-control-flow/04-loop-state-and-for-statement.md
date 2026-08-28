@@ -95,4 +95,8 @@ for (int lap{0}; lap < 6; ++lap) {
 
 **当初始化、判断和一个统一的推进步骤自然成组时，使用 `for`；是否继续主要取决于某个状态，且状态变化没有单一固定位置时，使用 `while`；第一次操作必然发生时，才使用 `do-while`。**选择不同循环形式的目的，是让开始、继续、推进和结束的关系直接呈现在结构中。
 
-相关语言规则可参阅 C++23 工作草案中的 [for 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.for)、[语句中的条件](https://timsong-cpp.github.io/cppwp/n4950/stmt.pre)与[块作用域](https://timsong-cpp.github.io/cppwp/n4950/basic.scope.block)。
+## 参考资料
+
+- [C++23 工作草案：for 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.for)
+- [C++23 工作草案：语句中的条件](https://timsong-cpp.github.io/cppwp/n4950/stmt.pre)
+- [C++23 工作草案：块作用域](https://timsong-cpp.github.io/cppwp/n4950/basic.scope.block)

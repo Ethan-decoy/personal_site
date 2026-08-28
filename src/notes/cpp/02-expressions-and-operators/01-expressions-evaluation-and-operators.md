@@ -105,4 +105,8 @@ int remaining_count{12};
 
 整个 `int remaining_count{12};` 是声明，其中的 `12` 是初始化器使用的表达式。**声明与表达式属于不同的语法结构；分号只表示相应结构结束，不能据此把二者视为同一种东西。**
 
-相关语言规则可参阅 C++23 工作草案中的[表达式](https://eel.is/c%2B%2Bdraft/expr.pre)、[执行与求值](https://eel.is/c%2B%2Bdraft/intro.execution)和[表达式语句](https://eel.is/c%2B%2Bdraft/stmt.expr)。
+## 参考资料
+
+- [C++23 工作草案：表达式](https://timsong-cpp.github.io/cppwp/n4950/expr.pre)
+- [C++23 工作草案：执行与求值](https://timsong-cpp.github.io/cppwp/n4950/intro.execution)
+- [C++23 工作草案：表达式语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.expr)

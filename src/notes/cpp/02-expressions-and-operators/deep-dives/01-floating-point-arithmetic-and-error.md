@@ -363,3 +363,8 @@ binary32 拥有 24 bits 有效精度，因此从 `1.0` 向上的相邻间隔为�
 在恰好等于 `2` 的整数次幂的位置，上方与下方属于不同的指数区间，两侧间隔会相差一倍。这里所说的 ULP 采用从当前值到下一个更大可表示值的间隔，以避免边界处产生歧义。
 
 [返回算术运算主线](../02-arithmetic-operations-and-result-types.md)
+
+## 参考资料
+
+- [C++23 工作草案：浮点类型](https://timsong-cpp.github.io/cppwp/n4950/basic.fundamental)
+- [IEEE 754-2019：IEEE Standard for Floating-Point Arithmetic](https://standards.ieee.org/ieee/315/6210/)

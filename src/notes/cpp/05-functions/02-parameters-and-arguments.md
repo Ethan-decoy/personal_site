@@ -99,4 +99,7 @@ int encoded_value{encode_pair(first_digit, second_digit)};
 
 按值传递算术对象时，参数名称应当说明函数体眼中的业务含义，实参表达式则应让调用位置清楚展示数据来源。带有相互影响副作用的实参应先拆开求值，避免把正确性建立在语言没有规定的左右顺序上。
 
-相关语言规则可参阅 C++23 工作草案中的[函数调用](https://timsong-cpp.github.io/cppwp/n4950/expr.call)与[函数参数作用域](https://timsong-cpp.github.io/cppwp/n4950/basic.scope.param)。
+## 参考资料
+
+- [C++23 工作草案：函数调用](https://timsong-cpp.github.io/cppwp/n4950/expr.call)
+- [C++23 工作草案：函数参数作用域](https://timsong-cpp.github.io/cppwp/n4950/basic.scope.param)

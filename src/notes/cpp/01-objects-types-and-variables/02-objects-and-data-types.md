@@ -77,4 +77,8 @@ double front_left_pressure{2.5};
 
 这些分组只描述本章将要解决的问题，不是 C++ 类型系统的完整分类。
 
-相关语言规则可参阅 C++23 工作草案中的[对象模型](https://timsong-cpp.github.io/cppwp/n4950/intro.object)、[类型](https://timsong-cpp.github.io/cppwp/n4950/basic.types)与[基本类型](https://timsong-cpp.github.io/cppwp/n4950/basic.fundamental)。
+## 参考资料
+
+- [C++23 工作草案：对象模型](https://timsong-cpp.github.io/cppwp/n4950/intro.object)
+- [C++23 工作草案：类型](https://timsong-cpp.github.io/cppwp/n4950/basic.types)
+- [C++23 工作草案：基本类型](https://timsong-cpp.github.io/cppwp/n4950/basic.fundamental)

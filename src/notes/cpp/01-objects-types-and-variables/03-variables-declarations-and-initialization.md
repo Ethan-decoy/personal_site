@@ -121,7 +121,7 @@ double front_left_pressure{2.5};
 | 蛇形命名法（snake case） | `front_left_pressure` | 所有单词小写，并使用下划线分隔 |
 | 大驼峰命名法（Pascal case） | `FrontLeftPressure` | 每个单词的首字母大写 |
 
-C++ 没有规定唯一的命名风格，成熟项目也采用不同约定。当前笔记的自有名称统一使用 `snake_case`，与 C++ 标准库的命名传统保持一致。[C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#nl10-prefer-underscore_style-names) 在没有既有项目规范时也建议优先使用 `underscore_style`；进入已有代码库时，应当遵循项目已经建立的规则。
+C++ 没有规定唯一的命名风格，成熟项目也采用不同约定。当前笔记的自有名称统一使用 `snake_case`，与 C++ 标准库的命名传统保持一致。C++ Core Guidelines 的 NL.10 在没有既有项目规范时也建议优先使用 `underscore_style`；进入已有代码库时，应当遵循项目已经建立的规则。
 
 ### 每条声明只引入一个变量
 
@@ -139,3 +139,10 @@ double rear_left_pressure{2.75};
 ```
 
 每个变量的数据类型、名称和初始化器因而具有独立位置，阅读、修改和代码审查都更加直接。
+
+## 参考资料
+
+- [C++23 工作草案：标识符](https://timsong-cpp.github.io/cppwp/n4950/lex.name)
+- [C++23 工作草案：声明与定义](https://timsong-cpp.github.io/cppwp/n4950/basic.def)
+- [C++23 工作草案：初始化](https://timsong-cpp.github.io/cppwp/n4950/dcl.init)
+- [C++ Core Guidelines：NL.10 优先使用 underscore_style 名称](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#nl10-prefer-underscore_style-names)

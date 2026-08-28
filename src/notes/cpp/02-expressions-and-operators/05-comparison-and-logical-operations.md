@@ -122,4 +122,9 @@ bool zero_or_large{
 
 **把保护条件放在会失败的表达式左侧，是短路求值最重要的工程用途之一。**左侧条件必须足以排除右侧的失败边界，并让这种保护关系可以从代码结构中直接读出。
 
-相关语言规则可参阅 C++23 工作草案中的[关系运算符](https://eel.is/c%2B%2Bdraft/expr.rel)、[相等性运算符](https://eel.is/c%2B%2Bdraft/expr.eq)、[逻辑与](https://eel.is/c%2B%2Bdraft/expr.log.and)和[逻辑或](https://eel.is/c%2B%2Bdraft/expr.log.or)。
+## 参考资料
+
+- [C++23 工作草案：关系运算符](https://timsong-cpp.github.io/cppwp/n4950/expr.rel)
+- [C++23 工作草案：相等性运算符](https://timsong-cpp.github.io/cppwp/n4950/expr.eq)
+- [C++23 工作草案：逻辑与](https://timsong-cpp.github.io/cppwp/n4950/expr.log.and)
+- [C++23 工作草案：逻辑或](https://timsong-cpp.github.io/cppwp/n4950/expr.log.or)

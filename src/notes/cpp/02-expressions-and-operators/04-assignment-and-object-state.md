@@ -148,4 +148,8 @@ int total_count{base_count + added_count};
 
 **副作用通常应当成为独立、清楚的步骤。**括号可以说明表达式怎样分组，但不能消除其中的状态修改。
 
-相关语言规则可参阅 C++23 工作草案中的[赋值与复合赋值](https://eel.is/c%2B%2Bdraft/expr.assign)、[前置自增与自减](https://eel.is/c%2B%2Bdraft/expr.pre.incr)以及[后置自增与自减](https://eel.is/c%2B%2Bdraft/expr.post.incr)。
+## 参考资料
+
+- [C++23 工作草案：赋值与复合赋值](https://timsong-cpp.github.io/cppwp/n4950/expr.ass)
+- [C++23 工作草案：前置自增与自减](https://timsong-cpp.github.io/cppwp/n4950/expr.pre.incr)
+- [C++23 工作草案：后置自增与自减](https://timsong-cpp.github.io/cppwp/n4950/expr.post.incr)

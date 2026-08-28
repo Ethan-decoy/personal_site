@@ -130,4 +130,8 @@ double pressure_step_kpa{
 
 **分支结构应让读者直接看见条件、可选路径和最终汇合位置，而不是要求读者证明缩进或表达式副作用恰好产生了预期结果。**
 
-相关语言规则可参阅 C++23 工作草案中的 [if 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.if)、[语句中的条件](https://timsong-cpp.github.io/cppwp/n4950/stmt.pre)与[条件运算符](https://timsong-cpp.github.io/cppwp/n4950/expr.cond)。
+## 参考资料
+
+- [C++23 工作草案：if 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.if)
+- [C++23 工作草案：语句中的条件](https://timsong-cpp.github.io/cppwp/n4950/stmt.pre)
+- [C++23 工作草案：条件运算符](https://timsong-cpp.github.io/cppwp/n4950/expr.cond)

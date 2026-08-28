@@ -35,4 +35,6 @@ engine_running = true;
 
 `bool` 适合表示真正只有两种状态的信息。如果“未知”“尚未检查”或“发生故障”也是独立状态，单独一个 `bool` 就无法完整表达业务含义。此时应当选择能够明确列出全部状态的类型，而不是再约定某个隐藏值。
 
-相关语言规则可参阅 C++23 工作草案中的[基本类型](https://timsong-cpp.github.io/cppwp/n4950/basic.fundamental)。
+## 参考资料
+
+- [C++23 工作草案：基本类型](https://timsong-cpp.github.io/cppwp/n4950/basic.fundamental)

@@ -43,4 +43,6 @@ C++23 没有为三种浮点类型规定统一的 byte 数和 IEEE 754 格式。�
 
 二进制小数怎样形成、IEEE 754 怎样组织符号位、指数域与小数域，以及普通值和特殊值怎样由 bit patterns 分类，参见附章：[二进制浮点数的表示（Binary Floating-Point Representation）](deep-dives/01-binary-floating-point-representation.md)。
 
-相关语言规则可参阅 C++23 工作草案中的[浮点类型](https://timsong-cpp.github.io/cppwp/n4950/basic.fundamental)。
+## 参考资料
+
+- [C++23 工作草案：浮点类型](https://timsong-cpp.github.io/cppwp/n4950/basic.fundamental)

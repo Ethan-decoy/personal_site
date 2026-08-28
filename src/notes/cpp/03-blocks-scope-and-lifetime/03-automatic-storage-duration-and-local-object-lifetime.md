@@ -120,4 +120,9 @@ int pressure_difference{
 
 **局部对象应当在已经能够确定有效初始状态、并且接近第一次使用的位置创建。**这既避免无意义的占位状态，也缩短了需要持续维护对象有效状态的时间。
 
-相关语言规则可参阅 C++23 工作草案中的[自动存储期](https://timsong-cpp.github.io/cppwp/n4950/basic.stc.auto)、[对象生命周期](https://timsong-cpp.github.io/cppwp/n4950/basic.life)和[声明语句中的初始化与销毁](https://timsong-cpp.github.io/cppwp/n4950/stmt.dcl)。相关工程实践可参阅 C++ Core Guidelines 的 [ES.21：不要过早引入变量](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es21-dont-introduce-a-variable-or-constant-before-you-need-to-use-it)。
+## 参考资料
+
+- [C++23 工作草案：自动存储期](https://timsong-cpp.github.io/cppwp/n4950/basic.stc.auto)
+- [C++23 工作草案：对象生命周期](https://timsong-cpp.github.io/cppwp/n4950/basic.life)
+- [C++23 工作草案：声明语句中的初始化与销毁](https://timsong-cpp.github.io/cppwp/n4950/stmt.dcl)
+- [C++ Core Guidelines：ES.21 不要过早引入变量](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es21-dont-introduce-a-variable-or-constant-before-you-need-to-use-it)

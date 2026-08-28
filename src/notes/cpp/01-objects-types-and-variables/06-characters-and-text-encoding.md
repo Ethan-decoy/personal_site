@@ -28,7 +28,7 @@ date: 2026-08-25
 | `65～90` | 大写字母 `A～Z` |
 | `97～122` | 小写字母 `a～z` |
 
-完整的 7-bit ASCII 编码表与 bit 排列方式可参阅 [RFC 20：ASCII format for Network Interchange](https://www.rfc-editor.org/rfc/rfc20.html)。
+RFC 20 完整列出了 7-bit ASCII 编码表与 bit 排列方式。
 
 ## char
 
@@ -66,4 +66,9 @@ C++23 还提供 `wchar_t`、`char8_t`、`char16_t` 和 `char32_t` 等内建字�
 
 **任何一种字符类型都不能被普遍理解为“一个对象恰好保存一个用户看到的字符”。**一个码点可能需要多个编码单元，一个用户感知字符也可能由多个码点共同构成；字符、码点、编码单元和实际 bytes 必须分别判断。
 
-Unicode 的字符与码点模型可参阅 [The Unicode Standard](https://www.unicode.org/standard/standard.html)，UTF-8 的编码规则可参阅 [RFC 3629](https://www.rfc-editor.org/rfc/rfc3629.html)。
+## 参考资料
+
+- [C++23 工作草案：基本类型](https://timsong-cpp.github.io/cppwp/n4950/basic.fundamental)
+- [RFC 20：ASCII Format for Network Interchange](https://www.rfc-editor.org/rfc/rfc20.html)
+- [The Unicode Standard](https://www.unicode.org/standard/standard.html)
+- [RFC 3629：UTF-8, a Transformation Format of ISO 10646](https://www.rfc-editor.org/rfc/rfc3629.html)

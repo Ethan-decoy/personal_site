@@ -14,3 +14,7 @@ date: 2026-08-10
 面向对象编程是 C++ 支持的一种程序组织方式，并不是 C++ 本身的全部。这里的“对象”用于建立组织复杂系统的直觉；C++ 在语言规则中使用 object 这个术语时，范围还要更广。
 
 **把系统理解为许多保存自身状态、承担相应职责并彼此协作的对象，再由这些对象逐层组合出完整程序——这就是面向对象编程。**
+
+## 参考资料
+
+- [Bjarne Stroustrup：What Is “Object-Oriented Programming”?](https://stroustrup.com/whatis.pdf)

@@ -124,4 +124,9 @@ int calculate_target_pressure_kpa() {
 
 **声明使函数在当前位置可被认识；定义使完整程序拥有能够执行的函数体。**把这两项责任分开，函数之间就不必完全依赖源码中的定义先后排列。
 
-相关语言规则可参阅 C++23 工作草案中的[函数](https://timsong-cpp.github.io/cppwp/n4950/dcl.fct)、[函数定义](https://timsong-cpp.github.io/cppwp/n4950/dcl.fct.def.general)、[函数调用](https://timsong-cpp.github.io/cppwp/n4950/expr.call)与[单一定义规则](https://timsong-cpp.github.io/cppwp/n4950/basic.def.odr)。
+## 参考资料
+
+- [C++23 工作草案：函数](https://timsong-cpp.github.io/cppwp/n4950/dcl.fct)
+- [C++23 工作草案：函数定义](https://timsong-cpp.github.io/cppwp/n4950/dcl.fct.def.general)
+- [C++23 工作草案：函数调用](https://timsong-cpp.github.io/cppwp/n4950/expr.call)
+- [C++23 工作草案：单一定义规则](https://timsong-cpp.github.io/cppwp/n4950/basic.def.odr)

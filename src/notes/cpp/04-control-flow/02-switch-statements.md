@@ -183,4 +183,9 @@ default: {
 
 **选择 `switch` 的理由是问题本身具有一个离散控制值和多个固定入口，而不是分支数量看起来较多。**无论采用哪种形式，入口、停止位置和未覆盖值都应当从代码结构中清楚可见。
 
-相关语言规则可参阅 C++23 工作草案中的 [switch 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.switch)、[break 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.break)、[控制转移与局部变量](https://timsong-cpp.github.io/cppwp/n4950/stmt.dcl)以及 [fallthrough 属性](https://timsong-cpp.github.io/cppwp/n4950/dcl.attr.fallthrough)。
+## 参考资料
+
+- [C++23 工作草案：switch 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.switch)
+- [C++23 工作草案：break 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.break)
+- [C++23 工作草案：控制转移与局部变量](https://timsong-cpp.github.io/cppwp/n4950/stmt.dcl)
+- [C++23 工作草案：fallthrough 属性](https://timsong-cpp.github.io/cppwp/n4950/dcl.attr.fallthrough)

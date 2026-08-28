@@ -130,4 +130,10 @@ while (value < 5) {
 
 真正需要限制的是在较长循环体或多层嵌套中分散许多控制转移，使读者难以找到所有出口和继续位置。**提前转移应靠近触发它的条件，并且只有在比继续增加嵌套更清楚时使用。**结束当前单层循环时，也不应通过篡改循环变量或制造隐蔽状态来模拟本可直接表达的 `break`。
 
-相关语言规则可参阅 C++23 工作草案中的[跳转语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.jump)、[break 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.break)、[continue 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.cont)与[控制转移时的局部对象销毁](https://timsong-cpp.github.io/cppwp/n4950/stmt.dcl)。相关工程实践可参阅 C++ Core Guidelines 的 [ES.77：减少循环中的 break 与 continue](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es77-minimize-the-use-of-break-and-continue-in-loops)。
+## 参考资料
+
+- [C++23 工作草案：跳转语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.jump)
+- [C++23 工作草案：break 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.break)
+- [C++23 工作草案：continue 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.cont)
+- [C++23 工作草案：控制转移时的局部对象销毁](https://timsong-cpp.github.io/cppwp/n4950/stmt.dcl)
+- [C++ Core Guidelines：ES.77 减少循环中的 break 与 continue](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es77-minimize-the-use-of-break-and-continue-in-loops)

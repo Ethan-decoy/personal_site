@@ -95,4 +95,8 @@ while (tire_pressure_kpa < 220) {
 
 **判断循环能否按预期结束，应当寻找使条件最终不成立的真实执行路径，而不是仅凭循环体看起来执行了某些操作。**状态不必在所有问题中单调变化，但终止机制必须与条件观察的状态具有可解释的关系。
 
-相关语言规则可参阅 C++23 工作草案中的[迭代语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.iter)、[while 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.while)与 [do-while 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.do)。
+## 参考资料
+
+- [C++23 工作草案：迭代语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.iter)
+- [C++23 工作草案：while 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.while)
+- [C++23 工作草案：do-while 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.do)

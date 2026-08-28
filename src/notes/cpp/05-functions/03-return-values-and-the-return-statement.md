@@ -107,4 +107,7 @@ int calculate_pressure_deficit_kpa(int pressure_kpa) {
 
 返回类型不是对函数结果的注释，而是调用边界的一部分。**声明返回 `int` 的普通函数不能让控制流直接越过函数体末尾；正常返回调用者时必须建立 `int` 结果。声明返回 `void` 的函数则不向调用者提供值结果。**
 
-相关语言规则可参阅 C++23 工作草案中的[返回语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.return)与[跳转语句及作用域退出](https://timsong-cpp.github.io/cppwp/n4950/stmt.jump)。
+## 参考资料
+
+- [C++23 工作草案：返回语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.return)
+- [C++23 工作草案：跳转语句及作用域退出](https://timsong-cpp.github.io/cppwp/n4950/stmt.jump)

@@ -119,4 +119,8 @@ unsigned int result{count + adjustment};
 
 普通数量运算应尽量让参与同一次运算的整数具有一致的符号属性。不同类型的数据来自外部接口时，应先确认可表示范围与业务含义，而不是让有符号与无符号转换悄然决定结果。
 
-相关语言规则可参阅 C++23 工作草案中的[通常算术转换](https://eel.is/c%2B%2Bdraft/expr.arith.conv)、[整数提升](https://eel.is/c%2B%2Bdraft/conv.prom)和[整数转换](https://eel.is/c%2B%2Bdraft/conv.integral)。
+## 参考资料
+
+- [C++23 工作草案：通常算术转换](https://timsong-cpp.github.io/cppwp/n4950/expr.arith.conv)
+- [C++23 工作草案：整数提升](https://timsong-cpp.github.io/cppwp/n4950/conv.prom)
+- [C++23 工作草案：整数转换](https://timsong-cpp.github.io/cppwp/n4950/conv.integral)

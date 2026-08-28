@@ -69,4 +69,8 @@ int warning_pressure_kpa{default_pressure_limit_kpa() - 20};
 
 **一个函数应当围绕一项能够被清楚命名的工作组织语句。**如果名称必须同时罗列许多彼此独立的动作，通常说明函数边界没有准确对应问题本身。
 
-相关语言规则可参阅 C++23 工作草案中的[函数](https://timsong-cpp.github.io/cppwp/n4950/dcl.fct)、[函数定义](https://timsong-cpp.github.io/cppwp/n4950/dcl.fct.def.general)与[函数调用](https://timsong-cpp.github.io/cppwp/n4950/expr.call)。
+## 参考资料
+
+- [C++23 工作草案：函数](https://timsong-cpp.github.io/cppwp/n4950/dcl.fct)
+- [C++23 工作草案：函数定义](https://timsong-cpp.github.io/cppwp/n4950/dcl.fct.def.general)
+- [C++23 工作草案：函数调用](https://timsong-cpp.github.io/cppwp/n4950/expr.call)

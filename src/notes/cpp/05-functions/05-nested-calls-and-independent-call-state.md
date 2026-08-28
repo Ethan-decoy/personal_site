@@ -94,4 +94,8 @@ int repeat_without_progress(int remaining_steps) {
 
 本篇描述的是 C++ 语义上的嵌套调用关系。实现通常怎样保存尚未完成的调用，可继续参阅附章[调用栈与栈帧](deep-dives/01-call-stack-and-stack-frames.md)。
 
-相关语言规则可参阅 C++23 工作草案中的[程序执行](https://timsong-cpp.github.io/cppwp/n4950/intro.execution)、[函数调用](https://timsong-cpp.github.io/cppwp/n4950/expr.call)与[自动存储期](https://timsong-cpp.github.io/cppwp/n4950/basic.stc.auto)。
+## 参考资料
+
+- [C++23 工作草案：程序执行](https://timsong-cpp.github.io/cppwp/n4950/intro.execution)
+- [C++23 工作草案：函数调用](https://timsong-cpp.github.io/cppwp/n4950/expr.call)
+- [C++23 工作草案：自动存储期](https://timsong-cpp.github.io/cppwp/n4950/basic.stc.auto)

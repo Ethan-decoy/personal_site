@@ -433,3 +433,8 @@ binary32 的 bias 为 `127`，所以非规格化数使用的实际指数仍然�
 小数域也全为 `0` 时，有效数成为 `0.000...₂`，编码表示零；小数域不全为 `0` 时，编码才表示非规格化数。符号位同样可以使非规格化数为正或为负。整数没有指数域和隐含前导 bit，因此不存在与之对应的规格化或非规格化分类。
 
 [返回浮点类型主线](../07-floating-point-types.md)
+
+## 参考资料
+
+- [C++23 工作草案：浮点类型](https://timsong-cpp.github.io/cppwp/n4950/basic.fundamental)
+- [IEEE 754-2019：IEEE Standard for Floating-Point Arithmetic](https://standards.ieee.org/ieee/315/6210/)

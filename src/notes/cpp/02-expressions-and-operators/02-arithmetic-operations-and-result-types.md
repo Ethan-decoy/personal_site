@@ -113,4 +113,7 @@ int negative_remainder{-7 % 3};  // -1
 
 浮点加减法怎样对齐指数、乘除法怎样组合有效数与指数、舍入怎样选择相邻可表示值，以及较小数值为何可能被吸收，参见附章：[浮点运算、舍入与误差（Floating-Point Arithmetic, Rounding, and Error）](deep-dives/01-floating-point-arithmetic-and-error.md)。
 
-相关语言规则可参阅 C++23 工作草案中的[乘法类运算符](https://eel.is/c%2B%2Bdraft/expr.mul)与[加法类运算符](https://eel.is/c%2B%2Bdraft/expr.add)。
+## 参考资料
+
+- [C++23 工作草案：乘法类运算符](https://timsong-cpp.github.io/cppwp/n4950/expr.mul)
+- [C++23 工作草案：加法类运算符](https://timsong-cpp.github.io/cppwp/n4950/expr.add)

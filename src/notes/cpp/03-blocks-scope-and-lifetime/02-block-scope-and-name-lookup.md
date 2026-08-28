@@ -89,4 +89,10 @@ tire_count += 1; // 错误：已经离开相应的块作用域
 
 名称隐藏迫使读者持续判断当前名称究竟指定哪个对象。**变量名应当限制在满足用途的最小合理作用域中，并避免在嵌套作用域中重复使用相同名称。**
 
-相关语言规则可参阅 C++23 工作草案中的[块作用域](https://timsong-cpp.github.io/cppwp/n4950/basic.scope.block)、[声明的生效位置](https://timsong-cpp.github.io/cppwp/n4950/basic.scope.pdecl)与[非限定名称查找](https://timsong-cpp.github.io/cppwp/n4950/basic.lookup.unqual)。相关工程实践可参阅 C++ Core Guidelines 的 [ES.5：保持较小的作用域](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es5-keep-scopes-small)与 [ES.12：不要在嵌套作用域中重用名称](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es12-do-not-reuse-names-in-nested-scopes)。
+## 参考资料
+
+- [C++23 工作草案：块作用域](https://timsong-cpp.github.io/cppwp/n4950/basic.scope.block)
+- [C++23 工作草案：声明的生效位置](https://timsong-cpp.github.io/cppwp/n4950/basic.scope.pdecl)
+- [C++23 工作草案：非限定名称查找](https://timsong-cpp.github.io/cppwp/n4950/basic.lookup.unqual)
+- [C++ Core Guidelines：ES.5 保持较小的作用域](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es5-keep-scopes-small)
+- [C++ Core Guidelines：ES.12 不要在嵌套作用域中重用名称](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es12-do-not-reuse-names-in-nested-scopes)

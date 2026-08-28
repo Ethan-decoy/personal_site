@@ -66,4 +66,6 @@ int main() {}
 
 `main` 把完整程序连接到外部运行环境：辅助函数由程序中的调用表达式进入，`main` 则由托管实现按照特殊规则调用。进入函数体之后，它仍然使用与其他函数相同的代码块、局部对象和控制流模型；特殊之处集中在入口身份、声明限制与终止状态上。
 
-相关语言规则可参阅 C++23 工作草案中的[main 函数](https://timsong-cpp.github.io/cppwp/n4950/basic.start.main)。
+## 参考资料
+
+- [C++23 工作草案：main 函数](https://timsong-cpp.github.io/cppwp/n4950/basic.start.main)

@@ -81,4 +81,8 @@ C++ 允许实现按照如同规则（as-if rule）改变程序的内部执行方
 
 **调用栈适合解释常见实现怎样承载嵌套调用；判断程序语义时，仍应以每次调用的独立状态、作用域和生命周期规则为准。**
 
-相关语言规则可参阅 C++23 工作草案中的[抽象机与实现一致性](https://timsong-cpp.github.io/cppwp/n4950/intro.compliance)、[程序执行](https://timsong-cpp.github.io/cppwp/n4950/intro.execution)与[自动存储期](https://timsong-cpp.github.io/cppwp/n4950/basic.stc.auto)。
+## 参考资料
+
+- [C++23 工作草案：抽象机与实现一致性](https://timsong-cpp.github.io/cppwp/n4950/intro.compliance)
+- [C++23 工作草案：程序执行](https://timsong-cpp.github.io/cppwp/n4950/intro.execution)
+- [C++23 工作草案：自动存储期](https://timsong-cpp.github.io/cppwp/n4950/basic.stc.auto)

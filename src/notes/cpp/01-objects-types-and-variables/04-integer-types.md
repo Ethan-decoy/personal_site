@@ -44,4 +44,6 @@ C++ 规定了标准整数类型之间的最低表示能力和相对大小，同�
 
 普通计数、差值和算术通常优先使用有符号整数。无符号类型适合明确需要模运算、bit patterns 或外部接口规定无符号表示的场景。**无符号类型扩大了非负范围，却不能表达“业务上绝不允许负数”这一约束。**
 
-相关语言规则可参阅 C++23 工作草案中的[基本类型](https://timsong-cpp.github.io/cppwp/n4950/basic.fundamental)。
+## 参考资料
+
+- [C++23 工作草案：基本类型](https://timsong-cpp.github.io/cppwp/n4950/basic.fundamental)

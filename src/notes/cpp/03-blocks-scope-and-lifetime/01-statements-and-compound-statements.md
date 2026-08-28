@@ -49,4 +49,8 @@ date: 2026-08-26
 
 这里的外层与内层花括号分别形成一个代码块。缩进呈现了它们的嵌套关系，但真正建立边界的是源代码中的花括号。
 
-相关语言规则可参阅 C++23 工作草案中的[语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.pre)、[复合语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.block)与[声明语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.dcl)。
+## 参考资料
+
+- [C++23 工作草案：语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.pre)
+- [C++23 工作草案：复合语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.block)
+- [C++23 工作草案：声明语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.dcl)

@@ -169,4 +169,8 @@ int result{previous_count + count};
 
 括号也不能挽救承担了太多工作的表达式。如果读者必须同时追踪多次状态修改、类型转换和许多层分组，应使用具有含义的中间对象和独立语句拆分过程。**表达式结构应当帮助读者直接看见计算关系，而不是要求读者证明代码最终碰巧正确。**
 
-相关语言规则可参阅 C++23 工作草案中的[括号表达式](https://eel.is/c%2B%2Bdraft/expr.prim.paren)、[运算符](https://eel.is/c%2B%2Bdraft/expr.pre)和[执行与求值顺序](https://eel.is/c%2B%2Bdraft/intro.execution)。
+## 参考资料
+
+- [C++23 工作草案：括号表达式](https://timsong-cpp.github.io/cppwp/n4950/expr.prim.paren)
+- [C++23 工作草案：运算符](https://timsong-cpp.github.io/cppwp/n4950/expr.pre)
+- [C++23 工作草案：执行与求值顺序](https://timsong-cpp.github.io/cppwp/n4950/intro.execution)

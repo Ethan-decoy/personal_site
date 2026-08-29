@@ -747,7 +747,7 @@ export default function NotesPage({
 	return (
 		<div>
 			<div
-				className="fixed bottom-0 left-8 top-32 z-10 hidden w-56 flex-col overflow-y-auto pb-6 md:flex"
+				className="fixed bottom-0 left-8 top-32 z-10 hidden w-56 flex-col overflow-y-auto pb-6 2xl:flex"
 				style={{ color: theme.textSec }}
 			>
 				<SidebarCatalog
@@ -865,7 +865,7 @@ export default function NotesPage({
 					>
 						<button
 							type="button"
-							className="mb-2 flex w-full items-center justify-between rounded-xl px-4 py-3 md:hidden"
+							className="mb-2 flex w-full items-center justify-between rounded-xl px-4 py-3 2xl:hidden"
 							aria-expanded={mobileSidebarOpen}
 							aria-controls="mobile-notes-catalog"
 							style={{
@@ -898,7 +898,7 @@ export default function NotesPage({
 							</svg>
 						</button>
 						{mobileSidebarOpen && (
-							<div id="mobile-notes-catalog" className="mb-6 md:hidden">
+							<div id="mobile-notes-catalog" className="mb-6 2xl:hidden">
 								<SidebarCatalog
 									theme={theme}
 									searchQuery={searchQuery}

@@ -362,7 +362,7 @@ body {
 	isolation: isolate;
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 96rem) {
 	.notes-sidebar-search-header {
 		top: 0;
 	}

@@ -52,6 +52,27 @@ function usesGlobalThemeTransition(element) {
 	);
 }
 
+const BREAKPOINT_WIDTHS = {
+	md: 768,
+	lg: 1024,
+	xl: 1280,
+	"2xl": 1536,
+};
+
+function responsiveFlexBreakpoint(className) {
+	return /(?:^|\s)(md|lg|xl|2xl):flex(?:\s|$)/.exec(className)?.[1] ?? null;
+}
+
+function responsiveHiddenBreakpoint(className) {
+	return /(?:^|\s)(md|lg|xl|2xl):hidden(?:\s|$)/.exec(className)?.[1] ?? null;
+}
+
+function readingContentStart(viewportWidth) {
+	const frameWidth = Math.min(viewportWidth, 64 * 16);
+	const frameLeft = (viewportWidth - frameWidth) / 2;
+	return frameLeft + 2 * 16;
+}
+
 try {
 	const [sidebarCss, notesPageSource] = await Promise.all([
 		readFile(new URL("../src/index.css", import.meta.url), "utf8"),
@@ -161,6 +182,33 @@ try {
 		const segment = node.key.split("/").at(-1);
 		return !node.indexFile && node.title === segment;
 	});
+	const desktopCatalogClasses =
+		/className="([^"]*fixed bottom-0 left-8 top-32[^"]*)"/.exec(
+			notesPageSource,
+		)?.[1] ?? "";
+	const desktopCatalogBreakpoint = responsiveFlexBreakpoint(
+		desktopCatalogClasses,
+	);
+	const mobileCatalogButtonClasses =
+		/className="([^"]*mb-2 flex w-full[^"]*)"/.exec(notesPageSource)?.[1] ?? "";
+	const mobileCatalogPanelClasses =
+		/id="mobile-notes-catalog" className="([^"]*)"/.exec(
+			notesPageSource,
+		)?.[1] ?? "";
+	const mobileCatalogButtonBreakpoint = responsiveHiddenBreakpoint(
+		mobileCatalogButtonClasses,
+	);
+	const mobileCatalogPanelBreakpoint = responsiveHiddenBreakpoint(
+		mobileCatalogPanelClasses,
+	);
+	const desktopCatalogMinWidth = desktopCatalogBreakpoint
+		? BREAKPOINT_WIDTHS[desktopCatalogBreakpoint]
+		: 0;
+	const desktopCatalogRight = (2 + 14) * 16;
+	const desktopCatalogGap = 2 * 16;
+	const desktopCatalogClearance =
+		readingContentStart(desktopCatalogMinWidth) -
+		(desktopCatalogRight + desktopCatalogGap);
 
 	const checks = [
 		{
@@ -199,6 +247,16 @@ try {
 		{
 			name: "the closed mobile catalog is not mounted beside the desktop catalog",
 			pass: topLevelTitleOccurrences === 1,
+		},
+		{
+			name: "the fixed desktop catalog only appears when it clears the centered reading frame",
+			pass: Boolean(desktopCatalogBreakpoint) && desktopCatalogClearance >= 0,
+		},
+		{
+			name: "the mobile catalog remains available until the fixed catalog appears",
+			pass:
+				mobileCatalogButtonBreakpoint === desktopCatalogBreakpoint &&
+				mobileCatalogPanelBreakpoint === desktopCatalogBreakpoint,
 		},
 		{
 			name: "the catalog starts collapsed instead of opening an arbitrary first category",
@@ -257,7 +315,9 @@ try {
 				sidebarCss.includes(".notes-sidebar-search-header") &&
 				sidebarCss.includes("position: sticky") &&
 				sidebarCss.includes("top: 4.5rem") &&
-				sidebarCss.includes("top: 0"),
+				/@media \(min-width: 96rem\) \{\s*\.notes-sidebar-search-header \{\s*top: 0;\s*\}\s*\}/.test(
+					sidebarCss,
+				),
 		},
 		{
 			name: "one search query mounts exactly one result surface",
@@ -298,6 +358,16 @@ try {
 						title: node.title,
 						noteCount: node.noteCount,
 					})),
+				},
+				layout: {
+					desktopCatalogBreakpoint,
+					mobileCatalogButtonBreakpoint,
+					mobileCatalogPanelBreakpoint,
+					desktopCatalogMinWidth,
+					desktopCatalogRight,
+					desktopCatalogGap,
+					readingContentStart: readingContentStart(desktopCatalogMinWidth),
+					desktopCatalogClearance,
 				},
 			},
 			null,

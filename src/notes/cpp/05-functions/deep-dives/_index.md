@@ -1,6 +1,7 @@
 ---
 title: 附章
 date: 2026-08-27
+sidebarAfter: ../05-nested-calls-and-independent-call-state.md
 ---
 
 # 附章

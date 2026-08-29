@@ -1,6 +1,7 @@
 ---
-title: 表达式与运算符附章
+title: 附章
 date: 2026-08-25
+sidebarAfter: ../02-arithmetic-operations-and-result-types.md
 ---
 
 # 表达式与运算符附章

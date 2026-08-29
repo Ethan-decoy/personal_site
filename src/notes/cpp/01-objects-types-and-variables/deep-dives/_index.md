@@ -1,6 +1,7 @@
 ---
 title: 附章
 date: 2026-08-25
+sidebarAfter: ../07-floating-point-types.md
 ---
 
 # 附章

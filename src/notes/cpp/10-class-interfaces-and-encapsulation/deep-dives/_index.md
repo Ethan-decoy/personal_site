@@ -1,6 +1,7 @@
 ---
 title: 附章
 date: 2026-08-29
+sidebarAfter: ../01-member-functions-and-invocation-objects.md
 ---
 
 # 附章

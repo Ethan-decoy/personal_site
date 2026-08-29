@@ -9,7 +9,6 @@ import {
 } from "react";
 import { SectionTitle } from "../components";
 import {
-	type NestedFileNode,
 	type NestedTreeNode,
 	type NoteContent,
 	type NoteLinkTarget,
@@ -236,13 +235,7 @@ function SidebarNode({
 }) {
 	const [hoveredFile, setHoveredFile] = useState<string | null>(null);
 	const expanded = expandedKeys.has(node.key);
-
-	const fileChildren: NestedFileNode[] = [];
-	const dirChildren: NestedTreeNode[] = [];
-	for (const c of node.children) {
-		if (isDirectoryNode(c)) dirChildren.push(c);
-		else fileChildren.push(c);
-	}
+	const nodeIndent = depth === 0 ? 0 : node.sidebarAfter === undefined ? 8 : 16;
 
 	const hasChildren = node.children.length > 0;
 	const selectedIndex = Boolean(
@@ -253,7 +246,7 @@ function SidebarNode({
 		.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
 
 	return (
-		<div style={{ marginLeft: depth > 0 ? 8 : 0 }}>
+		<div style={{ marginLeft: nodeIndent }}>
 			<div
 				className="group flex w-full items-center rounded-lg transition-colors duration-150"
 				style={{
@@ -348,46 +341,47 @@ function SidebarNode({
 						className="ml-2 border-l pl-1"
 						style={{ borderColor: theme.border }}
 					>
-						{dirChildren.map((d) => (
-							<SidebarNode
-								key={d.key}
-								node={d}
-								theme={theme}
-								depth={depth + 1}
-								expandedKeys={expandedKeys}
-								onToggle={onToggle}
-								selectedFile={selectedFile}
-								onOpen={onOpen}
-								onPrefetch={onPrefetch}
-							/>
-						))}
-						{fileChildren.map((file) => (
-							<button
-								type="button"
-								key={file.file}
-								className="w-full rounded-r py-1 pl-3 pr-2 text-left text-xs leading-5 transition-colors duration-150"
-								style={{
-									backgroundColor:
-										selectedFile === file.file
-											? theme.accentLight
-											: hoveredFile === file.file
-												? `${theme.accentLight}60`
-												: "transparent",
-									color:
-										selectedFile === file.file ? theme.text : theme.textSec,
-								}}
-								onClick={() => onOpen(file.file)}
-								onPointerEnter={() => {
-									onPrefetch(file.file);
-									setHoveredFile(file.file);
-								}}
-								onFocus={() => onPrefetch(file.file)}
-								onTouchStart={() => onPrefetch(file.file)}
-								onMouseLeave={() => setHoveredFile(null)}
-							>
-								{file.title}
-							</button>
-						))}
+						{node.children.map((child) =>
+							isDirectoryNode(child) ? (
+								<SidebarNode
+									key={child.key}
+									node={child}
+									theme={theme}
+									depth={depth + 1}
+									expandedKeys={expandedKeys}
+									onToggle={onToggle}
+									selectedFile={selectedFile}
+									onOpen={onOpen}
+									onPrefetch={onPrefetch}
+								/>
+							) : (
+								<button
+									type="button"
+									key={child.file}
+									className="w-full rounded-r py-1 pl-3 pr-2 text-left text-xs leading-5 transition-colors duration-150"
+									style={{
+										backgroundColor:
+											selectedFile === child.file
+												? theme.accentLight
+												: hoveredFile === child.file
+													? `${theme.accentLight}60`
+													: "transparent",
+										color:
+											selectedFile === child.file ? theme.text : theme.textSec,
+									}}
+									onClick={() => onOpen(child.file)}
+									onPointerEnter={() => {
+										onPrefetch(child.file);
+										setHoveredFile(child.file);
+									}}
+									onFocus={() => onPrefetch(child.file)}
+									onTouchStart={() => onPrefetch(child.file)}
+									onMouseLeave={() => setHoveredFile(null)}
+								>
+									{child.title}
+								</button>
+							),
+						)}
 					</div>
 				</CollapsibleBranch>
 			)}

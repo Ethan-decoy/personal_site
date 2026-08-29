@@ -12,6 +12,7 @@ type NoteManifestRecord = {
 	title: string;
 	date: string;
 	order?: number;
+	sidebarAfter?: string;
 	searchText: string;
 	absolutePath: string;
 };
@@ -33,12 +34,14 @@ function parseNote(
 	);
 	const filename = file.replace(/^.*\//, "").replace(/\.md$/, "");
 	const order = fields.order === undefined ? undefined : Number(fields.order);
+	const sidebarAfter = fields.sidebarAfter?.trim() || undefined;
 
 	return {
 		file,
 		title: fields.title || filename,
 		date: fields.date || "",
 		order: Number.isNaN(order) ? undefined : order,
+		sidebarAfter,
 		searchText: normalized.trim(),
 	};
 }
@@ -102,12 +105,15 @@ export function notesManifestPlugin(): Plugin {
 			for (const note of notes) this.addWatchFile(note.absolutePath);
 
 			if (id === RESOLVED_NOTES_MANIFEST_ID) {
-				const manifest = notes.map(({ file, title, date, order }) => ({
-					file,
-					title,
-					date,
-					order,
-				}));
+				const manifest = notes.map(
+					({ file, title, date, order, sidebarAfter }) => ({
+						file,
+						title,
+						date,
+						order,
+						sidebarAfter,
+					}),
+				);
 				return `export default ${JSON.stringify(manifest)};`;
 			}
 

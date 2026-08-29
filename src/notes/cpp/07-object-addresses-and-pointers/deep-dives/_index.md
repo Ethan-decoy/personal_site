@@ -1,6 +1,7 @@
 ---
 title: 附章
 date: 2026-08-27
+sidebarAfter: ../01-objects-storage-and-addresses.md
 ---
 
 # 附章

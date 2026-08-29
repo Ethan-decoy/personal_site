@@ -88,6 +88,7 @@ About 页面有独立的 personal/work 分支，不应机械塞入普通页面�
 - `title`
 - `date`
 - 可选 `order`
+- 目录 `_index.md` 可选 `sidebarAfter`，使用相对 Markdown 路径声明该目录在侧栏中跟随的同级正文
 
 以下划线开头的目录是内部草稿或测试内容，不进入公开目录、搜索索引或生产 JavaScript。
 

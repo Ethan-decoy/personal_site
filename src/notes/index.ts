@@ -25,6 +25,7 @@ interface NoteMetadata {
 	title: string;
 	date: string;
 	order?: number;
+	sidebarAfter?: string;
 }
 
 export interface NoteContent extends NoteMetadata {
@@ -46,6 +47,7 @@ export interface NestedTreeNode {
 	children: (NestedTreeNode | NestedFileNode)[];
 	isDir: true;
 	indexFile?: string;
+	sidebarAfter?: string;
 }
 
 export interface SearchResult {
@@ -124,6 +126,46 @@ function directoryKeyForFile(file: string): string {
 	return parts.length > 1 ? parts.slice(0, -1).join("/") : "";
 }
 
+function resolveSidebarAfter(
+	indexFile: string,
+	relativeTarget: string,
+): string {
+	const target = relativeTarget.trim().replace(/\\/g, "/");
+	if (
+		!target ||
+		target.startsWith("/") ||
+		/^[a-z][a-z\d+.-]*:/i.test(target) ||
+		/[?#]/.test(target)
+	) {
+		throw new Error(
+			`Invalid sidebarAfter "${relativeTarget}" in "${indexFile}": expected a relative Markdown path`,
+		);
+	}
+
+	const segments = directoryKeyForFile(indexFile).split("/").filter(Boolean);
+	for (const segment of target.split("/")) {
+		if (!segment || segment === ".") continue;
+		if (segment === "..") {
+			if (segments.length === 0) {
+				throw new Error(
+					`Invalid sidebarAfter "${relativeTarget}" in "${indexFile}": target escapes src/notes`,
+				);
+			}
+			segments.pop();
+			continue;
+		}
+		segments.push(segment);
+	}
+
+	const resolved = normalizeFileKey(segments.join("/"));
+	if (!resolved.endsWith(".md")) {
+		throw new Error(
+			`Invalid sidebarAfter "${relativeTarget}" in "${indexFile}": target must be a Markdown file`,
+		);
+	}
+	return resolved;
+}
+
 function extractPrefix(file: string): number {
 	const m = fileName(file).match(/^(\d+)/);
 	return m ? Number.parseInt(m[1], 10) : Number.POSITIVE_INFINITY;
@@ -150,6 +192,39 @@ function compareDirectories(a: NestedTreeNode, b: NestedTreeNode): number {
 	return directoryCollator.compare(aSegment, bSegment);
 }
 
+function mergeSidebarChildren(
+	directoryKey: string,
+	dirChildren: NestedTreeNode[],
+	fileChildren: NestedFileNode[],
+): (NestedTreeNode | NestedFileNode)[] {
+	const unpositionedDirectories: NestedTreeNode[] = [];
+	const directoriesAfterFile = new Map<string, NestedTreeNode[]>();
+
+	for (const directory of dirChildren) {
+		if (!directory.sidebarAfter) {
+			unpositionedDirectories.push(directory);
+			continue;
+		}
+		if (!fileChildren.some((file) => file.file === directory.sidebarAfter)) {
+			throw new Error(
+				`Invalid sidebarAfter in "${directory.indexFile ?? directory.key}": "${directory.sidebarAfter}" is not a direct article of "${directoryKey}"`,
+			);
+		}
+		const positioned = directoriesAfterFile.get(directory.sidebarAfter) ?? [];
+		positioned.push(directory);
+		directoriesAfterFile.set(directory.sidebarAfter, positioned);
+	}
+
+	const children: (NestedTreeNode | NestedFileNode)[] = [
+		...unpositionedDirectories,
+	];
+	for (const file of fileChildren) {
+		children.push(file);
+		children.push(...(directoriesAfterFile.get(file.file) ?? []));
+	}
+	return children;
+}
+
 function isNestedTreeNode(
 	node: NestedTreeNode | NestedFileNode,
 ): node is NestedTreeNode {
@@ -171,6 +246,7 @@ function buildNotesIndex(): NotesIndex {
 			title,
 			date: manifestRecord.date,
 			order: manifestRecord.order,
+			sidebarAfter: manifestRecord.sidebarAfter,
 		};
 
 		if (isIndexFile(file)) {
@@ -209,7 +285,17 @@ function buildNotesIndex(): NotesIndex {
 			.map(toTreeNode)
 			.sort(compareDirectories);
 		const fileChildren = [...builder.files].sort(compareFiles);
-		const title = indexFile ? notesByFile[indexFile].title : builder.title;
+		const indexMetadata = indexFile ? notesByFile[indexFile] : undefined;
+		const title = indexMetadata?.title ?? builder.title;
+		const sidebarAfter =
+			indexFile && indexMetadata?.sidebarAfter
+				? resolveSidebarAfter(indexFile, indexMetadata.sidebarAfter)
+				: undefined;
+		const children = mergeSidebarChildren(
+			builder.key,
+			dirChildren,
+			fileChildren,
+		);
 		directoryTitles[builder.key] = title;
 
 		return {
@@ -218,9 +304,10 @@ function buildNotesIndex(): NotesIndex {
 			noteCount:
 				fileChildren.length +
 				dirChildren.reduce((total, child) => total + child.noteCount, 0),
-			children: [...dirChildren, ...fileChildren],
+			children,
 			isDir: true,
 			indexFile,
+			sidebarAfter,
 		};
 	}
 

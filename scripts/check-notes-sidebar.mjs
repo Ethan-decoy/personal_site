@@ -206,6 +206,81 @@ try {
 			? []
 			: [{ directory: directory.key, actualOrder, expectedOrder }];
 	});
+	const appendixDirectories = allDirectories.filter((directory) =>
+		directory.key.endsWith("/deep-dives"),
+	);
+	const appendixTitleMismatches = appendixDirectories
+		.filter((directory) => directory.title !== "附章")
+		.map((directory) => ({
+			directory: directory.key,
+			actualTitle: directory.title,
+		}));
+	const appendixPlacementMismatches = appendixDirectories.flatMap(
+		(appendixDirectory) => {
+			const directory = appendixDirectory.key;
+			const afterFile = appendixDirectory.sidebarAfter;
+			const parentKey = directory.split("/").slice(0, -1).join("/");
+			const parent = allDirectories.find((node) => node.key === parentKey);
+			if (!afterFile) {
+				return [{ directory, reason: "missing sidebarAfter" }];
+			}
+			if (!parent) {
+				return [{ directory, afterFile, reason: "missing parent" }];
+			}
+
+			const appendixIndex = parent.children.indexOf(appendixDirectory);
+			const targetIndex = parent.children.findIndex(
+				(child) => !("key" in child) && child.file === afterFile,
+			);
+			return appendixIndex === targetIndex + 1 && targetIndex >= 0
+				? []
+				: [
+						{
+							directory,
+							afterFile,
+							appendixIndex,
+							targetIndex,
+							actualOrder: parent.children.map((child) =>
+								"key" in child ? child.key : child.file,
+							),
+						},
+					];
+		},
+	);
+	const appendixRenderDirectory = appendixDirectories.find(
+		(directory) => directory.key === "cpp/05-functions/deep-dives",
+	);
+	const appendixRenderParentKey = appendixRenderDirectory?.key
+		.split("/")
+		.slice(0, -1)
+		.join("/");
+	const appendixRenderParent = allDirectories.find(
+		(node) => node.key === appendixRenderParentKey,
+	);
+	const appendixRenderTarget = appendixRenderParent?.children.find(
+		(child) =>
+			!("key" in child) && child.file === appendixRenderDirectory?.sidebarAfter,
+	);
+	const appendixCatalogHtml = renderToStaticMarkup(
+		React.createElement(SidebarCatalog, {
+			...searchCatalogProps,
+			searchQuery: "",
+			searchFocused: false,
+			suggestions: [],
+			searchResults: [],
+			expandedKeys: new Set(["cpp", appendixRenderParentKey]),
+		}),
+	);
+	const appendixRenderTargetPosition = appendixRenderTarget
+		? appendixCatalogHtml.indexOf(appendixRenderTarget.title)
+		: -1;
+	const appendixRenderDirectoryPosition = appendixRenderDirectory
+		? appendixCatalogHtml.indexOf(appendixRenderDirectory.title)
+		: -1;
+	const appendixRenderIndentPosition = appendixCatalogHtml.lastIndexOf(
+		'style="margin-left:16px"',
+		appendixRenderDirectoryPosition,
+	);
 	const desktopCatalogClasses =
 		/className="([^"]*fixed bottom-0 left-8 top-32[^"]*)"/.exec(
 			notesPageSource,
@@ -299,6 +374,26 @@ try {
 		{
 			name: "numbered sibling notes follow their effective order sequence",
 			pass: numberedSiblingOrderMismatches.length === 0,
+		},
+		{
+			name: "appendix directories follow their related chapter articles",
+			pass: appendixPlacementMismatches.length === 0,
+		},
+		{
+			name: "appendix directories use the concise sidebar title",
+			pass: appendixTitleMismatches.length === 0,
+		},
+		{
+			name: "rendered appendix groups preserve the mixed sidebar order",
+			pass:
+				appendixRenderTargetPosition >= 0 &&
+				appendixRenderTargetPosition < appendixRenderDirectoryPosition,
+		},
+		{
+			name: "rendered appendix groups are indented beneath related articles",
+			pass:
+				appendixRenderTargetPosition < appendixRenderIndentPosition &&
+				appendixRenderIndentPosition < appendixRenderDirectoryPosition,
 		},
 		{
 			name: "expanded branches are not clipped by a fixed height ceiling",
@@ -398,6 +493,13 @@ try {
 					desktopCatalogClearance,
 				},
 				numberedSiblingOrderMismatches,
+				appendixTitleMismatches,
+				appendixPlacementMismatches,
+				appendixRender: {
+					targetPosition: appendixRenderTargetPosition,
+					indentPosition: appendixRenderIndentPosition,
+					directoryPosition: appendixRenderDirectoryPosition,
+				},
 			},
 			null,
 			2,

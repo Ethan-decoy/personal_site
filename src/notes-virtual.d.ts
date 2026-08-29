@@ -4,6 +4,7 @@ declare module "virtual:notes-manifest" {
 		title: string;
 		date: string;
 		order?: number;
+		sidebarAfter?: string;
 	}>;
 	export default manifest;
 }

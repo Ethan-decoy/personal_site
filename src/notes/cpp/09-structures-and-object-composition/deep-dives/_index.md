@@ -1,6 +1,7 @@
 ---
 title: 附章
 date: 2026-08-28
+sidebarAfter: ../04-copying-and-assigning-struct-objects.md
 ---
 
 # 附章

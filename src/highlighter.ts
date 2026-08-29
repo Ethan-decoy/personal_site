@@ -4,8 +4,10 @@
  * 如果 WASM 加载失败或语言不支持，返回 null 让调用方 fallback。
  */
 
-import { Parser, Language, Node } from "web-tree-sitter";
+import { Language, type Node, Parser } from "web-tree-sitter";
+import treeSitterWasmUrl from "web-tree-sitter/tree-sitter.wasm?url";
 
+/* 0.1.13 的语法 WASM 与 web-tree-sitter 0.26 不兼容；升级绑定时必须同步更换语法文件。 */
 const WASM_BASE = "https://cdn.jsdelivr.net/npm/tree-sitter-wasms@0.1.13/out/";
 
 const LANG_MAP: Record<string, string> = {
@@ -48,32 +50,60 @@ const LANG_MAP: Record<string, string> = {
 	"c#": "tree-sitter-c_sharp.wasm",
 };
 
-let parser: Parser | null = null;
-let tsInitialized = false;
-const langCache: Record<string, Language> = {};
+/* 当前节点分类只对 C++ 做过完整校验；其余语言继续使用 highlight.js fallback。 */
+const ENABLED_LANGUAGES = new Set(["cpp"]);
 
-async function ensureParser() {
-	if (tsInitialized) return;
-	await Parser.init();
-	parser = new Parser();
-	tsInitialized = true;
+let parser: Parser | null = null;
+let parserPromise: Promise<Parser> | null = null;
+const langCache: Record<string, Language> = {};
+const langPromises: Partial<Record<string, Promise<Language | null>>> = {};
+
+async function ensureParser(): Promise<Parser> {
+	if (parser) return parser;
+	if (!parserPromise) {
+		parserPromise = Parser.init({
+			locateFile: () => treeSitterWasmUrl,
+		})
+			.then(() => {
+				parser = new Parser();
+				return parser;
+			})
+			.catch((error: unknown) => {
+				parserPromise = null;
+				throw error;
+			});
+	}
+	return parserPromise;
 }
 
 async function getLanguage(lang: string): Promise<Language | null> {
 	if (langCache[lang]) return langCache[lang];
+	if (langPromises[lang]) return langPromises[lang];
 	const wasm = LANG_MAP[lang];
 	if (!wasm) return null;
-	const res = await fetch(WASM_BASE + wasm);
-	if (!res.ok) return null;
-	const buf = await res.arrayBuffer();
-	const L = await Language.load(new Uint8Array(buf));
-	langCache[lang] = L;
-	return L;
+
+	const languagePromise = (async () => {
+		const res = await fetch(WASM_BASE + wasm);
+		if (!res.ok) return null;
+		const buf = await res.arrayBuffer();
+		const language = await Language.load(new Uint8Array(buf));
+		langCache[lang] = language;
+		return language;
+	})();
+	langPromises[lang] = languagePromise;
+
+	try {
+		return await languagePromise;
+	} finally {
+		delete langPromises[lang];
+	}
 }
 
 /* ---- 节点类型 → 高亮类别 ---- */
 function nodeCategory(node: Node): string | null {
 	const t = node.type;
+
+	if (!node.isNamed && t.startsWith("#")) return "meta";
 
 	switch (t) {
 		/* 注释 */
@@ -87,6 +117,7 @@ function nodeCategory(node: Node): string | null {
 		case "raw_string_literal":
 		case "char_literal":
 		case "string":
+		case "system_lib_string":
 		case "heredoc_body":
 			return "string";
 
@@ -129,7 +160,6 @@ function nodeCategory(node: Node): string | null {
 			return "built_in";
 
 		/* 预处理器 / meta */
-		case "preproc_include":
 		case "preproc_def":
 		case "preproc_if":
 		case "preproc_ifdef":
@@ -148,6 +178,11 @@ function nodeCategory(node: Node): string | null {
 			return "operator";
 	}
 
+	/* Tree-sitter 会把大多数关键字表示为匿名叶子节点，节点类型就是源码文本。 */
+	if (!node.isNamed && /^[A-Za-z_][A-Za-z0-9_]*$/.test(t)) {
+		return "keyword";
+	}
+
 	/* 标识符：根据父节点上下文决定 */
 	if (t === "identifier" || t === "field_identifier") {
 		return idCategory(node);
@@ -160,14 +195,20 @@ function idCategory(node: Node): string | null {
 	const p = node.parent;
 	if (!p) return null;
 	const pt = p.type;
+	const call = p.parent;
+	const isCalledField =
+		pt === "field_expression" &&
+		node.type === "field_identifier" &&
+		call?.type === "call_expression" &&
+		call.childForFieldName("function")?.equals(p);
 
 	/* 函数名场景 */
 	if (
 		pt === "call_expression" ||
 		pt === "template_method" ||
-		(pt === "field_expression" && node.type === "field_identifier") ||
+		isCalledField ||
 		(pt === "function_declarator" &&
-			!p.children.some((c) => c.type === "type_identifier"))
+			!p.children.some((c) => c?.type === "type_identifier"))
 	) {
 		return "function";
 	}
@@ -205,6 +246,17 @@ const CAT_TO_CLASS: Record<string, string> = {
 	operator: "hljs-operator",
 };
 
+const OPAQUE_NODE_TYPES = new Set([
+	"comment",
+	"line_comment",
+	"block_comment",
+	"string_literal",
+	"raw_string_literal",
+	"char_literal",
+	"string",
+	"heredoc_body",
+]);
+
 function esc(s: string): string {
 	return s
 		.replace(/&/g, "&amp;")
@@ -221,34 +273,37 @@ export async function highlight(
 	code: string,
 	lang: string,
 ): Promise<string | null> {
-	await ensureParser();
+	if (!ENABLED_LANGUAGES.has(lang)) return null;
+
+	const activeParser = await ensureParser();
 	const language = await getLanguage(lang);
-	if (!language || !parser) return null;
+	if (!language) return null;
 
-	parser.setLanguage(language);
+	activeParser.setLanguage(language);
 
-	let tree: ReturnType<typeof parser.parse> = null;
+	let tree: ReturnType<Parser["parse"]>;
 	try {
-		tree = parser.parse(code);
+		tree = activeParser.parse(code);
 	} catch {
 		return null;
 	}
 	if (!tree) return null;
 
-	/* 遍历语法树，收集叶子节点的高亮区间 */
+	/* 遍历语法树，收集高亮区间 */
 	const spans: Array<{ start: number; end: number; cat: string }> = [];
 
 	function walk(node: Node) {
-		if (node.childCount === 0) {
+		if (node.childCount === 0 || OPAQUE_NODE_TYPES.has(node.type)) {
 			const cat = nodeCategory(node);
 			if (cat && CAT_TO_CLASS[cat]) {
 				spans.push({ start: node.startIndex, end: node.endIndex, cat });
+				return;
 			}
-		} else {
-			for (let i = 0; i < node.childCount; i++) {
-				const child = node.child(i);
-				if (child) walk(child);
-			}
+		}
+
+		for (let i = 0; i < node.childCount; i++) {
+			const child = node.child(i);
+			if (child) walk(child);
 		}
 	}
 

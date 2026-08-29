@@ -478,6 +478,18 @@ function MarkdownCodeBlock({
 	return <AsyncCodeBlock lang={lang} value={value} className={className} />;
 }
 
+const NO_HIGHLIGHTER_ERROR = Symbol("no-highlighter-error");
+let lastReportedHighlighterError: unknown = NO_HIGHLIGHTER_ERROR;
+
+function reportHighlighterError(error: unknown) {
+	if (Object.is(error, lastReportedHighlighterError)) return;
+	lastReportedHighlighterError = error;
+	console.warn(
+		"Tree-sitter highlighting failed; using highlight.js fallback.",
+		error,
+	);
+}
+
 function AsyncCodeBlock({
 	lang,
 	value,
@@ -487,12 +499,21 @@ function AsyncCodeBlock({
 
 	useEffect(() => {
 		let cancelled = false;
+		setHtml(null);
 		void loadTreeSitterHighlighter()
 			.then(({ highlight }) => highlight(value, lang))
 			.then((result) => {
-				if (!cancelled && result) setHtml(result);
+				if (cancelled) return;
+				if (result) {
+					setHtml(result);
+					lastReportedHighlighterError = NO_HIGHLIGHTER_ERROR;
+				}
 			})
-			.catch(() => {});
+			.catch((error: unknown) => {
+				if (import.meta.env.DEV) {
+					reportHighlighterError(error);
+				}
+			});
 		return () => {
 			cancelled = true;
 		};

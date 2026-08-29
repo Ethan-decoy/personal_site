@@ -42,7 +42,7 @@ observed_temperature_c  ──指代──>  engine_temperature_c
 | `int* temperature_target{&engine_temperature_c};` | `int*` 对象 | 是，保存指针值 |
 | `int& observed_temperature_c{engine_temperature_c};` | `int&` 引用变量 | 否，建立绑定关系 |
 
-引用具有自己的生命周期，绑定关系也会在引用初始化完成后建立；这并不使引用成为具有独立对象表示的“引用对象”。被引用名称指定的 `engine_temperature_c` 才是这里保存温度状态的对象。
+引用具有自己的生命周期，绑定关系也会在引用初始化完成后建立；这并不使引用成为另一个独立对象。被引用名称指定的 `engine_temperature_c` 才是这里保存温度状态的对象。
 
 对引用名称使用取地址运算符，得到的也是被绑定对象的地址：
 

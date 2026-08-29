@@ -53,7 +53,7 @@ int** pointer_address{&temperature_target};
 
 ## 常见 ABI 使用对象地址传递引用
 
-应用二进制接口（Application Binary Interface，ABI）规定编译后的不同程序片段怎样交换参数、返回结果和访问数据。以许多 GCC 与 Clang 目标采用的 Itanium C++ ABI 为例，引用参数通过指向被绑定对象的指针传递，引用返回也以指向目标对象的指针形式返回。
+第五章的[应用二进制接口：编译产物之间的契约](../../05-functions/deep-dives/02-application-binary-interface.md)已经建立了 ABI 的通用模型。本篇只观察其中与引用有关的一项实现规则：以许多 GCC 与 Clang 目标采用的 Itanium C++ ABI 为例，引用参数通过指向被绑定对象的指针传递，引用返回也以指向目标对象的指针形式返回。
 
 ```cpp
 void increase_temperature_c(int& temperature_c) {
@@ -82,7 +82,7 @@ void increase_temperature_c(int& temperature_c) {
 - “引用一定不占任何存储”；
 - “引用一定存放在调用栈中”。
 
-**生成代码能够说明某个编译器在特定平台、选项与上下文中的选择，不能单独证明所有 C++ 引用都具有相同对象表示。**
+**生成代码能够说明某个编译器在特定平台、选项与上下文中的选择，不能单独证明所有 C++ 引用都采用相同的机器表示或存储形式。**
 
 ## 引用不是隐藏指针
 

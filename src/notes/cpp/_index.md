@@ -17,3 +17,4 @@ date: 2026-08-08
 8. [对象地址与指针](07-object-addresses-and-pointers/_index.md)
 9. [对象身份与左值引用](08-object-identity-and-lvalue-references/_index.md)
 10. [结构体与对象组合](09-structures-and-object-composition/_index.md)
+11. [类的接口与封装](10-class-interfaces-and-encapsulation/_index.md)

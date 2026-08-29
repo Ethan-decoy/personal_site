@@ -130,12 +130,9 @@ function extractPrefix(file: string): number {
 }
 
 function compareFiles(a: NestedFileNode, b: NestedFileNode): number {
-	if (a.order !== undefined && b.order !== undefined) return a.order - b.order;
-	if (a.order !== undefined) return -1;
-	if (b.order !== undefined) return 1;
-	const aNum = extractPrefix(a.file);
-	const bNum = extractPrefix(b.file);
-	if (aNum !== bNum) return aNum - bNum;
+	const aOrder = a.order ?? extractPrefix(a.file);
+	const bOrder = b.order ?? extractPrefix(b.file);
+	if (aOrder !== bOrder) return aOrder - bOrder;
 	if (a.date && b.date) return b.date.localeCompare(a.date);
 	return a.title.localeCompare(b.title);
 }

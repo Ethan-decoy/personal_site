@@ -73,6 +73,16 @@ function readingContentStart(viewportWidth) {
 	return frameLeft + 2 * 16;
 }
 
+function effectiveFileOrder(file) {
+	const filenamePrefix = /^(\d+)-/.exec(file.file.split("/").at(-1) ?? "");
+	return (
+		file.order ??
+		(filenamePrefix
+			? Number.parseInt(filenamePrefix[1], 10)
+			: Number.POSITIVE_INFINITY)
+	);
+}
+
 try {
 	const [sidebarCss, notesPageSource] = await Promise.all([
 		readFile(new URL("../src/index.css", import.meta.url), "utf8"),
@@ -182,6 +192,20 @@ try {
 		const segment = node.key.split("/").at(-1);
 		return !node.indexFile && node.title === segment;
 	});
+	const numberedSiblingOrderMismatches = allDirectories.flatMap((directory) => {
+		const numberedFiles = directory.children.filter(
+			(child) =>
+				!("key" in child) && /^\d+-/.test(child.file.split("/").at(-1) ?? ""),
+		);
+		const expectedFiles = [...numberedFiles].sort(
+			(left, right) => effectiveFileOrder(left) - effectiveFileOrder(right),
+		);
+		const actualOrder = numberedFiles.map((file) => file.file);
+		const expectedOrder = expectedFiles.map((file) => file.file);
+		return actualOrder.every((file, index) => file === expectedOrder[index])
+			? []
+			: [{ directory: directory.key, actualOrder, expectedOrder }];
+	});
 	const desktopCatalogClasses =
 		/className="([^"]*fixed bottom-0 left-8 top-32[^"]*)"/.exec(
 			notesPageSource,
@@ -271,6 +295,10 @@ try {
 		{
 			name: "directories without index pages receive readable fallback labels",
 			pass: rawFallbackDirectories.length === 0,
+		},
+		{
+			name: "numbered sibling notes follow their effective order sequence",
+			pass: numberedSiblingOrderMismatches.length === 0,
 		},
 		{
 			name: "expanded branches are not clipped by a fixed height ceiling",
@@ -369,6 +397,7 @@ try {
 					readingContentStart: readingContentStart(desktopCatalogMinWidth),
 					desktopCatalogClearance,
 				},
+				numberedSiblingOrderMismatches,
 			},
 			null,
 			2,

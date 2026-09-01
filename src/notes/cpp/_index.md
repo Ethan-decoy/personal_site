@@ -19,3 +19,4 @@ date: 2026-08-08
 10. [结构体与对象组合](09-structures-and-object-composition/_index.md)
 11. [类的接口与封装](10-class-interfaces-and-encapsulation/_index.md)
 12. [函数重载与重载决议](11-function-overloading-and-overload-resolution/_index.md)
+13. [运算符重载与表达式语义](12-operator-overloading-and-expression-semantics/_index.md)

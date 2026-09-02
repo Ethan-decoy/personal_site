@@ -547,7 +547,7 @@ body {
 }
 
 .markdown-prose > :where(h1, h2, h3, h4, h5, h6, p, ul, ol, blockquote, hr) {
-	max-width: min(65ch, 100%);
+	max-width: min(80ch, 100%);
 }
 
 .markdown-prose > p:has(> :where(img, .katex-display):only-child) {

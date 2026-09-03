@@ -20,3 +20,4 @@ date: 2026-08-08
 11. [类的接口与封装](10-class-interfaces-and-encapsulation/_index.md)
 12. [函数重载与重载决议](11-function-overloading-and-overload-resolution/_index.md)
 13. [运算符重载与表达式语义](12-operator-overloading-and-expression-semantics/_index.md)
+14. [用户定义转换与显式接口](13-user-defined-conversions-and-explicit-interfaces/_index.md)

@@ -22,3 +22,4 @@ date: 2026-08-08
 13. [运算符重载与表达式语义](12-operator-overloading-and-expression-semantics/_index.md)
 14. [用户定义转换与显式接口](13-user-defined-conversions-and-explicit-interfaces/_index.md)
 15. [类对象的复制与复制能力](14-copying-class-objects-and-copyability/_index.md)
+16. [类对象的销毁与资源生命周期](15-class-object-destruction-and-resource-lifetime/_index.md)

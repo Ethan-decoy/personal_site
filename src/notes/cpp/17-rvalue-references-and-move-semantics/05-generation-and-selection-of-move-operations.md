@@ -60,6 +60,21 @@ inspection& operator=(inspection&&) = default;
 
 在 `inspection` 当前没有额外特殊成员声明的情况下，省去这两行就能得到需要的移动行为。显式默认化用于表达必要的接口选择，不需要成为每个类都照抄的清单。
 
+## 构造函数的隐式声明规则对照
+
+无实参创建对象、从同类型对象复制或移动，以及接收其他初始数据，适用的声明规则不同。下表以 `T` 表示类名，汇总几种常见构造接口：
+
+| 构造接口（常见形式） | 隐式声明与删除规则 |
+| --- | --- |
+| 默认构造 `T()` | 类没有任何用户声明的构造函数时，隐式声明 |
+| 复制构造 `T(const T&)` | 没有用户声明的复制构造函数时，隐式声明；若类声明了移动构造或移动赋值，这项隐式复制构造被定义为删除 |
+| 移动构造 `T(T&&)` | 没有用户声明的移动构造，且没有用户声明的复制构造、复制赋值、移动赋值或析构函数时，隐式声明 |
+| 普通带参构造 `T(int)` | 不会按数据成员自动生成；由类作者提供所需接口 |
+
+这里的“用户声明”包括写出 `= default` 或 `= delete`，不要求手写函数体。在未额外声明特殊成员的 `inspection` 定义中，普通构造函数 `inspection(int, int&)` 会阻止编译器提供[隐式默认构造](../10-class-interfaces-and-encapsulation/04-constructors-and-member-initialization.md#默认构造函数何时由编译器提供)，却不阻止该类隐式声明复制或移动构造；它的复制操作不可用，是因为 `registration` 成员不能复制。
+
+隐式声明只解决接口是否存在。成员操作不成立时，默认化的构造函数仍可能被定义为删除；调用处还要满足访问权限与重载选择规则。**判断构造调用时，既要看类声明了哪些构造函数，也要看初始化选中了哪一项，以及选中的函数能否合法调用。**
+
 ## 没有移动操作，也可能接收右值
 
 下面的读数快照类型只有普通构造与自行声明的复制构造，没有移动构造：
@@ -100,6 +115,8 @@ const snapshot copy{std::move(source)};
 
 ## 参考资料
 
+- [C++23 工作草案：默认构造函数的隐式声明](https://timsong-cpp.github.io/cppwp/n4950/class.default.ctor#1)
+- [C++23 工作草案：用户声明与显式默认化](https://timsong-cpp.github.io/cppwp/n4950/dcl.fct.def.default#5)
 - [C++23 工作草案：复制与移动构造的声明、默认定义与删除](https://timsong-cpp.github.io/cppwp/n4950/class.copy.ctor)
 - [C++23 工作草案：复制与移动赋值的声明、默认定义与删除](https://timsong-cpp.github.io/cppwp/n4950/class.copy.assign)
 - [C++23 工作草案：引用绑定的重载优先级](https://timsong-cpp.github.io/cppwp/n4950/over.ics.rank)

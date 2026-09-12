@@ -12,23 +12,24 @@ order: 3
 
 ## 标准转换序列的匹配等级
 
-在当前已经建立的算术类型和标准转换范围内，匹配质量首先分为三个等级：
-
-| 匹配等级 | 当前范围内的典型情形 |
-| --- | --- |
-| 精确匹配（Exact Match） | `int` 实参匹配 `int` 形参 |
-| 提升（Promotion） | `short` 提升为 `int`，`float` 提升为 `double` |
-| 转换（Conversion） | `int` 转换为 `long`，`int` 转换为 `double` |
-
-它们的优先关系是：
-
-```text
-Exact Match
-    优于
-Promotion
-    优于
-Conversion
-```
+> [!TIP]
+> 在当前已经建立的算术类型和标准转换范围内，匹配质量首先分为三个等级：
+>
+> | 匹配等级 | 当前范围内的典型情形 |
+> | --- | --- |
+> | 精确匹配（Exact Match） | `int` 实参匹配 `int` 形参 |
+> | 提升（Promotion） | `short` 提升为 `int`，`float` 提升为 `double` |
+> | 转换（Conversion） | `int` 转换为 `long`，`int` 转换为 `double` |
+>
+> 它们的优先关系是：
+>
+> ```text
+> Exact Match
+>     优于
+> Promotion
+>     优于
+> Conversion
+> ```
 
 例如：
 

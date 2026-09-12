@@ -59,7 +59,8 @@ const pressure_delta_kpa projected{baseline + correction};
 
 `baseline + correction` 调用按值返回的运算符函数，因而产生 `pressure_delta_kpa` 类型的 prvalue。这个结果初始化 `projected`；求值结束后，`projected.value == 20`，`baseline.value` 仍然是 `15`，`correction.value` 仍然是 `5`。
 
-**在这组接口中，复合赋值修改左操作数并返回指代它的 lvalue；普通加法不修改输入，而是产生用于建立独立对象的值。**函数声明和函数体共同建立这项语义，`+=` 与 `+` 的符号不会自动替实现作出保证。
+> [!IMPORTANT]
+> 在这组接口中，复合赋值修改左操作数并返回指代它的 lvalue；普通加法不修改输入，而是产生用于建立独立对象的值。函数声明和函数体共同建立这项语义，`+=` 与 `+` 的符号不会自动替实现作出保证。
 
 ## 相关运算应当保持一致
 

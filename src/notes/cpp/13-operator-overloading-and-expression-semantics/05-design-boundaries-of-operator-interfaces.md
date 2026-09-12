@@ -86,9 +86,10 @@ const validation_result first{false};
 const validation_result combined{first && perform_secondary_check(secondary_check_ran)};
 ```
 
-虽然 `first.passed` 为 `false`，`perform_secondary_check` 仍然执行，因此 `secondary_check_ran == true`。两个操作数求值结束后，`operator&&` 才进入函数体；此时函数已经无法撤销右操作数产生的副作用。
-
-对于这里的运算符写法，左操作数仍然先于右操作数求值。失去的是“根据左侧结果完全跳过右侧”的短路能力，而不是左右求值顺序本身。重载 `operator||` 具有相同边界。
+> [!WARNING]
+> 虽然 `first.passed` 为 `false`，`perform_secondary_check` 仍然执行，因此 `secondary_check_ran == true`。两个操作数求值结束后，`operator&&` 才进入函数体；此时函数已经无法撤销右操作数产生的副作用。
+>
+> 对于这里的运算符写法，左操作数仍然先于右操作数求值。失去的是“根据左侧结果完全跳过右侧”的短路能力，而不是左右求值顺序本身。重载 `operator||` 具有相同边界。
 
 调用者通常会把短路视为 `&&` 和 `||` 的基本语义，因此普通接口不应使用这两个符号表达必须求值两侧的组合操作。
 

@@ -30,24 +30,24 @@ order: 6
 
 `explicit operator bool()` 展示了更窄的接口边界：对象可以自然参与条件判断，却不能作为普通函数的 `bool` 实参。这种设计保留了控制流中的可读性，同时避免类型在其他表达式和重载中普遍退化为布尔值。
 
-下面的独立示例把整数 Pa 转为整数 kPa。转换会丢弃不足 `1 kPa` 的余数，因此函数名直接写出截断策略：
+下面的独立示例把整数 Pa 转为整数 kPa。转换会丢弃不足 `1 kPa` 的余数，因此函数名直接写出截断策略。两种单位的整数值都用 `long` 保存，其标准保证的取值范围足以容纳示例中的 `220'600 Pa`：
 
 ```cpp
 struct pressure_pa {
-    int value_pa;
+    long value_pa;
 };
 
 struct pressure_kpa {
-    int value_kpa;
+    long value_kpa;
 };
 
 pressure_kpa truncate_to_whole_kpa(pressure_pa pressure) {
-    constexpr int pa_per_kpa{1'000};
+    constexpr long pa_per_kpa{1'000L};
     return pressure_kpa{pressure.value_pa / pa_per_kpa};
 }
 
 const pressure_kpa displayed_pressure{
-    truncate_to_whole_kpa(pressure_pa{220'600})
+    truncate_to_whole_kpa(pressure_pa{220'600L})
 };
 ```
 
@@ -57,11 +57,12 @@ const pressure_kpa displayed_pressure{
 
 ## 运算符形式只提供转换机会
 
-成员二元运算符由调用对象提供左操作数，只有右操作数通过显式形参参与匹配；非成员形式则让左右操作数都通过形参参与匹配。非成员形式由此能够提供对称的转换机会，却不能证明两种转换方向都具有合理含义。
+对于本章使用的普通二元 `operator+`，成员形式由调用对象提供左操作数，只有右操作数通过显式形参参与匹配；非成员形式则让左右操作数都通过形参参与匹配。非成员形式由此能够提供对称的转换机会，却不能证明两种转换方向都具有合理含义。
 
 如果裸整数没有单位，允许它在 `pressure_delta_kpa + int` 与 `int + pressure_delta_kpa` 中自动进入压力类型，并不会因为两种写法都能通过编译就变得安全。运算符形式决定语言在哪里尝试转换，类型设计仍要决定转换是否应当隐式发生。
 
-**构造函数、转换函数、`explicit`、重载决议和运算符候选共同决定一条转换路径会在多大范围内生效。设计转换接口，就是决定哪些类型关系可以由编译器自动完成，哪些单位、损失、策略和失败边界必须由调用者明确写出。**
+> [!PRACTICE]
+> 构造函数、转换函数、`explicit`、重载决议和运算符候选共同决定一条转换路径会在多大范围内生效。设计转换接口，就是决定哪些类型关系可以由编译器自动完成，哪些单位、损失、策略和失败边界必须由调用者明确写出。
 
 ## 参考资料
 

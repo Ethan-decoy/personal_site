@@ -61,6 +61,10 @@ pressure_kpa
 
 ### 转换函数之后可以继续有标准转换
 
+这里需要先从 `pressure_code` 对象得到一个 `short`。源类可以用[转换函数](../03-conversion-functions-and-target-type-results.md#转换函数的声明形式)提供这条路径：`operator` 后接目标类型，`operator short()` 声明产生 `short` 结果的成员函数，前面不再另写返回类型。
+
+空的 `()` 表示没有普通形参，转换来源是调用对象；尾随 `const` 允许通过 `const` 对象调用。
+
 ```cpp
 class pressure_code {
   public:
@@ -77,7 +81,9 @@ const pressure_code code{};
 const int category{classify_pressure(code)};
 ```
 
-这里，调用对象对 `operator short() const` 的匹配不需要改变类型；转换函数产生 `short` 结果后，第二标准转换序列再执行 `short` 到 `int` 的整数提升：
+这项转换函数没有声明为 `explicit`，可以参与本次实参的隐式转换。求值 `classify_pressure(code)` 时，先以 `code` 为调用对象执行转换函数，函数体中的 `return short{2};` 产生 `short` 值 `2`；再通过整数提升得到 `int` 值 `2`，用于初始化 `classify_pressure` 的形参。
+
+调用对象对转换函数的匹配不需要改变类型；转换函数调用位于序列中间，随后 `short` 到 `int` 的整数提升属于第二标准转换序列：
 
 ```text
 pressure_code
@@ -197,6 +203,7 @@ const pressure_kpa copied_pressure = {230}; // 错误：选中后因 explicit �
 
 - [C++23 工作草案：隐式转换序列](https://timsong-cpp.github.io/cppwp/n4950/over.best.ics)
 - [C++23 工作草案：用户定义转换序列](https://timsong-cpp.github.io/cppwp/n4950/over.ics.user)
+- [C++23 工作草案：转换函数](https://timsong-cpp.github.io/cppwp/n4950/class.conv.fct)
 - [C++23 工作草案：隐式转换序列的排序](https://timsong-cpp.github.io/cppwp/n4950/over.ics.rank)
 - [C++23 工作草案：列表初始化序列](https://timsong-cpp.github.io/cppwp/n4950/over.ics.list)
 - [C++23 工作草案：列表初始化中的重载决议](https://timsong-cpp.github.io/cppwp/n4950/over.match.list)

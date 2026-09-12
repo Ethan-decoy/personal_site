@@ -61,14 +61,15 @@ destroy channel 1
 
 `front_channel` 在类定义中先声明，`rear_channel` 后声明，因此构造 `tire_monitor` 时先完成前者的初始化，再完成后者的初始化。销毁按照构造完成顺序的相反顺序进行，所以先销毁 `rear_channel`，再销毁 `front_channel`。
 
-成员初始化列表的书写顺序不能改变这项关系。构造顺序由成员声明顺序决定，成员销毁则反向使用同一顺序：
-
-```text
-构造：front_channel → rear_channel → tire_monitor 构造函数体
-销毁：tire_monitor 析构函数体 → rear_channel → front_channel
-```
-
-这项逆序关系允许较晚构造的成员在销毁时继续使用较早构造、尚未销毁的成员。若成员之间存在生命周期依赖，声明顺序同时决定构造和销毁两端的有效关系，不能只为了排版随意排列。
+> [!TIP]
+> 成员初始化列表的书写顺序不能改变这项关系。构造顺序由成员声明顺序决定，成员销毁则反向使用同一顺序：
+>
+> ```text
+> 构造：front_channel → rear_channel → tire_monitor 构造函数体
+> 销毁：tire_monitor 析构函数体 → rear_channel → front_channel
+> ```
+>
+> 这项逆序关系允许较晚构造的成员在销毁时继续使用较早构造、尚未销毁的成员。若成员之间存在生命周期依赖，声明顺序同时决定构造和销毁两端的有效关系，不能只为了排版随意排列。
 
 ## 默认析构仍然销毁成员
 

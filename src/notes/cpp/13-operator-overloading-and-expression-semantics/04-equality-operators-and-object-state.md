@@ -62,7 +62,8 @@ const bool same_identity{&first == &second};           // false
 
 若把 `operator==` 实现成 `&left == &right`，它只能重复对象身份判断。这样的实现会让两个独立却状态相同的值对象永远不相等，违背当前 `tire_snapshot` 的值语义。
 
-**地址相等比较对象身份；对于当前这样的值类型，`operator==` 应当比较类型对外承诺的逻辑状态。**
+> [!PRACTICE]
+> 地址相等比较对象身份；对于当前这样的值类型，`operator==` 应当比较类型对外承诺的逻辑状态。
 
 ## 相等由类型语义决定
 

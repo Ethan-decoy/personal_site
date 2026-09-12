@@ -43,7 +43,7 @@ const pressure_delta_kpa total_delta{calibration_delta + temperature_delta};
 
 函数按值返回 `pressure_delta_kpa`，所以 `calibration_delta + temperature_delta` 产生该类型的 prvalue，并用它初始化独立对象 `total_delta`。求值结束后，`total_delta.value == 5`，两个原对象保持不变。
 
-**重载运算符表达式的结果类型和值类别由被选中函数的返回声明决定，不是由运算符符号单独决定。**若运算符函数返回左值引用，表达式结果就是 lvalue；符号本身不会强制它产生新对象。
+**本篇 `+` 表达式的结果类型和值类别由被选中函数的返回声明决定，不是由符号单独决定。**若运算符函数返回左值引用，表达式结果就是 lvalue；符号本身不会强制它产生新对象。
 
 ## 运算符函数仍然可以直接调用
 

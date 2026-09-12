@@ -91,37 +91,46 @@ remaining_count = 9;
 
 ## 为对象提供明确的初始状态
 
-下面的声明没有显式初始化器：
+下面的程序在 `main` 函数内定义一个没有显式初始化器的普通局部 `double` 对象：
+
+```cpp
+int main() {
+    double front_left_pressure;
+    double observed_pressure{front_left_pressure}; // 未定义行为：读取不确定值
+    return 0;
+}
+```
+
+> [!WARNING]
+> 这里的声明不会为 `front_left_pressure` 设置数值，对象保留不确定值（indeterminate value）。在有效赋值替换这个不确定值之前读取它，会在 C++23 中产生未定义行为（undefined behavior）：语言不再规定程序必须怎样表现。对象已经存在，不代表它已经具有可读取的确定值。
+
+在同样的函数体语境中，先赋值再读取则可以成立：
 
 ```cpp
 double front_left_pressure;
+front_left_pressure = 2.5;
+double observed_pressure{front_left_pressure}; // 正确：读取已经写入的 2.5
 ```
 
-这段代码在语法上成立，却没有表达程序希望对象从什么值开始。**省略初始化器不能被普遍理解为“自动初始化为零”；具体初始状态取决于对象类型和声明所处的上下文。**在能够确定初始状态时，应当把初始化器直接写在声明中：
+这里的赋值直接写入 `2.5`，不需要先读取目标对象原先的值；最后一行才读取已经确定的数值。但当初值已经能够确定时，直接初始化更清楚：
 
 ```cpp
 double front_left_pressure{2.5};
 ```
 
-这样，变量从生命周期开始就具有明确含义，也不会留下“对象已经存在，但当前是否可以读取”这一额外状态。
+这样，对象从生命周期开始就具有明确状态，不需要额外追踪“是否已经赋过值”。上述读取边界也适用于函数内以相同方式定义的普通局部 `int` 对象；不能据此推断所有省略初始化器的声明具有相同后果，具体初始状态仍取决于对象类型和声明位置。
 
 ## 基本编码习惯
 
 ### 让名称表达数据的含义
 
-变量名不仅要符合标识符的语法规则，还应当让读者知道变量保存的是什么。`value`、`data` 或 `x` 虽然都是合法名称，却无法说明其中保存的是轮胎气压、剩余数量还是其他数据；`front_left_pressure` 能够直接表达数据的业务含义。
+变量名的清楚程度取决于语境。小范围示例中，`value`、`source`、`target` 等短名可以直接说明当前角色；需要同时区分不同位置的气压时，`front_left_pressure` 这样的名称更有帮助。名称应补足当前语境缺少的信息，不必重复已经明确的类型或业务背景。
 
 ### 保持一致的命名风格
 
-多个单词组成的变量名通常采用以下形式：
+当前笔记的自有名称统一使用蛇形命名法（snake case，`snake_case`）：单词小写，并用下划线分隔，例如 `front_left_pressure`。这与 C++ 标准库的命名传统及 C++ Core Guidelines 的 NL.10 建议一致。
 
-| 风格 | 示例 | 组合方式 |
-| --- | --- | --- |
-| 小驼峰命名法（lower camel case） | `frontLeftPressure` | 第一个单词小写，后续单词首字母大写 |
-| 蛇形命名法（snake case） | `front_left_pressure` | 所有单词小写，并使用下划线分隔 |
-| 大驼峰命名法（Pascal case） | `FrontLeftPressure` | 每个单词的首字母大写 |
-
-C++ 没有规定唯一的命名风格，成熟项目也采用不同约定。当前笔记的自有名称统一使用 `snake_case`，与 C++ 标准库的命名传统保持一致。C++ Core Guidelines 的 NL.10 在没有既有项目规范时也建议优先使用 `underscore_style`；进入已有代码库时，应当遵循项目已经建立的规则。
+命名风格属于项目约定，C++ 语言没有规定唯一形式；进入已有代码库时，应当遵循项目已经建立的规则。
 
 ### 每条声明只引入一个变量
 
@@ -145,4 +154,5 @@ double rear_left_pressure{2.75};
 - [C++23 工作草案：标识符](https://timsong-cpp.github.io/cppwp/n4950/lex.name)
 - [C++23 工作草案：声明与定义](https://timsong-cpp.github.io/cppwp/n4950/basic.def)
 - [C++23 工作草案：初始化](https://timsong-cpp.github.io/cppwp/n4950/dcl.init)
+- [C++23 工作草案：不确定值](https://timsong-cpp.github.io/cppwp/n4950/basic.indet)
 - [C++ Core Guidelines：NL.10 优先使用 underscore_style 名称](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#nl10-prefer-underscore_style-names)

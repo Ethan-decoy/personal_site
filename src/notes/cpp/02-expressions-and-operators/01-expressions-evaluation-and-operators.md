@@ -42,7 +42,9 @@ int next_wheel_count{wheel_count + 1};
 
 ## 值计算与副作用（Value Computations and Side Effects）
 
-求值可以包含值计算（value computation），也可以对程序状态产生副作用（side effect）。在当前范围内，修改已有对象就是最直接的副作用：
+求值可以包含值计算（value computation），也可以产生副作用（side effect）。值计算确定表达式的结果，例如算出一个值或确定一个对象的身份；副作用则是对执行环境状态的改变，例如修改对象或进行输入输出。
+
+在当前范围内，可以用读取对象和修改对象作对照。下面的片段放在 `main` 函数体内：
 
 ```cpp
 int remaining_count{12};
@@ -53,7 +55,8 @@ remaining_count = 9;
 
 初始化 `snapshot` 时，表达式 `remaining_count` 提供对象当前保存的值，不修改该对象。最后一行中的赋值表达式则把 `remaining_count` 改为保存 `9`，因此产生副作用。
 
-**“表达式具有结果”与“表达式会不会修改状态”是两个不同问题。**算术表达式通常只计算结果；赋值、自增和自减等表达式除了具有结果，还会改变对象。判断一段代码时，需要分别追踪这两件事。
+> [!IMPORTANT]
+> “副作用”是中性术语，不表示有害、意外或次要。修改对象、输出信息本来就可能是代码的主要目的。判断表达式时，应分别追踪它得到什么结果，以及它对执行环境产生什么作用。
 
 ## 运算符与操作数（Operators and Operands）
 
@@ -108,5 +111,5 @@ int remaining_count{12};
 ## 参考资料
 
 - [C++23 工作草案：表达式](https://timsong-cpp.github.io/cppwp/n4950/expr.pre)
-- [C++23 工作草案：执行与求值](https://timsong-cpp.github.io/cppwp/n4950/intro.execution)
+- [C++23 工作草案：值计算与副作用](https://timsong-cpp.github.io/cppwp/n4950/intro.execution#7)
 - [C++23 工作草案：表达式语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.expr)

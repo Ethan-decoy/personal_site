@@ -56,7 +56,8 @@ double rear_pressure{2.75};
 double total_pressure{front_pressure + rear_pressure};
 ```
 
-这里的两个操作数采用 `double`，加法结果也是 `double`。**表达式先根据操作数和运算符完成求值，初始化器或赋值目标随后才使用结果；接收结果的对象不能反向决定前面的运算采用整数还是浮点规则。**
+> [!IMPORTANT]
+> 这里的两个操作数采用 `double`，加法结果也是 `double`。表达式先根据操作数和运算符完成求值，初始化器或赋值目标随后才使用结果；接收结果的对象不能反向决定前面的运算采用整数还是浮点规则。
 
 不同算术类型共同参与同一次运算时，需要先确定共同类型；这套规则见[通常算术转换](03-usual-arithmetic-conversions.md)。
 

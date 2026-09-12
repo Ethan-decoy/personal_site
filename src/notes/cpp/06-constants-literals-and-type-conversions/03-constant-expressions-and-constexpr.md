@@ -51,7 +51,8 @@ constexpr int compile_time_limit{requested_attempts};  // 错误
 
 ## const 整数对象的精确边界
 
-`const` 与 `constexpr` 不能简单理解为“一个只能在运行期使用，一个只能在编译期使用”。在当前同一作用域内，如果 `const` 整数对象本身使用常量表达式初始化，它的值也可以继续参与常量表达式：
+> [!TIP]
+> `const` 与 `constexpr` 不能简单理解为“一个只能在运行期使用，一个只能在编译期使用”。在当前同一作用域内，如果 `const` 整数对象本身使用常量表达式初始化，它的值也可以继续参与常量表达式。
 
 ```cpp
 const int maintenance_mode{2};

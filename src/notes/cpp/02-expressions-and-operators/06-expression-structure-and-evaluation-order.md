@@ -62,14 +62,15 @@ int result{2 + (3 * 4)};
 
 结合性只在相关运算符处于同一优先级时决定分组。二元减法从左向右结合，因此 `10 - 3 - 2` 表示 `(10 - 3) - 2`；赋值从右向左结合，因此 `first = second = 0` 表示 `first = (second = 0)`。
 
-**优先级与结合性是语法解析规则，不表示操作数一定按照相同方向求值。**“从左向右结合”不能被理解成“运行时一定先求值左操作数”。
+> [!IMPORTANT]
+> 优先级与结合性是语法解析规则，不表示操作数一定按照相同方向求值。“从左向右结合”不能被理解成“运行时一定先求值左操作数”。
 
 ## 连续比较不能表达数学区间
 
 数学中可以写 $0 \leq position < limit$，但 C++ 的关系运算符不会把它解释成一个三方关系：
 
 ```cpp
-int position{3};
+int position{6};
 int limit{5};
 
 bool inside{0 <= position < limit};
@@ -81,18 +82,20 @@ bool inside{0 <= position < limit};
 (0 <= position) < limit
 ```
 
-`0 <= position` 先产生 `bool` 结果，随后 `false` 或 `true` 又以相应整数值参与第二次比较。它没有表达“`position` 同时不小于 `0` 且小于 `limit`”。
+`0 <= position` 先得到 `true`，这个 `bool` 结果提升为整数 `1`，第二次比较实际成为 `1 < 5`，最终得到 `true`。`position` 明明已经超出区间，错误写法却仍然把它判为区间内。它没有表达“`position` 同时不小于 `0` 且小于 `limit`”。
 
 正确写法分别建立两个比较，再用逻辑与组合：
 
 ```cpp
-int position{3};
+int position{6};
 int limit{5};
 
 bool inside{
     (position >= 0) && (position < limit)
 };
 ```
+
+这里的 `position >= 0` 为 `true`，`position < limit` 为 `false`，逻辑与最终得到 `false`，正确排除了区间外的 `6`。
 
 相等性比较也不能用 `first == second == third` 表示三个值彼此相等。它会先得到一个 `bool`，再把这个布尔结果与第三个操作数比较。每一项关系都应当成为独立比较表达式。
 

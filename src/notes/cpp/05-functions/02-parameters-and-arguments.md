@@ -30,7 +30,8 @@ int adjusted_pressure_kpa{calculate_adjusted_pressure_kpa(measured_pressure_kpa,
 
 这里，实参表达式 `measured_pressure_kpa` 对应形参 `pressure_kpa`，字面量 `5` 对应形参 `change_kpa`。对应关系由它们在各自列表中的位置确定。
 
-**在当前按值传递（pass by value）的算术类型模型中，形参是函数边界内接收数据的新对象；实参是调用位置用来提供数据的表达式。**
+> [!IMPORTANT]
+> 在当前按值传递（pass by value）的算术类型模型中，形参是函数边界内接收数据的新对象；实参是调用位置用来提供数据的表达式。
 
 ## 当前的按值传递模型
 

@@ -30,7 +30,8 @@ double pressure_kpa{4};
 
 两处 `4` 都是 `int` 类型的整数字面量。第二行最终创建的是 `double` 对象，但目标对象的类型不会倒过来改变字面量本身的类型；初始化过程会在需要时把 `int` 值转换为 `double` 值。
 
-**字面量的类型先由自身写法确定，使用它的语境再决定是否需要转换。**
+> [!IMPORTANT]
+> 字面量的类型先由自身写法确定，使用它的语境再决定是否需要转换。
 
 ## 整数字面量的进制
 
@@ -49,7 +50,7 @@ double pressure_kpa{4};
 
 ```cpp
 int maximum_rotation_per_minute{12'000};
-int color_mask{0xFF'00'7A};
+long color_mask{0xFF'00'7A};
 ```
 
 分隔符不会改变字面量的值或类型。

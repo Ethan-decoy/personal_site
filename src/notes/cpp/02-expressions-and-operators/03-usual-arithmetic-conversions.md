@@ -46,22 +46,11 @@ float < double < long double
 
 ## 整数提升（Integral Promotions）
 
-只有整数类型参与运算时，等级低于 `int` 的常见整数类型首先进行整数提升（integral promotions）：
-
-- `bool` 提升为 `int`；
-- `char`、`signed char`、`unsigned char`、`short` 和 `unsigned short`，在 `int` 能够表示其全部值时提升为 `int`，否则提升为 `unsigned int`。
-
-`wchar_t`、`char8_t`、`char16_t` 与 `char32_t` 使用更长的候选序列。语言选择其中第一个能够表示源类型全部值的类型：
-
-```text
-int
-unsigned int
-long
-unsigned long
-long long
-unsigned long long
-源字符类型的底层类型（underlying type）
-```
+> [!TIP]
+> 只有整数类型参与运算时，先分别完成整数提升（integral promotions），再用提升后的类型确定共同类型。常见的提升规则是：
+>
+> - `bool` 提升为 `int`，`false` 对应 `0`，`true` 对应 `1`；
+> - `char`、`signed char`、`unsigned char`、`short` 和 `unsigned short`，在 `int` 能够表示其全部值时提升为 `int`，否则提升为 `unsigned int`。
 
 ```cpp
 short front_count{120};
@@ -73,6 +62,8 @@ int total_count{front_count + rear_count};
 两个 `short` 操作数在加法前都提升为 `int`，因此表达式 `front_count + rear_count` 的类型是 `int`，而不是 `short`。
 
 **整数提升不是“结果超出小类型范围时才临时发生”的补救措施，而是相应运算求值前固定执行的类型规则。**即使两个值都很小，表达式仍然采用提升后的类型。
+
+`wchar_t`、`char8_t`、`char16_t` 与 `char32_t` 的提升候选范围更广，查阅时可见[文末补充](#补充其他字符类型的整数提升)。
 
 ## 相同符号属性的整数共同运算
 
@@ -103,7 +94,7 @@ unsigned int count{0};
 unsigned int result{count + adjustment};
 ```
 
-求值加法之前，`adjustment` 提供的 `-1` 转换为与它模 $2^N$ 同余的 `unsigned int` 值，也就是该类型的最大可表示值。加法随后按照无符号规则执行，`result` 最终得到同一个最大值。
+求值加法之前，`adjustment` 提供的 `-1` 先转换为 `unsigned int`。设 `unsigned int` 的位宽为 $N$，它的范围就是 $0$ 到 $2^N-1$；给 `-1` 加上一个模 $2^N$，便得到范围内与它同余的值 $2^N-1$，也就是该类型的最大可表示值。加法随后按照无符号规则执行，`count` 提供的 `0` 与这个最大值相加，`result` 最终得到同一个最大值。
 
 **这里没有发生有符号整数溢出；真正改变计算含义的是运算前的共同类型转换。**源代码表面上的负数在进入无符号运算后，已经不再以负值参与计算。
 
@@ -118,6 +109,23 @@ unsigned int result{count + adjustment};
 **不能只查看最终接收结果的对象类型来判断运算是否安全。**表达式在哪种类型中求值，必须先从操作数与通常算术转换推导出来。
 
 普通数量运算应尽量让参与同一次运算的整数具有一致的符号属性。不同类型的数据来自外部接口时，应先确认可表示范围与业务含义，而不是让有符号与无符号转换悄然决定结果。
+
+## 补充：其他字符类型的整数提升
+
+`wchar_t`、`char8_t`、`char16_t` 与 `char32_t` 各自具有底层类型（underlying type）：它是提供相同值范围与表示的整数类型，字符类型本身仍是独立类型。
+
+这些字符类型进行整数提升时，依次考察以下候选，选择第一个能够表示底层类型全部值的类型：
+
+```text
+int
+unsigned int
+long
+unsigned long
+long long
+unsigned long long
+```
+
+如果没有候选满足要求，就提升为源字符类型的底层类型。确定提升结果后，再按照前面的共同类型规则参与后续运算。
 
 ## 参考资料
 

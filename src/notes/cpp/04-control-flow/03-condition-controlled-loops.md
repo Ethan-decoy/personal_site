@@ -91,7 +91,10 @@ while (tire_pressure_kpa < 220) {
 }
 ```
 
-每次条件求值都会继续观察到 `180`。这段代码没有给出任何使条件产生 `false` 的执行路径，因此循环无法通过当前条件结束；对于原本预期结束的程序，这通常意味着推进关系缺失。
+这里没有语句改变 `tire_pressure_kpa`，也没有其他退出路径，条件无法因当前代码中的状态变化而成为 `false`。循环缺少了预期终止所需的推进关系。
+
+> [!WARNING]
+> C++23 的前向进展（forward progress）规则允许实现假定执行流程最终会终止，或执行输入输出等标准认可的进展操作。反复读取或修改普通局部对象不能单独满足这一要求。上例没有终止路径，也没有这类进展操作，因而具有未定义行为；不能依赖它在实际程序中永远重复检查条件。
 
 **判断循环能否按预期结束，应当寻找使条件最终不成立的真实执行路径，而不是仅凭循环体看起来执行了某些操作。**状态不必在所有问题中单调变化，但终止机制必须与条件观察的状态具有可解释的关系。
 
@@ -100,3 +103,4 @@ while (tire_pressure_kpa < 220) {
 - [C++23 工作草案：迭代语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.iter)
 - [C++23 工作草案：while 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.while)
 - [C++23 工作草案：do-while 语句](https://timsong-cpp.github.io/cppwp/n4950/stmt.do)
+- [C++23 工作草案：前向进展](https://timsong-cpp.github.io/cppwp/n4950/intro.progress)

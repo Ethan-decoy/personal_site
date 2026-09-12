@@ -21,7 +21,7 @@ wheel_count = 5;  // 错误：不能给 const 对象赋值
 ++wheel_count;    // 错误：不能递增 const 对象
 ```
 
-这些语句不是“执行后没有效果”，而是程序本身不合法，编译器必须拒绝。
+这些语句不是“执行后没有效果”，而是程序本身不合法，编译器必须给出诊断。
 
 在当前已经认识的基本类型范围内，定义 `const` 对象时必须建立确定的初始状态：
 
@@ -81,3 +81,4 @@ const int required_wheel_count{4};
 
 - [C++23 工作草案：cv 限定符](https://timsong-cpp.github.io/cppwp/n4950/dcl.type.cv)
 - [C++23 工作草案：类型限定](https://timsong-cpp.github.io/cppwp/n4950/basic.type.qualifier)
+- [C++23 工作草案：实现符合性与诊断要求](https://timsong-cpp.github.io/cppwp/n4950/intro.compliance.general)

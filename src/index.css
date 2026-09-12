@@ -558,6 +558,128 @@ body {
 	letter-spacing: -0.025em;
 }
 
+/* Callouts keep key statements and their boundaries visible during lookup. */
+.markdown-prose .markdown-callout {
+	--callout-accent: #546577;
+	--callout-background: rgba(84, 101, 119, 0.055);
+	max-width: min(80ch, 100%);
+	margin: 1.5em 0;
+	border-inline-start: 3px solid var(--callout-accent);
+	border-radius: 0 6px 6px 0;
+	padding: 0.8em 1em;
+	background: var(--callout-background);
+	color: var(--tw-prose-body);
+	font-style: normal;
+	overflow-wrap: anywhere;
+}
+
+.markdown-prose .markdown-callout[data-callout="tip"] {
+	--callout-accent: #326b60;
+	--callout-background: rgba(50, 107, 96, 0.06);
+}
+
+.markdown-prose .markdown-callout[data-callout="practice"] {
+	--callout-accent: #67558c;
+	--callout-background: rgba(103, 85, 140, 0.06);
+}
+
+.markdown-prose .markdown-callout[data-callout="important"] {
+	--callout-accent: #2f5d7c;
+	--callout-background: rgba(47, 93, 124, 0.075);
+}
+
+.markdown-prose .markdown-callout[data-callout="warning"] {
+	--callout-accent: #80591e;
+	--callout-background: rgba(128, 89, 30, 0.065);
+}
+
+.markdown-prose .markdown-callout[data-callout="caution"] {
+	--callout-accent: #984b47;
+	--callout-background: rgba(152, 75, 71, 0.06);
+}
+
+.markdown-prose.dark .markdown-callout {
+	--callout-accent: #adb9c4;
+	--callout-background: rgba(173, 185, 196, 0.055);
+}
+
+.markdown-prose.dark .markdown-callout[data-callout="tip"] {
+	--callout-accent: #94c6b6;
+	--callout-background: rgba(148, 198, 182, 0.065);
+}
+
+.markdown-prose.dark .markdown-callout[data-callout="practice"] {
+	--callout-accent: #b9a6db;
+	--callout-background: rgba(185, 166, 219, 0.065);
+}
+
+.markdown-prose.dark .markdown-callout[data-callout="important"] {
+	--callout-accent: #8cbbd2;
+	--callout-background: rgba(140, 187, 210, 0.075);
+}
+
+.markdown-prose.dark .markdown-callout[data-callout="warning"] {
+	--callout-accent: #d4b47a;
+	--callout-background: rgba(212, 180, 122, 0.065);
+}
+
+.markdown-prose.dark .markdown-callout[data-callout="caution"] {
+	--callout-accent: #dda29a;
+	--callout-background: rgba(221, 162, 154, 0.065);
+}
+
+.markdown-prose .markdown-callout-compact {
+	display: grid;
+	grid-template-columns: 1.1em minmax(0, 1fr);
+	column-gap: 0.6em;
+}
+
+.markdown-callout-compact > .markdown-callout-icon {
+	position: static;
+	margin-top: 0.3em;
+	color: var(--callout-accent);
+}
+
+.markdown-callout-body {
+	min-width: 0;
+}
+
+.markdown-callout-title {
+	display: flex;
+	align-items: baseline;
+	gap: 0.5em;
+	margin-bottom: 0.4em;
+	color: var(--callout-accent);
+	font-size: 0.875em;
+	font-weight: 600;
+	line-height: 1.6;
+}
+
+.markdown-callout-icon {
+	position: relative;
+	top: 0.15em;
+	flex: 0 0 1.1em;
+	width: 1.1em;
+	height: 1.1em;
+}
+
+.markdown-callout-title > span {
+	min-width: 0;
+}
+
+.markdown-callout-body > :first-child {
+	margin-top: 0;
+}
+
+.markdown-callout-body > :last-child {
+	margin-bottom: 0;
+}
+
+.markdown-callout-body > table {
+	display: block;
+	overflow-x: auto;
+}
+
 .markdown-prose code::before,
 .markdown-prose code::after {
 	content: none !important;

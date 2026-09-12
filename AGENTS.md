@@ -98,6 +98,8 @@ About 页面有独立的 personal/work 分支，不应机械塞入普通页面�
 2. `src/notes/index.ts` 使用 `import.meta.glob` 为公开正文建立按文件懒加载器，并构造目录树。
 3. `src/notes-renderer.tsx` 使用 React Markdown、GFM、KaTeX 与语法高亮渲染正文。
 
+Markdown 重点提示使用 `> [!TYPE] 可选标题`，在正文中直接展开。提示块语法与 C++ 笔记使用建议见 `src/notes/cpp/_guidelines/markdown-callouts.md`；调整视觉时参照 `docs/DESIGN.md` 的 Markdown 文档排版约定。
+
 不要把全部 Markdown 正文重新打入首包。修改目录、搜索或渲染逻辑后，至少运行 `pnpm build`，确保 Markdown、侧栏、性能预算和私有目录泄漏检查全部通过。
 
 ## 图片与性能

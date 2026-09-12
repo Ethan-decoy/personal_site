@@ -52,6 +52,66 @@ try {
 		}),
 	);
 
+	const renderMarkdown = (content) =>
+		renderToStaticMarkup(
+			React.createElement(MarkdownPreview, {
+				content,
+				theme: { name: "fixture", accent: "#1B3A5C" },
+				isDark: false,
+			}),
+		);
+	const calloutHtml = [
+		["NOTE", "说明"],
+		["TIP", "提示"],
+		["PRACTICE", "工程实践"],
+		["IMPORTANT", "核心"],
+		["WARNING", "易错"],
+		["CAUTION", "注意"],
+	].map(([type, label]) => ({
+		type,
+		label,
+		html: renderMarkdown(`> [!${type}]\n> ${type} 的首行正文。`),
+	}));
+	const richCalloutHtml = renderMarkdown(
+		[
+			"> [!IMPORTANT] 记住 **表达式类别** 与 `std::move`",
+			"> 首行正文包含 **粗体** 和 `value`。",
+			">",
+			"> 第二段包含 [标准参考](https://example.com/reference) 与 $x^2$。",
+			">",
+			"> - 保留列表第一项",
+			">   - 保留嵌套列表",
+			">",
+			"> ```cpp",
+			"> auto moved = std::move(value);",
+			"> ```",
+			">",
+			"> $$",
+			"> x^2 + y^2",
+			"> $$",
+			">",
+			"> > 普通嵌套引用。",
+		].join("\n"),
+	);
+	const ordinaryQuoteHtml = renderMarkdown(
+		[
+			"> 普通引用保留 **强调**。",
+			"",
+			"> [!UNKNOWN] 未知标记",
+			"> 未知类型的正文。",
+			"",
+			"> 前文不是提示标记。",
+			"> [!TIP] 出现在后面的标记。",
+			"",
+			"> `[!WARNING]` 行内代码中的标记。",
+			"",
+			"> ```",
+			"> [!CAUTION]",
+			"> 代码中的标记。",
+			"> ```",
+		].join("\n"),
+	);
+
 	const checks = [
 		{
 			name: "the Markdown module does not synthesize a metadata header",
@@ -118,6 +178,109 @@ try {
 		{
 			name: "renderer does not inject component-local style tags",
 			pass: !html.includes("<style>"),
+		},
+		{
+			name: "supported callouts keep accessible type names without visible default titles",
+			pass: calloutHtml.every(
+				({ type, label, html: rendered }) =>
+					/<aside\b[^>]*class="[^"]*\bmarkdown-callout\b/.test(rendered) &&
+					rendered.includes(`data-callout="${type.toLowerCase()}"`) &&
+					rendered.includes(`aria-label="${label}"`) &&
+					rendered.includes("markdown-callout-compact") &&
+					!rendered.includes("markdown-callout-title") &&
+					!rendered.includes(`[!${type}]`),
+			),
+		},
+		{
+			name: "a marker and body in the same Markdown paragraph keep the complete first body line",
+			pass: calloutHtml.every(({ type, html: rendered }) =>
+				new RegExp(
+					`class="markdown-callout-body"[^>]*>\\s*<p>${type} 的首行正文。<\\/p>`,
+				).test(rendered),
+			),
+		},
+		{
+			name: "custom callout titles retain inline Markdown and do not consume body text",
+			pass:
+				/class="markdown-callout-title"[^>]*>[\s\S]*?记住 <strong>表达式类别<\/strong> 与 <code class="markdown-inline-code">std::move<\/code>[\s\S]*?<\/div>/.test(
+					richCalloutHtml,
+				) &&
+				/class="markdown-callout-body"[^>]*>\s*<p>首行正文包含 <strong>粗体<\/strong> 和 <code class="markdown-inline-code">value<\/code>。<\/p>/.test(
+					richCalloutHtml,
+				) &&
+				!richCalloutHtml.includes("[!IMPORTANT]"),
+		},
+		{
+			name: "callout bodies retain separate paragraphs, links, nested lists, and ordinary nested quotes",
+			pass:
+				richCalloutHtml.includes(
+					'<p>第二段包含 <a href="https://example.com/reference"',
+				) &&
+				richCalloutHtml.includes("保留列表第一项") &&
+				richCalloutHtml.includes("保留嵌套列表") &&
+				(richCalloutHtml.match(/<ul\b/g) ?? []).length === 2 &&
+				/<blockquote>\s*<p>普通嵌套引用。<\/p>\s*<\/blockquote>/.test(
+					richCalloutHtml,
+				) &&
+				(richCalloutHtml.match(/<aside\b/g) ?? []).length === 1,
+		},
+		{
+			name: "fenced code inside callouts retains highlighting and its copy control outside pre",
+			pass:
+				(richCalloutHtml.match(/<pre\b/g) ?? []).length === 1 &&
+				(richCalloutHtml.match(/class="markdown-code-copy"/g) ?? []).length ===
+					1 &&
+				richCalloutHtml.includes("hljs-keyword") &&
+				!/<pre[^>]*>[\s\S]*?markdown-code-copy[\s\S]*?<\/pre>/.test(
+					richCalloutHtml,
+				),
+		},
+		{
+			name: "inline and display math inside callouts retain their rendered formula structure",
+			pass:
+				(richCalloutHtml.match(/class="katex"/g) ?? []).length === 2 &&
+				richCalloutHtml.includes('class="katex-display"'),
+		},
+		{
+			name: "ordinary quotes, unknown markers, and markers outside the opening text remain ordinary Markdown",
+			pass:
+				!ordinaryQuoteHtml.includes("markdown-callout") &&
+				(ordinaryQuoteHtml.match(/<blockquote>/g) ?? []).length === 5 &&
+				ordinaryQuoteHtml.includes("普通引用保留 <strong>强调</strong>。") &&
+				ordinaryQuoteHtml.includes("[!UNKNOWN] 未知标记") &&
+				ordinaryQuoteHtml.includes("未知类型的正文。") &&
+				ordinaryQuoteHtml.includes("[!TIP] 出现在后面的标记。") &&
+				ordinaryQuoteHtml.includes(
+					'<code class="markdown-inline-code">[!WARNING]</code>',
+				) &&
+				/<pre\b[^>]*>[\s\S]*?\[!CAUTION\][\s\S]*?<\/pre>/.test(
+					ordinaryQuoteHtml,
+				),
+		},
+		{
+			name: "static callouts use readable labels and hide decorative icons without live alert semantics",
+			pass: [
+				...calloutHtml.map((fixture) => fixture.html),
+				richCalloutHtml,
+			].every(
+				(rendered) =>
+					!rendered.includes('role="alert"') &&
+					!rendered.includes("aria-live=") &&
+					/<svg\b[^>]*aria-hidden="true"[^>]*>/.test(rendered) &&
+					/<svg\b[^>]*focusable="false"[^>]*>/.test(rendered),
+			),
+		},
+		{
+			name: "callouts do not introduce invalid paragraph or pre nesting",
+			pass: [
+				...calloutHtml.map((fixture) => fixture.html),
+				richCalloutHtml,
+			].every(
+				(rendered) =>
+					!/<p\b[^>]*>(?:(?!<\/p>)[\s\S])*?<(?:aside|div|p|ul|ol|pre|blockquote)\b/.test(
+						rendered,
+					) && !/<pre[^>]*>\s*<(?:div|figure)\b/.test(rendered),
+			),
 		},
 	];
 

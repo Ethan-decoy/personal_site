@@ -34,6 +34,7 @@ import swift from "highlight.js/lib/languages/swift";
 import ts from "highlight.js/lib/languages/typescript";
 import xml from "highlight.js/lib/languages/xml";
 import yaml from "highlight.js/lib/languages/yaml";
+import { rehypeMarkdownCallouts } from "./markdown-callouts";
 
 const loadTreeSitterHighlighter = () => import("./highlighter");
 
@@ -145,45 +146,6 @@ export const HLJS_THEMES = {
 	},
 };
 
-/* ---- GitHub-style callout detection ---- */
-function makeCallouts(
-	isDark: boolean,
-): Record<string, { label: string; border: string; bg: string; icon: string }> {
-	const alpha = isDark ? 0.15 : 0.08;
-	return {
-		"!NOTE": {
-			label: "Note",
-			border: isDark ? "#58A6D0" : "#3B82F6",
-			bg: `rgba(59,130,246,${alpha})`,
-			icon: "ℹ️",
-		},
-		"!TIP": {
-			label: "Tip",
-			border: isDark ? "#5CC9A7" : "#10B981",
-			bg: `rgba(16,185,129,${alpha})`,
-			icon: "💡",
-		},
-		"!IMPORTANT": {
-			label: "Important",
-			border: isDark ? "#A78BFA" : "#8B5CF6",
-			bg: `rgba(139,92,246,${alpha})`,
-			icon: "❗",
-		},
-		"!WARNING": {
-			label: "Warning",
-			border: isDark ? "#FBBF24" : "#F59E0B",
-			bg: `rgba(245,158,11,${alpha})`,
-			icon: "⚠️",
-		},
-		"!CAUTION": {
-			label: "Caution",
-			border: isDark ? "#F87171" : "#EF4444",
-			bg: `rgba(239,68,68,${alpha})`,
-			icon: "🚨",
-		},
-	};
-}
-
 function extractText(node: ReactNode): string {
 	if (typeof node === "string") return node;
 	if (Array.isArray(node)) return node.map(extractText).join("");
@@ -192,47 +154,6 @@ function extractText(node: ReactNode): string {
 			(node as { props: { children?: ReactNode } }).props.children,
 		);
 	return "";
-}
-
-function Callout({
-	children,
-	isDark,
-	...rest
-}: { children?: ReactNode; isDark: boolean } & Record<string, unknown>) {
-	const text = extractText(children);
-	const firstLine = text.trim().split("\n")[0].trim();
-	const callout = makeCallouts(isDark)[firstLine];
-
-	if (callout) {
-		const childArray = Array.isArray(children) ? children : [children];
-		const [, ...restChildren] = childArray;
-		return (
-			<div
-				style={{
-					borderLeft: `3px solid ${callout.border}`,
-					backgroundColor: callout.bg,
-					borderRadius: "0 8px 8px 0",
-					padding: "12px 16px",
-					margin: "1em 0",
-				}}
-				{...rest}
-			>
-				<div
-					style={{
-						fontWeight: 600,
-						fontSize: "0.875rem",
-						marginBottom: 4,
-						color: callout.border,
-					}}
-				>
-					{callout.icon} {callout.label}
-				</div>
-				{restChildren}
-			</div>
-		);
-	}
-
-	return <blockquote {...rest}>{children}</blockquote>;
 }
 
 /* ---- Code blocks: <pre> is the only block-level rendering seam ---- */
@@ -850,7 +771,12 @@ function Plot({
 
 /* ---- Stable plugin arrays (prevents ReactMarkdown re-processing) ---- */
 const REMARK_PLUGINS = [remarkMath, remarkGfm, remarkCjkFriendly];
-const REHYPE_PLUGINS = [rehypeRaw, rehypeSlug, rehypeKatex];
+const REHYPE_PLUGINS = [
+	rehypeRaw,
+	rehypeMarkdownCallouts,
+	rehypeSlug,
+	rehypeKatex,
+];
 
 export interface NoteLinkTarget {
 	file: string;
@@ -916,9 +842,6 @@ function makeComponents(
 			}
 			return <a href={href}>{children}</a>;
 		},
-		blockquote: ({ children }: { children?: ReactNode }) => (
-			<Callout isDark={dark}>{children}</Callout>
-		),
 		code: ({ className, children }: CodeElementProps) => (
 			<InlineCode className={className}>{children}</InlineCode>
 		),

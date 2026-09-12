@@ -31,7 +31,7 @@ bool inspect_tire_manually(bool sensor_ready, int& active_registration_count) {
 
 ## 让对象生命周期承载清理责任
 
-资源获取即初始化（Resource Acquisition Is Initialization, RAII）把成对责任封装进对象生命周期：对象初始化时建立有效的资源关系，销毁时执行相应的释放动作。
+资源获取即初始化（Resource Acquisition Is Initialization, RAII）把成对责任封装进对象生命周期：对象初始化时建立有效的资源关系，销毁时完成仍由它承担的清理。
 
 ```cpp
 class calibration_registration {
@@ -63,7 +63,7 @@ bool inspect_tire(bool sensor_ready, int& active_registration_count) {
 }
 ```
 
-`current_registration` 构造完成后，计数已经递增，对象的存在表示本次登记仍然有效。无论函数选择 `return false;` 还是 `return true;`，返回结果建立后都要离开函数作用域；局部对象随后销毁，其析构函数把计数递减。调用者不再需要在每条返回路径上重复这项动作。
+本例只在构造时登记、析构时解除。`current_registration` 构造完成后，计数已经递增，登记责任一直由它承担到析构。无论函数选择 `return false;` 还是 `return true;`，返回结果建立后都要离开函数作用域；局部对象随后销毁，其析构函数把计数递减。每条返回路径都不再需要显式执行这项动作。
 
 RAII 不是一项新的存储期，也不会改变 `return` 的控制流含义。它利用已经存在的构造、析构和自动存储期规则，把“必须执行的清理”变成局部对象销毁过程的一部分。
 
@@ -81,7 +81,7 @@ RAII 不是一项新的存储期，也不会改变 `return` 的控制流含义�
 
 把一项清理动作放进析构函数，不会自动延长所有关联对象的生命周期，也不会让悬空指针变得可用。RAII 保证的是自身承担的动作随自身销毁执行；这项动作访问的外部对象仍须满足原有的指针与生命周期约束。
 
-**RAII 用对象生命周期表达资源责任：成功构造建立责任，对象存活表示责任有效，析构结束责任。只有资源关系和所有被访问对象的生命周期同时正确，这项自动清理才真正安全。**
+**RAII 用对象生命周期管理资源责任：对象销毁时，完成它仍然承担的清理动作。具体需要清理什么，取决于对象当时的资源状态；动作访问的外部对象也必须仍然有效。**
 
 ## 参考资料
 

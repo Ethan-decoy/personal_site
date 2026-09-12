@@ -24,3 +24,4 @@ date: 2026-08-08
 15. [用户定义转换与显式接口](14-user-defined-conversions-and-explicit-interfaces/_index.md)
 16. [类对象的复制与复制能力](15-copying-class-objects-and-copyability/_index.md)
 17. [类对象的销毁与资源生命周期](16-class-object-destruction-and-resource-lifetime/_index.md)
+18. [右值引用与移动语义](17-rvalue-references-and-move-semantics/_index.md)

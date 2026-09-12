@@ -10,6 +10,8 @@ order: 5
 
 ## 参数形式作用于完整状态
 
+示例沿用[结构体定义中的 `tire_state`](01-user-defined-types-and-struct-definitions.md#用-struct-定义一种类型)，三个成员依次是压力 `pressure_bar`、温度 `temperature_c` 和磨损比例 `wear_percent`。下面的函数定义放在该类型定义之后，调用片段放在函数体内。
+
 ```cpp
 double calculate_projected_temperature_c(tire_state state, double temperature_increase_c) {
     state.temperature_c += temperature_increase_c;

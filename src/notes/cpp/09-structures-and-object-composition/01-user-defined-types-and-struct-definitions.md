@@ -37,6 +37,8 @@ tire_state front_left{2.4, 36.0, 18};
 tire_state rear_right{2.2, 32.0, 12};
 ```
 
+对这里的简单结构体，花括号中的三项按成员声明顺序，分别初始化 `pressure_bar`、`temperature_c` 和 `wear_percent`。
+
 这里创建了两个类型相同、身份独立的对象。每个对象都能把一组相关状态作为一个整体参与初始化、赋值和函数调用。
 
 **结构体定义描述一种对象应当由哪些成员构成；结构体对象才是在程序运行期间保存具体成员状态的实体。**
@@ -68,3 +70,4 @@ struct tire_state {
 - [C++23 工作草案：类类型](https://timsong-cpp.github.io/cppwp/n4950/class.pre)
 - [C++23 工作草案：类成员](https://timsong-cpp.github.io/cppwp/n4950/class.mem.general)
 - [C++23 工作草案：成员访问控制](https://timsong-cpp.github.io/cppwp/n4950/class.access.general)
+- [C++23 工作草案：聚合初始化](https://timsong-cpp.github.io/cppwp/n4950/dcl.init.aggr)

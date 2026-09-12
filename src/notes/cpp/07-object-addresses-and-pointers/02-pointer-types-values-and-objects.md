@@ -25,7 +25,8 @@ int* temperature_target{&engine_temperature_c};
 
 `engine_temperature_c` 是这段指向关系的目标。`temperature_target` 则是另一个独立对象：它有自己的类型、身份、生命周期和当前值，只是它当前保存的值指向 `engine_temperature_c`。
 
-**取地址表达式产生指针值；变量声明创建指针对象。指针对象与目标对象是两个独立对象。**
+> [!IMPORTANT]
+> 取地址表达式产生指针值；变量声明创建指针对象。指针对象与目标对象是两个独立对象。
 
 取地址运算符需要一个能够指定已有对象的表达式。整数字面量只产生一个值，不能像具名对象一样直接被取地址：
 

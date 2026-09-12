@@ -21,6 +21,8 @@ tire_state front_left{2.4, 36.0, 18};
 tire_state rear_right{2.2, 32.0, 12};
 ```
 
+一个对象如果不是任何其他对象的子对象，就称为**完整对象（complete object）**。本例的 `front_left` 和 `rear_right` 都是完整对象，它们内部的三个成员各自形成成员子对象。
+
 类型定义中只有一条 `pressure_bar` 成员声明，但两个完整对象分别包含自己的 `double` 成员子对象：
 
 ```text

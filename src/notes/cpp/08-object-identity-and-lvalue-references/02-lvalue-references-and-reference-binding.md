@@ -86,7 +86,8 @@ selected_temperature_c = backup_temperature_c;
 
 最后，`primary_temperature_c == 65`，`backup_temperature_c == 65`，而 `selected_temperature_c` 仍然指代 `primary_temperature_c`。右侧 lvalue 读取 `backup_temperature_c` 当前保存的值，再把该值写入引用所指定的对象；没有发生重新绑定。
 
-**初始化建立引用绑定；之后对引用名称赋值，是给被绑定对象赋值。**
+> [!IMPORTANT]
+> 引用初始化建立绑定；之后对引用名称赋值，是给被绑定对象赋值。
 
 ## 引用也能绑定指针对象
 

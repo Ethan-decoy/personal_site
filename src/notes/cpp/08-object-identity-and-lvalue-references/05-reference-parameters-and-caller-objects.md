@@ -15,8 +15,10 @@ void increase_pressure_kpa(int& pressure_kpa, int increase_kpa) {
     pressure_kpa += increase_kpa;
 }
 
-int current_pressure_kpa{210};
-increase_pressure_kpa(current_pressure_kpa, 5);
+int main() {
+    int current_pressure_kpa{210};
+    increase_pressure_kpa(current_pressure_kpa, 5);
+}
 ```
 
 调用发生时，`current_pressure_kpa` 是能够指定已有 `int` 对象的 lvalue，因此引用形参 `pressure_kpa` 绑定到这个对象。`increase_kpa` 则是普通按值形参，由实参 `5` 初始化为独立的 `int` 对象。
@@ -68,10 +70,12 @@ void reset_pressure_if_present(int* pressure_kpa) {
     }
 }
 
-int current_pressure_kpa{210};
+int main() {
+    int current_pressure_kpa{210};
 
-reset_pressure_if_present(&current_pressure_kpa);
-reset_pressure_if_present(nullptr);
+    reset_pressure_if_present(&current_pressure_kpa);
+    reset_pressure_if_present(nullptr);
+}
 ```
 
 第一个调用提供可修改对象的地址，第二个调用明确表示没有目标。若函数语义要求调用者一定提供对象，使用 `int&` 能够省去这一可选状态；若缺少目标本身是合法输入，使用 `int*` 才能表达这项差异。
@@ -88,15 +92,16 @@ reset_pressure_if_present(nullptr);
 | `const int* value` | `const int*` 指针对象 | 可以为空 | 目标存在时不能经此路径修改 |
 | `int* value` | `int*` 指针对象 | 可以为空 | 目标存在时可以 |
 
-这些区别描述语言语义，而不是固定的性能排名。对于 `int`、`double` 和指针这类复制成本低、函数只需要数值的小型标量，按值传递通常最直接：
-
-```cpp
-bool is_pressure_within_limit(int pressure_kpa, int maximum_pressure_kpa) {
-    return pressure_kpa <= maximum_pressure_kpa;
-}
-```
-
-`const int&` 版本在语言上成立，却没有因为“没有创建独立 `int` 形参对象”就自动更快。具体调用约定、优化结果和间接访问成本都由实现与上下文决定。
+> [!PRACTICE]
+> 这些区别描述语言语义，而不是固定的性能排名。对于 `int`、`double` 和指针这类复制成本低、函数只需要数值的小型标量，按值传递通常最直接：
+>
+> ```cpp
+> bool is_pressure_within_limit(int pressure_kpa, int maximum_pressure_kpa) {
+>     return pressure_kpa <= maximum_pressure_kpa;
+> }
+> ```
+>
+> `const int&` 版本在语言上成立，却没有因为“没有创建独立 `int` 形参对象”就自动更快。具体调用约定、优化结果和间接访问成本都由实现与上下文决定。
 
 引用参数适合表达目标必须存在的关系：使用 `int&` 明确允许函数修改目标，使用 `const int&` 限制这条访问路径。指针参数则保留“目标可以不存在”的状态。引用与指针参数都不延长普通调用者对象的生命周期；函数若让相应访问关系离开当前调用，之后的使用仍不得超过目标对象的生命周期。
 

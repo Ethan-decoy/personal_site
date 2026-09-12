@@ -16,6 +16,8 @@ C++ 的设计始于 1979 年。Bjarne Stroustrup 希望把 Simula 组织程序�
 
 现代 C++ 已经不只是“给 C 加上类”。它既允许程序直接表达与存储、硬件和平台边界密切相关的操作，也允许把反复出现的细节封装成具有明确接口、能够组合复用的程序部件。
 
+这两种能力共同服务于**零额外开销原则（zero-overhead principle）**：未使用的能力不应强迫程序承担额外开销；与仔细手写同等功能的方案相比，采用抽象也不应额外增加时间或存储开销。这是语言的设计目标，完成任务本身所需的计算和存储仍然存在。
+
 **C++ 提供控制力和抽象工具，但不会自动让程序安全、高效或易于维护。**语言规则决定哪些程序具有含义，接口与资源怎样组织则仍然需要工程判断。
 
 ## 标准规定共同的语言契约
@@ -48,5 +50,6 @@ C++ 实现通常包含编译器和标准库（standard library）的具体实现
 ## 参考资料
 
 - [Bjarne Stroustrup：A History of C++: 1979–1991](https://stroustrup.com/hopl2.pdf)
+- [Bjarne Stroustrup：Foundations of C++，设计目标与零额外开销原则](https://stroustrup.com/ETAPS12-corrected.pdf#page=2)
 - [WG21：C++ 标准版本与公开草案](https://www.open-std.org/jtc1/sc22/wg21/docs/standards)
 - [WG21：C++23 最终工作草案 N4950](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/n4950.pdf)

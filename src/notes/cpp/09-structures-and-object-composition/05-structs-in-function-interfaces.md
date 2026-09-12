@@ -39,7 +39,7 @@ const bool service_required{needs_service(current)};
 set_pressure_bar(current, 2.5);
 ```
 
-`projected_temperature_c == 48.0`，而按值参数中的修改没有传回 `current`；`service_required == true`；最后一个调用才把 `current.pressure_bar` 改为 `2.5`。结构体成员较多时，接口形式同时表达是否复制整组状态、是否允许修改原对象。
+`projected_temperature_c == 48.0`，而按值参数中的修改没有传回 `current`；`service_required == true`；最后一个调用才把 `current.pressure_bar` 改为 `2.5`。接口选择决定函数使用独立状态还是原对象，以及能否通过形参修改原对象。
 
 ## 指针参数保留无目标状态
 

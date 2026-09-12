@@ -27,6 +27,8 @@ int* secondary_calibration_target{primary_calibration_target};
 
 这次赋值把 `engine_temperature_c` 修改为 `82`。`primary_calibration_target` 也能观察到这个新值，因为两条路径接触的是同一个对象，并不是两个副本在自动同步。
 
+当两处代码需要共同读取或修改这个温度对象时，保存指针值就能各自保留访问途径，无需复制目标对象。它们也因此观察同一份状态；若要保留修改前的温度，应当另存一份数值。
+
 ## 重新指向只改变指针对象
 
 给已有指针对象赋予另一个指针值，会让它改为指向另一个对象。这种关系变化常称为重新指向（reseating）：

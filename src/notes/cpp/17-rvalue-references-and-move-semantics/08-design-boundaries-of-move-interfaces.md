@@ -1,7 +1,7 @@
 ---
 title: 移动接口的设计边界（Design Boundaries of Move Interfaces）
 date: 2026-09-05
-order: 6
+order: 8
 ---
 
 # 移动接口的设计边界（Design Boundaries of Move Interfaces）

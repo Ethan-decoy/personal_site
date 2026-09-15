@@ -27,3 +27,4 @@ date: 2026-08-08
 18. [右值引用与移动语义](17-rvalue-references-and-move-semantics/_index.md)
 19. [异常传播与失败后的对象状态](18-exception-propagation-and-failure-state/_index.md)
 20. [动态对象与独占所有权](19-dynamic-objects-and-exclusive-ownership/_index.md)
+21. [固定长度序列与连续范围](20-fixed-size-sequences-and-contiguous-ranges/_index.md)

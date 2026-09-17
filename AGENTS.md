@@ -53,6 +53,8 @@
 
 About 页面有独立的 personal/work 分支，不应机械塞入普通页面映射。
 
+生活面的「在看」由 `src/pages/about-personal.tsx` 中的 `WATCHING_COLLECTIONS` 按观看年份维护，最新年份在前；新增剧集或调整展示时，遵循 `docs/DESIGN.md` 的「在看的年度收纳」约定。
+
 ### 路由
 
 路由使用 URL Hash，例如：

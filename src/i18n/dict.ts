@@ -110,13 +110,13 @@ export const dict = {
 	},
 	"about.favorites.series": { zh: "剧集", en: "Series" },
 	"about.favorites.music": { zh: "音乐", en: "Music" },
-	"about.favorites.series.modernFamily": {
-		zh: "剧集《Modern Family》海报",
-		en: "Poster for Modern Family",
+	"about.favorites.series.canThisLoveBeTranslated": {
+		zh: "《이 사랑 통역 되나요?》韩文主海报，两位主角在暖色的意大利广场上对望",
+		en: "The Korean-language main poster for 이 사랑 통역 되나요?, with the two leads looking at each other in an Italian square",
 	},
-	"about.favorites.series.modernFamily.title": {
-		zh: "Modern Family",
-		en: "Modern Family",
+	"about.favorites.series.modernFamily": {
+		zh: "《Modern Family》海报，穿白衣的家庭成员错落坐在阶梯上",
+		en: "Modern Family poster with the family dressed in white and arranged across staggered steps",
 	},
 	"about.favorites.song.homeToMama": {
 		zh: "Justin Bieber 与 Cody Simpson《Home to Mama》歌曲封面",

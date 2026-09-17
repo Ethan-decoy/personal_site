@@ -7,7 +7,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { useI18n } from "../i18n";
+import { type DictKey, useI18n } from "../i18n";
 import {
 	type ImageLoadPriority,
 	prepareImage,
@@ -20,10 +20,55 @@ const SERVE_PEOPLE_RED = "#D52B1E";
 const PERSONAL_IMAGE_PATHS = {
 	recent: "assets/recent/cat-portrait.jpg",
 	beliefs: "assets/mao-style-serve-the-people.png",
-	watching: "assets/favorites/series-modern-family.jpg",
 	listening:
 		"assets/favorites/song-home-to-mama-justin-bieber-cody-simpson.jpg",
 } as const;
+
+type WatchingCollection = {
+	year: string;
+	series: {
+		id: string;
+		title: string;
+		language: string;
+		sourceUrl?: string;
+		posterSide: "left" | "right";
+		altKey: DictKey;
+		src: string;
+		width: number;
+		height: number;
+	}[];
+};
+
+// 年份与年内记录均按观看先后倒序排列；新记录放在对应年份的开头。
+const WATCHING_COLLECTIONS: WatchingCollection[] = [
+	{
+		year: "2026",
+		series: [
+			{
+				id: "can-this-love-be-translated",
+				title: "이 사랑 통역 되나요?",
+				language: "ko",
+				posterSide: "right",
+				altKey: "about.favorites.series.canThisLoveBeTranslated",
+				sourceUrl:
+					"https://about.netflix.com/ko/news/can-this-love-be-translated-main-trailer",
+				src: "assets/favorites/series-can-this-love-be-translated-poster.webp",
+				width: 900,
+				height: 1333,
+			},
+			{
+				id: "modern-family",
+				title: "Modern Family",
+				language: "en",
+				posterSide: "left",
+				altKey: "about.favorites.series.modernFamily",
+				src: "assets/favorites/series-modern-family.jpg",
+				width: 1200,
+				height: 1600,
+			},
+		],
+	},
+];
 
 function resolvePersonalImage(path: string) {
 	return `${import.meta.env.BASE_URL}${path}`;
@@ -182,11 +227,13 @@ function loadPosterImage(
 	return prepareImage(resolvePosterSrc(poster), priority);
 }
 
-const PERSONAL_PANEL_IMAGES: Partial<Record<LifePanelId, string>> = {
-	recent: resolvePersonalImage(PERSONAL_IMAGE_PATHS.recent),
-	beliefs: resolvePersonalImage(PERSONAL_IMAGE_PATHS.beliefs),
-	watching: resolvePersonalImage(PERSONAL_IMAGE_PATHS.watching),
-	listening: resolvePersonalImage(PERSONAL_IMAGE_PATHS.listening),
+const PERSONAL_PANEL_IMAGES: Partial<Record<LifePanelId, string[]>> = {
+	recent: [resolvePersonalImage(PERSONAL_IMAGE_PATHS.recent)],
+	beliefs: [resolvePersonalImage(PERSONAL_IMAGE_PATHS.beliefs)],
+	watching: WATCHING_COLLECTIONS[0]?.series
+		.slice(0, 1)
+		.map((series) => resolvePersonalImage(series.src)),
+	listening: [resolvePersonalImage(PERSONAL_IMAGE_PATHS.listening)],
 };
 
 function preparePersonalPanel(panel: LifePanelId): Promise<void> {
@@ -200,9 +247,12 @@ function preparePersonalPanel(panel: LifePanelId): Promise<void> {
 			: Promise.resolve();
 	}
 
-	const source = PERSONAL_PANEL_IMAGES[panel];
-	return source
-		? prepareImage(source, "high").then(() => undefined)
+	const [current, ...upcoming] = PERSONAL_PANEL_IMAGES[panel] ?? [];
+	for (const source of upcoming) {
+		void prepareImage(source, "low").catch(() => undefined);
+	}
+	return current
+		? prepareImage(current, "high").then(() => undefined)
 		: Promise.resolve();
 }
 
@@ -212,9 +262,7 @@ export function preloadPersonalImages(): void {
 	if (personalImageWarmupStarted) return;
 	personalImageWarmupStarted = true;
 	scheduleImageWarmup([
-		...Object.values(PERSONAL_PANEL_IMAGES).filter((source): source is string =>
-			Boolean(source),
-		),
+		...Object.values(PERSONAL_PANEL_IMAGES).flatMap((sources) => sources ?? []),
 		...MAGNETIC_POSTERS.map(resolvePosterSrc),
 	]);
 }
@@ -539,6 +587,103 @@ function GamePosterCarousel({
 	);
 }
 
+function WatchingCollections({
+	theme,
+	label,
+}: {
+	theme: Theme;
+	label: string;
+}) {
+	const { t } = useI18n();
+
+	return (
+		<div className="space-y-24 sm:space-y-32">
+			{WATCHING_COLLECTIONS.map((collection, collectionIndex) => (
+				<section
+					key={collection.year}
+					aria-labelledby={`watching-year-${collection.year}`}
+				>
+					<h2 id={`watching-year-${collection.year}`} className="sr-only">
+						{collection.year} · {label}
+					</h2>
+					<ol className="space-y-16 sm:space-y-24">
+						{collection.series.map((series, seriesIndex) => {
+							const isFirst = collectionIndex === 0 && seriesIndex === 0;
+							const posterOnRight = series.posterSide === "right";
+
+							return (
+								<li
+									key={series.id}
+									className={
+										seriesIndex > 0 ? "border-t pt-16 sm:pt-24" : undefined
+									}
+									style={{ borderColor: theme.borderLight }}
+								>
+									<figure
+										aria-labelledby={`watching-${collection.year}-${series.id}`}
+										data-source={series.sourceUrl}
+										className={`grid min-h-[31rem] gap-10 lg:items-end lg:gap-16 ${posterOnRight ? "lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]" : "lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"}`}
+									>
+										<div
+											className={`flex min-h-[31rem] items-center justify-center p-5 sm:p-8 ${posterOnRight ? "lg:order-2" : ""}`}
+											style={{
+												backgroundColor: theme.bgDeep,
+												border: `1px solid ${theme.borderLight}`,
+											}}
+										>
+											<img
+												src={resolvePersonalImage(series.src)}
+												alt={t(series.altKey)}
+												className="block h-auto w-full max-w-[18rem] rounded-[2px]"
+												width={series.width}
+												height={series.height}
+												decoding="async"
+												loading={isFirst ? "eager" : "lazy"}
+												fetchPriority={isFirst ? "high" : "low"}
+												draggable={false}
+											/>
+										</div>
+										<figcaption
+											className={`pb-2 lg:pb-10 ${posterOnRight ? "lg:order-1" : ""}`}
+										>
+											<p
+												className="flex items-baseline gap-3 text-[10px] font-semibold tracking-[0.16em] sm:text-[11px]"
+												style={{ color: theme.accent }}
+											>
+												<span>{t("about.favorites.series")}</span>
+												<span
+													aria-hidden="true"
+													style={{ color: theme.border }}
+												>
+													·
+												</span>
+												<span
+													className="font-mono font-normal tracking-[0.1em]"
+													style={{ color: theme.textSec }}
+												>
+													{collection.year}
+												</span>
+											</p>
+											<h3
+												id={`watching-${collection.year}-${series.id}`}
+												lang={series.language}
+												className={`mt-6 max-w-2xl font-semibold ${series.language === "ko" ? "break-keep text-[clamp(2.8rem,7.4vw,5.8rem)] leading-[1.12] tracking-[-0.055em]" : "text-[clamp(2.8rem,8vw,6.3rem)] leading-[0.98] tracking-[-0.06em]"}`}
+												style={{ color: theme.text }}
+											>
+												{series.title}
+											</h3>
+										</figcaption>
+									</figure>
+								</li>
+							);
+						})}
+					</ol>
+				</section>
+			))}
+		</div>
+	);
+}
+
 type RecentLifeContent = {
 	label: string;
 	wish: {
@@ -842,15 +987,7 @@ export default function PersonalLifePage({
 			title: t("about.personal.recent.cat"),
 		},
 	};
-	const seriesTitle = t("about.favorites.series");
 	const musicTitle = t("about.favorites.music");
-	const series = {
-		label: t("about.favorites.series.modernFamily"),
-		title: t("about.favorites.series.modernFamily.title"),
-		src: PERSONAL_IMAGE_PATHS.watching,
-		width: 1200,
-		height: 1600,
-	};
 	const song = {
 		label: t("about.favorites.song.homeToMama"),
 		title: t("about.favorites.song.homeToMama.title"),
@@ -1182,39 +1319,7 @@ export default function PersonalLifePage({
 					)}
 
 					{displayedPanel === "watching" && (
-						<figure className="grid min-h-[31rem] gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-end lg:gap-16">
-							<div
-								className="flex min-h-[31rem] items-center justify-center p-5 sm:p-8"
-								style={{
-									backgroundColor: theme.bgDeep,
-									border: `1px solid ${theme.borderLight}`,
-								}}
-							>
-								<img
-									src={`${import.meta.env.BASE_URL}${series.src}`}
-									alt={series.label}
-									className="block h-auto w-full max-w-[18rem] rounded-[2px]"
-									width={series.width}
-									height={series.height}
-									decoding="async"
-									fetchPriority="high"
-								/>
-							</div>
-							<figcaption className="pb-2 lg:pb-10">
-								<p
-									className="text-[10px] font-semibold tracking-[0.16em] sm:text-[11px]"
-									style={{ color: theme.accent }}
-								>
-									{seriesTitle}
-								</p>
-								<h2
-									className="mt-6 max-w-2xl text-[clamp(2.8rem,8vw,6.3rem)] font-semibold leading-[0.98] tracking-[-0.06em]"
-									style={{ color: theme.text }}
-								>
-									{series.title}
-								</h2>
-							</figcaption>
-						</figure>
+						<WatchingCollections theme={theme} label={labels.watching} />
 					)}
 
 					{displayedPanel === "listening" && (

@@ -29,3 +29,4 @@ date: 2026-08-08
 20. [动态对象与独占所有权](19-dynamic-objects-and-exclusive-ownership/_index.md)
 21. [固定长度序列与连续范围](20-fixed-size-sequences-and-contiguous-ranges/_index.md)
 22. [文本的保存与借用](21-text-ownership-and-borrowing/_index.md)
+23. [迭代器、区间与算法](22-iterators-ranges-and-algorithms/_index.md)

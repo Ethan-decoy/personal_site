@@ -90,7 +90,7 @@ int main() {
 
 程序先输出 `240 250`，再输出 `240 240`。复制构造为 `snapshot` 建立独立的三个元素；之后的赋值把 `source` 的各个元素值赋给 `snapshot` 中已经存在的对应元素。整个过程没有让两个数组共用同一组 `double` 元素。
 
-数组的移动也依照[成员逐项移动](../17-rvalue-references-and-move-semantics/05-generation-and-selection-of-move-operations.md)的关系进行。它不会像接管 `vector` 的独立存储那样，把这一整组元素的存储从源对象转交给目标对象；具体可用性与成本取决于元素类型和数量。对 `double` 数组使用 `std::move`，不能因此省去传递各个元素值的工作。
+数组的移动也依照[成员逐项移动](../17-rvalue-references-and-move-semantics/05-generation-and-selection-of-move-operations.md#默认移动把成员分别交给相应操作)的关系进行。它不会像接管 `vector` 的独立存储那样，把这一整组元素的存储从源对象转交给目标对象；具体可用性与成本取决于元素类型和数量。对 `double` 数组使用 `std::move`，不能因此省去传递各个元素值的工作。
 
 ## 空数组与下标边界
 
@@ -101,7 +101,7 @@ int main() {
 > [!PRACTICE]
 > 如果元素数量在编译时确定，并且这个数量就是数据结构的一部分，`std::array` 能直接表达约束。数量来自运行时或需要增减时，`std::vector` 更符合需求，即使某个具体对象创建后恰好不再改变长度。
 >
-> 两者都拥有元素，按值复制都可能涉及整组数据。函数只需要读取一组连续元素时，可以通过[连续范围借用](02-borrowing-contiguous-ranges-with-span.md)表达访问需求，让接口不必绑定某一种拥有者类型。
+> 两者都拥有元素，按值复制都可能涉及整组数据。函数只需要读取一组连续元素时，可以通过[连续范围借用](02-borrowing-contiguous-ranges-with-span.md#按值接收视图借用调用方的数据)表达访问需求，让接口不必绑定某一种拥有者类型。
 
 ## 参考资料
 

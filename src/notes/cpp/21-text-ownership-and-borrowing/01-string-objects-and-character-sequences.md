@@ -64,7 +64,7 @@ front 5
 
 `"front"` 中每个字母各用一个 `char`，所以这里的内容长度恰好等于可见字母数。这个对应关系不能直接推广到所有文本。
 
-[字符与文本编码](../01-objects-types-and-variables/06-characters-and-text-encoding.md)区分了编码单元与人所看到的字符：例如，在一个字节为 8 位、普通字符串字面量采用 UTF-8 编码的环境中，`std::string text{"中"}` 的 `size()` 是 `3`。字符串记录的是三个 `char` 元素，不会自动把它们合计为一个汉字。
+[字符与文本编码](../01-objects-types-and-variables/06-characters-and-text-encoding.md#unicode-与-utf-8)区分了编码单元与人所看到的字符：例如，在一个字节为 8 位、普通字符串字面量采用 UTF-8 编码的环境中，`std::string text{"中"}` 的 `size()` 是 `3`。字符串记录的是三个 `char` 元素，不会自动把它们合计为一个汉字。
 
 下标访问也采用同样的单位。对 UTF-8 文本随意替换或切断某个 `char`，可能破坏一个字符的完整编码；`std::string` 不会替调用者验证这一点。
 
@@ -92,7 +92,7 @@ int main() {
 > [!WARNING]
 > 对 `std::string`，下标大于 `size()` 是未定义行为；把 `size()` 位置的字符改成非零值，同样是未定义行为。这个位置不是预留的追加槽位。普通内容操作仍应限定在小于 `size()` 的下标内，不能照搬其他序列类型的边界规则。
 
-字符串也可以把空字符保存为内容的一部分；这种情况下，内部空字符会计入长度，末尾标记仍位于 `size()` 位置。构造时是否只读到第一个空字符，取决于使用的接口，而不是 `std::string` 无法保存它。需要与按结束标记读取的接口交接时，可以查阅[空终止文本与指针接口](deep-dives/01-null-terminated-text-and-pointer-interfaces.md)。
+字符串也可以把空字符保存为内容的一部分；这种情况下，内部空字符会计入长度，末尾标记仍位于 `size()` 位置。构造时是否只读到第一个空字符，取决于使用的接口，而不是 `std::string` 无法保存它。需要与按结束标记读取的接口交接时，可以查阅[空终止文本与指针接口](deep-dives/01-null-terminated-text-and-pointer-interfaces.md#显式长度保留内容中的空字符)。
 
 ## 参考
 

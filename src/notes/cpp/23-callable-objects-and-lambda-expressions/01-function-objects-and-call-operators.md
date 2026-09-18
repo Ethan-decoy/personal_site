@@ -41,7 +41,7 @@ int main() {
 
 `check{245.0}` 初始化对象的成员，保存本次配置。`check(248.0)` 则调用这个对象的 `operator()`：`value` 接收 `248.0`，函数体读取 `check.limit_kpa`，返回 `bool`。显式写成 `check.operator()(248.0)` 也会调用同一个成员函数。
 
-末尾的 `const` 与[普通 const 成员函数](../10-class-interfaces-and-encapsulation/02-const-member-functions-and-read-only-access.md)含义相同：当前调用只读取对象中的配置，因此也能通过 `const above_limit` 调用。它不表示返回值是常量，也不要求参数本身是 `const`。
+末尾的 `const` 与[普通 const 成员函数](../10-class-interfaces-and-encapsulation/02-const-member-functions-and-read-only-access.md#const-对象只能提供受限访问)含义相同：当前调用只读取对象中的配置，因此也能通过 `const above_limit` 调用。它不表示返回值是常量，也不要求参数本身是 `const`。
 
 这种能够像函数一样调用的对象称为函数对象（function object）。本篇使用具有 `operator()` 的类对象；这里的“函数对象”描述调用能力，不表示对象变成了普通函数。
 

@@ -44,7 +44,7 @@ const bool same_object{&updated == &accumulated}; // true
 
 返回 `pressure_delta_kpa&` 是接口惯例，不是所有 `operator+=` 都必须服从的语法要求。C++ 允许为重载的 `+=` 选择其他返回类型，也允许把它定义为非成员函数；当前成员形式和引用结果能够最直接地表达“修改左对象，并把该对象作为运算结果”。
 
-[`this` 指针与隐式对象参数](../10-class-interfaces-and-encapsulation/deep-dives/01-implicit-object-parameter-this-and-implementation-model.md)进一步说明了调用对象与 `*this` 的关系。
+[`this` 指针与隐式对象参数](../10-class-interfaces-and-encapsulation/deep-dives/01-implicit-object-parameter-this-and-implementation-model.md#函数体中的-this-表达式)进一步说明了调用对象与 `*this` 的关系。
 
 ## 加法产生独立结果
 

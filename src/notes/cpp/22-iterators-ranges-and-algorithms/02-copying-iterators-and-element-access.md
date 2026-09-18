@@ -50,7 +50,7 @@ int main() {
 | `std::vector<double>::const_iterator` | 可以 | 不可以 |
 | `const std::vector<double>::const_iterator` | 不可以 | 不可以 |
 
-表中元素访问始终以位置有效且可以解引用为前提。这里的两层限制与[指针本身和所指对象的 const](../07-object-addresses-and-pointers/06-pointers-and-const-qualification.md)、[视图对象和元素的只读关系](../20-fixed-size-sequences-and-contiguous-ranges/03-copying-views-and-element-access.md)一致。
+表中元素访问始终以位置有效且可以解引用为前提。这里的两层限制与[指针本身和所指对象的 const](../07-object-addresses-and-pointers/06-pointers-and-const-qualification.md#const-可以约束两个不同层次)、[视图对象和元素的只读关系](../20-fixed-size-sequences-and-contiguous-ranges/03-copying-views-and-element-access.md#视图对象的只读与元素的只读)一致。
 
 下面固定一个可写位置，再用只读位置依次观察元素：
 

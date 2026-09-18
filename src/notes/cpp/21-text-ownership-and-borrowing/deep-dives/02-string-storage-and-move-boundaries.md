@@ -6,7 +6,7 @@ order: 2
 
 # 字符串的存储选择与移动边界（String Storage and Move Boundaries）
 
-`string` 拥有连续字符，但“拥有”不规定这些字符一定放在对象外部。这个实现空间解释了[文本借用的移动边界](../05-text-lifetimes-and-interface-boundaries.md)：目标取得文本值，并不总是意味着目标接管了字符原来的地址。
+`string` 拥有连续字符，但“拥有”不规定这些字符一定放在对象外部。这个实现空间解释了[文本借用的移动边界](../05-text-lifetimes-and-interface-boundaries.md#移动字符串也不能保证旧视图跟随目标)：目标取得文本值，并不总是意味着目标接管了字符原来的地址。
 
 这里区分接口保证与存储机制。无论字符放在哪里，`string` 都负责自己的文本，`string_view` 都只借用字符；程序首先依据这些契约安排有效期，存储方案用于理解成本与地址行为的差别。
 
@@ -28,7 +28,7 @@ SSO 是实现选择，不是 C++23 要求所有标准库采用的固定布局。
 
 ## 移动的成本取决于能转交什么
 
-[移动构造](../../17-rvalue-references-and-move-semantics/03-move-construction-and-resource-transfer.md)允许类型利用源对象现有的资源建立目标，不要求每种类型都执行同一种“交换指针”动作。
+[移动构造](../../17-rvalue-references-and-move-semantics/03-move-construction-and-resource-transfer.md#两个对象身份一份资源责任)允许类型利用源对象现有的资源建立目标，不要求每种类型都执行同一种“交换指针”动作。
 
 对于采用上述两种存储方式的实现，可以推演出不同的机会与限制：
 

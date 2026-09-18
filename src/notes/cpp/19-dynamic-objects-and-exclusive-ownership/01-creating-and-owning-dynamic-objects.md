@@ -57,7 +57,7 @@ int main() {
 
 程序输出两行 `240`。`owner` 是拥有者对象，`*owner` 指定动态传感器，`observed` 是对同一传感器的只读借用。绑定引用没有创建另一个传感器，也没有复制拥有关系。
 
-`make_unique` 返回的拥有者结果用于初始化 `owner`，这沿用[同类型纯右值直接建立结果对象](../17-rvalue-references-and-move-semantics/06-return-by-value-and-result-objects.md)的规则。动态传感器的构造与拥有者结果的初始化，是不同对象上的动作。
+`make_unique` 返回的拥有者结果用于初始化 `owner`，这沿用[同类型纯右值直接建立结果对象](../17-rvalue-references-and-move-semantics/06-return-by-value-and-result-objects.md#返回表达式可以直接构造接收对象)的规则。动态传感器的构造与拥有者结果的初始化，是不同对象上的动作。
 
 ## 空拥有者仍然是有效对象
 
@@ -84,7 +84,7 @@ if (empty) {
 
 第一个程序离开 `main` 的作用域时，`owner` 的析构会销毁传感器并归还其存储。传感器没有用户编写的析构动作，但它的生命周期仍然结束，存储也仍然需要归还。
 
-如果局部拥有者已经完成构造，随后执行的操作抛出异常，在[向处理者展开调用过程](../18-exception-propagation-and-failure-state/02-stack-unwinding-and-scope-cleanup.md)时需要销毁这个拥有者，它也会执行同样的清理。异常展开不改变拥有关系的责任规则。
+如果局部拥有者已经完成构造，随后执行的操作抛出异常，在[向处理者展开调用过程](../18-exception-propagation-and-failure-state/02-stack-unwinding-and-scope-cleanup.md#从抛出位置到处理者需要销毁退出范围中的对象)时需要销毁这个拥有者，它也会执行同样的清理。异常展开不改变拥有关系的责任规则。
 
 创建失败发生在更早的位置。对于本章采用的普通分配方式，取得存储失败会抛出异常；目标构造函数也可能抛出异常。这些情况下，`make_unique` 不会正常返回一个表示失败的空拥有者，声明中的 `owner` 也没有完成初始化。
 

@@ -18,7 +18,7 @@ order: 2
 
 两个端点需要具有相同的迭代器类型，且组成[合法区间](../22-iterators-ranges-and-algorithms/01-iterator-positions-and-half-open-ranges.md#两个位置组成半开区间)。谓词必须能够接受该区间的元素并产生可作真假判断的结果；直接返回 `bool` 就满足这里的结果要求。端点、谓词的类型由函数模板从实参确定，不需要手写模板实参。
 
-下面把[保存上限的函数对象](01-function-objects-and-call-operators.md)交给算法。读数按值传入 `operator()`，复制一个 `double`，不会修改原元素。
+下面把[保存上限的函数对象](01-function-objects-and-call-operators.md#让对象支持调用表达式)交给算法。读数按值传入 `operator()`，复制一个 `double`，不会修改原元素。
 
 ```cpp
 #include <algorithm>

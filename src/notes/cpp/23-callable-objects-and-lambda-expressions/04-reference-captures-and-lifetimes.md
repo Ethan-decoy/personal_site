@@ -8,7 +8,7 @@ order: 4
 
 按值捕获可以保存创建闭包时的配置。但有些操作需要读取外部对象当前的状态，或者修改调用方提供的对象。这时，闭包可以保存访问原对象的关系，而不建立它的独立副本。
 
-这种关系称为按引用捕获（capture by reference）。它延续[引用的非拥有语义](../08-object-identity-and-lvalue-references/02-lvalue-references-and-reference-binding.md)：闭包能够访问原对象，但不负责延长它的生命周期。
+这种关系称为按引用捕获（capture by reference）。它延续[引用的非拥有语义](../08-object-identity-and-lvalue-references/02-lvalue-references-and-reference-binding.md#引用与指针表达不同约束)：闭包能够访问原对象，但不负责延长它的生命周期。
 
 ## 一个保存快照，一个读取原对象
 
@@ -63,7 +63,7 @@ int main() {
 }
 ```
 
-输出 `1`。返回的闭包已经保存独立的 `double`，不依赖参数对象 `limit` 继续存在。闭包的按值返回遵循[返回结果对象的规则](../17-rvalue-references-and-move-semantics/06-return-by-value-and-result-objects.md)，不需要把内部配置改成引用才能离开函数。
+输出 `1`。返回的闭包已经保存独立的 `double`，不依赖参数对象 `limit` 继续存在。闭包的按值返回遵循[返回结果对象的规则](../17-rvalue-references-and-move-semantics/06-return-by-value-and-result-objects.md#返回表达式可以直接构造接收对象)，不需要把内部配置改成引用才能离开函数。
 
 下面是一个可以独立定义的错误版本。错误不在返回类型，而在返回结果所借用的对象：
 
@@ -84,7 +84,7 @@ auto make_dangling_check(double limit) {
 
 “按值捕获”说明复制了哪个对象，不说明这个对象拥有哪份资源。例如，已有 `std::string_view view` 时，`[view]` 保存的是视图副本，仍借用原来的字符；已有 `std::span` 或指针时，按值捕获也不会复制它们访问的元素。
 
-若原字符串销毁，或修改字符串使[旧字符访问关系失效](../21-text-ownership-and-borrowing/05-text-lifetimes-and-interface-boundaries.md)，读取所捕获视图的字符仍然错误。闭包自己的视图成员完整存在，也不能代替字符拥有者。
+若原字符串销毁，或修改字符串使[旧字符访问关系失效](../21-text-ownership-and-borrowing/05-text-lifetimes-and-interface-boundaries.md#修改字符串后不沿用旧借用的有效性假设)，读取所捕获视图的字符仍然错误。闭包自己的视图成员完整存在，也不能代替字符拥有者。
 
 需要独立保存一段文本时，可以先从仍然有效的视图建立 `std::string text{view}`，再按值捕获 `text`。这时闭包保存拥有字符的字符串副本，代价是复制文本；单纯把 `[&view]` 改成 `[view]`，只消除了对视图对象本身的依赖，没有消除对字符的借用。
 

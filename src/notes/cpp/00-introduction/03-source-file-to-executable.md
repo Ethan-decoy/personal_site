@@ -6,7 +6,7 @@ order: 3
 
 # 从源文件到可执行程序（From Source File to Executable Program）
 
-在[编译并运行第一个 C++ 程序](02-choosing-cpp-development-tools.md)中，编译器驱动程序接收了 `main.cpp`，最终生成可以启动的程序。这个面向用户的入口会协调多个工具，一条命令因而隐藏了从源文本到可执行文件的不同职责。
+在[编译并运行第一个 C++ 程序](02-choosing-cpp-development-tools.md#使用-gcc-编译)中，编译器驱动程序接收了 `main.cpp`，最终生成可以启动的程序。这个面向用户的入口会协调多个工具，一条命令因而隐藏了从源文本到可执行文件的不同职责。
 
 共同完成 C++ 构建的一组工具称为工具链（toolchain）。
 

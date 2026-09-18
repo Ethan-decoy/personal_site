@@ -8,7 +8,7 @@ order: 2
 
 校准函数已经建立了两项登记，随后因读数无效抛出异常。异常会跳过函数剩余的普通语句，但这些登记不能因此失去解除责任。
 
-[作用域绑定清理与 RAII](../16-class-object-destruction-and-resource-lifetime/03-scope-bound-cleanup-and-raii.md)把责任交给对象析构：对象销毁时，执行它承担的清理动作。当控制因异常转向处理者时，这项关系仍然可以成立，关键在于哪些对象已经构造完成，以及控制离开了哪些作用域。
+[作用域绑定清理与 RAII](../16-class-object-destruction-and-resource-lifetime/03-scope-bound-cleanup-and-raii.md#让对象生命周期承载清理责任)把责任交给对象析构：对象销毁时，执行它承担的清理动作。当控制因异常转向处理者时，这项关系仍然可以成立，关键在于哪些对象已经构造完成，以及控制离开了哪些作用域。
 
 ## 从抛出位置到处理者，需要销毁退出范围中的对象
 

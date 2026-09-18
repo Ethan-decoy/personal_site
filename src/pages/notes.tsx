@@ -28,6 +28,7 @@ import {
 	toggleExpandedKey,
 } from "../notes/sidebar-state";
 import type { Section, Theme, ThemeMode } from "../themes";
+import { useNotePeek } from "../use-note-peek";
 
 /* ---- Reading Progress SliderTrack ---- */
 const NUM_SEGMENTS = 60;
@@ -44,6 +45,15 @@ const MarkdownPreview = lazy(() =>
 		default: Preview,
 	})),
 );
+
+const loadNotePeek = () => import("../note-peek");
+const NotePeek = lazy(loadNotePeek);
+
+function preloadNotePeek(file: string): Promise<void> {
+	return Promise.all([preloadNoteReader(file), loadNotePeek()]).then(
+		() => undefined,
+	);
+}
 
 function preloadNoteReader(file: string): Promise<void> {
 	return Promise.all([loadNote(file), loadMarkdownRenderer()]).then(
@@ -550,10 +560,24 @@ export default function NotesPage({
 	const currentNoteFile = useRef<string | null>(null);
 	const noteRequestRef = useRef(0);
 	const [noteLoading, setNoteLoading] = useState(false);
-	const [backToSource, setBackToSource] = useState<{
-		file: string;
-		scrollY: number;
-	} | null>(null);
+	const [readingHistory, setReadingHistory] = useState<
+		{
+			file: string;
+			scrollY: number;
+		}[]
+	>([]);
+	const {
+		peek,
+		openPeek,
+		closePeek,
+		keepOpen,
+		scheduleClose,
+		onNoteLinkPointerEnter,
+		onNoteLinkPointerLeave,
+		onNoteLinkFocus,
+		onNoteLinkBlur,
+	} = useNotePeek(selectedNote?.file ?? null, preloadNotePeek);
+	const backToSource = readingHistory[readingHistory.length - 1];
 
 	useEffect(() => {
 		currentNoteFile.current = selectedNote?.file ?? null;
@@ -614,9 +638,12 @@ export default function NotesPage({
 
 	useEffect(() => {
 		if (!pendingAnchor) return;
-		const el = document.getElementById(pendingAnchor);
+		const content = document.querySelector("[data-note-content]");
+		const el = Array.from(content?.querySelectorAll("[id]") ?? []).find(
+			(element) => element.id === pendingAnchor,
+		);
 		if (el) {
-			el.scrollIntoView({ behavior: "smooth", block: "start" });
+			el.scrollIntoView({ behavior: "instant", block: "start" });
 			setPendingAnchor(null);
 			return;
 		}
@@ -666,18 +693,22 @@ export default function NotesPage({
 			const sourceScrollY = window.scrollY;
 			setNoteLoading(true);
 			setSearchFocused(false);
+			closePeek();
+			setPendingAnchor(null);
 
 			void Promise.all([loadNote(file), loadMarkdownRenderer()])
 				.then(([note]) => {
 					if (requestId !== noteRequestRef.current || !note) return;
 
-					if (options.rememberSource && sourceFile && sourceFile !== file) {
-						setBackToSource({
-							file: sourceFile,
-							scrollY: sourceScrollY,
-						});
+					if (options.restoreScrollY !== undefined) {
+						setReadingHistory((previous) => previous.slice(0, -1));
+					} else if (options.rememberSource && sourceFile) {
+						setReadingHistory((previous) => [
+							...previous,
+							{ file: sourceFile, scrollY: sourceScrollY },
+						]);
 					} else {
-						setBackToSource(null);
+						setReadingHistory([]);
 					}
 
 					setSelectedNote(note);
@@ -698,7 +729,7 @@ export default function NotesPage({
 						requestAnimationFrame(() =>
 							window.scrollTo({
 								top: options.restoreScrollY,
-								behavior: "smooth",
+								behavior: "instant",
 							}),
 						);
 						return;
@@ -711,7 +742,7 @@ export default function NotesPage({
 					if (requestId === noteRequestRef.current) setNoteLoading(false);
 				});
 		},
-		[],
+		[closePeek],
 	);
 
 	const prefetchNote = useCallback((file: string) => {
@@ -726,10 +757,25 @@ export default function NotesPage({
 	);
 
 	const openMarkdownNote = useCallback(
+		(target: NoteLinkTarget, trigger: HTMLAnchorElement) => {
+			if (target.file === selectedNoteFile) {
+				if (target.anchor) setPendingAnchor(target.anchor);
+				return;
+			}
+			if (selectedNoteFile?.endsWith("/_index.md")) {
+				openNote(target.file, { anchor: target.anchor });
+				return;
+			}
+			openPeek(target, trigger);
+		},
+		[openNote, openPeek, selectedNoteFile],
+	);
+
+	const openFullReference = useCallback(
 		(target: NoteLinkTarget) => {
 			openNote(target.file, {
 				anchor: target.anchor,
-				rememberSource: target.isWiki,
+				rememberSource: true,
 			});
 		},
 		[openNote],
@@ -740,6 +786,43 @@ export default function NotesPage({
 
 	return (
 		<div>
+			{peek && (
+				<Suspense fallback={null}>
+					<NotePeek
+						key={peek.key}
+						activation={peek.activation}
+						onPointerEnter={keepOpen}
+						onPointerLeave={scheduleClose}
+						target={peek.target}
+						trigger={peek.trigger}
+						theme={theme}
+						mode={mode}
+						onClose={closePeek}
+						onOpenFull={openFullReference}
+					/>
+				</Suspense>
+			)}
+			{backToSource && (
+				<button
+					type="button"
+					className="note-reading-return"
+					aria-label="返回原阅读位置"
+					title="返回原阅读位置"
+					disabled={noteLoading}
+					onClick={() =>
+						openNote(backToSource.file, {
+							restoreScrollY: backToSource.scrollY,
+						})
+					}
+					style={{
+						backgroundColor: theme.bg,
+						color: theme.accent,
+						borderColor: theme.border,
+					}}
+				>
+					<span aria-hidden="true">←</span> 返回
+				</button>
+			)}
 			<div
 				className="fixed bottom-0 left-8 top-32 z-10 hidden w-56 flex-col overflow-y-auto pb-6 2xl:flex"
 				style={{ color: theme.textSec }}
@@ -763,37 +846,6 @@ export default function NotesPage({
 
 			{selectedNote && (
 				<div className="hidden md:flex flex-col items-center fixed right-[calc((100vw-96rem)/2+3rem)] top-1/2 -translate-y-1/2 z-10">
-					{backToSource &&
-						(() => {
-							return (
-								<button
-									type="button"
-									aria-label="返回来源笔记"
-									onClick={() => {
-										const y = backToSource.scrollY ?? 0;
-										openNote(backToSource.file, { restoreScrollY: y });
-									}}
-									className="absolute w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 ease-out"
-									style={{
-										top: "-80px",
-										backgroundColor: theme.bgDeep,
-										border: `1px solid ${theme.border}`,
-									}}
-								>
-									<svg
-										aria-hidden="true"
-										className="w-3 h-3"
-										style={{ color: theme.textSec }}
-										viewBox="0 0 16 16"
-										fill="none"
-										stroke="currentColor"
-										strokeWidth="1.5"
-									>
-										<path d="M10 3l-5 5 5 5" />
-									</svg>
-								</button>
-							);
-						})()}
 					<SliderTrack
 						progress={progress}
 						accent={theme.accent}
@@ -912,13 +964,7 @@ export default function NotesPage({
 						)}
 
 						{selectedNote ? (
-							<div
-								key={selectedNote.file}
-								style={{
-									animation: "fade-up 0.25s ease-out both",
-									animationDelay: "0ms",
-								}}
-							>
+							<div key={selectedNote.file}>
 								<div data-note-content aria-busy={noteLoading}>
 									<Suspense fallback={null}>
 										<MarkdownPreview
@@ -927,6 +973,10 @@ export default function NotesPage({
 											isDark={mode === "dark"}
 											resolveNoteHref={resolveMarkdownNoteHref}
 											onNoteOpen={openMarkdownNote}
+											onNoteLinkPointerEnter={onNoteLinkPointerEnter}
+											onNoteLinkPointerLeave={onNoteLinkPointerLeave}
+											onNoteLinkFocus={onNoteLinkFocus}
+											onNoteLinkBlur={onNoteLinkBlur}
 										/>
 									</Suspense>
 								</div>

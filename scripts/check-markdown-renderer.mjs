@@ -112,7 +112,179 @@ try {
 		].join("\n"),
 	);
 
+	const excerptSource = [
+		"# Excerpt fixture",
+		"",
+		"Opening explanation.",
+		"",
+		"## Repeated `value`",
+		"",
+		"FIRST_SECTION_BODY",
+		"",
+		"Repeated *value*",
+		"---",
+		"",
+		"SECOND_SECTION_BODY",
+		"",
+		"```cpp",
+		"// ## Following is code, not a heading.",
+		"int first_line = 1;",
+		"int final_line = 2;",
+		"```",
+		"",
+		"| Item | Value |",
+		"| --- | --- |",
+		"| last_row | 42 |",
+		"",
+		"$$",
+		"x^2 + y^2",
+		"$$",
+		"",
+		"> [!NOTE]",
+		"> COMPLETE_CALLOUT_BODY",
+		"",
+		"### Nested detail",
+		"",
+		'<span id="term">TERM_DEFINITION</span>',
+		"",
+		'<a href="#term" aria-describedby="term" aria-labelledby="term">Local reference</a>',
+		"",
+		"[Nested reference](#nested-detail)",
+		"",
+		"[Outside reference](#following)",
+		"",
+		"## Following",
+		"",
+		"EXCLUDED_NEXT_SECTION",
+	].join("\n");
+	const renderExcerpt = (content, anchor, idPrefix = ":preview:") =>
+		renderToStaticMarkup(
+			React.createElement(MarkdownPreview, {
+				content,
+				theme: { accent: "#1B3A5C" },
+				excerpt: { anchor, idPrefix },
+			}),
+		);
+	const anchoredExcerpt = renderExcerpt(excerptSource, "repeated-value-1");
+	const fullExcerptSource = renderMarkdown(excerptSource);
+	const introductorySource = [
+		"# Introduction",
+		"",
+		"USEFUL_OPENING",
+		"",
+		"## First section",
+		"",
+		"```",
+		"## heading-like code",
+		"WHOLE_CODE_BLOCK_END",
+		"```",
+		"",
+		"| Item | Value |",
+		"| --- | --- |",
+		"| INTRO_TABLE_END | 42 |",
+		"",
+		"$$",
+		"x^2",
+		"$$",
+		"",
+		"> [!TIP]",
+		"> INTRO_CALLOUT",
+		"",
+		"LAST_INCLUDED_PARAGRAPH",
+		"",
+		"EXCLUDED_SEVENTH_BLOCK",
+	].join("\n");
+	const introductoryExcerpt = renderExcerpt(introductorySource, null);
+	const missingExcerpt = renderExcerpt(introductorySource, "missing-section");
+	const encodedExcerpt = renderExcerpt(
+		"# Document\n\n## 结构体\n\nENCODED_ANCHOR_BODY\n\n## Next\n\nEXCLUDED",
+		encodeURIComponent("结构体"),
+	);
+	const footnoteExcerpt = renderExcerpt(
+		"# Short note\n\nDefinition[^term].\n\n[^term]: Footnote definition.",
+		null,
+	);
+
 	const checks = [
+		{
+			name: "anchored excerpts preserve full-document duplicate slugs for inline and setext headings",
+			pass:
+				anchoredExcerpt.includes('id=":preview:repeated-value-1"') &&
+				anchoredExcerpt.includes("SECOND_SECTION_BODY") &&
+				!anchoredExcerpt.includes("FIRST_SECTION_BODY") &&
+				!anchoredExcerpt.includes('id=":preview:repeated-value"'),
+		},
+		{
+			name: "anchored excerpts include subheadings and stop before the next peer section",
+			pass:
+				anchoredExcerpt.includes('id=":preview:nested-detail"') &&
+				!anchoredExcerpt.includes("EXCLUDED_NEXT_SECTION") &&
+				!anchoredExcerpt.includes('id=":preview:following"'),
+		},
+		{
+			name: "heading-like code does not truncate excerpts and code, tables, math, and callouts remain whole",
+			pass:
+				anchoredExcerpt.includes("Following is code, not a heading.") &&
+				anchoredExcerpt.includes("final_line") &&
+				(anchoredExcerpt.match(/<pre\b/g) ?? []).length === 1 &&
+				anchoredExcerpt.includes("last_row") &&
+				anchoredExcerpt.includes("</table>") &&
+				anchoredExcerpt.includes("katex-display") &&
+				anchoredExcerpt.includes("COMPLETE_CALLOUT_BODY"),
+		},
+		{
+			name: "excerpt IDs and local href and ARIA references are isolated from the original document",
+			pass:
+				anchoredExcerpt.includes('id=":preview:term"') &&
+				anchoredExcerpt.includes('href="#:preview:term"') &&
+				anchoredExcerpt.includes('aria-describedby=":preview:term"') &&
+				anchoredExcerpt.includes('aria-labelledby=":preview:term"') &&
+				anchoredExcerpt.includes('href="#:preview:nested-detail"') &&
+				anchoredExcerpt.includes('href="#following"') &&
+				!Array.from(
+					anchoredExcerpt.matchAll(/\bid="([^"]+)"/g),
+					(match) => match[1],
+				).some((id) => fullExcerptSource.includes(`id="${id}"`)),
+		},
+		{
+			name: "unanchored excerpts keep a useful introduction and first section with a bounded block count",
+			pass:
+				introductoryExcerpt.includes("USEFUL_OPENING") &&
+				introductoryExcerpt.includes('id=":preview:first-section"') &&
+				introductoryExcerpt.includes("WHOLE_CODE_BLOCK_END") &&
+				introductoryExcerpt.includes("INTRO_TABLE_END") &&
+				introductoryExcerpt.includes("katex-display") &&
+				introductoryExcerpt.includes("INTRO_CALLOUT") &&
+				introductoryExcerpt.includes("LAST_INCLUDED_PARAGRAPH") &&
+				!introductoryExcerpt.includes("EXCLUDED_SEVENTH_BLOCK") &&
+				!introductoryExcerpt.includes("note-excerpt-notice"),
+		},
+		{
+			name: "missing excerpt anchors show an explicit notice and the complete opening blocks",
+			pass:
+				missingExcerpt.includes('class="note-excerpt-notice"') &&
+				missingExcerpt.includes("未找到该小节") &&
+				missingExcerpt.includes("USEFUL_OPENING") &&
+				missingExcerpt.includes("WHOLE_CODE_BLOCK_END") &&
+				!missingExcerpt.includes("EXCLUDED_SEVENTH_BLOCK"),
+		},
+		{
+			name: "encoded Unicode anchors resolve to the same section as document anchors",
+			pass:
+				encodedExcerpt.includes('id=":preview:结构体"') &&
+				encodedExcerpt.includes("ENCODED_ANCHOR_BODY") &&
+				!encodedExcerpt.includes("EXCLUDED") &&
+				!encodedExcerpt.includes("note-excerpt-notice"),
+		},
+		{
+			name: "footnote IDs and accessible relationships are namespaced along with headings",
+			pass:
+				footnoteExcerpt.includes('id=":preview:footnote-label"') &&
+				footnoteExcerpt.includes('aria-describedby=":preview:footnote-label"') &&
+				footnoteExcerpt.includes('href="#:preview:user-content-fn-term"') &&
+				footnoteExcerpt.includes('id=":preview:user-content-fnref-term"'),
+		},
+
 		{
 			name: "the Markdown module does not synthesize a metadata header",
 			pass: !html.includes("<header") && !html.includes("<time"),

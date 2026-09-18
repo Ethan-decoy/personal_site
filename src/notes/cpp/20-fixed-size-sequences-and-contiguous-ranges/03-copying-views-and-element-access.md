@@ -8,7 +8,7 @@ order: 3
 
 `std::array` 拥有自己的元素，复制数组会建立另一组元素。`std::span` 保存的是对一段连续元素的访问关系。对它进行复制、赋值或添加 `const` 时，需要分清：操作改变的是视图对象，还是它所访问的元素？
 
-这里使用的 `std::span<double>` 和 `std::span<const double>` 都在运行期间记录范围长度；视图的基本构造与访问契约见[借用连续范围](02-borrowing-contiguous-ranges-with-span.md)。
+这里使用的 `std::span<double>` 和 `std::span<const double>` 都在运行期间记录范围长度；视图的基本构造与访问契约见[借用连续范围](02-borrowing-contiguous-ranges-with-span.md#从拥有者建立视图)。
 
 ## 复制视图会保留同一段访问关系
 

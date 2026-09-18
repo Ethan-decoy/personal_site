@@ -42,7 +42,7 @@ C++23 没有为三种浮点类型规定统一的 byte 数和 IEEE 754 格式。�
 
 一般浮点计算通常优先使用 `double`，它在主流实现中比 `float` 提供更高精度。只有存储空间、内存带宽、硬件接口或既有数据格式提出明确约束时，才需要优先考虑 `float`；选择 `long double` 时，则不能假设它一定比 `double` 提供更多有效精度。
 
-二进制小数怎样形成、IEEE 754 怎样组织符号位、指数域与小数域，以及普通值和特殊值怎样由 bit patterns 分类，参见附章：[二进制浮点数的表示（Binary Floating-Point Representation）](deep-dives/01-binary-floating-point-representation.md)。
+二进制小数怎样形成、IEEE 754 怎样组织符号位、指数域与小数域，以及普通值和特殊值怎样由 bit patterns 分类，参见附章：[二进制浮点数的表示（Binary Floating-Point Representation）](deep-dives/01-binary-floating-point-representation.md#binary32-与-binary64-的位结构)。
 
 ## 参考资料
 

@@ -64,7 +64,7 @@ int main() {
 
 ## 两个位置组成半开区间
 
-用起点 `first` 和终点 `last` 描述的区间写作 **`[first, last)`**：包括 `first` 指定的元素，不包括 `last` 指定的位置。这与[用偏移和数量选取子范围](../20-fixed-size-sequences-and-contiguous-ranges/04-subranges-and-interval-boundaries.md)描述的是同一类边界关系，只是这里直接保存两端位置。
+用起点 `first` 和终点 `last` 描述的区间写作 **`[first, last)`**：包括 `first` 指定的元素，不包括 `last` 指定的位置。这与[用偏移和数量选取子范围](../20-fixed-size-sequences-and-contiguous-ranges/04-subranges-and-interval-boundaries.md#用起点偏移与数量选出一段元素)描述的是同一类边界关系，只是这里直接保存两端位置。
 
 `[samples.begin(), samples.end())` 覆盖全部元素。起点与终点相等时，`[first, first)` 是空区间；它可以位于容器开头、中间或尾后。用于结束一个子区间的 `last`，也可以指向整个容器中仍然存在的某个元素，只是该元素不属于当前区间。
 
@@ -80,7 +80,7 @@ int main() {
 
 迭代器表示访问关系，不拥有元素。容器销毁或某次操作使旧位置失效后，保存下来的迭代器不能继续用于访问、推进或判断原区间是否结束。仅仅写了 `current != finish`，不能证明参与比较的位置本身仍然有效。
 
-`vector` 的[重新分配](../11-sequences-and-data-access/04-sequence-storage-and-reference-validity.md)会让旧元素位置失效；即使没有重新分配，改变数量也可能破坏原来的结束边界。这些操作需要依据[容器修改与迭代器有效性](04-container-mutation-and-iterator-validity.md)判断。
+`vector` 的[重新分配](../11-sequences-and-data-access/04-sequence-storage-and-reference-validity.md#追加元素怎样影响引用)会让旧元素位置失效；即使没有重新分配，改变数量也可能破坏原来的结束边界。这些操作需要依据[容器修改与迭代器有效性](04-container-mutation-and-iterator-validity.md#修改数值与改变序列结构)判断。
 
 > [!PRACTICE]
 > 只需依次处理全部元素时，范围 `for` 更直接。需要保存某个位置、限定一段区间，或接收操作返回的位置时，再显式使用迭代器。选择取决于要表达的关系，不必为了使用迭代器而改写已有的简单循环。

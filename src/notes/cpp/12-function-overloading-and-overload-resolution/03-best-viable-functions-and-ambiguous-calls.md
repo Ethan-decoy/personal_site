@@ -53,7 +53,7 @@ const int third{pressure_code(floating_value)};
 
 `floating_value` 从 `float` 到 `double` 属于浮点提升；转换为整数类型只能得到 Conversion 等级，因此第三条调用选择 `pressure_code(double)`。
 
-**比较的是标准规定的转换序列等级，不是转换结果是否符合业务需要。**Exact Match 也不必表示机器层面完全没有任何处理；附章[标准转换序列与重载排序](deep-dives/01-standard-conversion-sequences-and-overload-ranking.md)进一步拆解这些等级的组成。
+**比较的是标准规定的转换序列等级，不是转换结果是否符合业务需要。**Exact Match 也不必表示机器层面完全没有任何处理；附章[标准转换序列与重载排序](deep-dives/01-standard-conversion-sequences-and-overload-ranking.md#序列的组成决定整体等级)进一步拆解这些等级的组成。
 
 ## 相同等级不保证存在更好选择
 

@@ -91,7 +91,7 @@ int main() {
 
 ## 从序列副本到已有元素的接管
 
-[采样序列的复制与访问](../11-sequences-and-data-access/03-sequence-copying-and-function-access.md)已经区分了两种需求：引用让函数访问原序列，复制则建立可以独立修改的一组元素。如果接收方需要管理自己的序列，而调用方允许源序列改变原有内容，就可以使用移动构造：
+[采样序列的复制与访问](../11-sequences-and-data-access/03-sequence-copying-and-function-access.md#参数形式表达需要怎样的数据关系)已经区分了两种需求：引用让函数访问原序列，复制则建立可以独立修改的一组元素。如果接收方需要管理自己的序列，而调用方允许源序列改变原有内容，就可以使用移动构造：
 
 ```cpp
 #include <iostream>

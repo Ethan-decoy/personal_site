@@ -106,7 +106,7 @@ not found in range
 
 查找返回后，来源销毁或修改使该位置失效，同样不能继续读取结果。`std::find` 不会为了保存结果而延长容器或元素的生命周期，也不会在容器改变后重新查找同一个值。
 
-文本接口中的[成员 find](../21-text-ownership-and-borrowing/04-searching-and-selecting-text.md)与这里的算法返回形式不同：`text.find('=')` 返回下标或 `npos`；`std::find(first, last, value)` 返回迭代器或本次的 `last`。识别缺失结果，要跟随所使用的接口，不能因为名称相同就混用判断规则。
+文本接口中的[成员 find](../21-text-ownership-and-borrowing/04-searching-and-selecting-text.md#查找结果同时表达位置与缺失)与这里的算法返回形式不同：`text.find('=')` 返回下标或 `npos`；`std::find(first, last, value)` 返回迭代器或本次的 `last`。识别缺失结果，要跟随所使用的接口，不能因为名称相同就混用判断规则。
 
 > [!PRACTICE]
 > 操作就是“在这段元素中找第一个相等值”时，标准算法直接表达了意图。需要独立保存查到的数值，可以在确认成功后复制该值；需要继续操作原元素时，保留位置并维持它的有效期。对于已有明确下标语义的文本成员接口，也无需只为统一写法而强行改用迭代器。

@@ -95,7 +95,7 @@ int outside_temperature_c{-42};
 | `2.4F` | `float` |
 | `2.4L` | `long double` |
 
-`2.4e2` 使用科学计数法表示 240.0；没有后缀，因此类型仍是 `double`。十进制小数不一定能够由对应的浮点类型精确表示，具体原因可以回看[浮点类型](../01-objects-types-and-variables/07-floating-point-types.md)及其附章。
+`2.4e2` 使用科学计数法表示 240.0；没有后缀，因此类型仍是 `double`。十进制小数不一定能够由对应的浮点类型精确表示，具体原因可以回看[浮点类型](../01-objects-types-and-variables/07-floating-point-types.md#可表示值与舍入)及其附章。
 
 单引号包围的 `'A'` 是字符字面量，在当前使用的普通形式下类型是 `char`；`true` 与 `false` 是布尔字面量，类型是 `bool`。
 

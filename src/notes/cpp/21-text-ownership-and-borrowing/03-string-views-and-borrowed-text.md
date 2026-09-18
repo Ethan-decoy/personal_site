@@ -8,7 +8,7 @@ order: 3
 
 只读取一个传感器名称时，函数需要的是一段字符及其长度。把它复制成新的 `std::string`，会额外建立一份拥有字符的对象；限制函数只能接收 `const std::string&`，又会把接口绑定在某一种拥有者上。
 
-**字符串视图（string view）**用来表达对一段连续字符的只读借用。头文件 `<string_view>` 提供的 `std::string_view` 是处理 `char` 序列的具体类型，可以借用字符串对象、字符串字面量或其中的一段。它沿用[连续范围视图的模型](../20-fixed-size-sequences-and-contiguous-ranges/02-borrowing-contiguous-ranges-with-span.md)：记录访问起点和长度，不拥有这些字符。
+**字符串视图（string view）**用来表达对一段连续字符的只读借用。头文件 `<string_view>` 提供的 `std::string_view` 是处理 `char` 序列的具体类型，可以借用字符串对象、字符串字面量或其中的一段。它沿用[连续范围视图的模型](../20-fixed-size-sequences-and-contiguous-ranges/02-borrowing-contiguous-ranges-with-span.md#将连续元素作为一段范围交给函数)：记录访问起点和长度，不拥有这些字符。
 
 ## 视图保存范围，字符由来源维持
 
@@ -128,7 +128,7 @@ int main() {
 > [!IMPORTANT]
 > `string.substr(...)` 建立拥有字符的字符串，`view.substr(...)` 建立借用字符的视图。选择哪一种，取决于结果是否需要独立保存字符，而不只取决于两次调用的文本是否相同。
 
-视图不会延长字符串的生命周期，复制视图或取得子视图也不会改变这一点。字符串销毁或操作使原字符访问失效后，视图不能再用于读取；具体边界见[文本借用的有效期与接口选择](05-text-lifetimes-and-interface-boundaries.md)。
+视图不会延长字符串的生命周期，复制视图或取得子视图也不会改变这一点。字符串销毁或操作使原字符访问失效后，视图不能再用于读取；具体边界见[文本借用的有效期与接口选择](05-text-lifetimes-and-interface-boundaries.md#修改字符串后不沿用旧借用的有效性假设)。
 
 ## 参考资料
 

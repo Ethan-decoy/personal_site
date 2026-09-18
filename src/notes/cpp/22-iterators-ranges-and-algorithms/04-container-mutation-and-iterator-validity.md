@@ -12,7 +12,7 @@ order: 4
 
 对 `std::vector<double>`，通过有效迭代器执行 `*cursor = 250.0`，只给当前位置的 `double` 赋值。元素数量、存储位置和结束位置都不改变，已有迭代器仍然有效。
 
-[追加与预留容量](../11-sequences-and-data-access/04-sequence-storage-and-reference-validity.md)则可能改变元素存储。把这些规则用于迭代器时，还要单独考虑 `end()`：它表示当前序列的结束边界，并不指向某个可以被保留的元素。
+[追加与预留容量](../11-sequences-and-data-access/04-sequence-storage-and-reference-validity.md#已知数量时预留容量)则可能改变元素存储。把这些规则用于迭代器时，还要单独考虑 `end()`：它表示当前序列的结束边界，并不指向某个可以被保留的元素。
 
 下面只讨论 `vector<double>` 上成功完成的操作：
 

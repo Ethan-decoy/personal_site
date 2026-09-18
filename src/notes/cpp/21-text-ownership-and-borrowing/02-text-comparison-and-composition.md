@@ -40,7 +40,7 @@ int main() {
 1
 ```
 
-数组在初始化指针时[转换为指向首元素的指针](../20-fixed-size-sequences-and-contiguous-ranges/deep-dives/01-built-in-arrays-and-pointer-conversion.md)。`first` 和 `second` 指向不同数组中的元素，所以不相等；`left` 和 `right` 都拥有两个字符 `'o'`、`'k'`，所以文本相等。
+数组在初始化指针时[转换为指向首元素的指针](../20-fixed-size-sequences-and-contiguous-ranges/deep-dives/01-built-in-arrays-and-pointer-conversion.md#转换产生首元素指针数组仍然存在)。`first` 和 `second` 指向不同数组中的元素，所以不相等；`left` 和 `right` 都拥有两个字符 `'o'`、`'k'`，所以文本相等。
 
 > [!IMPORTANT]
 > `const char*` 上的 `==` 比较指针，`std::string` 上的 `==` 比较文本内容。把地址传进字符串构造函数，会按该构造接口读取并保存文本；地址本身不会因此获得文本比较的语义。
@@ -88,7 +88,7 @@ sensor= front
 1
 ```
 
-`joined` 由一次组合表达式产生；`entry` 则由函数先追加位置名称，再追加分号。两条路径都得到拥有文本的对象，既不会让结果依赖 `prefix` 或 `location` 的存储，也不会留下对局部变量 `result` 的引用。`return result;` 使用[返回局部对象的规则](../17-rvalue-references-and-move-semantics/07-returning-local-objects.md)，不需要额外写 `std::move(result)`。
+`joined` 由一次组合表达式产生；`entry` 则由函数先追加位置名称，再追加分号。两条路径都得到拥有文本的对象，既不会让结果依赖 `prefix` 或 `location` 的存储，也不会留下对局部变量 `result` 的引用。`return result;` 使用[返回局部对象的规则](../17-rvalue-references-and-move-semantics/07-returning-local-objects.md#不要为普通局部返回额外添加移动转换)，不需要额外写 `std::move(result)`。
 
 ## 字面量不会自行变成字符串运算
 

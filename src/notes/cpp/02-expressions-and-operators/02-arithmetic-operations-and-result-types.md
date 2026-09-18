@@ -59,7 +59,7 @@ double total_pressure{front_pressure + rear_pressure};
 > [!IMPORTANT]
 > 这里的两个操作数采用 `double`，加法结果也是 `double`。表达式先根据操作数和运算符完成求值，初始化器或赋值目标随后才使用结果；接收结果的对象不能反向决定前面的运算采用整数还是浮点规则。
 
-不同算术类型共同参与同一次运算时，需要先确定共同类型；这套规则见[通常算术转换](03-usual-arithmetic-conversions.md)。
+不同算术类型共同参与同一次运算时，需要先确定共同类型；这套规则见[通常算术转换](03-usual-arithmetic-conversions.md#转换的是参与运算的值)。
 
 ## 整数除法
 
@@ -112,7 +112,7 @@ int negative_remainder{-7 % 3};  // -1
 
 **每一步浮点运算都可能需要把精确数学结果映射为相应类型允许的可表示值；不能把舍入理解成只在最终存入对象时统一发生一次。**连续多次运算可能连续产生误差，运算顺序也可能影响最终可表示值。
 
-浮点加减法怎样对齐指数、乘除法怎样组合有效数与指数、舍入怎样选择相邻可表示值，以及较小数值为何可能被吸收，参见附章：[浮点运算、舍入与误差（Floating-Point Arithmetic, Rounding, and Error）](deep-dives/01-floating-point-arithmetic-and-error.md)。
+浮点加减法怎样对齐指数、乘除法怎样组合有效数与指数、舍入怎样选择相邻可表示值，以及较小数值为何可能被吸收，参见附章：[浮点运算、舍入与误差（Floating-Point Arithmetic, Rounding, and Error）](deep-dives/01-floating-point-arithmetic-and-error.md#浮点运算与误差)。
 
 ## 参考资料
 

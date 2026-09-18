@@ -936,3 +936,179 @@ body {
 .prose-ocean.dark a:hover {
 	color: #a4cadb;
 }
+
+/* A quiet reference sheet, anchored to the text rather than the application. */
+.note-peek {
+	position: fixed;
+	inset: auto;
+	z-index: 80;
+	margin: 0;
+	padding: 0;
+	max-width: none;
+	border: 1px solid var(--peek-border);
+	border-radius: 6px;
+	background: var(--peek-bg);
+	color: var(--peek-text);
+	box-shadow: 0 4px 18px rgb(0 0 0 / 0.07);
+	overflow: hidden;
+	outline: none;
+}
+
+.note-peek[open] {
+	display: flex;
+	flex-direction: column;
+}
+.note-peek::backdrop {
+	background: rgb(0 0 0 / 0.12);
+}
+
+.note-peek-header {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-shrink: 0;
+	padding: 8px 10px 0 20px;
+}
+
+.note-peek-source {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex: 1;
+	min-width: 0;
+	min-height: 32px;
+	text-align: left;
+	color: var(--peek-muted);
+	cursor: pointer;
+}
+
+.note-peek-title {
+	overflow: hidden;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 1.6;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.note-peek-source svg {
+	flex-shrink: 0;
+}
+.note-peek-source:hover {
+	color: var(--peek-accent);
+}
+.note-peek-source:disabled {
+	cursor: default;
+}
+
+.note-peek-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 32px;
+	height: 32px;
+	color: var(--peek-muted);
+	cursor: pointer;
+}
+
+.note-peek-icon:hover {
+	color: var(--peek-text);
+}
+.note-peek :where(button, a):focus-visible {
+	outline: 2px solid var(--peek-accent);
+	outline-offset: 2px;
+}
+
+.note-peek-body {
+	min-height: 0;
+	padding: 12px 20px 20px;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	scrollbar-gutter: stable;
+}
+
+.note-peek-body:focus-visible {
+	outline: 1px solid var(--peek-accent);
+	outline-offset: -3px;
+}
+.note-peek-body .markdown-prose {
+	font-size: 15px;
+	line-height: 1.8;
+}
+.note-peek-body .markdown-prose > :first-child,
+.note-peek-body .markdown-prose > h1:first-child + * {
+	margin-top: 0;
+}
+.note-peek-body .markdown-prose > h1:first-child,
+.note-peek-body .markdown-prose > .note-excerpt-notice + h1 {
+	display: none;
+}
+.note-peek-body .markdown-prose :where(h1, h2) {
+	font-size: 18px;
+	line-height: 1.5;
+}
+.note-peek-body .markdown-prose h3 {
+	font-size: 16px;
+}
+.note-peek-body .markdown-prose > :last-child {
+	margin-bottom: 0;
+}
+.note-peek-body .note-excerpt-notice {
+	color: var(--peek-muted);
+	font-size: 12px;
+}
+.note-peek-status {
+	display: block;
+	padding: 12px 0;
+	color: var(--peek-muted);
+	font-size: 13px;
+}
+.note-peek-retry {
+	margin-left: 8px;
+	color: var(--peek-accent);
+	cursor: pointer;
+}
+
+.note-reading-return {
+	position: fixed;
+	bottom: calc(1.25rem + env(safe-area-inset-bottom));
+	left: 50%;
+	z-index: 30;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-height: 40px;
+	padding: 8px 14px;
+	transform: translateX(-50%);
+	border: 1px solid;
+	border-radius: 4px;
+	font-size: 12px;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.note-reading-return:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 3px;
+}
+
+@media (max-width: 639px) {
+	.note-peek {
+		border-radius: 8px 8px 0 0;
+		border-bottom: 0;
+	}
+	.note-peek-header {
+		padding: 6px 8px 0 20px;
+	}
+	.note-peek-source {
+		min-height: 40px;
+	}
+	.note-peek-icon {
+		width: 40px;
+		height: 40px;
+	}
+	.note-peek-body {
+		padding-bottom: calc(20px + env(safe-area-inset-bottom));
+	}
+}

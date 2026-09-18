@@ -117,7 +117,7 @@ const std::span<const double> view{samples};
 `view.size()` 为 `3`，`view` 借用这三个元素，并只允许通过它读取。这里使用接受整个数组的构造方式；若先把 `samples` 转成 `double*` 并只留下该指针，指针本身就不能提供同样的数量信息。
 
 > [!PRACTICE]
-> 需要拥有固定数量的元素时，可以用 [std::array](../01-fixed-size-sequences-and-array-objects.md) 表达完整的值；函数只需借用连续数据时，可以用 [std::span](../02-borrowing-contiguous-ranges-with-span.md) 同时传递访问位置与数量。接触内置数组或指针接口时，先确认长度在哪个环节仍然可知，避免在形参方括号中写一个数字就把它当作保证。
+> 需要拥有固定数量的元素时，可以用 [std::array](../01-fixed-size-sequences-and-array-objects.md#元素随数组对象一起存在) 表达完整的值；函数只需借用连续数据时，可以用 [std::span](../02-borrowing-contiguous-ranges-with-span.md#将连续元素作为一段范围交给函数) 同时传递访问位置与数量。接触内置数组或指针接口时，先确认长度在哪个环节仍然可知，避免在形参方括号中写一个数字就把它当作保证。
 
 ## 参考资料
 

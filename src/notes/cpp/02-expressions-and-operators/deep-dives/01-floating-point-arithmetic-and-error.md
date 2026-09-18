@@ -7,7 +7,7 @@ date: 2026-08-25
 
 [返回算术运算主线](../02-arithmetic-operations-and-result-types.md)
 
-C++23 并不只凭 `float` 或 `double` 的类型名称保证采用 IEEE 754，也不把所有表达式的中间精度与求值方式固定成同一种实现。本篇以 IEEE 754 的 binary32（32 位）和 binary64（64 位）二进制格式为模型，解释有限精度怎样影响算术结果；字段编码与数值分类参见[二进制浮点数的表示](../../01-objects-types-and-variables/deep-dives/01-binary-floating-point-representation.md)。
+C++23 并不只凭 `float` 或 `double` 的类型名称保证采用 IEEE 754，也不把所有表达式的中间精度与求值方式固定成同一种实现。本篇以 IEEE 754 的 binary32（32 位）和 binary64（64 位）二进制格式为模型，解释有限精度怎样影响算术结果；字段编码与数值分类参见[二进制浮点数的表示](../../01-objects-types-and-variables/deep-dives/01-binary-floating-point-representation.md#binary32-与-binary64-的位结构)。
 
 ## 浮点运算与误差
 

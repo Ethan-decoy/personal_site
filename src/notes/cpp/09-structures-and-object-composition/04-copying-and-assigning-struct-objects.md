@@ -81,7 +81,7 @@ const double observed_pressure_bar{*(secondary.observed_pressure_bar)};
 > [!IMPORTANT]
 > 结构体复制让完整对象及其成员子对象具有独立身份，但每个成员值中原有的别名关系仍按该成员类型的规则保留。
 >
-> 上述复制按成员语义建立结果，并不等于逐字节复制对象存储。填充区域与对象表示为何不能代替成员语义，见附章[对象布局、对齐与填充](deep-dives/01-object-layout-alignment-and-padding.md)。
+> 上述复制按成员语义建立结果，并不等于逐字节复制对象存储。填充区域与对象表示为何不能代替成员语义，见附章[对象布局、对齐与填充](deep-dives/01-object-layout-alignment-and-padding.md#对象表示值表示与填充不是同一层概念)。
 >
 > 本篇结论限定于成员均支持相应操作的简单结构体；成员自身的类型约束会继续约束完整结构体能否复制初始化或复制赋值。
 

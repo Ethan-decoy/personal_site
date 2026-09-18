@@ -8,7 +8,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { type Components } from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
 import rehypeSlug from "rehype-slug";
@@ -35,6 +35,7 @@ import ts from "highlight.js/lib/languages/typescript";
 import xml from "highlight.js/lib/languages/xml";
 import yaml from "highlight.js/lib/languages/yaml";
 import { rehypeMarkdownCallouts } from "./markdown-callouts";
+import { type NoteExcerptOptions, rehypeNoteExcerpt } from "./note-excerpt";
 
 const loadTreeSitterHighlighter = () => import("./highlighter");
 
@@ -786,7 +787,21 @@ export interface NoteLinkTarget {
 
 interface NoteLinkAdapter {
 	resolveNoteHref?: (href: string) => NoteLinkTarget | null;
-	onNoteOpen?: (target: NoteLinkTarget) => void;
+	onNoteOpen?: (target: NoteLinkTarget, trigger: HTMLAnchorElement) => void;
+	onNoteLinkPointerEnter?: (
+		target: NoteLinkTarget,
+		trigger: HTMLAnchorElement,
+	) => void;
+	onNoteLinkPointerLeave?: (trigger: HTMLAnchorElement) => void;
+	onNoteLinkFocus?: (
+		target: NoteLinkTarget,
+		trigger: HTMLAnchorElement,
+	) => void;
+	onNoteLinkBlur?: (
+		trigger: HTMLAnchorElement,
+		relatedTarget: EventTarget | null,
+	) => void;
+	excerptIdPrefix?: string;
 }
 
 /* ---- Components factory (avoids TS type conflict with custom Plot) ---- */
@@ -794,13 +809,42 @@ function makeComponents(
 	dark: boolean,
 	theme: { accent: string },
 	noteLinks: NoteLinkAdapter,
-) {
+): Components {
 	return {
-		a: ({ href, children }: { href?: string; children?: ReactNode }) => {
+		a: ({ node: _node, href, children, ...props }) => {
 			if (!href) return <span>{children}</span>;
+			if (
+				noteLinks.excerptIdPrefix &&
+				href.startsWith(`#${noteLinks.excerptIdPrefix}`)
+			) {
+				return (
+					<a
+						{...props}
+						href={href}
+						onClick={(event) => {
+							event.preventDefault();
+							const article = event.currentTarget.closest("article");
+							const target = Array.from(
+								article?.querySelectorAll("[id]") ?? [],
+							).find((element) => element.id === href.slice(1));
+							const scrollRoot = article?.closest("[data-note-preview-scroll]");
+							if (target && scrollRoot) {
+								const offset =
+									target.getBoundingClientRect().top -
+									scrollRoot.getBoundingClientRect().top;
+								scrollRoot.scrollTop += offset;
+							} else {
+								target?.scrollIntoView({ block: "nearest" });
+							}
+						}}
+					>
+						{children}
+					</a>
+				);
+			}
 			if (href.startsWith("http")) {
 				return (
-					<a href={href} target="_blank" rel="noopener noreferrer">
+					<a {...props} href={href} target="_blank" rel="noopener noreferrer">
 						{children}
 					</a>
 				);
@@ -809,10 +853,37 @@ function makeComponents(
 			if (noteTarget && noteLinks.onNoteOpen) {
 				return (
 					<a
+						{...props}
 						href={href}
+						onPointerEnter={(event) => {
+							if (
+								event.pointerType === "mouse" &&
+								window.matchMedia("(any-hover: hover) and (any-pointer: fine)")
+									.matches
+							) {
+								noteLinks.onNoteLinkPointerEnter?.(
+									noteTarget,
+									event.currentTarget,
+								);
+							}
+						}}
+						onPointerLeave={(event) => {
+							if (event.pointerType === "mouse")
+								noteLinks.onNoteLinkPointerLeave?.(event.currentTarget);
+						}}
+						onFocus={(event) => {
+							if (event.currentTarget.matches(":focus-visible"))
+								noteLinks.onNoteLinkFocus?.(noteTarget, event.currentTarget);
+						}}
+						onBlur={(event) =>
+							noteLinks.onNoteLinkBlur?.(
+								event.currentTarget,
+								event.relatedTarget,
+							)
+						}
 						onClick={(e) => {
 							e.preventDefault();
-							noteLinks.onNoteOpen?.(noteTarget);
+							noteLinks.onNoteOpen?.(noteTarget, e.currentTarget);
 						}}
 						className={`inline-flex items-center gap-0.5 ${noteTarget.isWiki ? "font-medium" : ""}`}
 						style={noteTarget.isWiki ? { color: theme.accent } : undefined}
@@ -840,7 +911,11 @@ function makeComponents(
 					</a>
 				);
 			}
-			return <a href={href}>{children}</a>;
+			return (
+				<a {...props} href={href}>
+					{children}
+				</a>
+			);
 		},
 		code: ({ className, children }: CodeElementProps) => (
 			<InlineCode className={className}>{children}</InlineCode>
@@ -905,17 +980,60 @@ export function MarkdownPreview({
 	isDark,
 	resolveNoteHref,
 	onNoteOpen,
+	onNoteLinkPointerEnter,
+	onNoteLinkPointerLeave,
+	onNoteLinkFocus,
+	onNoteLinkBlur,
+	excerpt,
 }: {
 	content: string;
 	theme: ThemeColors;
 	isDark?: boolean;
-	resolveNoteHref?: (href: string) => NoteLinkTarget | null;
-	onNoteOpen?: (target: NoteLinkTarget) => void;
-}) {
+	excerpt?: NoteExcerptOptions;
+} & Omit<NoteLinkAdapter, "excerptIdPrefix">) {
 	const dark = isDark ?? false;
 	const components = useMemo(
-		() => makeComponents(dark, theme, { resolveNoteHref, onNoteOpen }),
-		[dark, theme, resolveNoteHref, onNoteOpen],
+		() =>
+			makeComponents(dark, theme, {
+				resolveNoteHref,
+				onNoteOpen,
+				onNoteLinkPointerEnter,
+				onNoteLinkPointerLeave,
+				onNoteLinkFocus,
+				onNoteLinkBlur,
+				excerptIdPrefix: excerpt?.idPrefix,
+			}),
+		[
+			dark,
+			theme,
+			resolveNoteHref,
+			onNoteOpen,
+			onNoteLinkPointerEnter,
+			onNoteLinkPointerLeave,
+			onNoteLinkFocus,
+			onNoteLinkBlur,
+			excerpt?.idPrefix,
+		],
+	);
+
+	const excerptAnchor = excerpt?.anchor;
+	const excerptIdPrefix = excerpt?.idPrefix;
+	const rehypePlugins = useMemo(
+		() =>
+			excerptIdPrefix
+				? [
+						rehypeRaw,
+						rehypeMarkdownCallouts,
+						rehypeSlug,
+						() =>
+							rehypeNoteExcerpt({
+								anchor: excerptAnchor ?? null,
+								idPrefix: excerptIdPrefix,
+							}),
+						rehypeKatex,
+					]
+				: REHYPE_PLUGINS,
+		[excerptAnchor, excerptIdPrefix],
 	);
 
 	const markdownStyle = markdownThemeVariables(theme, dark);
@@ -928,7 +1046,7 @@ export function MarkdownPreview({
 			>
 				<ReactMarkdown
 					remarkPlugins={REMARK_PLUGINS}
-					rehypePlugins={REHYPE_PLUGINS}
+					rehypePlugins={rehypePlugins}
 					components={components}
 				>
 					{content}

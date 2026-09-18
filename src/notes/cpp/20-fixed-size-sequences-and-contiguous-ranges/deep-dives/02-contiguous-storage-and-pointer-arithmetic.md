@@ -14,7 +14,7 @@ order: 2
 
 对于本篇使用的 `std::array<double, N>`、`std::vector<double>` 和 `std::span<double>`，成员函数 `data()` 提供底层连续元素的指针。范围非空时，返回值指向其第一个元素。调用 `data()` 不复制元素，不转移所有权，也不延长元素的生命周期。
 
-`array`、`vector` 的可修改对象通过 `data()` 提供 `double*`，对应的 `const` 对象提供 `const double*`。`span` 则延续[视图与元素的两层只读关系](../03-copying-views-and-element-access.md)：`std::span<double>` 的 `data()` 返回 `double*`，即使视图对象本身带有 `const`；`std::span<const double>` 返回 `const double*`。
+`array`、`vector` 的可修改对象通过 `data()` 提供 `double*`，对应的 `const` 对象提供 `const double*`。`span` 则延续[视图与元素的两层只读关系](../03-copying-views-and-element-access.md#视图对象的只读与元素的只读)：`std::span<double>` 的 `data()` 返回 `double*`，即使视图对象本身带有 `const`；`std::span<const double>` 返回 `const double*`。
 
 范围为空时，其中没有可访问的元素；但 `data()` 仍可能保留一个位置，例如截取出的空子范围可以保留指向原序列某个元素的指针。因此，应使用 `empty()` 或 `size()` 判断范围是否包含元素，不能只检查 `data() != nullptr`。原始指针能否解引用，取决于它是否指向仍然有效的对象，空范围本身不提供这项保证。
 
@@ -76,7 +76,7 @@ int main() {
 
 同样，来自两个不同非空数组的元素指针不能相减来“测量两个数组之间的距离”，这种相减具有未定义行为。即使类型相同、数值上看似相邻，也不满足同一数组的前提。
 
-这些运算还依赖原对象仍然有效。`vector` 扩容导致元素迁移后，旧 `data()` 指针就不能继续用于访问或计算原来的元素范围。连续存储说明的是当前元素的排列，不能让旧借用跳过[失效与生命周期规则](../05-range-lifetimes-and-interface-boundaries.md)。
+这些运算还依赖原对象仍然有效。`vector` 扩容导致元素迁移后，旧 `data()` 指针就不能继续用于访问或计算原来的元素范围。连续存储说明的是当前元素的排列，不能让旧借用跳过[失效与生命周期规则](../05-range-lifetimes-and-interface-boundaries.md#重新分配会使旧范围失效)。
 
 ## 指针与数量可以组成视图，但数量由调用者保证
 

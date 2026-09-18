@@ -60,7 +60,7 @@ const int archived_pressure_kpa{archived.current_pressure_kpa()}; // 220
 > [!IMPORTANT]
 > 复制构造以已有同类型对象为源，建立具有独立身份的新对象；它不会把源对象本身变成新对象，也不会在两者之间自动保留同步关系。
 
-当前快照只需要复制两个 `int` 成员，所需工作很少。[复制一份 `std::vector<double>` 采样序列](../11-sequences-and-data-access/03-sequence-copying-and-function-access.md)则需要为新序列建立独立元素，用源序列中的采样值初始化它们。两者都通过复制构造建立新对象，实际工作却不同。**复制构造的成本来自为了得到所需副本而实际执行的工作。**
+当前快照只需要复制两个 `int` 成员，所需工作很少。[复制一份 `std::vector<double>` 采样序列](../11-sequences-and-data-access/03-sequence-copying-and-function-access.md#副本保存独立的元素)则需要为新序列建立独立元素，用源序列中的采样值初始化它们。两者都通过复制构造建立新对象，实际工作却不同。**复制构造的成本来自为了得到所需副本而实际执行的工作。**
 
 ## const 引用描述复制源
 

@@ -100,6 +100,10 @@ About 页面有独立的 personal/work 分支，不应机械塞入普通页面�
 2. `src/notes/index.ts` 使用 `import.meta.glob` 为公开正文建立按文件懒加载器，并构造目录树。
 3. `src/notes-renderer.tsx` 使用 React Markdown、GFM、KaTeX 与语法高亮渲染正文。
 
+正文跨篇引用由 `src/use-note-peek.ts` 管理悬停、聚焦与关闭延迟，通过 `src/note-peek.tsx` 按需打开速览；`src/note-excerpt.ts` 在标题 slug 生成后提取小节并隔离预览 ID。修改引用交互或提取规则时，遵循 `docs/DESIGN.md` 的「笔记引用速览」，并保留 `scripts/check-markdown-renderer.mjs` 中的速览检查。
+
+C++ 正文的概念引用应指向目标小节的实际标题锚点，目录导航和明确的「返回主线」保留全文入口。修改相关链接或标题后，运行 `pnpm check:cpp-links`；该检查使用页面实际渲染的锚点验证公开 C++ 笔记中的站内链接，已纳入构建。
+
 Markdown 重点提示使用 `> [!TYPE] 可选标题`，在正文中直接展开。提示块语法与 C++ 笔记使用建议见 `src/notes/cpp/_guidelines/markdown-callouts.md`；调整视觉时参照 `docs/DESIGN.md` 的 Markdown 文档排版约定。
 
 不要把全部 Markdown 正文重新打入首包。修改目录、搜索或渲染逻辑后，至少运行 `pnpm build`，确保 Markdown、侧栏、性能预算和私有目录泄漏检查全部通过。
@@ -120,11 +124,12 @@ Markdown 重点提示使用 `> [!TYPE] 可选标题`，在正文中直接展开�
 
 1. `tsc -b`
 2. Markdown 渲染检查
-3. 笔记侧栏检查
-4. 项目页贡献图检查
-5. Vite 生产构建
-6. 性能预算检查
-7. 图片资源检查
+3. C++ 笔记链接与锚点检查
+4. 笔记侧栏检查
+5. 项目页贡献图检查
+6. Vite 生产构建
+7. 性能预算检查
+8. 图片资源检查
 
 `tsconfig.tsbuildinfo` 是生成文件，已由 `.gitignore` 排除，不应提交。
 

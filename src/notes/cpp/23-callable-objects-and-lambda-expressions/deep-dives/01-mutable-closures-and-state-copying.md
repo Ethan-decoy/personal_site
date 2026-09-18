@@ -8,7 +8,7 @@ order: 1
 
 按值捕获既可以保存只读配置，也可以建立由闭包自己维护的状态。例如，一个操作每次被调用时递增自己保存的计数，不需要修改创建它的函数中的原变量。
 
-这要求改变默认的调用权限。本篇以[按值捕获](../03-lambda-expressions-and-value-captures.md)和[引用捕获](../04-reference-captures-and-lifetimes.md)的区别为前提，只讨论本章这种显式列出捕获对象和普通参数的 Lambda。
+这要求改变默认的调用权限。本篇以[按值捕获](../03-lambda-expressions-and-value-captures.md#按值捕获保存建立时的配置)和[引用捕获](../04-reference-captures-and-lifetimes.md#一个保存快照一个读取原对象)的区别为前提，只讨论本章这种显式列出捕获对象和普通参数的 Lambda。
 
 ## 可修改调用不再是默认的 const 成员函数
 

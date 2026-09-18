@@ -154,9 +154,9 @@ std::unique_ptr<pressure_sensor> make_owned_sensor(double value_kpa) {
 
 `make_sensor` 交付一个传感器结果，调用者可以直接用它初始化自己的对象。只有需求确实是独立管理一个动态传感器时，`make_owned_sensor` 的返回形式才准确：它创建动态目标，并把负责清理的拥有者结果交给调用者。
 
-两者都遵循[按值返回的结果对象规则](../17-rvalue-references-and-move-semantics/06-return-by-value-and-result-objects.md)。这里 `make_unique`、`make_owned_sensor` 的同类型纯右值结果可以直接初始化接收它的拥有者；不需要为了“把结果移出去”而额外写 `std::move`。
+两者都遵循[按值返回的结果对象规则](../17-rvalue-references-and-move-semantics/06-return-by-value-and-result-objects.md#返回表达式可以直接构造接收对象)。这里 `make_unique`、`make_owned_sensor` 的同类型纯右值结果可以直接初始化接收它的拥有者；不需要为了“把结果移出去”而额外写 `std::move`。
 
-如果工厂先建立一个非 `const` 局部拥有者，再在普通 `return owner;` 中返回它，则适用[局部对象的返回规则](../17-rvalue-references-and-move-semantics/07-returning-local-objects.md)：可以直接在结果位置构造，未采用这一省略时也可以隐式移动。被管理的动态目标不会因为拥有者的返回路径不同而需要另建一份。
+如果工厂先建立一个非 `const` 局部拥有者，再在普通 `return owner;` 中返回它，则适用[局部对象的返回规则](../17-rvalue-references-and-move-semantics/07-returning-local-objects.md#具名返回值优化允许合并对象身份)：可以直接在结果位置构造，未采用这一省略时也可以隐式移动。被管理的动态目标不会因为拥有者的返回路径不同而需要另建一份。
 
 不能改成返回局部拥有者的 `get()` 来省去拥有者结果。局部拥有者一旦销毁，目标也会清理，调用者取得的裸指针不会延长它的生命周期。
 

@@ -45,7 +45,7 @@ total_count = completed_count + new_count;
 
 `completed_count + new_count` 先按照算术运算规则产生 `int` 值 `5`，这个值随后写入 `total_count`。**左侧对象只负责接收结果，不能反向改变右侧表达式此前采用的运算规则。**
 
-如果右侧结果类型与左侧对象类型不同，赋值会按照相应的[隐式类型转换](../06-constants-literals-and-type-conversions/04-implicit-type-conversions.md)规则把结果转换为左侧对象的类型，再完成存储。转换可能丢失信息，因此不同类型之间的赋值必须符合数据本身的含义与范围。
+如果右侧结果类型与左侧对象类型不同，赋值会按照相应的[隐式类型转换](../06-constants-literals-and-type-conversions/04-implicit-type-conversions.md#语境要求另一种类型)规则把结果转换为左侧对象的类型，再完成存储。转换可能丢失信息，因此不同类型之间的赋值必须符合数据本身的含义与范围。
 
 ## 左操作数必须能够被修改
 

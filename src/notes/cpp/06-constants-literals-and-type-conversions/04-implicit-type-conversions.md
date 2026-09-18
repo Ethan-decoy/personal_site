@@ -51,7 +51,7 @@ double measured_pressure_kpa{pressure_to_kpa(measured_pressure_pa)};
 
 调用函数时，`measured_pressure_pa` 的 `long` 值被转换为 `double`，再初始化形参 `pressure_pa`。源对象仍然是保存 240000 的 `long` 对象。
 
-运算符内部如何寻找共同类型，已经在[通常算术转换](../02-expressions-and-operators/03-usual-arithmetic-conversions.md)中建立；这里关注的是同一种“目标类型要求”怎样出现在初始化、赋值、函数边界和条件语境中。
+运算符内部如何寻找共同类型，已经在[通常算术转换](../02-expressions-and-operators/03-usual-arithmetic-conversions.md#转换的是参与运算的值)中建立；这里关注的是同一种“目标类型要求”怎样出现在初始化、赋值、函数边界和条件语境中。
 
 ## 当前数值类型的转换结果
 

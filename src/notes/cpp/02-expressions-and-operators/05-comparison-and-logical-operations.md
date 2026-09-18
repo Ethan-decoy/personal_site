@@ -56,7 +56,7 @@ bool below_limit{item_count < limit};
 
 正零与负零通过 `==` 比较时相等。在支持 NaN 的常见实现中，只要任一操作数是 NaN，`==` 就得到 `false`，`!=` 得到 `true`，`<`、`<=`、`>` 与 `>=` 也都得到 `false`。遇到可能产生 NaN 的数据时，不能只依赖普通大小比较完成有效性判断。
 
-浮点误差形成的原因参见[浮点运算、舍入与误差](deep-dives/01-floating-point-arithmetic-and-error.md)。
+浮点误差形成的原因参见[浮点运算、舍入与误差](deep-dives/01-floating-point-arithmetic-and-error.md#规格化与舍入normalization-and-rounding)。
 
 ## 逻辑运算符（Logical Operators）
 

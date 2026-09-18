@@ -30,3 +30,4 @@ date: 2026-08-08
 21. [固定长度序列与连续范围](20-fixed-size-sequences-and-contiguous-ranges/_index.md)
 22. [文本的保存与借用](21-text-ownership-and-borrowing/_index.md)
 23. [迭代器、区间与算法](22-iterators-ranges-and-algorithms/_index.md)
+24. [可调用对象与 Lambda 表达式](23-callable-objects-and-lambda-expressions/_index.md)

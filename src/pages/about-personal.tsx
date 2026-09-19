@@ -45,18 +45,6 @@ const WATCHING_COLLECTIONS: WatchingCollection[] = [
 		year: "2026",
 		series: [
 			{
-				id: "can-this-love-be-translated",
-				title: "이 사랑 통역 되나요?",
-				language: "ko",
-				posterSide: "right",
-				altKey: "about.favorites.series.canThisLoveBeTranslated",
-				sourceUrl:
-					"https://about.netflix.com/ko/news/can-this-love-be-translated-main-trailer",
-				src: "assets/favorites/series-can-this-love-be-translated-poster.webp",
-				width: 900,
-				height: 1333,
-			},
-			{
 				id: "modern-family",
 				title: "Modern Family",
 				language: "en",

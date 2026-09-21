@@ -33,3 +33,4 @@ date: 2026-08-08
 24. [可调用对象与 Lambda 表达式](23-callable-objects-and-lambda-expressions/_index.md)
 25. [排序、比较关系与有序查找](24-sorting-ordering-and-ordered-search/_index.md)
 26. [可选值与缺失状态](25-optional-values-and-absence/_index.md)
+27. [按键组织数据与有序映射](26-keyed-data-and-ordered-maps/_index.md)

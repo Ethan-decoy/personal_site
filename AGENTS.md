@@ -91,13 +91,14 @@ About 页面有独立的 personal/work 分支，不应机械塞入普通页面�
 - `date`
 - 可选 `order`
 - 目录 `_index.md` 可选 `sidebarAfter`，使用相对 Markdown 路径声明该目录在侧栏中跟随的同级正文
+- 目录索引可选 `sidebarGroups: headings`，以正文二级标题及其列表中的直属子目录 `_index.md` 链接定义逻辑分篇；启用后，每个子目录必须恰好归属一篇，目录下只放子目录和索引。
 
 以下划线开头的目录是内部草稿或测试内容，不进入公开目录、搜索索引或生产 JavaScript。
 
 笔记加载分为三层：
 
 1. `scripts/notes-manifest-plugin.ts` 在构建期扫描公开 Markdown，生成 `virtual:notes-manifest` 和按需加载的 `virtual:notes-search-index`。
-2. `src/notes/index.ts` 使用 `import.meta.glob` 为公开正文建立按文件懒加载器，并构造目录树。
+2. `src/notes/index.ts` 使用 `import.meta.glob` 为公开正文建立按文件懒加载器，并构造目录树。逻辑分篇保留正文路径，搜索分类与自动展开路径均由实际侧栏树生成。
 3. `src/notes-renderer.tsx` 使用 React Markdown、GFM、KaTeX 与语法高亮渲染正文。
 
 正文跨篇引用由 `src/use-note-peek.ts` 管理悬停、聚焦与关闭延迟，通过 `src/note-peek.tsx` 按需打开速览；`src/note-excerpt.ts` 在标题 slug 生成后提取小节并隔离预览 ID。修改引用交互或提取规则时，遵循 `docs/DESIGN.md` 的「笔记引用速览」，并保留 `scripts/check-markdown-renderer.mjs` 中的速览检查。

@@ -5,6 +5,10 @@ declare module "virtual:notes-manifest" {
 		date: string;
 		order?: number;
 		sidebarAfter?: string;
+		sidebarGroups?: Array<{
+			title: string;
+			directories: string[];
+		}>;
 	}>;
 	export default manifest;
 }

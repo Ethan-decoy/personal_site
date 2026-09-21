@@ -26,6 +26,7 @@ interface NoteMetadata {
 	date: string;
 	order?: number;
 	sidebarAfter?: string;
+	sidebarGroups?: (typeof noteManifest)[number]["sidebarGroups"];
 }
 
 export interface NoteContent extends NoteMetadata {
@@ -46,6 +47,7 @@ export interface NestedTreeNode {
 	noteCount: number;
 	children: (NestedTreeNode | NestedFileNode)[];
 	isDir: true;
+	isGroup?: true;
 	indexFile?: string;
 	sidebarAfter?: string;
 }
@@ -79,6 +81,7 @@ interface NotesIndex {
 	sidebarTree: NestedTreeNode[];
 	notesByFile: Record<string, NoteMetadata>;
 	directoryTitles: Record<string, string>;
+	ancestorKeysByFile: Record<string, string[]>;
 	visibleFiles: string[];
 	isEmpty: boolean;
 }
@@ -225,6 +228,42 @@ function mergeSidebarChildren(
 	return children;
 }
 
+function groupSidebarDirectories(
+	directoryKey: string,
+	groups: NonNullable<NoteMetadata["sidebarGroups"]>,
+	directories: NestedTreeNode[],
+): NestedTreeNode[] {
+	const remaining = new Map(
+		directories.map((directory) => [directory.key, directory]),
+	);
+	const grouped = groups.map((group): NestedTreeNode => {
+		const children = group.directories.map((key) => {
+			const directory = remaining.get(key);
+			if (!directory?.indexFile || directory.sidebarAfter) {
+				throw new Error(
+					`Invalid sidebar group in ${directoryKey}: ${key} must be an unassigned direct child directory with an index`,
+				);
+			}
+			remaining.delete(key);
+			return directory;
+		});
+		return {
+			key: `${directoryKey}/@group-${children[0].key.slice(directoryKey.length + 1)}`,
+			title: group.title,
+			noteCount: children.reduce((total, child) => total + child.noteCount, 0),
+			children,
+			isDir: true,
+			isGroup: true,
+		};
+	});
+	if (remaining.size) {
+		throw new Error(
+			`Ungrouped sidebar directories in ${directoryKey}: ${[...remaining.keys()].join(", ")}`,
+		);
+	}
+	return grouped;
+}
+
 function isNestedTreeNode(
 	node: NestedTreeNode | NestedFileNode,
 ): node is NestedTreeNode {
@@ -247,6 +286,7 @@ function buildNotesIndex(): NotesIndex {
 			date: manifestRecord.date,
 			order: manifestRecord.order,
 			sidebarAfter: manifestRecord.sidebarAfter,
+			sidebarGroups: manifestRecord.sidebarGroups,
 		};
 
 		if (isIndexFile(file)) {
@@ -291,12 +331,18 @@ function buildNotesIndex(): NotesIndex {
 			indexFile && indexMetadata?.sidebarAfter
 				? resolveSidebarAfter(indexFile, indexMetadata.sidebarAfter)
 				: undefined;
-		const children = mergeSidebarChildren(
-			builder.key,
-			dirChildren,
-			fileChildren,
-		);
-		directoryTitles[builder.key] = title;
+		if (indexMetadata?.sidebarGroups && fileChildren.length) {
+			throw new Error(
+				`Grouped sidebar index ${indexFile} must contain only child directories`,
+			);
+		}
+		const children = indexMetadata?.sidebarGroups
+			? groupSidebarDirectories(
+					builder.key,
+					indexMetadata.sidebarGroups,
+					dirChildren,
+				)
+			: mergeSidebarChildren(builder.key, dirChildren, fileChildren);
 
 		return {
 			key: builder.key,
@@ -315,10 +361,25 @@ function buildNotesIndex(): NotesIndex {
 		.map(toTreeNode)
 		.sort(compareDirectories);
 
+	const ancestorKeysByFile: Record<string, string[]> = {};
+	function indexSidebarPaths(nodes: NestedTreeNode[], ancestors: string[]) {
+		for (const node of nodes) {
+			const keys = [...ancestors, node.key];
+			directoryTitles[node.key] = node.title;
+			if (node.indexFile) ancestorKeysByFile[node.indexFile] = keys;
+			for (const child of node.children) {
+				if (isNestedTreeNode(child)) indexSidebarPaths([child], keys);
+				else ancestorKeysByFile[child.file] = keys;
+			}
+		}
+	}
+	indexSidebarPaths(sidebarTree, []);
+
 	return {
 		sidebarTree,
 		notesByFile,
 		directoryTitles,
+		ancestorKeysByFile,
 		visibleFiles,
 		isEmpty: visibleFiles.length === 0,
 	};
@@ -363,12 +424,7 @@ export function loadNote(file: string): Promise<NoteContent | null> {
 }
 
 export function expandedKeysForFile(file: string): Set<string> {
-	const keys = new Set<string>();
-	const parts = normalizeFileKey(file).replace(/^\.\//, "").split("/");
-	for (let i = 0; i < parts.length - 1; i++) {
-		keys.add(parts.slice(0, i + 1).join("/"));
-	}
-	return keys;
+	return new Set(notesIndex.ancestorKeysByFile[normalizeFileKey(file)] ?? []);
 }
 
 export function isDirectoryNode(
@@ -406,17 +462,9 @@ export async function searchNotes(query: string): Promise<SearchResult[]> {
 		const bodyMatch = searchBodyIndex.get(file)?.includes(q) ?? false;
 
 		if (titleMatch || bodyMatch) {
-			const directoryKey = directoryKeyForFile(file);
-			const segments = directoryKey ? directoryKey.split("/") : [];
 			const category =
-				segments
-					.map((_, index) => {
-						const key = segments.slice(0, index + 1).join("/");
-						return (
-							notesIndex.directoryTitles[key] ??
-							fallbackDirectoryTitle(segments[index])
-						);
-					})
+				notesIndex.ancestorKeysByFile[file]
+					?.map((key) => notesIndex.directoryTitles[key])
 					.join(" › ") || "其他";
 			results.push({
 				title: note.title,

@@ -268,7 +268,7 @@ try {
 			searchFocused: false,
 			suggestions: [],
 			searchResults: [],
-			expandedKeys: new Set(["cpp", appendixRenderParentKey]),
+			expandedKeys: notes.expandedKeysForFile(appendixRenderParent.indexFile),
 		}),
 	);
 	const appendixRenderTargetPosition = appendixRenderTarget
@@ -281,6 +281,103 @@ try {
 		'style="margin-left:16px"',
 		appendixRenderDirectoryPosition,
 	);
+	const cppRoot = tree.find((node) => node.key === "cpp");
+	const cppGroups = cppRoot?.children.filter((node) => "key" in node) ?? [];
+	const cppChapters = cppGroups.flatMap((group) => group.children);
+	const expectedChapterKeys = Object.keys(notes.notesIndex.notesByFile)
+		.filter((file) => /^\.\/cpp\/\d+-[^/]+\/_index\.md$/.test(file))
+		.map((file) => file.slice(2, -"/_index.md".length))
+		.sort();
+	const cppIndex = await notes.loadNote("./cpp/_index.md");
+	const overviewGroupTitles = [...cppIndex.content.matchAll(/^## (.+)$/gm)].map(
+		(match) => match[1],
+	);
+	const cppGroupCatalogHtml = renderToStaticMarkup(
+		React.createElement(SidebarCatalog, {
+			...searchCatalogProps,
+			searchQuery: "",
+			searchFocused: false,
+			suggestions: [],
+			searchResults: [],
+			expandedKeys: new Set(["cpp"]),
+		}),
+	);
+	const appendixArticle = appendixRenderDirectory?.children.find(
+		(child) => !("key" in child),
+	);
+	const appendixGroup = cppGroups.find((group) =>
+		group.children.some((child) => child.key === appendixRenderParentKey),
+	);
+	if (!cppRoot || !appendixArticle || !appendixGroup) {
+		throw new Error(
+			"Fixture requires C++ parts and an article in a nested appendix",
+		);
+	}
+	const appendixAncestorKeys = [
+		cppRoot.key,
+		appendixGroup.key,
+		appendixRenderParentKey,
+		appendixRenderDirectory.key,
+	];
+	const appendixExpanded = notes.expandedKeysForFile(appendixArticle.file);
+	const chapterIndexExpanded = notes.expandedKeysForFile(
+		appendixRenderParent.indexFile,
+	);
+	const previouslyExpanded = new Set([
+		indexedDirectory.key,
+		cppGroups.find((group) => group !== appendixGroup).key,
+	]);
+	const revealedAppendix = sidebarState.revealFileInExpandedKeys(
+		previouslyExpanded,
+		appendixArticle.file,
+	);
+	const [loadedAppendix, loadedChapterIndex, appendixSearchResults] =
+		await Promise.all([
+			notes.loadNote(appendixArticle.file),
+			notes.loadNote(appendixRenderParent.indexFile),
+			notes.searchNotes(appendixArticle.title),
+		]);
+	const appendixSearchResult = appendixSearchResults.find(
+		(result) => result.file === appendixArticle.file,
+	);
+	const chapterLink = notes.resolveNoteHref(
+		`${appendixRenderParentKey.slice("cpp/".length)}/_index.md`,
+		"./cpp/_index.md",
+	);
+	const appendixLink = notes.resolveNoteHref(
+		`deep-dives/${appendixArticle.filename}`,
+		appendixRenderParent.indexFile,
+	);
+	const { parseSidebarGroups } = await vite.ssrLoadModule(
+		"/scripts/notes-manifest-plugin.ts",
+	);
+	const parsedGroups = parseSidebarGroups(
+		"## First part\n2. [Second](02-second/_index.md)\n1. [First](01-first/_index.md)\n## Next part\n- [Third](03-third/_index.md)",
+		"./cpp/_index.md",
+	);
+	const invalidGroupFixtures = [
+		[
+			"duplicate chapter",
+			"## Part\n- [A](01-a/_index.md)\n- [A again](01-a/_index.md)",
+		],
+		[
+			"duplicate heading",
+			"## Part\n- [A](01-a/_index.md)\n## Part\n- [B](02-b/_index.md)",
+		],
+		["parent escape", "## Part\n- [Other](../_index.md)"],
+		["nested directory", "## Part\n- [Deep](01-a/deep-dives/_index.md)"],
+		["missing heading", "- [A](01-a/_index.md)"],
+		["empty group", "## Empty\n## Part\n- [A](01-a/_index.md)"],
+	];
+	const invalidGroupChecks = invalidGroupFixtures.map(([name, body]) => {
+		let rejected = false;
+		try {
+			parseSidebarGroups(body, "./cpp/_index.md");
+		} catch {
+			rejected = true;
+		}
+		return { name: `sidebar grouping rejects ${name}`, pass: rejected };
+	});
 	const desktopCatalogClasses =
 		/className="([^"]*fixed bottom-0 left-8 top-32[^"]*)"/.exec(
 			notesPageSource,
@@ -310,6 +407,105 @@ try {
 		(desktopCatalogRight + desktopCatalogGap);
 
 	const checks = [
+		{
+			name: "C++ parts use the five overview headings without separate index pages",
+			pass:
+				cppRoot.children.length === 5 &&
+				cppGroups.length === overviewGroupTitles.length &&
+				cppGroups.every(
+					(group, index) =>
+						group.isGroup === true &&
+						!group.indexFile &&
+						group.title === overviewGroupTitles[index],
+				),
+		},
+		{
+			name: "grouping preserves every physical C++ chapter exactly once in order",
+			pass:
+				cppChapters.length === expectedChapterKeys.length &&
+				cppChapters.every(
+					(chapter, index) =>
+						chapter.key === expectedChapterKeys[index] &&
+						chapter.indexFile === `./${expectedChapterKeys[index]}/_index.md`,
+				),
+		},
+		{
+			name: "part counts retain their chapters' public article totals",
+			pass:
+				cppGroups.every(
+					(group) =>
+						group.noteCount ===
+						group.children.reduce((total, child) => total + child.noteCount, 0),
+				) &&
+				cppRoot.noteCount ===
+					cppGroups.reduce((total, group) => total + group.noteCount, 0),
+		},
+		{
+			name: "opening only C++ mounts part rows while chapters remain collapsed",
+			pass:
+				cppGroups.every((group) => cppGroupCatalogHtml.includes(group.title)) &&
+				cppChapters.every(
+					(chapter) => !cppGroupCatalogHtml.includes(chapter.title),
+				),
+		},
+		{
+			name: "opening a nested appendix reveals its part and every real ancestor",
+			pass:
+				appendixExpanded.size === appendixAncestorKeys.length &&
+				appendixAncestorKeys.every((key) => appendixExpanded.has(key)),
+		},
+		{
+			name: "opening a chapter overview reveals its containing part",
+			pass:
+				chapterIndexExpanded.size === 3 &&
+				appendixAncestorKeys
+					.slice(0, 3)
+					.every((key) => chapterIndexExpanded.has(key)),
+		},
+		{
+			name: "revealing a grouped appendix preserves other manually expanded branches",
+			pass: [...previouslyExpanded, ...appendixAncestorKeys].every((key) =>
+				revealedAppendix.has(key),
+			),
+		},
+		{
+			name: "grouped chapter indexes and deep articles keep their lazy-loading paths",
+			pass:
+				loadedAppendix?.file === appendixArticle.file &&
+				typeof loadedAppendix.content === "string" &&
+				loadedChapterIndex?.file === appendixRenderParent.indexFile &&
+				typeof loadedChapterIndex.content === "string",
+		},
+		{
+			name: "overview and appendix links still resolve through physical chapter paths",
+			pass:
+				chapterLink?.file === appendixRenderParent.indexFile &&
+				appendixLink?.file === appendixArticle.file,
+		},
+		{
+			name: "search results include the part between subject and chapter",
+			pass:
+				appendixSearchResult?.category ===
+				[
+					cppRoot.title,
+					appendixGroup.title,
+					appendixRenderParent.title,
+					appendixRenderDirectory.title,
+				].join(" \u203a "),
+		},
+		{
+			name: "sidebar grouping reads heading and link order from Markdown",
+			pass:
+				JSON.stringify(parsedGroups) ===
+				JSON.stringify([
+					{
+						title: "First part",
+						directories: ["cpp/02-second", "cpp/01-first"],
+					},
+					{ title: "Next part", directories: ["cpp/03-third"] },
+				]),
+		},
+		...invalidGroupChecks,
 		{
 			name: "the initial catalog contains metadata instead of note bodies",
 			pass:
@@ -466,6 +662,8 @@ try {
 				},
 				catalog: {
 					topLevelDirectories: tree.length,
+					cppParts: cppGroups.length,
+					cppChapters: cppChapters.length,
 					directories: allDirectories.length,
 					files: allFiles.length,
 					indexLoadMs: Number(indexLoadMs.toFixed(1)),

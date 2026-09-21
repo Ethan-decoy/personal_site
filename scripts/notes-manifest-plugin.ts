@@ -13,9 +13,74 @@ type NoteManifestRecord = {
 	date: string;
 	order?: number;
 	sidebarAfter?: string;
+	sidebarGroups?: SidebarGroup[];
 	searchText: string;
 	absolutePath: string;
 };
+
+type SidebarGroup = {
+	title: string;
+	directories: string[];
+};
+
+export function parseSidebarGroups(body: string, file: string): SidebarGroup[] {
+	const groups: SidebarGroup[] = [];
+	const directories = new Set<string>();
+	let fence: string | undefined;
+	for (const line of body.split("\n")) {
+		const fenceMatch = /^\s*(\x60{3,}|~{3,})/.exec(line);
+		if (fenceMatch) {
+			if (!fence) fence = fenceMatch[1];
+			else if (
+				fenceMatch[1][0] === fence[0] &&
+				fenceMatch[1].length >= fence.length
+			)
+				fence = undefined;
+			continue;
+		}
+		if (fence) continue;
+		const heading = /^##\s+(.+?)\s*$/.exec(line);
+		if (heading) {
+			if (groups.some((group) => group.title === heading[1])) {
+				throw new Error(`Duplicate sidebar group ${heading[1]} in ${file}`);
+			}
+			groups.push({ title: heading[1], directories: [] });
+			continue;
+		}
+		const item = /^\s*(?:[-*+]|\d+[.)])\s+\[([^\]]+)\]\(([^)]+)\)\s*$/.exec(
+			line,
+		);
+		if (!item) continue;
+		const target = /^(?:\.\/)?([^/]+)\/_index\.md$/.exec(item[2]);
+		const group = groups.at(-1);
+		if (
+			!group ||
+			!target ||
+			target[1] === "." ||
+			target[1] === ".." ||
+			target[1].startsWith("_") ||
+			/[:\\?#]/.test(target[1])
+		) {
+			throw new Error(
+				`Invalid sidebar group link ${item[2]} in ${file}: use a direct child directory index under a level-two heading`,
+			);
+		}
+		const directory = path.posix.join(path.posix.dirname(file), target[1]);
+		if (directories.has(directory)) {
+			throw new Error(
+				`Duplicate sidebar group directory ${directory} in ${file}`,
+			);
+		}
+		directories.add(directory);
+		group.directories.push(directory);
+	}
+	if (!groups.length || groups.some((group) => !group.directories.length)) {
+		throw new Error(
+			`Invalid sidebar groups in ${file}: each level-two heading needs child directory links`,
+		);
+	}
+	return groups;
+}
 
 function parseNote(
 	raw: string,
@@ -35,6 +100,14 @@ function parseNote(
 	const filename = file.replace(/^.*\//, "").replace(/\.md$/, "");
 	const order = fields.order === undefined ? undefined : Number(fields.order);
 	const sidebarAfter = fields.sidebarAfter?.trim() || undefined;
+	if (
+		fields.sidebarGroups &&
+		(fields.sidebarGroups !== "headings" || !file.endsWith("/_index.md"))
+	) {
+		throw new Error(
+			`Invalid sidebarGroups in ${file}: use headings on a directory index`,
+		);
+	}
 
 	return {
 		file,
@@ -42,6 +115,9 @@ function parseNote(
 		date: fields.date || "",
 		order: Number.isNaN(order) ? undefined : order,
 		sidebarAfter,
+		sidebarGroups: fields.sidebarGroups
+			? parseSidebarGroups(match?.[2] ?? "", file)
+			: undefined,
 		searchText: normalized.trim(),
 	};
 }
@@ -106,12 +182,13 @@ export function notesManifestPlugin(): Plugin {
 
 			if (id === RESOLVED_NOTES_MANIFEST_ID) {
 				const manifest = notes.map(
-					({ file, title, date, order, sidebarAfter }) => ({
+					({ file, title, date, order, sidebarAfter, sidebarGroups }) => ({
 						file,
 						title,
 						date,
 						order,
 						sidebarAfter,
+						sidebarGroups,
 					}),
 				);
 				return `export default ${JSON.stringify(manifest)};`;

@@ -824,7 +824,7 @@ export default function NotesPage({
 				</button>
 			)}
 			<div
-				className="fixed bottom-0 left-8 top-32 z-10 hidden w-56 flex-col overflow-y-auto pb-6 2xl:flex"
+				className="fixed bottom-0 left-8 top-32 z-10 hidden w-[min(20rem,calc(50vw-34rem))] flex-col overflow-y-auto pb-6 2xl:flex min-[111rem]:left-[calc(50vw-53.5rem)]"
 				style={{ color: theme.textSec }}
 			>
 				<SidebarCatalog
@@ -845,7 +845,7 @@ export default function NotesPage({
 			</div>
 
 			{selectedNote && (
-				<div className="hidden md:flex flex-col items-center fixed right-[calc((100vw-96rem)/2+3rem)] top-1/2 -translate-y-1/2 z-10">
+				<div className="hidden lg:flex [@media(height<30rem)]:hidden flex-col items-center fixed right-[max(2rem,calc((100vw-96rem)/2+3rem))] top-1/2 -translate-y-1/2 z-10">
 					<SliderTrack
 						progress={progress}
 						accent={theme.accent}
@@ -965,7 +965,11 @@ export default function NotesPage({
 
 						{selectedNote ? (
 							<div key={selectedNote.file}>
-								<div data-note-content aria-busy={noteLoading}>
+								<div
+									data-note-content
+									aria-busy={noteLoading}
+									className="2xl:relative 2xl:left-10"
+								>
 									<Suspense fallback={null}>
 										<MarkdownPreview
 											content={selectedNote.content}

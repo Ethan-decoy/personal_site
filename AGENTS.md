@@ -105,6 +105,8 @@ About 页面有独立的 personal/work 分支，不应机械塞入普通页面�
 
 C++ 正文的概念引用应指向目标小节的实际标题锚点，目录导航和明确的「返回主线」保留全文入口。修改相关链接或标题后，运行 `pnpm check:cpp-links`；该检查使用页面实际渲染的锚点验证公开 C++ 笔记中的站内链接，已纳入构建。
 
+规划 C++ 新章、调整分篇或审阅全书覆盖时，核对 `src/notes/cpp/_guidelines/book-structure.md` 的已有范围、依赖与缺口；正文构造遵循同目录的 `writing-style.md`。
+
 Markdown 重点提示使用 `> [!TYPE] 可选标题`，在正文中直接展开。提示块语法与 C++ 笔记使用建议见 `src/notes/cpp/_guidelines/markdown-callouts.md`；调整视觉时参照 `docs/DESIGN.md` 的 Markdown 文档排版约定。
 
 不要把全部 Markdown 正文重新打入首包。修改目录、搜索或渲染逻辑后，至少运行 `pnpm build`，确保 Markdown、侧栏、性能预算和私有目录泄漏检查全部通过。

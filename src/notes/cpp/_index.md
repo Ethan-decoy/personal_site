@@ -48,3 +48,7 @@ sidebarGroups: headings
 26. [可选值与缺失状态](25-optional-values-and-absence/_index.md)
 27. [按键组织数据与有序映射](26-keyed-data-and-ordered-maps/_index.md)
 28. [哈希组织与无序映射](27-hashing-and-unordered-maps/_index.md)
+
+## 06 · 名称与程序组织
+
+29. [命名空间与名称查找](28-namespaces-and-name-lookup/_index.md)

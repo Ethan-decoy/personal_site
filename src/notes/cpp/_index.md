@@ -52,3 +52,4 @@ sidebarGroups: headings
 ## 06 · 名称与程序组织
 
 29. [命名空间与名称查找](28-namespaces-and-name-lookup/_index.md)
+30. [头文件与多文件程序](29-headers-and-multi-file-programs/_index.md)

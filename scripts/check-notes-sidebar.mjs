@@ -428,9 +428,10 @@ try {
 
 	const checks = [
 		{
-			name: "C++ parts use the five overview headings without separate index pages",
+			name: "C++ parts match the overview headings without separate index pages",
 			pass:
-				cppRoot.children.length === 5 &&
+				overviewGroupTitles.length > 0 &&
+				cppRoot.children.length === overviewGroupTitles.length &&
 				cppGroups.length === overviewGroupTitles.length &&
 				cppGroups.every(
 					(group, index) =>

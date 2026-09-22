@@ -437,8 +437,9 @@ let searchBodyIndexPromise: Promise<Map<string, string>> | null = null;
 
 function loadSearchBodyIndex(): Promise<Map<string, string>> {
 	searchBodyIndexPromise ??= import("virtual:notes-search-index")
+		.then(({ default: loadIndex }) => loadIndex())
 		.then(
-			({ default: entries }) =>
+			(entries) =>
 				new Map(
 					entries.map((entry) => [normalizeFileKey(entry.file), entry.body]),
 				),

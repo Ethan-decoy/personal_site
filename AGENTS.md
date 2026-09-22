@@ -97,7 +97,7 @@ About 页面有独立的 personal/work 分支，不应机械塞入普通页面�
 
 笔记加载分为三层：
 
-1. `scripts/notes-manifest-plugin.ts` 在构建期扫描公开 Markdown，生成 `virtual:notes-manifest` 和按需加载的 `virtual:notes-search-index`。
+1. `scripts/notes-manifest-plugin.ts` 在构建期扫描公开 Markdown，生成 `virtual:notes-manifest`；`virtual:notes-search-index` 在搜索时并行加载按序列化大小划分的索引块，合并完整正文索引。开发时 Markdown 修改会使索引快照及全部分块失效，新增或删除文件会刷新目录和分块清单。
 2. `src/notes/index.ts` 使用 `import.meta.glob` 为公开正文建立按文件懒加载器，并构造目录树。逻辑分篇保留正文路径，搜索分类与自动展开路径均由实际侧栏树生成。
 3. `src/notes-renderer.tsx` 使用 React Markdown、GFM、KaTeX 与语法高亮渲染正文。
 

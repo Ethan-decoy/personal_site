@@ -98,6 +98,26 @@ try {
 			vite.ssrLoadModule("/src/notes/sidebar-state.ts"),
 		]);
 	const tree = notes.getSidebarTree();
+	const { default: loadSearchIndex } = await vite.ssrLoadModule(
+		"virtual:notes-search-index",
+	);
+	const searchEntries = await loadSearchIndex();
+	const expectedSearchBodies = new Map(
+		await Promise.all(
+			Object.keys(notes.notesIndex.notesByFile).map(async (file) => [
+				file,
+				(
+					await readFile(
+						new URL(`../src/notes/${file.slice(2)}`, import.meta.url),
+						"utf8",
+					)
+				)
+					.replace(/\r\n/g, "\n")
+					.trim()
+					.toLowerCase(),
+			]),
+		),
+	);
 	const allDirectories = directories(tree);
 	const allFiles = files(tree);
 	const sampleFile = allFiles[0];
@@ -518,6 +538,16 @@ try {
 				!sampleFile ||
 				(loadedSample?.file === sampleFile.file &&
 					typeof loadedSample.content === "string"),
+		},
+		{
+			name: "search chunks preserve every public note body exactly once",
+			pass:
+				searchEntries.length === expectedSearchBodies.size &&
+				new Set(searchEntries.map((entry) => entry.file)).size ===
+					expectedSearchBodies.size &&
+				searchEntries.every(
+					(entry) => expectedSearchBodies.get(entry.file) === entry.body,
+				),
 		},
 		{
 			name: "the deferred full-text index preserves title search",

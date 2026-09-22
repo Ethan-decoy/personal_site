@@ -14,9 +14,11 @@ declare module "virtual:notes-manifest" {
 }
 
 declare module "virtual:notes-search-index" {
-	const searchIndex: Array<{
-		file: string;
-		body: string;
-	}>;
-	export default searchIndex;
+	function loadSearchIndex(): Promise<
+		Array<{
+			file: string;
+			body: string;
+		}>
+	>;
+	export default loadSearchIndex;
 }

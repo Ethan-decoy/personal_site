@@ -1,11 +1,14 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
-import type { Plugin } from "vite";
+import type { Plugin, ViteDevServer } from "vite";
 
 const NOTES_MANIFEST_ID = "virtual:notes-manifest";
 const NOTES_SEARCH_INDEX_ID = "virtual:notes-search-index";
 const RESOLVED_NOTES_MANIFEST_ID = `\0${NOTES_MANIFEST_ID}`;
 const RESOLVED_NOTES_SEARCH_INDEX_ID = `\0${NOTES_SEARCH_INDEX_ID}`;
+const NOTES_SEARCH_CHUNK_PREFIX = `${NOTES_SEARCH_INDEX_ID}/`;
+const RESOLVED_NOTES_SEARCH_CHUNK_PREFIX = `\0${NOTES_SEARCH_CHUNK_PREFIX}`;
+const SEARCH_CHUNK_TARGET_BYTES = 256 * 1024;
 
 type NoteManifestRecord = {
 	file: string;
@@ -156,28 +159,109 @@ async function collectNotes(notesRoot: string): Promise<NoteManifestRecord[]> {
 	);
 }
 
+function createSearchChunks(notes: NoteManifestRecord[]): string[] {
+	// Keep each note intact; a single large note can exceed the chunk target.
+	const chunks: string[] = [];
+	let entries: string[] = [];
+	let bytes = 2;
+	for (const { file, searchText } of notes) {
+		const entry = JSON.stringify({ file, body: searchText.toLowerCase() });
+		const entryBytes = Buffer.byteLength(entry, "utf8");
+		if (entries.length && bytes + 1 + entryBytes > SEARCH_CHUNK_TARGET_BYTES) {
+			chunks.push(`[${entries.join(",")}]`);
+			entries = [];
+			bytes = 2;
+		}
+		bytes += entryBytes + (entries.length ? 1 : 0);
+		entries.push(entry);
+	}
+	if (entries.length) chunks.push(`[${entries.join(",")}]`);
+	return chunks;
+}
+
 export function notesManifestPlugin(): Plugin {
 	let notesRoot = "";
+	let snapshot:
+		| Promise<{
+				notes: NoteManifestRecord[];
+				chunks: string[];
+		  }>
+		| undefined;
+	const loadedChunkIds = new Set<string>();
+
+	function getSnapshot() {
+		snapshot ??= collectNotes(notesRoot)
+			.then((notes) => ({ notes, chunks: createSearchChunks(notes) }))
+			.catch((error) => {
+				snapshot = undefined;
+				throw error;
+			});
+		return snapshot;
+	}
+
+	function isNotePath(file: string) {
+		const relativePath = path.relative(notesRoot, file);
+		return (
+			!relativePath.startsWith("..") &&
+			!path.isAbsolute(relativePath) &&
+			file.endsWith(".md")
+		);
+	}
+
+	function invalidateIndexes(server: ViteDevServer) {
+		snapshot = undefined;
+		const affected = [
+			RESOLVED_NOTES_MANIFEST_ID,
+			RESOLVED_NOTES_SEARCH_INDEX_ID,
+			...loadedChunkIds,
+		]
+			.map((id) => server.moduleGraph.getModuleById(id))
+			.filter((module) => module !== undefined);
+		for (const module of affected) server.moduleGraph.invalidateModule(module);
+		return affected;
+	}
 
 	return {
 		name: "notes-manifest",
 		configResolved(config) {
 			notesRoot = path.resolve(config.root, "src/notes");
 		},
+		buildStart() {
+			snapshot = undefined;
+		},
+		configureServer(server) {
+			const refreshStructure = (file: string) => {
+				if (!isNotePath(file)) return;
+				invalidateIndexes(server);
+				server.ws.send({ type: "full-reload" });
+			};
+			server.watcher.on("add", refreshStructure);
+			server.watcher.on("unlink", refreshStructure);
+		},
 		resolveId(id) {
 			if (id === NOTES_MANIFEST_ID) return RESOLVED_NOTES_MANIFEST_ID;
 			if (id === NOTES_SEARCH_INDEX_ID) return RESOLVED_NOTES_SEARCH_INDEX_ID;
+			if (
+				id.startsWith(NOTES_SEARCH_CHUNK_PREFIX) &&
+				/^\d+$/.test(id.slice(NOTES_SEARCH_CHUNK_PREFIX.length))
+			) {
+				const resolved = `\0${id}`;
+				loadedChunkIds.add(resolved);
+				return resolved;
+			}
 		},
 		async load(id) {
+			const isSearchChunk = id.startsWith(RESOLVED_NOTES_SEARCH_CHUNK_PREFIX);
 			if (
 				id !== RESOLVED_NOTES_MANIFEST_ID &&
-				id !== RESOLVED_NOTES_SEARCH_INDEX_ID
+				id !== RESOLVED_NOTES_SEARCH_INDEX_ID &&
+				!isSearchChunk
 			) {
 				return;
 			}
 
 			this.addWatchFile(notesRoot);
-			const notes = await collectNotes(notesRoot);
+			const { notes, chunks } = await getSnapshot();
 			for (const note of notes) this.addWatchFile(note.absolutePath);
 
 			if (id === RESOLVED_NOTES_MANIFEST_ID) {
@@ -194,29 +278,28 @@ export function notesManifestPlugin(): Plugin {
 				return `export default ${JSON.stringify(manifest)};`;
 			}
 
-			const searchIndex = notes.map(({ file, searchText }) => ({
-				file,
-				body: searchText.toLowerCase(),
-			}));
-			return `export default ${JSON.stringify(searchIndex)};`;
-		},
-		handleHotUpdate({ file, server }) {
-			const relativePath = path.relative(notesRoot, file);
-			if (
-				relativePath.startsWith("..") ||
-				path.isAbsolute(relativePath) ||
-				!file.endsWith(".md")
-			) {
-				return;
+			if (isSearchChunk) {
+				const index = Number(
+					id.slice(RESOLVED_NOTES_SEARCH_CHUNK_PREFIX.length),
+				);
+				const chunk = chunks[index];
+				if (chunk === undefined)
+					throw new Error(`Unknown notes search chunk: ${id}`);
+				return `export default ${chunk};`;
 			}
 
-			const affected = [
-				server.moduleGraph.getModuleById(RESOLVED_NOTES_MANIFEST_ID),
-				server.moduleGraph.getModuleById(RESOLVED_NOTES_SEARCH_INDEX_ID),
-			].filter((module) => module !== undefined);
-			for (const module of affected)
-				server.moduleGraph.invalidateModule(module);
-			return affected;
+			const imports = chunks.map(
+				(_, index) =>
+					`import(${JSON.stringify(`${NOTES_SEARCH_CHUNK_PREFIX}${index}`)})`,
+			);
+			return `export default async function loadSearchIndex() {
+				const chunks = await Promise.all([${imports.join(",")}]);
+				return chunks.flatMap((chunk) => chunk.default);
+			}`;
+		},
+		handleHotUpdate({ file, server }) {
+			if (!isNotePath(file)) return;
+			return invalidateIndexes(server);
 		},
 	};
 }

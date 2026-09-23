@@ -53,3 +53,4 @@ sidebarGroups: headings
 
 29. [命名空间与名称查找](28-namespaces-and-name-lookup/_index.md)
 30. [头文件与多文件程序](29-headers-and-multi-file-programs/_index.md)
+31. [跨文件对象与初始化](30-shared-objects-and-initialization/_index.md)

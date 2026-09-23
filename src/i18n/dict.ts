@@ -21,10 +21,7 @@ export const dict = {
 	// Home
 	"home.status": SHARED.currentFocus,
 	"home.name": { zh: "Ethan C.", en: "Ethan C." },
-	"home.role": {
-		zh: "图像算法工程师",
-		en: "Image Algorithm Engineer",
-	},
+	"home.role": { zh: "R&D", en: "R&D" },
 	"home.focusLabel": { zh: "方向", en: "FOCUS" },
 	"home.focus": {
 		zh: "工业视觉 · 三维测量",

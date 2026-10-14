@@ -1,0 +1,1364 @@
+{
+  "date": "2026-09-11",
+  "scope": "当前工作区第00–16章全部公开C++ Markdown",
+  "counts": {
+    "total": 129,
+    "body": 92,
+    "appendix": 10,
+    "index": 27
+  },
+  "method": "三组分段全文阅读44+43+41份；主审全文阅读总索引、全部章节/附章索引，并交叉复核候选涉及前后文与高风险入口。覆盖记录不表示逐篇双重审阅或零遗漏保证。",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "P2",
+      "title": "模运算、同余与N的含义未形成可推演模型"
+    },
+    {
+      "id": "R2",
+      "severity": "P2",
+      "title": "switch首例的break退出契约隔两节才出现"
+    },
+    {
+      "id": "R3",
+      "severity": "P2",
+      "title": "结构体首例未说明多项初始化的成员对应关系"
+    },
+    {
+      "id": "R4",
+      "severity": "P3",
+      "title": "完整对象缺少与子对象区分的明确判据"
+    },
+    {
+      "id": "R5",
+      "severity": "P3",
+      "title": "早期赋值片段未注明函数体语境"
+    }
+  ],
+  "observations": [
+    {
+      "id": "A1",
+      "title": "int**读法可补充，已有前提足以支撑当前论证"
+    },
+    {
+      "id": "A2",
+      "title": "浮点范围端点措辞可精简，不要求扩充异常机制"
+    }
+  ],
+  "files": [
+    {
+      "file": "src/notes/cpp/_index.md",
+      "reviewer": "主审",
+      "fullRead": true,
+      "lineCount": 27,
+      "sha256": "61bad54d1d497976a217b440e50caa26921ba69610d08fcdb67bec05c86d375f",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "全文阅读总索引并对照17章与所有附章索引；目录覆盖当前篇章，未发现需要全局重排的依据。"
+    },
+    {
+      "file": "src/notes/cpp/00-introduction/_index.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 12,
+      "sha256": "13afe6c93c9d8de09ce96b9f78a4e01dc1fa1371165ceee21575e36bbd1f918a",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。目录顺序与文件序号对应。"
+    },
+    {
+      "file": "src/notes/cpp/00-introduction/01-cpp-overview.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 53,
+      "sha256": "5bd0c32a7652cbea96a4990c7a74c9c3469cef4b5f5c3367a14442ed500f34d0",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。标准、实现与工程判断的职责有就地说明；概览不要求提前展开后续设施。"
+    },
+    {
+      "file": "src/notes/cpp/00-introduction/02-choosing-cpp-development-tools.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 118,
+      "sha256": "1b7d208c5c0ad235f22101307c61b39bde0225d5a0facd6531c1ef6328651861",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。最小程序紧随语法契约表；工具命令与运行环境有区分。已核验 Microsoft 官方 /std 资料仍列 c++23preview。"
+    },
+    {
+      "file": "src/notes/cpp/00-introduction/03-source-file-to-executable.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 129,
+      "sha256": "0aa9f4ffea7620b107fc6377b41cbf3bdf57c0d227a2f6e0ddc235ed8104c5f4",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。预处理、翻译单元、目标文件、符号与链接按职责递进，典型工具链与标准层次明确。"
+    },
+    {
+      "file": "src/notes/cpp/00-introduction/04-whitespace-and-comments.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 147,
+      "sha256": "4f8696d1a02dabb250e6d18be52779ba1c268b7d56d6ce8c5503ee390936a4c5",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。词法记号、空白与两类注释均有具体对照；语义与排版职责明确。"
+    },
+    {
+      "file": "src/notes/cpp/01-objects-types-and-variables/_index.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 16,
+      "sha256": "b271c219241064d23c8c194bff6635132750ab0135923ed7727ceb557c8a03dd",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。目录与附章所属关系明确。"
+    },
+    {
+      "file": "src/notes/cpp/01-objects-types-and-variables/01-object-oriented-programming.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 21,
+      "sha256": "64b379c27a3bfbe795f4fc2ce9eb6f489b70c5b9c51775893f4370ca1b7c5be0",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。直觉导论与语言 object 的范围区分明确。"
+    },
+    {
+      "file": "src/notes/cpp/01-objects-types-and-variables/02-objects-and-data-types.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 86,
+      "sha256": "73365f33c79eb1b5a7ef6bcc5303d0b14eb5375183c20c7dc3117cd446c6007c",
+      "findingIds": [
+        "R5"
+      ],
+      "observationIds": [],
+      "reviewNote": "发现 R5。对象、值、类型、生命周期及 bit/byte 有必要契约；早期操作片段的嵌入语境见 R5。"
+    },
+    {
+      "file": "src/notes/cpp/01-objects-types-and-variables/03-variables-declarations-and-initialization.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 159,
+      "sha256": "391b085bc7350b27256f4410f0762f4599254f101273431c6c13a01493b69b03",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。声明、定义、初始化、赋值有逐步拆解；不确定值片段明确 main 与局部对象。"
+    },
+    {
+      "file": "src/notes/cpp/01-objects-types-and-variables/04-integer-types.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 51,
+      "sha256": "3423ef05880b84488b21c407651ff74ba56ebe7038f2e4c6fbc13bd30f846bfd",
+      "findingIds": [
+        "R1"
+      ],
+      "observationIds": [],
+      "reviewNote": "发现 R1。平台宽度前提清楚；无符号模运算入口模型不足，见 R1。"
+    },
+    {
+      "file": "src/notes/cpp/01-objects-types-and-variables/05-boolean-type.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 41,
+      "sha256": "44c537de68d469ee5bb0bd47e59bd195fd6e0fe70e473ab00159881f65211d31",
+      "findingIds": [
+        "R5"
+      ],
+      "observationIds": [],
+      "reviewNote": "发现 R5。两个值、数值转换、存储与值集合区分清楚；操作片段语境见 R5。"
+    },
+    {
+      "file": "src/notes/cpp/01-objects-types-and-variables/06-characters-and-text-encoding.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 76,
+      "sha256": "e3ecac216c40b8b78a01e12983a53d0d1fda6892f5913ce6add605cad5e49f66",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。从编码映射到码点、UTF-8 编码单元和用户字符有逐层区分，未把 char 当完整字符。"
+    },
+    {
+      "file": "src/notes/cpp/01-objects-types-and-variables/07-floating-point-types.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 50,
+      "sha256": "08f9d35dbd6dccadbd7e3bed6badd0997be36162c0d38b2d00434efc0c344ada",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。范围、精度、可表示值及实现前提有解释，附章职责有定位。"
+    },
+    {
+      "file": "src/notes/cpp/01-objects-types-and-variables/deep-dives/_index.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 10,
+      "sha256": "15dcc03cff41ad193005a80a48faf73dec45a7576cbf6c4927f4b73dc315839f",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。sidebarAfter 指向浮点类型主线，实际插入关系满足当前附章前提。"
+    },
+    {
+      "file": "src/notes/cpp/01-objects-types-and-variables/deep-dives/01-binary-floating-point-representation.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 415,
+      "sha256": "ee6e7916e65b79a6bc8f200834b03390fb4d51fba60c867cf3a2fefe24798809",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。全文含数学推导已读；bias、e/E、f/F、隐含前导位与非规格化数均有现有解释，不复报旧问题。"
+    },
+    {
+      "file": "src/notes/cpp/02-expressions-and-operators/_index.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 15,
+      "sha256": "92c03e3fdd22ed149a6cd5d7b04a6b68872b51f448dd8613dbc8fac4cc81480d",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。正文与附章的入口一致。"
+    },
+    {
+      "file": "src/notes/cpp/02-expressions-and-operators/01-expressions-evaluation-and-operators.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 116,
+      "sha256": "090c6075888abd40c2c60fa40799fc2c658ebeb95bb63c6992bed2c8b2b4c7c8",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。对象身份、值计算、运算符与副作用中性含义均就地说明，当前修正有效。"
+    },
+    {
+      "file": "src/notes/cpp/02-expressions-and-operators/02-arithmetic-operations-and-result-types.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 121,
+      "sha256": "c78371c9136d7c432c00ae3369f59cb12c3085b3d7a25f06652730ec81b79c82",
+      "findingIds": [
+        "R1"
+      ],
+      "observationIds": [],
+      "reviewNote": "发现 R1。运算类型、整数除法与失败边界明确；无符号模运算沿用 R1 的未闭合前提。"
+    },
+    {
+      "file": "src/notes/cpp/02-expressions-and-operators/03-usual-arithmetic-conversions.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 135,
+      "sha256": "43e666fb0ad34cbbf9d47b7410a82e7f6081a22e5ed622a85403757211e82ac4",
+      "findingIds": [
+        "R1"
+      ],
+      "observationIds": [],
+      "reviewNote": "发现 R1。共同类型与整数提升有具体解释；模同余与未绑定 N 见 R1。"
+    },
+    {
+      "file": "src/notes/cpp/02-expressions-and-operators/04-assignment-and-object-state.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 170,
+      "sha256": "14683791fbaf5a4636abf908c44d685e670d638d5e06fd9a7d3a13f4637f9b87",
+      "findingIds": [
+        "R1"
+      ],
+      "observationIds": [],
+      "reviewNote": "发现 R1。值计算、修改、前后置和算术/写回边界有解释；32768 转 -32768 推导仍依赖 R1。"
+    },
+    {
+      "file": "src/notes/cpp/02-expressions-and-operators/05-comparison-and-logical-operations.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 132,
+      "sha256": "cba891414df3d12d9d2217118eccdea6d9108eabedd014edda11280d19a0993f",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。比较结果、NaN 条件、短路保护及先后关系有足够使用契约。"
+    },
+    {
+      "file": "src/notes/cpp/02-expressions-and-operators/06-expression-structure-and-evaluation-order.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 180,
+      "sha256": "c5cad4c8a002323e8e2f58338faa44a6d6e60395ad1d2d513444551291746647",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。分组与顺序明确区分；完整表达式及三种顺序关系、冲突副作用有示例。"
+    },
+    {
+      "file": "src/notes/cpp/02-expressions-and-operators/deep-dives/_index.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 10,
+      "sha256": "4a8673a0233336e6ec5dc32742f9aa7ecb41f3165d109f62467b7afae223ddc9",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。sidebarAfter 紧跟算术主线；正文就地回顾了浮点表示所需的最小关系。"
+    },
+    {
+      "file": "src/notes/cpp/02-expressions-and-operators/deep-dives/01-floating-point-arithmetic-and-error.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 395,
+      "sha256": "62f918784e03734678429e30bc3390fc185fa2ce73d93323d177da7987c25650",
+      "findingIds": [],
+      "observationIds": [
+        "A2"
+      ],
+      "reviewNote": "本轮未保留确定问题。当前bias、s/m/e/f、subnormal与ULP有实质解释；215行范围措辞单列可选观察A2，不要求展开整套浮点异常。"
+    },
+    {
+      "file": "src/notes/cpp/03-blocks-scope-and-lifetime/_index.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 11,
+      "sha256": "cbc71c380fd12a524565f5aaf7903ee002790ce6e8a6e01ee0b6eca6cfd7ac7f",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。目录依赖顺序合理。"
+    },
+    {
+      "file": "src/notes/cpp/03-blocks-scope-and-lifetime/01-statements-and-compound-statements.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 57,
+      "sha256": "6fecb05d3c003ba829467971f2940303b8e39f4f5bc4978acfebc4e4d6b8c2fd",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。语句、块与初始化花括号按语法位置区分，包含嵌入位置说明。"
+    },
+    {
+      "file": "src/notes/cpp/03-blocks-scope-and-lifetime/02-block-scope-and-name-lookup.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 99,
+      "sha256": "e4e6bb3d5e19fe2545af572e4bd487c5e17ff107008141ac15b426586f8b0dab",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。作用域、声明生效、隐藏与对象独立性有推演示例。"
+    },
+    {
+      "file": "src/notes/cpp/03-blocks-scope-and-lifetime/03-automatic-storage-duration-and-local-object-lifetime.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 130,
+      "sha256": "83190fd1cc1a179fecf447b13557ba3e64b0bfee85d6bbaba29e00865eb870a6",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。作用域、存储期和生命周期分开说明，初始化前读取和退出销毁边界清楚。"
+    },
+    {
+      "file": "src/notes/cpp/04-control-flow/_index.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 13,
+      "sha256": "38ae57143f422f0cbc658d51453c17736e83f5da62658f4dcfc3ef445b4800b8",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。阅读顺序为条件、switch、循环，再到控制转移，确认首次 break 入口在 switch 篇。"
+    },
+    {
+      "file": "src/notes/cpp/04-control-flow/01-conditional-statements.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 138,
+      "sha256": "774ad3cedcfc26d0bfd32332ff2d43197ebaaae03820d5dacbc6c913bafa75e0",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。if/else/条件运算符的条件、候选和求值规则按当前范围解释。"
+    },
+    {
+      "file": "src/notes/cpp/04-control-flow/02-switch-statements.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 193,
+      "sha256": "f88da7dd60450ff6c5f034382c7b643e4c998e7ca9d9067cf5b00747f0785425",
+      "findingIds": [
+        "R2"
+      ],
+      "observationIds": [],
+      "reviewNote": "发现 R2。case 常量、贯穿、属性和作用域有说明；首次 break 契约位置见 R2。"
+    },
+    {
+      "file": "src/notes/cpp/04-control-flow/03-condition-controlled-loops.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 107,
+      "sha256": "71349b331cf380841964c077fac7a42037b17c3e84447cec88b277e14bc76ca4",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。两类循环顺序、每轮对象和终止边界有说明，C++23 前向进展没有用运行表现代替保证。"
+    },
+    {
+      "file": "src/notes/cpp/04-control-flow/04-loop-state-and-for-statement.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 104,
+      "sha256": "c3e09de9378ff6e1d3ca2ac54905b9a801acf1eb9ae14782b6ef9d0e1b42da5d",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。for 各段作用和执行次序明确；省略条件与循环变量生命周期有说明。"
+    },
+    {
+      "file": "src/notes/cpp/04-control-flow/05-control-transfers-in-loops.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 143,
+      "sha256": "8affc17ecb4ab20cae47bfe53d95f5875609b824df2b42580482e5ea17d25f00",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。break/continue 目标、迭代位置和退出销毁有闭合示例。"
+    },
+    {
+      "file": "src/notes/cpp/05-functions/_index.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 16,
+      "sha256": "38d7fa41a037764127b2e596e71437eb2d9a5cd4fc4888822c4277c0a1838890",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。函数主线及附章位置与文件顺序相符。"
+    },
+    {
+      "file": "src/notes/cpp/05-functions/01-function-structure-and-calls.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 77,
+      "sha256": "42af09469388196924ee894d11d8fdece69c0bd0f3f2027450e32db218ef87eb",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。函数定义组成、调用语法、返回和调用表达式都有局部使用契约。"
+    },
+    {
+      "file": "src/notes/cpp/05-functions/02-parameters-and-arguments.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 107,
+      "sha256": "1868649a0af292ac62746957d5e1d02325790cbfff4e4fb0208b649289872e32",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。形参/实参、按值独立性和形参初始化求值次序均有具体解释。"
+    },
+    {
+      "file": "src/notes/cpp/05-functions/03-return-values-and-the-return-statement.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 115,
+      "sha256": "bd379776ce6c2c60f0a24989190c6b7bc7adc64f13cda240d9c1cd7017ff80ad",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。return、void 和遗漏返回值边界均在使用处解释，局部对象与返回结果分开。"
+    },
+    {
+      "file": "src/notes/cpp/05-functions/04-function-declarations-and-definitions.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 133,
+      "sha256": "71bbea918b635b5deb8d0a00b6637b45ec5bcdc90f9a31950a3a648dc1c6ceaf",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。前向声明、可见性、定义缺失及函数体不能嵌套逐步建立。"
+    },
+    {
+      "file": "src/notes/cpp/05-functions/05-nested-calls-and-independent-call-state.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 102,
+      "sha256": "65ce3a5e3b81c1208d779c862be4f3b69d682353be7a60c854f92ba30d7c3e7e",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。独立调用状态、递归终止及资源边界有说明；未假设必有物理栈。"
+    },
+    {
+      "file": "src/notes/cpp/05-functions/06-main-function-and-program-entry.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 73,
+      "sha256": "511a036382f9ab4ea31c5d48213d93c1395c97724d2d68d6d8d6302bf2edcb6d",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。托管实现、main 特殊声明和退出状态有必要契约。"
+    },
+    {
+      "file": "src/notes/cpp/05-functions/deep-dives/_index.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 11,
+      "sha256": "c9ca9015818e991a973122d16853f0774d12c9e1ac740bce73eba0b6fad9b810",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。sidebarAfter 指向嵌套调用正文，两篇附章依赖满足。"
+    },
+    {
+      "file": "src/notes/cpp/05-functions/deep-dives/01-call-stack-and-stack-frames.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 91,
+      "sha256": "d4541f43bf5259718fc9be899bf365d01379612167822bf39aea027213ad7eed",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。栈帧、寄存器、ABI 均有最小介绍；实现结构与语言生命周期分开。"
+    },
+    {
+      "file": "src/notes/cpp/05-functions/deep-dives/02-application-binary-interface.md",
+      "reviewer": "00–05",
+      "fullRead": true,
+      "lineCount": 101,
+      "sha256": "d7529340421a00913dd0e116ebf2bdcf79628ee45e98e02cc1ae70b48a358d31",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题。分别编译依赖已由第0章建立并局部回顾；ABI/API/调用约定等逐步解释。"
+    },
+    {
+      "file": "src/notes/cpp/06-constants-literals-and-type-conversions/_index.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 14,
+      "sha256": "ce68840d2a4fb904c02c47ae7330283b1d8a4f162be309bfe35d145108b07852",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/06-constants-literals-and-type-conversions/01-literals-and-their-types.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 110,
+      "sha256": "8053743d46b11b060d0f5f86e6c76ce1e2fdc0ac9e550904c04a366617d27224",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/06-constants-literals-and-type-conversions/02-const-objects.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 85,
+      "sha256": "2e29953e57d38f87c67816338c75cbbc1365bc37a173332a6997fb3ca851f18e",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/06-constants-literals-and-type-conversions/03-constant-expressions-and-constexpr.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 101,
+      "sha256": "81808f3c4772b3d1b4b811b92691bf2c15faa685c837975e37344384c13cc4b6",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/06-constants-literals-and-type-conversions/04-implicit-type-conversions.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 94,
+      "sha256": "87af9e1e59d81d4be0c634b5642724e2161e0cdaae727f3418cfd2f3aed2ff52",
+      "findingIds": [
+        "R1"
+      ],
+      "observationIds": [],
+      "reviewNote": "关联R1：62行已给出N为目标类型宽度，但同余关系仍沿用前序未闭合的数学模型；优先在首次引入处补齐。"
+    },
+    {
+      "file": "src/notes/cpp/06-constants-literals-and-type-conversions/05-list-initialization-and-narrowing.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 108,
+      "sha256": "dc24483832c170fe8bdc4bb3bba2c3cf588f3c2524e7b638be056dcda3aa057d",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/06-constants-literals-and-type-conversions/06-explicit-type-conversions.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 84,
+      "sha256": "6c6bf5d51de525ad72d33d91bacecdf0decc5c904f983581cc8657b909fc1218",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/07-object-addresses-and-pointers/_index.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 15,
+      "sha256": "326f451076d4707428be09e0279cacac26472d2a0269241db877c5825252b475",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/07-object-addresses-and-pointers/01-objects-storage-and-addresses.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 62,
+      "sha256": "82516f3eb47cca0167fe9d93c5e925b6f6f99cd0c66c187420ac7f1076d2bbe3",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/07-object-addresses-and-pointers/02-pointer-types-values-and-objects.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 61,
+      "sha256": "baed5ed9b4de19b1b6f67e0ed24514b2f6a4bfdcfc407d1b88ba0099fec945db",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/07-object-addresses-and-pointers/03-indirection-and-pointees.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 65,
+      "sha256": "a781bb0ce1d8a2e3b05414e58361ad39b8b60a78f5463ae9d85b9be062446a04",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/07-object-addresses-and-pointers/04-pointer-copying-reseating-and-aliasing.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 68,
+      "sha256": "f9d6f7dfb84425d4f66bc443edbc645dbfde94c1fec262747030eefc2810ef76",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/07-object-addresses-and-pointers/05-null-dangling-pointers-and-validity.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 100,
+      "sha256": "2f40da6ef6a6348e49eceb470294373618cebe274056a632cc430f382bff3a6d",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/07-object-addresses-and-pointers/06-pointers-and-const-qualification.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 75,
+      "sha256": "45a0d9109aa66c0b18b4bf7f4a2f75d531550db5296317728d277e808e065636",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/07-object-addresses-and-pointers/deep-dives/_index.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 10,
+      "sha256": "b89f74458a68d8c1b0933a3b6f9610533c7568d949504fa0350b2d8850432172",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/07-object-addresses-and-pointers/deep-dives/01-virtual-memory-and-address-translation.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 109,
+      "sha256": "c22ace466eb85ce7bdd9c85f7d1e98b216b9a6d1836174c0e49623f22ebaf412",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/08-object-identity-and-lvalue-references/_index.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 15,
+      "sha256": "daf03d797900c9f96d0e2eed2c82595e0034cd72d985b41567dbc390a7cc2fef",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/08-object-identity-and-lvalue-references/01-object-identity-and-expression-results.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 130,
+      "sha256": "73133df181441163d35f78da6703eba94ee973f4ea2b134cb7c97f8dfe57a120",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/08-object-identity-and-lvalue-references/02-lvalue-references-and-reference-binding.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 138,
+      "sha256": "b93e4b36cecb22a2f456e6f096df9dff08982478123eca70a829325bc3adab78",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/08-object-identity-and-lvalue-references/03-const-lvalue-references-and-access-constraints.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 86,
+      "sha256": "8a5b4bcdcb24524b92e6fbef6d83ad29117268add35b59a97a76bb3e26922784",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/08-object-identity-and-lvalue-references/04-temporary-objects-and-lifetime-extension.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 111,
+      "sha256": "932a7ecdb8ed4e7bb769ba0900962f1ca59ed0ad67827d98b3889e2a6e6f0cd7",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/08-object-identity-and-lvalue-references/05-reference-parameters-and-caller-objects.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 116,
+      "sha256": "b60d8bc92e1454889b7969a12e4e38c0505c48e104b62abbcd6702afcb4830a4",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/08-object-identity-and-lvalue-references/06-reference-returns-and-lifetime-boundaries.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 114,
+      "sha256": "8f487f309f683da8c17f287f2713a0e6cde4f755a6ef618e6d300c616fc10ced",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/08-object-identity-and-lvalue-references/deep-dives/_index.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 10,
+      "sha256": "3bdd69c736eab0d352f938f7d2fd6961664b2a4aa40c9aa6162d636bbb51139c",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/08-object-identity-and-lvalue-references/deep-dives/01-reference-semantics-and-implementation-models.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 109,
+      "sha256": "2815e0b9ec8365d803f78b6ce8587eebbb5e4bfa49c620cfdb9024759e5a9aa0",
+      "findingIds": [],
+      "observationIds": [
+        "A1"
+      ],
+      "reviewNote": "本轮未保留确定问题。A1：可补int**读法；反向核验认为前序指针对象、int*&分层关系及本篇50行已足以支撑当前取地址对照，降为可选可读性建议。"
+    },
+    {
+      "file": "src/notes/cpp/09-structures-and-object-composition/_index.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 15,
+      "sha256": "8236989a32e16bc7871a714f7cee4cb95279f68e80380e31622b80f1fa250355",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/09-structures-and-object-composition/01-user-defined-types-and-struct-definitions.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 71,
+      "sha256": "9637a20f233aeb4ad60a07b73f438d0ce5dfbe9c3b9eded4e0598062bac715c2",
+      "findingIds": [
+        "R3"
+      ],
+      "observationIds": [],
+      "reviewNote": "发现 R3"
+    },
+    {
+      "file": "src/notes/cpp/09-structures-and-object-composition/02-data-members-and-member-subobjects.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 91,
+      "sha256": "71637595b443abe590cacac20a73658b53419fc90b0ebb151b9cf120769f48b7",
+      "findingIds": [
+        "R4"
+      ],
+      "observationIds": [],
+      "reviewNote": "发现 R4"
+    },
+    {
+      "file": "src/notes/cpp/09-structures-and-object-composition/03-aggregate-initialization-and-default-member-initializers.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 122,
+      "sha256": "fde720d66841ba203869cdaa47cce3090aba399c85ca152eb906856866521d74",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/09-structures-and-object-composition/04-copying-and-assigning-struct-objects.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 92,
+      "sha256": "bdc62ff98a6f630c6d7ad7096134acea0fc8abc7b53c2f5a0684c8219ce52406",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/09-structures-and-object-composition/05-structs-in-function-interfaces.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 97,
+      "sha256": "24e572c93a7cfe67448f97f59bc39f64cf5e59b64f51b009178b6795082b935e",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/09-structures-and-object-composition/06-object-composition-and-lifetime-relationships.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 110,
+      "sha256": "138c48ede5d93031af9b48ace485b8d9a7b748b5a3a9a008f80b0c8d35df8216",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/09-structures-and-object-composition/deep-dives/_index.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 10,
+      "sha256": "f1a3c02896415e9ee6d6972125e319743aa687ed01d5d32a608c49915b6be000",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/09-structures-and-object-composition/deep-dives/01-object-layout-alignment-and-padding.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 218,
+      "sha256": "d5c933ec3d6c90a2ac75af089c94f2fe9d419904b17cb92d3a2ce0ece8cd6fcd",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/10-class-interfaces-and-encapsulation/_index.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 15,
+      "sha256": "115b5023932913d37f65a03d7ec5bf7bb68a9f63195dd01e3be92ac4d4b847a1",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/10-class-interfaces-and-encapsulation/01-member-functions-and-invocation-objects.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 84,
+      "sha256": "76cdb081ead2189e7219b566f57848bc93780be735c061c55e057a5df71d613e",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/10-class-interfaces-and-encapsulation/02-const-member-functions-and-read-only-access.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 105,
+      "sha256": "f6905a62fc130de72ac397f10725a23c1aa4aa84c8f73fa6a392db95a6ca5adb",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/10-class-interfaces-and-encapsulation/03-access-control-and-class-interfaces.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 94,
+      "sha256": "5c32f62e1b9b41a769e718077ec7880d2aceee6c89b339f29ccae2013f8737f3",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/10-class-interfaces-and-encapsulation/04-constructors-and-member-initialization.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 118,
+      "sha256": "bb37e2075463ec7e9ae6adfd606bd23f06aa7eb92a195b99512b2c92bd0e911e",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/10-class-interfaces-and-encapsulation/05-encapsulation-and-class-invariants.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 110,
+      "sha256": "dfd2aa424eeb7a0932420d48c006f94eb725a235da98f4f13f9bb597de19949e",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/10-class-interfaces-and-encapsulation/06-member-function-declarations-and-out-of-class-definitions.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 103,
+      "sha256": "0ce59c1f26fef3d1be216fefde61066dab220a5e8b241b651ce7c8332276ed28",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/10-class-interfaces-and-encapsulation/deep-dives/_index.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 10,
+      "sha256": "60b571fb11b0cd1cccae20adb3a9e09d51e7bd829f53713a59f33cfc69709a5a",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/10-class-interfaces-and-encapsulation/deep-dives/01-implicit-object-parameter-this-and-implementation-model.md",
+      "reviewer": "06–10",
+      "fullRead": true,
+      "lineCount": 121,
+      "sha256": "bcec167fd8df2fda629915b9705e95847a34f31e43a35a498fbd65aeb30e5cb3",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "本轮未发现具体问题"
+    },
+    {
+      "file": "src/notes/cpp/11-function-overloading-and-overload-resolution/_index.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 14,
+      "sha256": "ae280c22363ee5e217ea9e594eb819845ad6091d8b34fdb5df70c25af7e15995",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "标题与目录能表达查阅入口；当前正文顺序与 order/文件编号一致。"
+    },
+    {
+      "file": "src/notes/cpp/11-function-overloading-and-overload-resolution/01-overloaded-functions-and-overload-sets.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 96,
+      "sha256": "ba447f3101dbab5f9b5e1a3acb240bd904866ad5302d7076f41be5622aa03cc8",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "重载、重载决议、重载集与调整后的形参列表均有当前语义和区分例；顶层 const、引用来自前序。"
+    },
+    {
+      "file": "src/notes/cpp/11-function-overloading-and-overload-resolution/02-candidate-and-viable-functions.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 127,
+      "sha256": "e1a9eb31acff9600f1a0490937ba5c6d10535c50729084269055e0be928c3051",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "候选/可行先建立职责，数值转换与引用绑定示例随后说明可行性；没有只凭名称判断。"
+    },
+    {
+      "file": "src/notes/cpp/11-function-overloading-and-overload-resolution/03-best-viable-functions-and-ambiguous-calls.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 144,
+      "sha256": "8f489670a238b09ca0eeacb330f56b1248413cdc3983476a04753d0fc9fac9c0",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "隐式转换序列先界定实参初始化形参的路径；等级表和歧义、多实参比较均有可推演例。"
+    },
+    {
+      "file": "src/notes/cpp/11-function-overloading-and-overload-resolution/04-member-function-and-constructor-overloads.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 159,
+      "sha256": "df7a0c1b18773b65c81f1a8eb192299ccab781955d5b92233181e63bcce900d2",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "沿用已建立的成员调用对象、尾随 const 和构造初始化，说明它们怎样进入既有重载模型。"
+    },
+    {
+      "file": "src/notes/cpp/11-function-overloading-and-overload-resolution/05-design-boundaries-of-overloaded-interfaces.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 148,
+      "sha256": "edc09ef19d8e8db25272642d515bba4990570e9c179076a5068b5427a34f311c",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "综合篇使用已建立的重载、单位结构和 static_cast；工程判断保留单位、范围和语义条件。"
+    },
+    {
+      "file": "src/notes/cpp/11-function-overloading-and-overload-resolution/deep-dives/_index.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 10,
+      "sha256": "a54093198c7fbab51607dcd058163521eb8a3584f830084fbfd970ab63a8c1e1",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "已核对 sidebarAfter 与主线位置一致，附章前提在对应正文或就地解释建立。"
+    },
+    {
+      "file": "src/notes/cpp/11-function-overloading-and-overload-resolution/deep-dives/01-standard-conversion-sequences-and-overload-ranking.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 138,
+      "sha256": "c7aed65c63bfba788284dbf1daee8dd9009b1dd2a6fd6db51918884989f7b59b",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "标准转换阶段、引用绑定和同等级比较均有局部示例；侧栏在 11/03 后，所需前提成立。"
+    },
+    {
+      "file": "src/notes/cpp/12-operator-overloading-and-expression-semantics/_index.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 13,
+      "sha256": "58c7c6fd5d0cd268e1a125639e0b6032455cd0d8420505c85049373c689406c0",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "标题与目录能表达查阅入口；当前正文顺序与 order/文件编号一致。"
+    },
+    {
+      "file": "src/notes/cpp/12-operator-overloading-and-expression-semantics/01-operator-functions-and-class-type-expressions.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 80,
+      "sha256": "0d94d5476ce9e6b9f933d5092c725fe3e3580e1bfbceb9756e1852d065791ad3",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "operator+ 紧邻首次示例拆为返回类型、函数名及操作数形参；区分运算符表达式与直接调用。"
+    },
+    {
+      "file": "src/notes/cpp/12-operator-overloading-and-expression-semantics/02-member-and-non-member-operator-functions.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 79,
+      "sha256": "3de2d8ec1ed7eb7f1f3822e0328e533df34c98204cb7ccab26272fb8de08753a",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "成员/非成员分别说明调用对象与形参角色；替代定义明确，未重复并入造成歧义。"
+    },
+    {
+      "file": "src/notes/cpp/12-operator-overloading-and-expression-semantics/03-compound-assignment-and-value-producing-operations.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 78,
+      "sha256": "0060fa77a92203c2c504609cb3c48ddf2ea9736542ce87b19854ac3e59f70664",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "返回引用与 return *this 的当前语义在局部解释；前序 this 铺垫可追查，整数相加范围有声明。"
+    },
+    {
+      "file": "src/notes/cpp/12-operator-overloading-and-expression-semantics/04-equality-operators-and-object-state.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 89,
+      "sha256": "c0b7e858ea582cba3c54f7e518a2404188b7bf8def95cdcbbd0c69e8f33a2333",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "相等、对象身份和值状态的关系通过对照值落实；相等性质有就地中文含义，指针比较有语义边界。"
+    },
+    {
+      "file": "src/notes/cpp/12-operator-overloading-and-expression-semantics/05-design-boundaries-of-operator-interfaces.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 120,
+      "sha256": "76f4078e0f9ec94f4d4bfe623ae9ccf74927b36be4abe8486760dabef398eb4c",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "保留分组/求值区别；重载逻辑运算失去短路的后果通过可观察标记呈现，并保留求值顺序条件。"
+    },
+    {
+      "file": "src/notes/cpp/13-user-defined-conversions-and-explicit-interfaces/_index.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 15,
+      "sha256": "0bd074bdc6d44c62633f9e12de34a427ab035e6ceb4e833c43e43fd33464c1f5",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "标题与目录能表达查阅入口；当前正文顺序与 order/文件编号一致。"
+    },
+    {
+      "file": "src/notes/cpp/13-user-defined-conversions-and-explicit-interfaces/01-constructing-class-objects-from-other-types.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 78,
+      "sha256": "889a1a75a7146c7c4679109f0d0b372a27f07f5198289d5523fa7e547179f96e",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "先区分构造函数与转换函数承担的方向，当前只深化目标类构造；不要求先掌握转换函数语法才能阅读。"
+    },
+    {
+      "file": "src/notes/cpp/13-user-defined-conversions-and-explicit-interfaces/02-explicit-construction-and-implicit-conversion-boundaries.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 110,
+      "sha256": "ad4c73cbee90e6ab430eb612d189d1a70bc0290452f52ebe876ec3fd57a6f107",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "explicit 的意义、初始化语境、失败边界以及转换构造函数分类均已说明；复制列表初始化有条件回指。"
+    },
+    {
+      "file": "src/notes/cpp/13-user-defined-conversions-and-explicit-interfaces/03-conversion-functions-and-target-type-results.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 140,
+      "sha256": "09e6ee347c51c0f3305d87b876299635b3ba0b76241a1d836efd0284a1f2650c",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "近期修复生效：转换函数声明拆解先于完整类；explicit operator bool 的特殊语境以直接/复制初始化解释。"
+    },
+    {
+      "file": "src/notes/cpp/13-user-defined-conversions-and-explicit-interfaces/04-user-defined-conversions-and-overload-resolution.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 122,
+      "sha256": "29b73a6958df86b8c6bafd99e342d4417baefd4cef2bb3991b81c56dd6cdf21f",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "用户定义序列与标准序列区别明晰；类前向声明在使用前补了最小语义，双入口竞争区分初始化语境。"
+    },
+    {
+      "file": "src/notes/cpp/13-user-defined-conversions-and-explicit-interfaces/05-mixed-type-operations-and-conversion-symmetry.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 79,
+      "sha256": "d9d6b350918c9451a02934be7c470439dda93e4264e2c70ee4de76b5530d00e5",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "转换机会按成员/非成员的操作数角色解释，且限制普通二元 operator+，不误套到比较重写候选。"
+    },
+    {
+      "file": "src/notes/cpp/13-user-defined-conversions-and-explicit-interfaces/06-design-boundaries-of-conversion-interfaces.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 72,
+      "sha256": "1d6cbf9359b2becaed919c618d37d79fc2fc887f3751397903850289dea3f640",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "转换接口、具名损失策略与业务合法性区分清楚；long 容量前提就地写明。"
+    },
+    {
+      "file": "src/notes/cpp/13-user-defined-conversions-and-explicit-interfaces/deep-dives/_index.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 10,
+      "sha256": "55de595e09652c6c3e1f52b5302feb58903e742fa69edfd0c83f99023d7d3abd",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "已核对 sidebarAfter 与主线位置一致，附章前提在对应正文或就地解释建立。"
+    },
+    {
+      "file": "src/notes/cpp/13-user-defined-conversions-and-explicit-interfaces/deep-dives/01-user-defined-conversion-sequences-and-overload-ranking.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 210,
+      "sha256": "38ae6c4538bbce1009dec5cdf78b03ad4e7ea62d6fc16191ee1e174a719cacfc",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "近期 operator short 局部声明解释与隐式触发链已补齐；三段序列、列表初始化例外及 explicit 选后检查有完整路径。"
+    },
+    {
+      "file": "src/notes/cpp/14-copying-class-objects-and-copyability/_index.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 13,
+      "sha256": "d2c8b7a641172b7e28bdd96ae2aeccf6c468e4becc609c14f01d911b325f2f9d",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "标题与目录能表达查阅入口；当前正文顺序与 order/文件编号一致。"
+    },
+    {
+      "file": "src/notes/cpp/14-copying-class-objects-and-copyability/01-same-type-initialization-and-copy-construction.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 116,
+      "sha256": "5540f352a2ea071c1fa19c67f5b867959530b4d145c8b627b012c301b99bc6e5",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "复制构造沿用类构造、const 引用和成员初始化语法；与复制初始化、赋值的区别有对象身份解释。"
+    },
+    {
+      "file": "src/notes/cpp/14-copying-class-objects-and-copyability/02-copy-assignment-and-existing-object-state.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 122,
+      "sha256": "23c1f361c038f5bec437ecac77050261c6ff9a9c1b382e88e62df63d8fb06cbb",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "operator= 沿用已建立运算符命名与成员接口；自赋值、源 const 与返回引用角色有实际过程。"
+    },
+    {
+      "file": "src/notes/cpp/14-copying-class-objects-and-copyability/03-implicit-copy-operations-and-member-semantics.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 109,
+      "sha256": "003e74a25e21bc3204a4f4044658c6447b5b1f98784b86788920eeec4a695b3c",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "隐式声明先解释语言提供接口；逐成员构造/赋值、别名保留及 const 成员限制逐步建立。"
+    },
+    {
+      "file": "src/notes/cpp/14-copying-class-objects-and-copyability/04-defaulted-and-deleted-copy-operations.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 138,
+      "sha256": "da7f8d454b776ef930803ab3eab944c437e20f93d17f03775212c8fb90623e15",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "= default/= delete 在首次代码前已解释位置、含义、分号、候选保留；无名形参在 05/04 已建立。"
+    },
+    {
+      "file": "src/notes/cpp/14-copying-class-objects-and-copyability/05-design-boundaries-of-copy-interfaces.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 59,
+      "sha256": "375f2b69d4f2da07bb33fd60154eff5838c06144c2101caa782aeeceb8b321a1",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "值型与身份语义注明设计层次；复制前先确认领域含义，外部别名和自指成员关系有具体后果。"
+    },
+    {
+      "file": "src/notes/cpp/15-class-object-destruction-and-resource-lifetime/_index.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 12,
+      "sha256": "2f09b7dda2827ee1c468bf88d32c3e99aa7510465f11c446fe02511a98c8bf68",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "标题与目录能表达查阅入口；当前正文顺序与 order/文件编号一致。"
+    },
+    {
+      "file": "src/notes/cpp/15-class-object-destruction-and-resource-lifetime/01-destructors-and-class-object-destruction.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 79,
+      "sha256": "5ab8db4a13d0437ca87da9c466d8b0a2e908647774169a8acbd9236b55ba6532",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "析构特殊函数由完整程序及紧邻语法解释建立；生命周期精确终点与析构期间成员访问分开说明。"
+    },
+    {
+      "file": "src/notes/cpp/15-class-object-destruction-and-resource-lifetime/02-implicit-destructors-and-reverse-member-destruction.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 107,
+      "sha256": "7262611a0f16824af2bbd7341b40f66f3212d4c0f52e950a2d8b854a0483c627",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "析构函数体与成员销毁、逆序关系、默认析构及删除约束均接上既有构造模型。"
+    },
+    {
+      "file": "src/notes/cpp/15-class-object-destruction-and-resource-lifetime/03-scope-bound-cleanup-and-raii.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 92,
+      "sha256": "7d9f55cd091a2e2ba085ecb54bda8d765c3aecd1ad88cc120293ba363a88164a",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "资源与 RAII 先给具体配对责任；提前返回对照、删除复制原因及外部生命周期均已建立。计数范围观察未升级，见排除项。"
+    },
+    {
+      "file": "src/notes/cpp/15-class-object-destruction-and-resource-lifetime/04-design-boundaries-of-resource-responsibility-and-copyability.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 71,
+      "sha256": "4ee274491d00640d820b7147b79db849cf8c1b7322204e921c8899ca05943d84",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "综合既有析构、复制和观察关系判断责任；没有提前用智能指针、异常或尚未建立设施填充实践。"
+    },
+    {
+      "file": "src/notes/cpp/16-rvalue-references-and-move-semantics/_index.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 14,
+      "sha256": "bfd5794e171b9d88e1b59fb71659d254a91c15f70de969ad99bf6f46287ed5cd",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "标题与目录能表达查阅入口；当前正文顺序与 order/文件编号一致。"
+    },
+    {
+      "file": "src/notes/cpp/16-rvalue-references-and-move-semantics/01-rvalue-references-and-xvalues.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 74,
+      "sha256": "a6ffddf53d8ddf693909ac2b11df13943181d28741c50e0af7eb13337f2aaf0e",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "T&& 先明确是引用声明而非逻辑与；名字为左值、xvalue 身份和临时物化延寿有局部对象追踪。"
+    },
+    {
+      "file": "src/notes/cpp/16-rvalue-references-and-move-semantics/02-std-move-and-expression-category-conversion.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 69,
+      "sha256": "c3155eeaa93edb4e2e7cf82d3c8c556ddc593045822dbc9d7d4efbcdef5f4123",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "std::move 的头文件、返回引用、cv 保留、不转移资源契约先于例子；引用返回不延寿用当前整数例说明。"
+    },
+    {
+      "file": "src/notes/cpp/16-rvalue-references-and-move-semantics/03-move-construction-and-resource-transfer.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 96,
+      "sha256": "d90d031c385e515a9b4373e216a2865bf1d84f03cf94e43c3b8acf0ae2c96bdc",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "T(T&&) 与空/有责任状态先建立，示例逐步展示取指针和清空源；对象身份、调用选择和移动后可用性区分。"
+    },
+    {
+      "file": "src/notes/cpp/16-rvalue-references-and-move-semantics/04-move-assignment-and-existing-resource-responsibility.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 93,
+      "sha256": "fa8f576a15f0a8719df4d005de2970c492ec738bb2a14c3e3caf9d9e7019f7f4",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "移动赋值接口有类内声明与类外定义语境；旧责任、自移动、同计数不同登记和空状态均有解释。"
+    },
+    {
+      "file": "src/notes/cpp/16-rvalue-references-and-move-semantics/05-generation-and-selection-of-move-operations.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 108,
+      "sha256": "657438875dc600ee755b27fe8b43dc4af88a43d7af5b447705a75c553f03bdf6",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "隐式声明的必要条件、默认逐成员操作、显式删除与默认后删除的选择差别清楚；用 C++23 条款核验。"
+    },
+    {
+      "file": "src/notes/cpp/16-rvalue-references-and-move-semantics/06-design-boundaries-of-move-interfaces.md",
+      "reviewer": "11–16",
+      "fullRead": true,
+      "lineCount": 59,
+      "sha256": "1d1e20dbff152e40736bb9ad0e5f7dd039dfe0670b8edc7f5057eb07ce471284",
+      "findingIds": [],
+      "observationIds": [],
+      "reviewNote": "综合责任、源有效状态、外部生命周期、组合不变量与真实性能收益；没有重新开启未铺垫技术主线。"
+    }
+  ]
+}

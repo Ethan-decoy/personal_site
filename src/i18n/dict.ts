@@ -181,13 +181,14 @@ export const dict = {
 		zh: "左右滑动查看全年",
 		en: "Scroll horizontally to explore the year",
 	},
-	"projects.empty": {
-		zh: "目前还没有公开的开源项目仓库。",
-		en: "No public open-source repositories yet.",
+	"projects.experiments.title": { zh: "个人实验", en: "Personal experiments" },
+	"projects.try.description": {
+		zh: "轻量桌面练习工具，让感兴趣的知识形成肌肉记忆。",
+		en: "A lightweight desktop practice tool to turn what interests you into muscle memory.",
 	},
-	"projects.hint": {
-		zh: "尚未整理为公开仓库，后续收录后会在此更新。",
-		en: "Not yet organized into public repos — will be updated as they're published.",
+	"projects.try.sourceLabel": {
+		zh: "在 GitHub 查看 Try 源码",
+		en: "View the Try source on GitHub",
 	},
 
 	// Contact

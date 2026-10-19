@@ -1,115 +1,60 @@
-Conventional Commits 1.0.0
-Summary
-The Conventional Commits specification is a lightweight convention on top of commit messages. It provides an easy set of rules for creating an explicit commit history; which makes it easier to write automated tools on top of. This convention dovetails with SemVer, by describing the features, fixes, and breaking changes made in commit messages.
+# 提交规范
 
-The commit message should be structured as follows:
+本仓库基于 [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) 制定以下约定。上游允许省略 scope 等写法；本仓库使用必填 scope、中文描述和限定类型，按本文件执行。
 
-<type>[optional scope]: <description>
+## 提交信息
 
-[optional body]
+```text
+<type>(<scope>): <中文描述>
 
-[optional footer(s)]
-The commit contains the following structural elements, to communicate intent to the consumers of your library:
+[可选正文：原因、主要行为变化、必要的取舍]
 
-fix: a commit of the type fix patches a bug in your codebase (this correlates with PATCH in Semantic Versioning).
-feat: a commit of the type feat introduces a new feature to the codebase (this correlates with MINOR in Semantic Versioning).
-BREAKING CHANGE: a commit that has a footer BREAKING CHANGE:, or appends a ! after the type/scope, introduces a breaking API change (correlating with MAJOR in Semantic Versioning). A BREAKING CHANGE can be part of commits of any type.
-types other than fix: and feat: are allowed, for example @commitlint/config-conventional (based on the Angular convention) recommends build:, chore:, ci:, docs:, style:, refactor:, perf:, test:, and others.
-footers other than BREAKING CHANGE: <description> may be provided and follow a convention similar to git trailer format.
-Additional types are not mandated by the Conventional Commits specification, and have no implicit effect in Semantic Versioning (unless they include a BREAKING CHANGE). A scope may be provided to a commit’s type, to provide additional contextual information and is contained within parenthesis, e.g., feat(parser): add ability to parse arrays.
+[可选关联记录：Refs: #编号 或 Fixes: #编号]
+```
 
-Examples
-Commit message with description and breaking change footer
-feat: allow provided config object to extend other configs
+- type 和 scope 使用小写；scope 对应实际模块，使用英文字母、数字或连字符，例如 `notes`、`cpp`、`python`、`theme`、`ci`、`release`。
+- 中文描述直接说明这次完成的变化，保留必要的技术名称；避免“更新”“修改一些内容”等无法判断结果的标题。
+- 一个提交对应一项可独立说明、审阅和回退的变化；正文与标题间空一行。
+- 不兼容变化使用 `<type>(<scope>)!: <中文描述>`，正文说明受影响的行为、入口及迁移方式，可添加 `BREAKING CHANGE: <说明>` 尾注。
+- 提交信息不包含 Codex 签名、生成工具署名或为代理添加的共同作者尾注。
 
-BREAKING CHANGE: `extends` key in config file is now used for extending other config files
-Commit message with ! to draw attention to breaking change
-feat!: send an email to the customer when a product is shipped
-Commit message with scope and ! to draw attention to breaking change
-feat(api)!: send an email to the customer when a product is shipped
-Commit message with both ! and BREAKING CHANGE footer
-feat!: drop support for Node 6
+| type | 适用变化 | 示例 |
+| --- | --- | --- |
+| `feat` | 新增功能 | `feat(notes): 添加笔记引用速览` |
+| `fix` | 修复行为错误 | `fix(notes): 修正文章切换后的滚动进度` |
+| `chore` | 构建、CI、依赖、检查工具与仓库维护 | `chore(ci): 补充部署前构建检查` |
+| `style` | 视觉样式、排版或不影响行为的格式调整 | `style(home): 调整首页标题间距` |
+| `refactor` | 保持对外行为的内部重构 | `refactor(notes): 收拢目录树构建逻辑` |
+| `docs` | 文档和笔记内容 | `docs(workflow): 完善提交与发布规范` |
 
-BREAKING CHANGE: use JavaScript features not available in Node 6.
-Commit message with no body
-docs: correct spelling of CHANGELOG
-Commit message with scope
-feat(lang): add Polish language
-Commit message with multi-paragraph body and multiple footers
-fix: prevent racing of requests
+本仓库不额外使用 `ci`、`build`、`test` 或 `revert` type；工程工作归入 `chore` 并用 scope 区分。功能回退按实际意图使用 `fix` 或 `chore`，正文注明被回退的 SHA 与原因。
 
-Introduce a request id and a reference to latest request. Dismiss
-incoming responses other than from latest request.
+## 提交前后检查
 
-Remove timeouts which were used to mitigate the racing issue but are
-obsolete now.
+1. 提交前检查 `git status --short`、实际差异和 `git diff --cached`，只暂存本次工作。已有用户修改与未审阅笔记保持原状；同一文件混有无关修改时按差异块选择。
+2. 运行与变化相符的检查，范围要求见 [CONTRIBUTING.md](../CONTRIBUTING.md)。检查失败先处理；无法执行时如实记录原因。
+3. 提交后运行 `git log -1 --format=%B` 和 `git show --stat --oneline HEAD`，核对完整信息与文件范围。仅标题正确但正文带有代理署名，或夹带无关文件，仍不合规。
+4. 本次任务创建的提交检查不合格，按下一节修正并重新核对，通过后再交付。
 
-Reviewed-by: Z
-Refs: #123
-Specification
-The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+PR 标题遵循同一格式。默认 Squash 合并时，最终提交的标题和正文均需检查，不能直接接受自动拼接的描述。保留多个工作提交时逐个核对。
 
-Commits MUST be prefixed with a type, which consists of a noun, feat, fix, etc., followed by the OPTIONAL scope, OPTIONAL !, and REQUIRED terminal colon and space.
-The type feat MUST be used when a commit adds a new feature to your application or library.
-The type fix MUST be used when a commit represents a bug fix for your application.
-A scope MAY be provided after a type. A scope MUST consist of a noun describing a section of the codebase surrounded by parenthesis, e.g., fix(parser):
-A description MUST immediately follow the colon and space after the type/scope prefix. The description is a short summary of the code changes, e.g., fix: array parsing issue when multiple spaces were contained in string.
-A longer commit body MAY be provided after the short description, providing additional contextual information about the code changes. The body MUST begin one blank line after the description.
-A commit body is free-form and MAY consist of any number of newline separated paragraphs.
-One or more footers MAY be provided one blank line after the body. Each footer MUST consist of a word token, followed by either a :<space> or <space># separator, followed by a string value (this is inspired by the git trailer convention).
-A footer’s token MUST use - in place of whitespace characters, e.g., Acked-by (this helps differentiate the footer section from a multi-paragraph body). An exception is made for BREAKING CHANGE, which MAY also be used as a token.
-A footer’s value MAY contain spaces and newlines, and parsing MUST terminate when the next valid footer token/separator pair is observed.
-Breaking changes MUST be indicated in the type/scope prefix of a commit, or as an entry in the footer.
-If included as a footer, a breaking change MUST consist of the uppercase text BREAKING CHANGE, followed by a colon, space, and description, e.g., BREAKING CHANGE: environment variables now take precedence over config files.
-If included in the type/scope prefix, breaking changes MUST be indicated by a ! immediately before the :. If ! is used, BREAKING CHANGE: MAY be omitted from the footer section, and the commit description SHALL be used to describe the breaking change.
-Types other than feat and fix MAY be used in your commit messages, e.g., docs: update ref docs.
-The units of information that make up Conventional Commits MUST NOT be treated as case-sensitive by implementors, with the exception of BREAKING CHANGE which MUST be uppercase.
-BREAKING-CHANGE MUST be synonymous with BREAKING CHANGE, when used as a token in a footer.
-Why Use Conventional Commits
-Automatically generating CHANGELOGs.
-Automatically determining a semantic version bump (based on the types of commits landed).
-Communicating the nature of changes to teammates, the public, and other stakeholders.
-Triggering build and publish processes.
-Making it easier for people to contribute to your projects, by allowing them to explore a more structured commit history.
-FAQ
-How should I deal with commit messages in the initial development phase?
-We recommend that you proceed as if you’ve already released the product. Typically somebody, even if it’s your fellow software developers, is using your software. They’ll want to know what’s fixed, what breaks etc.
+## 不合规提交的修正
 
-Are the types in the commit title uppercase or lowercase?
-Any casing may be used, but it’s best to be consistent.
+“撤回重新提交”按提交所处阶段处理。先确认目标 SHA、作者、推送和发布状态，以及当前暂存区、工作区差异；本次工作默认只修正本次任务创建的提交，不批量改写既有历史。
 
-What do I do if the commit conforms to more than one of the commit types?
-Go back and make multiple commits whenever possible. Part of the benefit of Conventional Commits is its ability to drive us to make more organized commits and PRs.
+| 状态 | 处理方式 |
+| --- | --- |
+| 本次创建、尚未推送的最新提交，仅信息不合规 | 使用下方 amend 命令替换提交信息，保持提交内容不变 |
+| 本次创建、尚未推送的多个提交 | 保留工作区与暂存状态后，通过交互式 rebase 的 `reword` 修正；若范围混杂则拆分重提 |
+| 已推送到工作分支，尚未合并 | 优先在 Squash 合并时修正最终信息；确需改写分支时，确认当前授权覆盖该分支且无他人依赖，使用 `--force-with-lease` 推送 |
+| 已进入共享主线或已发布 | 保留公开历史和版本标签，记录历史例外；后续提交遵循规范。只有实现本身需要撤销时才新增回退提交 |
 
-Doesn’t this discourage rapid development and fast iteration?
-It discourages moving fast in a disorganized way. It helps you be able to move fast long term across multiple projects with varied contributors.
+仅修正自己最新的未推送提交信息时，例如：
 
-Might Conventional Commits lead developers to limit the type of commits they make because they’ll be thinking in the types provided?
-Conventional Commits encourages us to make more of certain types of commits such as fixes. Other than that, the flexibility of Conventional Commits allows your team to come up with their own types and change those types over time.
+```sh
+git commit --amend --only -m "docs(workflow): 完善提交与发布规范"
+```
 
-How does this relate to SemVer?
-fix type commits should be translated to PATCH releases. feat type commits should be translated to MINOR releases. Commits with BREAKING CHANGE in the commits, regardless of type, should be translated to MAJOR releases.
+`--only` 与 `--amend` 一起使用时，不会把已经暂存的其他改动带入修正提交，行为见 [Git 官方文档](https://git-scm.com/docs/git-commit)。修正前后对照 `git show -s --format=%T HEAD`，仅改信息时 tree SHA 必须一致；同时确认原暂存区与工作区差异仍保留。
 
-How should I version my extensions to the Conventional Commits Specification, e.g. @jameswomack/conventional-commit-spec?
-We recommend using SemVer to release your own extensions to this specification (and encourage you to make these extensions!)
-
-What do I do if I accidentally use the wrong commit type?
-When you used a type that’s of the spec but not the correct type, e.g. fix instead of feat
-Prior to merging or releasing the mistake, we recommend using git rebase -i to edit the commit history. After release, the cleanup will be different according to what tools and processes you use.
-
-When you used a type not of the spec, e.g. feet instead of feat
-In a worst case scenario, it’s not the end of the world if a commit lands that does not meet the Conventional Commits specification. It simply means that commit will be missed by tools that are based on the spec.
-
-Do all my contributors need to use the Conventional Commits specification?
-No! If you use a squash based workflow on Git lead maintainers can clean up the commit messages as they’re merged—adding no workload to casual committers. A common workflow for this is to have your git system automatically squash commits from a pull request and present a form for the lead maintainer to enter the proper git commit message for the merge.
-
-How does Conventional Commits handle revert commits?
-Reverting code can be complicated: are you reverting multiple commits? if you revert a feature, should the next release instead be a patch?
-
-Conventional Commits does not make an explicit effort to define revert behavior. Instead we leave it to tooling authors to use the flexibility of types and footers to develop their logic for handling reverts.
-
-One recommendation is to use the revert type, and a footer that references the commit SHAs that are being reverted:
-
-revert: let us never again speak of the noodle incident
-
-Refs: 676104e, a215868
+需要拆分或重提内容时，先保存并区分原提交内容与已有改动，再按单一目的重新暂存。不得为了修正格式使用 `reset --hard`、丢弃无关文件或普通强推。已发布代码有问题时，按 [Release 规范](releases.md) 以新版本修正。

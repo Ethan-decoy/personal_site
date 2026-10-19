@@ -143,9 +143,16 @@ Markdown 重点提示使用 `> [!TYPE] 可选标题`，在正文中直接展开�
 - 提交格式：`<type>(<scope>): <中文描述>`。
 - type 使用 `feat`、`fix`、`chore`、`style`、`refactor` 或 `docs`。
 - 一个提交只做一件事，不包含 Codex 签名。
-- 详细规范见 `docs/conventional-commits.md`。
+- 提交前、修正不合规提交或准备合并 PR 时，必须读取并遵循 `docs/conventional-commits.md`；提交后检查完整提交信息和文件范围。
+- 本次任务创建的未推送提交若不合规，必须修正后再交付；修正信息时保留代码、暂存区及无关工作区改动。已推送或已发布的提交按该文档区分处理。
 - 工作区可能存在尚未审阅的笔记、研究草稿或用户修改；除非任务明确要求，不得加入、删除、格式化或提交这些内容。
 - 不要因为构建更新了生成文件而覆盖用户改动。
+
+## Issue、PR 与 Release
+
+- 协作流程入口为 `CONTRIBUTING.md`。创建、分诊或关闭 Issue，以及创建或合并 PR 时，遵循 `docs/issues.md`，使用 `.github/ISSUE_TEMPLATE/` 和 `.github/pull_request_template.md`。
+- 准备版本、撰写 Release 说明或发布版本时，必须读取 `docs/releases.md`；版本、目标提交、验证结果、兼容性和已知问题都要可追溯。
+- `.github/release.yml` 仅配置 GitHub 自动发布说明的 PR 分类；正式说明仍需按发布模板核实、补充。Pages 部署成功与 GitHub Release 发布分别核对。
 
 ## CI/CD
 

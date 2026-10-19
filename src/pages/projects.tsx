@@ -267,6 +267,25 @@ function GitHubContributions({ theme }: { theme: Theme }) {
 	);
 }
 
+const PERSONAL_EXPERIMENTS = [
+	{
+		id: "try",
+		name: "Try",
+		href: "https://github.com/Ethan-decoy/Try",
+		descriptionKey: "projects.try.description",
+		sourceLabelKey: "projects.try.sourceLabel",
+		stack: "Rust / Slint",
+	},
+	{
+		id: "slint-math-input",
+		name: "slint-math-input",
+		href: "https://github.com/Ethan-decoy/slint_math_input",
+		descriptionKey: "projects.mathInput.description",
+		sourceLabelKey: "projects.mathInput.sourceLabel",
+		stack: "Rust / Slint",
+	},
+] as const;
+
 function PersonalExperiments({ theme }: { theme: Theme }) {
 	const { t } = useI18n();
 	return (
@@ -281,63 +300,70 @@ function PersonalExperiments({ theme }: { theme: Theme }) {
 			>
 				{t("projects.experiments.title")}
 			</h2>
-			<article
-				aria-labelledby="project-try-title"
-				className="mt-5 flex w-full max-w-sm flex-col gap-4 rounded-xl border border-[var(--experiment-border)] p-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-[border-color,transform] duration-200 ease-out hover:border-[var(--experiment-hover-border)] focus-within:border-[var(--experiment-hover-border)] motion-safe:hover:-translate-y-0.5 motion-reduce:transition-none"
-				style={
-					{
-						backgroundColor: theme.bgCard,
-						"--experiment-border": theme.borderLight,
-						"--experiment-hover-border": theme.border,
-					} as CSSProperties
-				}
-			>
-				<div className="flex items-center gap-3">
-					<div
-						className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-						style={{ backgroundColor: theme.bgDeep, color: theme.text }}
+			<div className="mt-5 grid max-w-[49rem] gap-4 md:grid-cols-2">
+				{PERSONAL_EXPERIMENTS.map((experiment) => (
+					<article
+						key={experiment.id}
+						aria-labelledby={`project-${experiment.id}-title`}
+						className="flex w-full max-w-sm flex-col gap-4 rounded-xl border border-[var(--experiment-border)] p-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-[border-color,transform] duration-200 ease-out hover:border-[var(--experiment-hover-border)] focus-within:border-[var(--experiment-hover-border)] motion-safe:hover:-translate-y-0.5 motion-reduce:transition-none"
+						style={
+							{
+								backgroundColor: theme.bgCard,
+								"--experiment-border": theme.borderLight,
+								"--experiment-hover-border": theme.border,
+							} as CSSProperties
+						}
 					>
-						{/* Try's public mark: https://github.com/Ethan-decoy/Try/blob/main/assets/logo.svg */}
-						<svg
-							aria-hidden="true"
-							viewBox="0 0 256 256"
-							className="h-7 w-7"
-							fill={theme.bgCard}
-							stroke="currentColor"
-							strokeWidth="8"
-							strokeLinejoin="round"
+						<div className="flex items-center gap-3">
+							{experiment.id === "try" && (
+								<div
+									className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+									style={{ backgroundColor: theme.bgDeep, color: theme.text }}
+								>
+									{/* Try's public mark: https://github.com/Ethan-decoy/Try/blob/main/assets/logo.svg */}
+									<svg
+										aria-hidden="true"
+										viewBox="0 0 256 256"
+										className="h-7 w-7"
+										fill={theme.bgCard}
+										stroke="currentColor"
+										strokeWidth="8"
+										strokeLinejoin="round"
+									>
+										<path d="M 207.7668998 36.9719554 A 8 8 0 0 1 219.0280446 48.2331002 L 164.4877097 114.4550895 A 48 48 0 0 0 161.3132815 171.1599365 L 185.6159905 208.4879198 A 8 8 0 0 1 174.5467914 219.5571189 L 137.2188081 195.2544099 A 48 48 0 0 0 84.8400635 195.2544099 L 47.5120802 219.5571189 A 8 8 0 0 1 36.4428811 208.4879198 L 60.7455901 171.1599365 A 48 48 0 0 0 60.7455901 118.7811919 L 36.4428811 81.4532086 A 8 8 0 0 1 47.5120802 70.3840095 L 84.8400635 94.6867185 A 48 48 0 0 0 141.5449105 91.5122903 L 207.7668998 36.9719554 Z" />
+									</svg>
+								</div>
+							)}
+							<h3
+								id={`project-${experiment.id}-title`}
+								lang="en"
+								className="min-w-0 text-xl font-semibold tracking-tight"
+								style={{ color: theme.text }}
+							>
+								<a
+									href={experiment.href}
+									target="_blank"
+									rel="noreferrer"
+									aria-label={t(experiment.sourceLabelKey)}
+									className="inline-flex min-h-9 max-w-full items-center rounded-sm [overflow-wrap:anywhere] hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4"
+								>
+									{experiment.name}
+								</a>
+							</h3>
+						</div>
+						<p className="text-[13px] leading-6" style={{ color: theme.text }}>
+							{t(experiment.descriptionKey)}
+						</p>
+						<p
+							lang="en"
+							className="mt-auto font-mono text-[11px]"
+							style={{ color: theme.textSec }}
 						>
-							<path d="M 207.7668998 36.9719554 A 8 8 0 0 1 219.0280446 48.2331002 L 164.4877097 114.4550895 A 48 48 0 0 0 161.3132815 171.1599365 L 185.6159905 208.4879198 A 8 8 0 0 1 174.5467914 219.5571189 L 137.2188081 195.2544099 A 48 48 0 0 0 84.8400635 195.2544099 L 47.5120802 219.5571189 A 8 8 0 0 1 36.4428811 208.4879198 L 60.7455901 171.1599365 A 48 48 0 0 0 60.7455901 118.7811919 L 36.4428811 81.4532086 A 8 8 0 0 1 47.5120802 70.3840095 L 84.8400635 94.6867185 A 48 48 0 0 0 141.5449105 91.5122903 L 207.7668998 36.9719554 Z" />
-						</svg>
-					</div>
-					<h3
-						id="project-try-title"
-						lang="en"
-						className="text-xl font-semibold tracking-tight"
-						style={{ color: theme.text }}
-					>
-						<a
-							href="https://github.com/Ethan-decoy/Try"
-							target="_blank"
-							rel="noreferrer"
-							aria-label={t("projects.try.sourceLabel")}
-							className="inline-flex min-h-9 items-center rounded-sm hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4"
-						>
-							Try
-						</a>
-					</h3>
-				</div>
-				<p className="text-[13px] leading-6" style={{ color: theme.text }}>
-					{t("projects.try.description")}
-				</p>
-				<p
-					lang="en"
-					className="font-mono text-[11px]"
-					style={{ color: theme.textSec }}
-				>
-					Rust / Slint
-				</p>
-			</article>
+							{experiment.stack}
+						</p>
+					</article>
+				))}
+			</div>
 		</section>
 	);
 }

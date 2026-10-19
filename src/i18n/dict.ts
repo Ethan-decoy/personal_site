@@ -190,6 +190,14 @@ export const dict = {
 		zh: "在 GitHub 查看 Try 源码",
 		en: "View the Try source on GitHub",
 	},
+	"projects.mathInput.description": {
+		zh: "原生公式输入组件",
+		en: "A native math input component",
+	},
+	"projects.mathInput.sourceLabel": {
+		zh: "在 GitHub 查看 slint-math-input 源码",
+		en: "View the slint-math-input source on GitHub",
+	},
 
 	// Contact
 	"contact.title": { zh: "联系", en: "Contact" },

@@ -40,7 +40,7 @@
 - `src/pages/home.tsx` — 首页；包含笑脸刻印、眼睛跟随与眨眼彩蛋。
 - `src/pages/about.tsx` — 关于页外壳与工作面。
 - `src/pages/about-personal.tsx` — 生活面；包含近来、相信、娱乐及图片轮播。
-- `src/pages/projects.tsx` — 项目页；渲染 GitHub 贡献图与项目占位信息。
+- `src/pages/projects.tsx` — 项目页；渲染 GitHub 贡献图与个人实验（Try、slint-math-input）。实验清单在页面模块中显式维护，中英文介绍位于 `src/i18n/dict.ts`；收录与卡片约定见 `docs/DESIGN.md` 的「个人实验」。
 - `src/pages/notes.tsx` — 笔记页；包含分类树、搜索、阅读区与滚动进度。
 - `src/pages/contact.tsx` — 联系页；包含同步打字效果。
 

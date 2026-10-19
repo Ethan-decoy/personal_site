@@ -65,8 +65,8 @@ void show_pressure(const T& value) {
 }
 
 int main() {
-    const pressure_sensor source;
-    const channel_sensor channel;
+    const pressure_sensor source{};
+    const channel_sensor channel{};
 
     show_pressure(7);
     show_pressure(source);

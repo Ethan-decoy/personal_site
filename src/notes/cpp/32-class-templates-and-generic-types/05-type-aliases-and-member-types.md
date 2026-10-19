@@ -108,7 +108,7 @@ template <typename Container> void print_first_copy(const Container& values) {
 int main() {
     const std::vector<int> pressures{220, 240};
     const std::array<double, 2> temperatures{21.5, 22.0};
-    const std::vector<int> empty;
+    const std::vector<int> empty{};
 
     print_first_copy(pressures);
     print_first_copy(temperatures);

@@ -49,7 +49,7 @@ int main() {
     requested_upper_kpa = 290;
     adjustable = pressure_limits{230, requested_upper_kpa};
 
-    std::cout << std::boolalpha << accepted << ' ' << width_kpa << '\n';
+    std::cout << accepted << ' ' << width_kpa << '\n';
     std::cout << adjustable.maximum_kpa() << '\n';
 }
 ```
@@ -57,7 +57,7 @@ int main() {
 输出为：
 
 ```text
-true 40
+1 40
 290
 ```
 

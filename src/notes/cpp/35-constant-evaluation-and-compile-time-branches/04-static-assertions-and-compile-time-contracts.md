@@ -121,11 +121,11 @@ template <std::size_t N> class calibration_points {
 
 int main() {
     const calibration_points<3> readings{{220, 240, 260}};
-    std::cout << std::boolalpha << readings.endpoints_equal() << '\n';
+    std::cout << readings.endpoints_equal() << '\n';
 }
 ```
 
-程序输出 `false`。定义 `readings` 需要完整的 `calibration_points<3>`，因而实例化类定义并检查 `N >= 2`，此时条件为真。
+程序输出 `0`。定义 `readings` 需要完整的 `calibration_points<3>`，因而实例化类定义并检查 `N >= 2`，此时条件为真。
 
 在同一 `main` 中增加以下定义会编译失败，原因来自类内的断言：
 
@@ -133,7 +133,7 @@ int main() {
 const calibration_points<1> insufficient{{240}}; // 错误：N >= 2 不成立
 ```
 
-只把它换成指针声明则不需要完整类定义。下面片段可以放入原程序的 `main`，并额外输出 `true`：
+只把它换成指针声明则不需要完整类定义。下面片段可以放入原程序的 `main`，并额外输出 `1`：
 
 ```cpp
 calibration_points<1>* unbuilt{nullptr};

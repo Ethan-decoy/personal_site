@@ -73,8 +73,9 @@ struct reading {
 `report.cpp` 同时包含自己的接口和类定义：
 
 ```cpp
-#include "reading.hpp"
 #include "report.hpp"
+
+#include "reading.hpp"
 
 namespace workshop {
 int pressure_margin(const reading& value, int target_kpa) {

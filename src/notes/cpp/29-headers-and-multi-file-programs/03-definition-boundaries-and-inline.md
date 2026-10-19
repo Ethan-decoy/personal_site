@@ -113,7 +113,7 @@ inline int pressure_margin(const reading& value, int target_kpa) {
 }
 ```
 
-用这段定义替换 `reading.hpp` 内的函数声明，`reading.cpp` 仍只包含该头文件。此时原来的构建命令就可以形成合法程序，输出仍为 `-20`。
+用这段定义替换 `reading.hpp` 中的普通函数定义，`reading.cpp` 仍只包含该头文件。此时原来的构建命令就可以形成合法程序，输出仍为 `-20`。
 
 对于这里具有外部链接的 inline 函数：
 

@@ -23,7 +23,7 @@ int main() {
     std::vector<int> target(source.size());
     std::ranges::transform(source, target.begin(), [](int value) { return value + 10; });
 
-    std::vector<int> appended;
+    std::vector<int> appended{};
     std::ranges::transform(
         source, std::back_inserter(appended), [](int value) { return value + 10; });
 

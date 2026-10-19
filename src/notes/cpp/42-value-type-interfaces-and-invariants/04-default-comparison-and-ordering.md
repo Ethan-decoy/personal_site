@@ -14,6 +14,8 @@ order: 4
 
 `<compare>` 提供比较类别类型。对下面两个整数成员，默认 `<=>` 按成员声明顺序作字典序比较，结果为 `std::strong_ordering`；此处还隐式形成默认的 `==`。
 
+这里的字典序比较（Lexicographical Comparison）先比较 `channel`；两项不同，就由它确定顺序。只有 `channel` 相同，才继续比较 `sequence`。两个成员都相同，结果才是相等。
+
 ```cpp
 #include <compare>
 #include <iostream>
@@ -29,8 +31,14 @@ int main() {
     const reading_key second{1, 4};
     std::cout << (first < second) << ' ' << (first == second) << '\n'; // 1 0
     std::cout << ((first <=> second) < 0) << '\n';                     // 1
+
+    const reading_key earlier{1, 9};
+    const reading_key later{2, 0};
+    std::cout << (earlier < later) << '\n'; // 1
 }
 ```
+
+`first` 与 `second` 的 `channel` 都是 1，因此由 `sequence` 的 3 小于 4 确定顺序。对照中，`earlier` 的 `channel` 为 1，已经小于 `later` 的 2；即使它的 `sequence` 为 9、大于另一项的 0，也不再改变结果。成员的声明顺序由此决定哪一项先参与判断。
 
 语言可根据三路比较形成相应关系表达式。手写任意 `<=>` 不等于所有情况下都自动获得相等比较；本例的相等生成依赖默认声明及相关规则。
 

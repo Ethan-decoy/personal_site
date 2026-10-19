@@ -45,7 +45,7 @@ template <typename Source> class reader_adapter : public Source {
 };
 
 int main() {
-    const reader_adapter<sensor> value;
+    const reader_adapter<sensor> value{};
     std::cout << value.read() << ' ' << value.as_double() << '\n'; // 220 220
 }
 ```

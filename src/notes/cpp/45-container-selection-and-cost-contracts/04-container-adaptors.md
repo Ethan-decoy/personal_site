@@ -19,14 +19,14 @@ order: 4
 #include <queue>
 
 int main() {
-    std::queue<int> pending;
+    std::queue<int> pending{};
     pending.push(220);
     pending.push(230);
     std::cout << pending.front() << '\n'; // 220
     pending.pop();
     std::cout << pending.front() << '\n'; // 230
 
-    std::priority_queue<int> urgent;
+    std::priority_queue<int> urgent{};
     urgent.push(220);
     urgent.push(240);
     urgent.push(230);

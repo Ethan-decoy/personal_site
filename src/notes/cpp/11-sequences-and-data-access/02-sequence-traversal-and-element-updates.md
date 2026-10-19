@@ -45,7 +45,7 @@ int main() {
 下面是放在函数体内的独立片段：
 
 ```cpp
-const std::vector<double> samples{240.0, 245.0, 250.0};
+std::vector<double> samples{240.0, 245.0, 250.0};
 
 for (double value : samples) {
     value += 5.0;
@@ -53,7 +53,9 @@ for (double value : samples) {
 }
 ```
 
-循环输出 `245`、`250`、`255`，但 `samples` 的三个元素仍然保存 `240.0`、`245.0` 和 `250.0`。`double value` 建立的是本轮局部对象，修改它没有向元素赋值；去掉 `const` 只允许修改这个局部对象，不会自动让它变成引用。
+循环输出 `245`、`250`、`255`，但 `samples` 的三个元素仍然保存 `240.0`、`245.0` 和 `250.0`。即使容器允许修改，`double value` 建立的仍是本轮局部对象，修改它没有向元素赋值。将循环变量从 `const double value` 改为 `double value`，只允许修改这个局部对象，不会自动让它变成引用。
+
+即使把容器声明为 `const std::vector<double>`，也仍能用 `double value` 建立可修改的局部副本。`const` 限制通过该容器修改原元素，不会自动把复制出来的新对象变成 `const`。
 
 > [!TIP]
 > 判断循环是否修改原元素，先看本轮变量的声明，再看循环体。`double value` 保存从元素读取的独立值；`double& value` 绑定元素，能通过它修改原数据。对于这里只需读取的 `double`，直接取得小值已经足够，不必为了“避免复制”而统一改成引用。

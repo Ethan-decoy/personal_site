@@ -91,7 +91,7 @@ double pressure_bar{monitor.observed_tire->pressure_bar}; // 未定义行为
 
 直接成员与指针成员表达两种不同关系：
 
-| 成员形式 | 完整对象直接包含什么 | 目标能否缺少 | 所表达的对象是否为成员子对象 |
+| 成员形式 | 完整对象直接包含什么 | 轮胎状态能否缺少 | 轮胎状态对象是否为成员子对象 |
 | --- | --- | --- | --- |
 | `tire_state tire;` | `tire_state` 成员子对象 | 不能 | 是 |
 | `const tire_state* observed_tire;` | 指针成员子对象 | 可以为空 | 否 |

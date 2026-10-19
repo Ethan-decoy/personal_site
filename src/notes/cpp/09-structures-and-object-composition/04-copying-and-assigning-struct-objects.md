@@ -18,7 +18,7 @@ struct tire_state {
 };
 
 tire_state current{2.4, 36.0, 18};
-tire_state saved{current};
+const tire_state saved{current};
 ```
 
 第二条对象声明创建新的 `tire_state` 对象 `saved`。虽然初始化器使用花括号，但这里只有一个同类型表达式 `current`；C++23 会直接用它初始化整个 `saved`，而不是把它当成 `pressure_bar` 的位置初始化器。当前简单类型由语言提供的复制操作会用 `current` 中对应成员的状态初始化 `saved` 的各成员子对象：
@@ -41,14 +41,13 @@ current.wear_percent = 25;
 
 ## 赋值修改已有结构体对象
 
-```cpp
-tire_state active{2.1, 40.0, 30};
-const tire_state baseline{2.3, 20.0, 0};
+继续使用这两个对象：`current` 的状态已经变为 `1.9`、`36.0`、`25`，`saved` 仍保留 `2.4`、`36.0`、`18`。若要让当前状态恢复为保存的快照，可以给已有的 `current` 赋值：
 
-active = baseline;
+```cpp
+current = saved;
 ```
 
-赋值不会创建新的 `tire_state` 对象。它把 `baseline` 各成员的当前状态赋给 `active` 中对应的已有成员子对象。执行后两个对象保存相同状态，但仍然具有各自身份；继续修改其中一个不会自动改变另一个。
+赋值不会创建新的 `tire_state` 对象。它读取 `saved` 各成员的状态，赋给 `current` 中对应的已有成员子对象。执行后，`current` 恢复为 `2.4`、`36.0`、`18`，两个对象仍具有各自身份；之后修改 `current`，也不会改变 `saved`。
 
 这与基本类型对象上的区别一致：初始化创建对象并建立初始状态，赋值修改已经存在的对象。结构体只把这项行为扩展到了由多个成员组成的完整对象。
 

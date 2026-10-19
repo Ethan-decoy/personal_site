@@ -29,6 +29,14 @@ int* secondary_calibration_target{primary_calibration_target};
 
 当两处代码需要共同读取或修改这个温度对象时，保存指针值就能各自保留访问途径，无需复制目标对象。它们也因此观察同一份状态；若要保留修改前的温度，应当另存一份数值。
 
+## 多条路径与同一个对象
+
+多个名称或表达式最终指定同一个对象时，它们之间存在别名关系（aliasing）。此时，下面三条访问路径都指定 `engine_temperature_c`：
+
+- 对象名称 `engine_temperature_c`；
+- 表达式 `*primary_calibration_target`；
+- 表达式 `*secondary_calibration_target`。
+
 ## 重新指向只改变指针对象
 
 给已有指针对象赋予另一个指针值，会让它改为指向另一个对象。这种关系变化常称为重新指向（reseating）：
@@ -51,14 +59,6 @@ secondary_calibration_target = &coolant_temperature_c;
 最后一行只改变 `secondary_calibration_target` 保存的指针值。它不会修改两个温度对象，也不会让 `primary_calibration_target` 跟随改变。
 
 **复制指针对象时复制的是指针值；给指针对象赋予另一个指针值，只改变接受赋值的那个指针对象。**
-
-## 多条路径与同一个对象
-
-多个名称或表达式最终指定同一个对象时，它们之间存在别名关系（aliasing）。在重新指向之前，下面三条访问路径都指定 `engine_temperature_c`：
-
-- 对象名称 `engine_temperature_c`；
-- 表达式 `*primary_calibration_target`；
-- 表达式 `*secondary_calibration_target`。
 
 可修改的别名越多，判断“某个对象可能在哪里被改变”就越困难。引入指针时，应让每条指向关系具有明确用途和受控范围。
 

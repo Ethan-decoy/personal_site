@@ -79,7 +79,7 @@ class tire_pressure {
 };
 
 double tire_pressure::value_bar() {
-    return 2.3;
+    return stored_value_bar;
 }
 ```
 

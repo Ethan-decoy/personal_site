@@ -63,7 +63,7 @@ const int maximum_temperature_c{120};
 
 名称表达式 `maximum_temperature_c` 仍然是 lvalue，因为它确定已有对象的身份；它的类型是 `const int`，因此不是可修改的 lvalue，不能成为普通赋值的左操作数。
 
-另一方面，赋值的右操作数同样可以是 lvalue：
+另一方面，lvalue 也可以出现在需要读取对象值的初始化器中：
 
 ```cpp
 int current_temperature_c{78};

@@ -53,8 +53,8 @@ void show_adjustment(const pressure_source& source) {
 }
 
 int main() {
-    const fixed_source fixed;
-    const calibrated_source calibrated;
+    const fixed_source fixed{};
+    const calibrated_source calibrated{};
     show_adjustment(fixed);      // unavailable
     show_adjustment(calibrated); // 10
 }
@@ -75,7 +75,7 @@ int main() {
 #include <typeinfo>
 
 int main() {
-    const fixed_source fixed;
+    const fixed_source fixed{};
     try {
         const auto& calibrated = dynamic_cast<const calibrated_source&>(fixed);
         std::cout << calibrated.adjustment() << '\n';

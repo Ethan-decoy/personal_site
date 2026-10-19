@@ -25,7 +25,7 @@ struct pressure_source {
 struct calibrated_source : pressure_source {};
 
 int main() {
-    const calibrated_source value;
+    const calibrated_source value{};
     const pressure_source& source = value;
     const pressure_source* pointer = &value;
 

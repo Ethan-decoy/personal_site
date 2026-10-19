@@ -48,14 +48,10 @@ class calibrated_source : public pressure_source {
     void calibrate(int value) {
         set_pressure(value);
     }
-
-    void copy_setting_from(const calibrated_source& source) {
-        set_pressure(source.read());
-    }
 };
 
 int main() {
-    calibrated_source value;
+    calibrated_source value{};
     value.calibrate(230);
     std::cout << value.read() << '\n'; // 230
 }
@@ -66,7 +62,7 @@ int main() {
 例如放在 `calibrated_source` 的成员函数体中：
 
 ```cpp
-pressure_source other;
+pressure_source other{};
 // other.set_pressure(240); // 取消注释会编译失败：目标是一般基类对象
 ```
 

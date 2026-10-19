@@ -33,11 +33,11 @@ struct combined : left, right {
 };
 
 int main() {
-    combined value;
-    const left& a = value;
-    const right& b = value;
-    const base& from_left = a;
-    const base& from_right = b;
+    const combined value{};
+    const left& left_path = value;
+    const right& right_path = value;
+    const base& from_left = left_path;
+    const base& from_right = right_path;
 
     std::cout << value.stored << '\n';                // 10
     std::cout << (&from_left == &from_right) << '\n'; // 1

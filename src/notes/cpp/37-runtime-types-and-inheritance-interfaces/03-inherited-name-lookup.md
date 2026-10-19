@@ -40,7 +40,7 @@ class calibrated_source : public pressure_source {
 };
 
 int main() {
-    const calibrated_source value;
+    const calibrated_source value{};
     const pressure_source& source = value;
     std::cout << value.read() << '\n';   // 230
     std::cout << value.read(5) << '\n';  // 235

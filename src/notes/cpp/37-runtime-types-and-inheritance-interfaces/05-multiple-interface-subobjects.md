@@ -40,7 +40,7 @@ class resettable_source : public readable, public resettable {
 };
 
 int main() {
-    resettable_source value;
+    resettable_source value{};
     readable& source = value;
     std::cout << source.read() << '\n'; // 220
 
@@ -80,7 +80,7 @@ struct right : base {};
 struct combined : left, right {};
 
 int main() {
-    combined value;
+    combined value{};
     left& left_path{value};
     right& right_path{value};
     left_path.stored = 230;

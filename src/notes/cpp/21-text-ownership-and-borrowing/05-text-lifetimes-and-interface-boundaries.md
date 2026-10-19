@@ -54,7 +54,7 @@ const std::string_view name{field.substr(7)};
 
 这是包含 `<string>` 与 `<string_view>` 后可放入函数体的错误用法。`field.substr(7)` 先产生临时 `string`，`name` 借用的是临时字符串中的字符。临时拥有者在这条声明的完整表达式结束时销毁，此后通过 `name` 读取字符具有未定义行为；原来的 `field` 仍然存在，也不能维持另一份字符。
 
-如果要借用 `field`，可把第二行改为 `const std::string_view name{std::string_view{field}.substr(7)};`。这里的临时视图在声明结束时销毁，却没有销毁字符；留下的 `name` 仍然借用 `field`。
+如果要借用 `field`，先从 `field` 建立视图，再从这份视图取得子串。第二行可改为 `const std::string_view name{std::string_view{field}.substr(7)};`。这里的临时视图在声明结束时销毁，却没有销毁字符；留下的 `name` 仍然借用 `field`。
 
 如果要保存独立的子串，则使用 `const std::string name{field.substr(7)};`。这时接收结果的对象本身就是拥有者，字符的有效期不再依赖 `field`。
 

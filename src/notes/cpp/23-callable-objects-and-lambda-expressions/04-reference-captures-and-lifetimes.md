@@ -86,7 +86,7 @@ auto make_dangling_check(double limit) {
 
 若原字符串销毁，或修改字符串使[旧字符访问关系失效](../21-text-ownership-and-borrowing/05-text-lifetimes-and-interface-boundaries.md#修改字符串后不沿用旧借用的有效性假设)，读取所捕获视图的字符仍然错误。闭包自己的视图成员完整存在，也不能代替字符拥有者。
 
-需要独立保存一段文本时，可以先从仍然有效的视图建立 `std::string text{view}`，再按值捕获 `text`。这时闭包保存拥有字符的字符串副本，代价是复制文本；单纯把 `[&view]` 改成 `[view]`，只消除了对视图对象本身的依赖，没有消除对字符的借用。
+需要独立保存一段文本时，可以先从仍然有效的视图建立 `const std::string text{view}`，再按值捕获 `text`。这时闭包保存拥有字符的字符串副本，代价是复制文本；单纯把 `[&view]` 改成 `[view]`，只消除了对视图对象本身的依赖，没有消除对字符的借用。
 
 > [!IMPORTANT]
 > 判断捕获是否独立，要继续看被捕获对象的语义。`double` 的副本保存独立数值，`string` 的副本保存独立文本，`string_view` 的副本仍然只保存借用范围。

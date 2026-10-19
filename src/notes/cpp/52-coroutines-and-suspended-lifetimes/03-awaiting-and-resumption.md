@@ -10,7 +10,18 @@ order: 3
 
 ## awaiter 决定当前操作如何继续
 
-等待器（Awaiter）提供三项操作。库可以直接提供等待器，也可以按协议由另一个对象取得它；这里从已经取得等待器开始观察执行过程。
+等待器（Awaiter）描述一次操作怎样判断就绪、安排暂停和取得结果。库可以直接提供等待器，也可以按协议由另一个对象取得它；这里从已经取得等待器开始观察执行过程。
+
+先看使用位置。假定库提供名为 `reading` 的读取等待器，这次操作正常完成时得到整数 220。下面是放在协程函数体内的片段，所用协程返回类型须允许这项等待协议，并已包含 `<iostream>`：
+
+```cpp
+const int value = co_await reading;
+std::cout << value << '\n'; // 正常取得结果后输出 220
+```
+
+`reading` 是等待对象，`co_await reading` 是取得结果的表达式，结果用于初始化 `value`。若协议让当前协程保持暂停，初始化尚未完成，下一行输出也尚未执行；等当前协程被合法恢复并取得结果后，才继续这段代码。
+
+等待器通过三项操作连接这条表达式与暂停过程：
 
 | 操作 | 主要作用 |
 | --- | --- |
@@ -24,7 +35,13 @@ order: 3
 
 首先调用 `await_ready()`。结果为 true 时，不调用 await_suspend，直接调用 `await_resume()`，并以它的返回值作为 co_await 的结果。结果为 false 时，**当前协程在调用 await_suspend 之前就已被视为暂停**，再把当前句柄交给它。
 
-先考虑由同一线程驱动，且 await_suspend 不在函数体内部自行 resume 当前协程的正常路径：
+先沿上面的 `reading` 追踪一条正常路径。假定仍由同一线程驱动，`await_ready()` 返回 false，`await_suspend` 保存恢复入口并返回 true，不在函数体内部自行 resume 当前协程：
+
+1. `await_ready()` 判断尚未就绪，当前协程先进入暂停状态。
+2. `await_suspend(handle)` 取得当前句柄并保存它，返回 true；执行先返回调用者或本次恢复协程的代码。`value` 尚未完成初始化。
+3. 驱动代码稍后通过保存的入口合法恢复当前协程，才调用 `await_resume()` 取得 220，完成 `value` 的初始化，再执行输出。
+
+返回 true 是一种选择。保持上面的同线程前提、且不在 await_suspend 内部自行恢复当前协程时，其他返回形式对应以下去向：
 
 | await_suspend 的返回形式 | 当前执行接下来怎样继续 |
 | --- | --- |
@@ -33,7 +50,7 @@ order: 3
 | 返回 bool，值为 false | 立即恢复当前协程，调用 await_resume，然后继续 co_await 后的代码 |
 | 返回 coroutine_handle | 语言恢复返回句柄所指的协程；若指向另一协程，当前协程仍保持暂停 |
 
-设一份读取等待器的 await_resume 返回 220。如果 await_ready 返回 true，co_await 直接得到 220。若 await_ready 返回 false，而 await_suspend 返回 false，会多经过暂停与立即恢复这一步，仍在本次执行中得到 220。若 await_suspend 返回 true，执行先返回调用者；只有当前协程后来被合法恢复，才调用 await_resume 取得 220。
+若 `reading` 的 `await_ready()` 返回 true，就跳过 await_suspend，直接由 await_resume 得到 220。若 await_ready 返回 false，而 await_suspend 返回 false，会经过暂停与立即恢复这一步，仍在本次执行中取得 220、初始化 `value` 并继续输出；不必等外部驱动代码稍后恢复。
 
 **await_resume 负责取得结果，并不负责发起恢复。**它也可以返回 void 或抛出异常；若 await_suspend 本身抛出异常，语言恢复当前协程并在 co_await 处重新抛出该异常，这条路径不调用 await_resume。
 

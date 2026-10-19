@@ -26,7 +26,7 @@ std::generator<int> readings() {
 int main() {
     auto source = readings();
     std::cout << "created\n";
-    for (int value : source) {
+    for (const int value : source) {
         std::cout << value << '\n';
     }
 }

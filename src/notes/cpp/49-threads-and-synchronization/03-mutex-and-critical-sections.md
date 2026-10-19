@@ -21,7 +21,7 @@ order: 3
 
 int main() {
     int count{};
-    std::mutex mutex;
+    std::mutex mutex{};
     const auto increment = [&] {
         const std::lock_guard lock{mutex};
         ++count;

@@ -20,7 +20,7 @@ order: 4
 
 struct account {
     int credits{100};
-    std::mutex mutex;
+    std::mutex mutex{};
 };
 
 bool transfer(account& from, account& to, int amount) {
@@ -38,8 +38,8 @@ bool transfer(account& from, account& to, int amount) {
 }
 
 int main() {
-    account first;
-    account second;
+    account first{};
+    account second{};
     std::jthread a{[&] { transfer(first, second, 10); }};
     std::jthread b{[&] { transfer(second, first, 20); }};
     a.join();

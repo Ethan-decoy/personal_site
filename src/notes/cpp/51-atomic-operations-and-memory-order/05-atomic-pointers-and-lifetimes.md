@@ -24,7 +24,7 @@ order: 5
 #include <memory>
 
 int main() {
-    std::atomic<std::shared_ptr<const int>> current;
+    std::atomic<std::shared_ptr<const int>> current{};
     current.store(std::make_shared<const int>(220));
     const auto snapshot = current.load();
     current.store(std::make_shared<const int>(230));

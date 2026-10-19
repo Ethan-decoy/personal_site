@@ -22,9 +22,9 @@ order: 6
 #include <thread>
 
 int main() {
-    std::mutex mutex;
-    std::condition_variable_any ready;
-    bool available{false};
+    std::mutex mutex{};
+    std::condition_variable_any ready{};
+    const bool available{false};
     bool cancelled{false};
 
     std::jthread worker{[&](std::stop_token stop) {

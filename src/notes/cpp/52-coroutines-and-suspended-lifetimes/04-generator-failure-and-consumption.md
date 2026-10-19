@@ -23,7 +23,7 @@ std::generator<int> readings() {
 int main() {
     auto source = readings();
     try {
-        for (int value : source) {
+        for (const int value : source) {
             std::cout << value << '\n';
         }
     } catch (const std::runtime_error& error) {

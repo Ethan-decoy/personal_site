@@ -17,8 +17,8 @@ order: 4
 #include <iostream>
 
 int main() {
-    std::promise<int> producer;
-    auto first = producer.get_future().share();
+    std::promise<int> producer{};
+    const auto first = producer.get_future().share();
     const auto second = first;
     producer.set_value(220);
 

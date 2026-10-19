@@ -16,7 +16,7 @@ order: 1
 
 移动构造使用 `<utility>` 中的 `std::exchange(object, replacement)`：它取出对象原值作为返回值，同时为对象赋入新值。这里 `std::exchange(source.state, {})` 返回源句柄，并把源句柄设为空；对 has_value 使用同样操作，将标记转交后把源设为 false。
 
-`<exception>` 中的 `std::rethrow_exception` 把非空 exception_ptr 保存的异常重新抛出。本例先检查 failure，再在 next 的调用位置报告协程体中的失败。
+`std::exception_ptr` 默认构造为空，表示没有保存异常；放在条件中检查时，非空才为 true。`<exception>` 中的 `std::rethrow_exception` 把非空 exception_ptr 保存的异常重新抛出。本例先检查 failure，再在 next 的调用位置报告协程体中的失败。
 
 ```cpp
 #include <cassert>
@@ -29,7 +29,7 @@ class int_generator {
   public:
     struct promise_type {
         int current{};
-        std::exception_ptr failure;
+        std::exception_ptr failure{};
 
         int_generator get_return_object() {
             return int_generator{std::coroutine_handle<promise_type>::from_promise(*this)};

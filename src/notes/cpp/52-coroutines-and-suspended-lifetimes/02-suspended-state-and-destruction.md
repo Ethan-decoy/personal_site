@@ -23,7 +23,7 @@ struct resource_trace {
 };
 
 std::generator<int> readings() {
-    resource_trace resource;
+    const resource_trace resource{};
     co_yield 220;
     std::cout << "completed\n";
 }
@@ -31,7 +31,7 @@ std::generator<int> readings() {
 int main() {
     {
         auto source = readings();
-        auto position = source.begin();
+        const auto position = source.begin();
         std::cout << *position << '\n'; // 220
     } // released；没有执行 completed
 }

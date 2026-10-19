@@ -19,7 +19,7 @@ order: 1
 #include <utility>
 
 int main() {
-    std::promise<int> producer;
+    std::promise<int> producer{};
     auto result = producer.get_future();
     std::jthread worker{[producer = std::move(producer)]() mutable { producer.set_value(220); }};
 

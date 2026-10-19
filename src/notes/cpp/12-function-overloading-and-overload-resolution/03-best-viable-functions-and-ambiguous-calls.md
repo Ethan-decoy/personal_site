@@ -12,6 +12,8 @@ order: 3
 
 ## 标准转换序列的匹配等级
 
+先看同名的 `encode_pressure(int)` 与 `encode_pressure(double)`。当 `measured_pressure_kpa` 是 `short` 对象时，调用 `encode_pressure(measured_pressure_kpa)` 有两条可行路径：提升为 `int`，或转换为 `double`。整数提升的匹配等级优于数值转换，因此选择 `encode_pressure(int)`。
+
 > [!TIP]
 > 在当前已经建立的算术类型和标准转换范围内，匹配质量首先分为三个等级：
 >
@@ -31,27 +33,23 @@ order: 3
 > Conversion
 > ```
 
-例如：
+再给同一名字增加一个接收 `long` 的重载，观察实参类型改变时的选择：
 
 ```cpp
-int pressure_code(int pressure_kpa);
-int pressure_code(long pressure_kpa);
-int pressure_code(double pressure_kpa);
+int encode_pressure(int pressure_kpa);
+int encode_pressure(long pressure_kpa);
+int encode_pressure(double pressure_kpa);
 
 int exact_value{220};
-short promoted_value{220};
 float floating_value{220.5F};
 
-const int first{pressure_code(exact_value)};
-const int second{pressure_code(promoted_value)};
-const int third{pressure_code(floating_value)};
+const int first{encode_pressure(exact_value)};
+const int second{encode_pressure(floating_value)};
 ```
 
-`exact_value` 已经是 `int`，因此第一条调用对 `pressure_code(int)` 是精确匹配。
+`exact_value` 已经是 `int`，因此第一条调用对 `encode_pressure(int)` 是精确匹配。
 
-`promoted_value` 从 `short` 到 `int` 属于整数提升；转换为 `long` 或 `double` 只能得到 Conversion 等级，因此第二条调用仍然选择 `pressure_code(int)`。
-
-`floating_value` 从 `float` 到 `double` 属于浮点提升；转换为整数类型只能得到 Conversion 等级，因此第三条调用选择 `pressure_code(double)`。
+`floating_value` 从 `float` 到 `double` 属于浮点提升；转换为整数类型只能得到 Conversion 等级，因此第二条调用选择 `encode_pressure(double)`。
 
 **比较的是标准规定的转换序列等级，不是转换结果是否符合业务需要。**Exact Match 也不必表示机器层面完全没有任何处理；附章[标准转换序列与重载排序](deep-dives/01-standard-conversion-sequences-and-overload-ranking.md#序列的组成决定整体等级)进一步拆解这些等级的组成。
 

@@ -35,23 +35,6 @@ const int recorded_value_kpa{read_pressure_value(230)};
 
 第一条声明执行普通复制初始化。第二条调用需要用 `int` 实参初始化 `pressure_kpa` 形参；函数参数的这种初始化同样允许隐式转换。两处都会调用 `pressure_kpa(int)` 建立目标对象。
 
-## 转换构造函数不由参数数量定义
-
-**标准把不是显式的（non-explicit）构造函数称为转换构造函数（converting constructor）。** `pressure_kpa(int)` 是转换构造函数；把它声明为 `explicit` 后，它仍然能构造对象，却不再属于这项标准术语。
-
-“单参数构造函数”只是常见形状，不是转换构造函数的定义。不是显式的多参数构造函数也属于这一分类，并能在提供了足够实参的语境中使用：
-
-```cpp
-class pressure_range {
-  public:
-    pressure_range(int minimum_kpa, int maximum_kpa);
-};
-
-const pressure_range operating_range = {100, 250};
-```
-
-这里的两参数构造函数是转换构造函数，复制列表初始化提供的两个元素能够初始化它的两个形参。`pressure_range value = 100;` 仍然不成立，因为单个源表达式没有为第二个形参提供实参。构造函数的标准分类与某个具体初始化能否为它提供合法实参，是两个不同判断。
-
 ## explicit 的可用性由初始化语境决定
 
 单位不应只由隐藏约定决定。下面是一份独立的替代定义：把 `pressure_kpa(int)` 声明为 `explicit`，保留从整数建立对象的能力，同时阻止普通隐式转换自动采用它。
@@ -82,7 +65,7 @@ class pressure_kpa {
 >
 > 普通复制初始化的声明已经写出了 `pressure_kpa`，却仍然不能采用 `explicit` 构造函数。这说明“调用处能否看见目标类型”不是语言的判断标准。直接列表初始化会考虑 `explicit` 构造函数；普通复制初始化和需要隐式转换的函数实参不会采用它；`static_cast` 明确请求转换到目标类型，因此可以采用它。
 >
-> 复制列表初始化还有一项特殊边界：重载决议先选择构造函数；如果最终选中的是 `explicit` 构造函数，这项初始化才被判为不合法。[附章进一步解释这项选择顺序](deep-dives/01-user-defined-conversion-sequences-and-overload-ranking.md#复制列表初始化在选中构造函数后检查-explicit)。
+> 复制列表初始化写作 `const pressure_kpa pressure = {220};`，它还有一项特殊边界：重载决议先选择构造函数；如果最终选中的是 `explicit` 构造函数，这项初始化才被判为不合法。[附章进一步解释这项选择顺序](deep-dives/01-user-defined-conversion-sequences-and-overload-ranking.md#复制列表初始化在选中构造函数后检查-explicit)。
 
 调用函数时，可以先直接列表初始化目标对象，再传递这个已经具有正确类型的结果：
 
@@ -101,6 +84,25 @@ const pressure_kpa invalid_pressure{-10};
 ```
 
 这条声明仍然可以使用 `explicit` 构造函数。`explicit` 只控制构造路径能否在特定语境中被隐式采用，不能判断 `-10` 是否符合压力模型，也不会自动执行范围验证。类若承诺压力不能为负，构造函数与其他公开状态入口仍须共同维护这项不变式。
+
+## 转换构造函数不由参数数量定义
+
+日常使用时，需要直接分清的是前面几种初始化语境能否采用 `explicit` 构造函数。阅读标准中的“转换构造函数”时，还需要辨认它的分类依据：
+
+**标准把不是显式的（non-explicit）构造函数称为转换构造函数（converting constructor）。** `pressure_kpa(int)` 是转换构造函数；把它声明为 `explicit` 后，它仍然能构造对象，却不再属于这项标准术语。
+
+“单参数构造函数”只是常见形状，不是转换构造函数的定义。不是显式的多参数构造函数也属于这一分类，并能在提供了足够实参的语境中使用：
+
+```cpp
+class pressure_range {
+  public:
+    pressure_range(int minimum_kpa, int maximum_kpa);
+};
+
+const pressure_range operating_range = {100, 250};
+```
+
+这里的两参数构造函数是转换构造函数，复制列表初始化提供的两个元素能够初始化它的两个形参。`pressure_range value = 100;` 仍然不成立，因为单个源表达式没有为第二个形参提供实参。构造函数的标准分类与某个具体初始化能否为它提供合法实参，是两个不同判断。
 
 ## 参考资料
 

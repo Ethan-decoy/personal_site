@@ -82,30 +82,9 @@ class pressure_reading {
 
 构造函数 `explicit pressure_reading(bool)` 控制从 `bool` 到 `pressure_reading` 的构造；转换函数 `explicit operator bool() const` 控制从 `pressure_reading` 到 `bool` 的转换。条件判断使用的是后一个方向。
 
-当前转换函数仍然遵守 `explicit` 的初始化边界：直接初始化可以采用它，普通复制初始化则不可以：
+`if` 条件使用按语境转换为 `bool`（contextual conversion to `bool`），会考虑这项 `explicit operator bool()`。普通函数的 `bool` 形参不使用这条特殊规则，不能自动采用它。
 
-```cpp
-const pressure_reading reading{true};
-
-const bool direct_availability(reading); // 正确：直接初始化
-const bool copied_availability = reading; // 错误：复制初始化
-```
-
-普通隐式转换是否成立，可以借助下面的假想声明理解：
-
-```cpp
-bool temporary = reading;
-```
-
-这个声明采用复制初始化，不能使用 `explicit operator bool()`，所以 `copied_availability` 不合法。这里的 `=` 仍然属于初始化语法，不是先构造对象再向它赋值。
-
-但是，`if` 条件需要的是按语境转换为 `bool`（contextual conversion to `bool`）。语言使用另一种判断模型：这项转换成立，当且仅当下面形式的假想声明成立：
-
-```cpp
-bool temporary(reading);
-```
-
-这次采用的是直接初始化形式，会考虑 `explicit operator bool()`，所以对象可以直接用于条件判断。条件语境与普通函数实参的边界并不相同：
+保留上面的类定义，把下面的声明和函数定义放在类定义之后。`inspect` 中的 `reading` 借用调用者的对象；三种使用方式都针对它：
 
 ```cpp
 void record_availability(bool is_available);
@@ -121,7 +100,32 @@ void inspect(const pressure_reading& reading) {
 ```
 
 > [!TIP]
-> `explicit operator bool()` 可用于直接初始化、显式转换和按语境转换为 `bool`，但不能用于普通复制初始化或普通函数实参转换。 这条较窄的接口边界允许对象自然地参与条件判断，而不会让它在其他语境中悄悄变成 `bool`。
+> `explicit operator bool()` 可用于直接初始化、显式转换和按语境转换为 `bool`，但不能用于普通复制初始化或普通函数实参转换。这条较窄的接口边界允许对象自然地参与条件判断，而不会让它在其他语境中悄悄变成 `bool`。
+
+这项区别可以进一步用初始化模型解释。下面的片段放在函数体内，对同一个对象分别作两种初始化：
+
+```cpp
+const pressure_reading reading{true};
+
+const bool direct_availability(reading);  // 正确：直接初始化
+const bool copied_availability = reading; // 错误：复制初始化
+```
+
+`direct_availability(reading)` 出现在变量声明中：圆括号提供初始值，没有发起函数调用。它使用直接初始化，可以采用显式转换函数；前面用花括号直接列表初始化 `int` 的例子也能采用相应的显式转换函数。`copied_availability = reading` 则采用复制初始化，不能使用 `explicit operator bool()`；这里的 `=` 仍然属于初始化语法，不是向已有对象赋值。
+
+普通隐式转换是否成立，可以借助下面形式的假想声明判断：
+
+```cpp
+bool temporary = reading;
+```
+
+这个模型使用复制初始化，不会考虑显式转换函数。`if` 所用的按语境转换为 `bool` 则以另一种假想声明为判断依据：
+
+```cpp
+bool temporary(reading);
+```
+
+后一个模型使用直接初始化，会考虑 `explicit operator bool()`。因此，`if (reading)` 可以采用它，普通的 `record_availability(reading)` 仍然不成立；调用者可以用 `static_cast<bool>(reading)` 明确取得布尔结果再传入。
 
 ## const 限定约束源对象
 

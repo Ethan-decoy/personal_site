@@ -23,14 +23,26 @@ pressure_delta_kpa operator+(const pressure_delta_kpa& left, const pressure_delt
 }
 ```
 
-## 复合赋值修改已有对象
+成员函数执行时，`this` 指向当前调用对象，`*this` 是指定该对象的 lvalue。`operator+=` 的返回类型是 `pressure_delta_kpa&`，因此 `return *this;` 返回的是调用对象的引用。
 
-成员 `operator+=` 通过调用对象取得左操作数，并通过 `increment` 取得右操作数：
+## 加法产生独立结果
+
+先用非成员 `operator+` 读取两个操作数，并按值返回新的 `pressure_delta_kpa`：
 
 ```cpp
 pressure_delta_kpa accumulated{15};
 const pressure_delta_kpa increment{5};
 
+const pressure_delta_kpa projected{accumulated + increment};
+```
+
+`accumulated + increment` 调用按值返回的运算符函数，因而产生 `pressure_delta_kpa` 类型的 prvalue。这个结果初始化 `projected`；求值结束后，`projected.value == 20`，`accumulated.value` 仍然是 `15`，`increment.value` 仍然是 `5`。
+
+## 复合赋值修改已有对象
+
+继续使用仍为 `15` 的 `accumulated` 和值为 `5` 的 `increment`。成员 `operator+=` 通过调用对象取得左操作数，通过形参取得右操作数：
+
+```cpp
 pressure_delta_kpa& updated{accumulated += increment};
 ```
 
@@ -40,24 +52,11 @@ pressure_delta_kpa& updated{accumulated += increment};
 const bool same_object{&updated == &accumulated}; // true
 ```
 
-成员函数执行时，`this` 指向当前调用对象，`*this` 是指定该对象的 lvalue。`return *this;` 与返回类型 `pressure_delta_kpa&` 共同使 `accumulated += increment` 的结果仍然指代 `accumulated`。这延续了内建复合赋值的结果模型：修改左操作数，并得到指向该左操作数的 lvalue。
+`return *this;` 与返回类型 `pressure_delta_kpa&` 共同使 `accumulated += increment` 的结果仍然指代 `accumulated`。这延续了内建复合赋值的结果模型：修改左操作数，并得到指定该左对象的 lvalue。先前的 `projected` 是独立对象，修改 `accumulated` 不会使它跟随变化。
 
 返回 `pressure_delta_kpa&` 是接口惯例，不是所有 `operator+=` 都必须服从的语法要求。C++ 允许为重载的 `+=` 选择其他返回类型，也允许把它定义为非成员函数；当前成员形式和引用结果能够最直接地表达“修改左对象，并把该对象作为运算结果”。
 
 [`this` 指针与隐式对象参数](../10-class-interfaces-and-encapsulation/deep-dives/01-implicit-object-parameter-this-and-implementation-model.md#函数体中的-this-表达式)进一步说明了调用对象与 `*this` 的关系。
-
-## 加法产生独立结果
-
-非成员 `operator+` 通过两个 `const` 引用读取操作数，并按值返回新的 `pressure_delta_kpa`：
-
-```cpp
-const pressure_delta_kpa baseline{15};
-const pressure_delta_kpa correction{5};
-
-const pressure_delta_kpa projected{baseline + correction};
-```
-
-`baseline + correction` 调用按值返回的运算符函数，因而产生 `pressure_delta_kpa` 类型的 prvalue。这个结果初始化 `projected`；求值结束后，`projected.value == 20`，`baseline.value` 仍然是 `15`，`correction.value` 仍然是 `5`。
 
 > [!IMPORTANT]
 > 在这组接口中，复合赋值修改左操作数并返回指代它的 lvalue；普通加法不修改输入，而是产生用于建立独立对象的值。函数声明和函数体共同建立这项语义，`+=` 与 `+` 的符号不会自动替实现作出保证。

@@ -51,14 +51,14 @@ bool operator==(const tire_snapshot& left, const tire_snapshot& right) {
 ```cpp
 const tire_snapshot first{220, 35, 18};
 const tire_snapshot second{220, 35, 18};
-const tire_snapshot changed_pressure{225, 35, 18};
+const tire_snapshot changed_temperature{220, 36, 18};
 
-const bool equal_state{first == second};               // true
-const bool different_state{first == changed_pressure}; // false
-const bool same_identity{&first == &second};           // false
+const bool equal_state{first == second};                     // true
+const bool equal_after_change{first == changed_temperature}; // false
+const bool same_identity{&first == &second};                 // false
 ```
 
-`first` 和 `second` 位于不同地址，因此它们具有不同身份；三个状态值相同，所以重载的 `==` 判定它们相等。`changed_pressure` 只改变了压力，但压力属于这项类型承诺的值状态，因此比较结果为 `false`。
+`first` 和 `second` 位于不同地址，因此它们具有不同身份；三个状态值相同，所以重载的 `==` 判定它们相等。`changed_temperature` 与 `first` 的压力、磨损相同，温度却不同。温度也属于这项类型承诺的值状态，因此比较结果为 `false`。
 
 若把 `operator==` 实现成 `&left == &right`，它只能重复对象身份判断。这样的实现会让两个独立却状态相同的值对象永远不相等，违背当前 `tire_snapshot` 的值语义。
 
@@ -67,7 +67,9 @@ const bool same_identity{&first == &second};           // false
 
 ## 相等由类型语义决定
 
-C++ 不会自动判断哪些成员构成对象的值。若上面的函数只比较压力而忽略温度和磨损，代码仍然能够通过编译，却会把本应不同的轮胎快照判为相等。反过来，类也可能保存用于加速计算的缓存或调用统计；若这些数据不属于类型公开表达的值，机械比较全部实现状态同样会得到错误接口。
+C++ 不会自动判断哪些成员构成对象的值。若上面的函数只比较压力而忽略温度和磨损，代码仍然能够通过编译。此时 `first` 与 `changed_temperature` 的压力都是 `220`，错误实现会返回 `true`，把温度不同的快照判为相等。
+
+反过来，类也可能保存用于加速计算的缓存或调用统计；若这些数据不属于类型公开表达的值，机械比较全部实现状态同样会得到错误接口。
 
 指针成员也不能只因为位于对象内部就机械决定相等含义。比较两个指针值回答的是它们是否指向同一目标；若类型承诺比较目标所表示的内容，还需要按照该项领域语义完成比较。数据成员的存储形式不能替类型定义逻辑相等。
 

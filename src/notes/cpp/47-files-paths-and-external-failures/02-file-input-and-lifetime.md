@@ -28,7 +28,7 @@ int main() {
         return 1;
     }
 
-    std::string line;
+    std::string line{};
     while (std::getline(input, line)) {
         std::cout << line << '\n';
     }

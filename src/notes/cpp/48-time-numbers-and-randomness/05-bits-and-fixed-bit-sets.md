@@ -10,7 +10,7 @@ order: 5
 
 ## bitset 表达固定数量的开关
 
-`std::bitset<N>` 位于 `<bitset>`，保存 N 个逻辑比特。`set(position)` 设置相应位，`test(position)` 读取布尔值，`count()` 统计置位项数。
+`std::bitset<N>` 位于 `<bitset>`，保存 N 个逻辑比特，默认构造时所有位都为 0。`set(position)` 将相应位设为 1，`test(position)` 读取布尔值，`count()` 统计置位项数。
 
 `<bit>` 中的 `std::popcount` 对受支持的无符号整数统计二进制一的数量。
 
@@ -20,7 +20,7 @@ order: 5
 #include <iostream>
 
 int main() {
-    std::bitset<8> enabled;
+    std::bitset<8> enabled{};
     enabled.set(2);
     std::cout << enabled.test(2) << ' ' << enabled.count() << '\n'; // 1 1
     std::cout << std::popcount(5u) << '\n';                         // 2，二进制 101

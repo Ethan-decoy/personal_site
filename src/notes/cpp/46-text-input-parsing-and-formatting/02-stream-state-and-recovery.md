@@ -56,7 +56,7 @@ int main() {
     if (!(input >> value)) {
         std::cout << "bad line\n";
         input.clear();
-        std::string discarded;
+        std::string discarded{};
         std::getline(input, discarded);
     }
     if (input >> value) {

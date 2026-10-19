@@ -19,7 +19,7 @@ order: 5
 #include <system_error>
 
 std::expected<bool, std::error_code> path_exists(const std::filesystem::path& path) {
-    std::error_code error;
+    std::error_code error{};
     const bool found = std::filesystem::exists(path, error);
     if (error) {
         return std::unexpected{error};

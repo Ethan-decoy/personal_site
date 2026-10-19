@@ -21,7 +21,7 @@ order: 1
 
 int main() {
     std::istringstream input{"front channel\n\nrear channel"};
-    std::string line;
+    std::string line{};
     while (std::getline(input, line)) {
         std::cout << '[' << line << "]\n";
     }

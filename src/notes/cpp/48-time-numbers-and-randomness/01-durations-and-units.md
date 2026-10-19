@@ -12,6 +12,8 @@ order: 1
 
 `<chrono>` 中的时长（Duration）`std::chrono::duration<Rep, Period>` 使用 Rep 保存数值，Period 表示每个单位相对于秒的比例。milliseconds、seconds 等是常用时长别名。
 
+省略 Period 时，每个计数单位默认是一秒，因此 `duration<double>` 用 double 保存秒数。
+
 ```cpp
 #include <chrono>
 #include <iostream>

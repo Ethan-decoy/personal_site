@@ -17,6 +17,8 @@ order: 2
 ```cpp
 #include <iostream>
 
+using reader = int(int, int);
+
 int current_adjustment{10};
 
 int adjusted(int value, int offset = current_adjustment) {
@@ -28,7 +30,7 @@ int main() {
     current_adjustment = 20;
     std::cout << adjusted(220) << '\n'; // 240
 
-    int (*operation)(int, int) = &adjusted;
+    reader* const operation{&adjusted};
     std::cout << operation(220, 0) << '\n'; // 220
 }
 ```
@@ -53,19 +55,19 @@ struct pressure_source {
 
 struct calibrated_source : pressure_source {
     int read(int offset = 10) const override {
-        return 220 + offset;
+        return 230 + offset;
     }
 };
 
 int main() {
-    const calibrated_source value;
+    const calibrated_source value{};
     const pressure_source& source = value;
-    std::cout << value.read() << '\n';  // 230
-    std::cout << source.read() << '\n'; // 220
+    std::cout << value.read() << '\n';  // 240
+    std::cout << source.read() << '\n'; // 230
 }
 ```
 
-两次都执行派生类实现；差别是分别补入 `10` 和 `0`。把差异归因于“基类调用没有发生虚分派”会误判对象行为。
+两次都执行派生类实现，所以都以 `230` 为基准。`value.read()` 按派生类声明补入 `10`，得到 `240`；`source.read()` 按基类声明补入 `0`，得到 `230`。若第二次执行的是基类实现，结果会是 `220`；当前的 `230` 因而也显示了虚分派仍然生效。
 
 > [!WARNING]
 > 改写覆盖函数的默认实参，不会改写经基类声明调用时使用的默认值。共同接口若要求统一缺省行为，通常在共同声明上维持一项约定，避免不同静态入口给出不同结果。

@@ -27,7 +27,7 @@ struct next_reading {
 };
 
 int main() {
-    next_reading source;
+    next_reading source{};
     std::function<int()> first = std::ref(source);
     auto second = first;
 

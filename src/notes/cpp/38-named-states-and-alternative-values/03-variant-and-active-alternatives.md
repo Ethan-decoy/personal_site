@@ -16,6 +16,8 @@ order: 3
 
 `std::get_if<T>(&value)` 检查当前类型：匹配时返回指向所保存值的指针，不匹配时返回 `nullptr`。本例每个类型只出现一次，因此可以按类型选择。
 
+下面的 `if` 条件先声明并初始化 `pressure`，再按这个指针是否非空选择分支。名称可用于这条 `if` 的分支及 `else`，语句结束后不再可用；两条 `if` 各自声明自己的 `pressure`。
+
 ```cpp
 #include <iostream>
 #include <string>
@@ -48,7 +50,7 @@ int main() {
 
 `result.index()` 返回当前备选项从 `0` 开始的序号。本例整数是 `0`，字符串是 `1`。序号依赖模板参数顺序，通常不适合直接充当持久化协议编码。
 
-默认构造会默认构造第一个备选项：`std::variant<int, std::string> result;` 保存值为零的整数。若第一个类型不能默认构造，这个默认构造也不可用。
+默认构造的 variant 会对第一个备选项进行值初始化（Value Initialization）。在本例中，这会使 `std::variant<int, std::string> result;` 保存值为零的整数。若第一个类型不能默认构造，这个默认构造也不可用。
 
 ## 相同表示不等于相同含义
 

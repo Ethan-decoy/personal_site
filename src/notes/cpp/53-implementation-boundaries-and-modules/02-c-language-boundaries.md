@@ -10,7 +10,7 @@ C 与 C++ 可以共同组成程序，但调用入口的语言链接、类型布�
 
 ## 共用头文件条件声明语言链接
 
-语言链接（Language Linkage）描述函数类型与名称的相关链接关系。下面头文件 pressure-api.h 用 `__cplusplus` 检测 C++ 编译语境；该宏由实现定义，不是用户自己命名的接口。
+语言链接（Language Linkage）描述函数类型与名称的相关链接关系。下面头文件 pressure-api.h 用 `__cplusplus` 检测 C++ 编译语境；该宏由 C++ 实现预定义，不是用户自己命名的接口。
 
 ```c
 #ifndef PRESSURE_API_H
@@ -29,6 +29,8 @@ int pressure_is_valid(int value);
 #endif
 ```
 
+`#ifdef __cplusplus` 在宏已定义时保留到匹配 `#endif` 之间的内容。C++ 编译这份头文件时，保留 `extern "C" {` 和对应的 `}`，将中间的函数声明包在其中；C 编译时跳过这两段，只留下普通函数声明。
+
 实现保存为 pressure-api.cpp：
 
 ```cpp
@@ -39,10 +41,11 @@ int pressure_is_valid(int value) {
 }
 ```
 
-C 调用方保存为 main.c：
+C 调用方保存为 main.c。这里 `main(void)` 表示入口不接收参数；`<stdio.h>` 提供 `printf`，当前格式 `"%d\n"` 将后一个 `int` 结果按十进制输出并换行：
 
 ```c
 #include "pressure-api.h"
+
 #include <stdio.h>
 
 int main(void) {

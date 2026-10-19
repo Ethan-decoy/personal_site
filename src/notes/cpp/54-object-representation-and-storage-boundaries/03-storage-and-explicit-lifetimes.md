@@ -8,7 +8,7 @@ order: 3
 
 取得足够空间与构造一个对象是两项动作。普通变量、容器和 RAII 将它们连接起来；底层工具有时需要显式管理这段边界。
 
-## construct_at 建立对象，destroy_at结束对象
+## construct_at 建立对象，destroy_at 结束对象
 
 `std::construct_at` 与 `std::destroy_at` 位于 `<memory>`。前者在合法地址构造对象并返回目标指针，后者调用相应销毁操作，不负责释放外层存储。
 
@@ -29,7 +29,7 @@ struct reading {
 
 int main() {
     alignas(reading) std::byte storage[sizeof(reading)];
-    reading* value = std::construct_at(reinterpret_cast<reading*>(storage), 220);
+    reading* const value{std::construct_at(reinterpret_cast<reading*>(storage), 220)};
     std::cout << value->pressure_kpa << '\n'; // 220
     std::destroy_at(value);                   // destroy 220
 }

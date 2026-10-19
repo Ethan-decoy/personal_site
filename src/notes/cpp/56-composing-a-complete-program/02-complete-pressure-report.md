@@ -40,7 +40,7 @@ std::expected<pressure, input_error> parse_pressure(std::string_view text) {
         return std::unexpected{input_error::invalid_number};
     }
     int value{};
-    const char* end = text.data() + text.size();
+    const char* const end{text.data() + text.size()};
     const auto parsed = std::from_chars(text.data(), end, value);
     if (parsed.ec == std::errc::result_out_of_range) {
         return std::unexpected{input_error::out_of_range};
@@ -51,7 +51,7 @@ std::expected<pressure, input_error> parse_pressure(std::string_view text) {
     if (parsed.ptr != end) {
         return std::unexpected{input_error::trailing_text};
     }
-    auto accepted = pressure::make(value);
+    const auto accepted = pressure::make(value);
     if (!accepted) {
         return std::unexpected{input_error::out_of_range};
     }
@@ -59,12 +59,12 @@ std::expected<pressure, input_error> parse_pressure(std::string_view text) {
 }
 
 std::expected<std::vector<pressure>, input_failure> read_pressures(std::istream& input) {
-    std::vector<pressure> values;
-    std::string line;
+    std::vector<pressure> values{};
+    std::string line{};
     std::size_t number{};
     while (std::getline(input, line)) {
         ++number;
-        auto value = parse_pressure(line);
+        const auto value = parse_pressure(line);
         if (!value) {
             return std::unexpected{input_failure{value.error(), number}};
         }

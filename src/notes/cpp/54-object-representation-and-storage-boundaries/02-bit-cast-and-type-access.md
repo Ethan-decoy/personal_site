@@ -31,11 +31,16 @@ int main() {
     static_assert(std::is_trivially_copyable_v<float>);
     static_assert(std::is_trivially_copyable_v<std::uint32_t>);
     const float pressure{220.5f};
+    const auto number = static_cast<std::uint32_t>(pressure);
+    const auto converted = static_cast<float>(number);
     const auto bits = std::bit_cast<std::uint32_t>(pressure);
     const auto restored = std::bit_cast<float>(bits);
-    std::cout << (restored == pressure) << '\n'; // 1
+    std::cout << number << ' ' << converted << '\n';                // 220 220
+    std::cout << restored << ' ' << (restored == pressure) << '\n'; // 220.5 1
 }
 ```
+
+数值转换使 `number` 得到 220，转回浮点后的 `converted` 是 220.0；小数部分在转成整数时已经丢失，转回不能补回它。表示转换则把 `pressure` 的表示传给 `bits`，再在本例前提下恢复成 220.5，因此 `restored == pressure` 成立。两条路径使用同一个源值，保留的关系却不同：一条按数值规则计算目标值，另一条传递对象表示。
 
 本例从有效浮点值取得表示，再转回。**大小相同与可平凡复制只是类型前提，还须检查产生的目标表示是否合法。**C++23 中，若产生的值表示不能对应目标类型的值，行为未定义；源中的填充位或未确定的位进入目标值表示时，也受到相应规则限制。因此，不能把任意整数位模式都当作合法目标值，也不能由此得到可跨平台保存的文件格式。
 

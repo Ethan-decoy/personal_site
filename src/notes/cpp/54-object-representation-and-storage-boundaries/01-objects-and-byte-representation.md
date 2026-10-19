@@ -20,7 +20,7 @@ order: 1
 #include <span>
 
 int main() {
-    int value{220};
+    const int value{220};
     const auto bytes = std::as_bytes(std::span{&value, 1});
     std::cout << (bytes.size() == sizeof(value)) << '\n'; // 1
 }

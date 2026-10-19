@@ -61,7 +61,7 @@ int pressure_store::read() const {
 #include <iostream>
 
 int main() {
-    const pressure_store source;
+    const pressure_store source{};
     std::cout << source.read() << '\n'; // 220
 }
 ```

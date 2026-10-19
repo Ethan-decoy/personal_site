@@ -43,6 +43,18 @@ target_compile_features(pressure_report PRIVATE cxx_std_23)
 set_target_properties(pressure_report PROPERTIES CXX_EXTENSIONS OFF)
 ```
 
+这些命令把当前工程和构建目标连接起来：
+
+| 配置 | 本例中的作用 |
+| --- | --- |
+| cmake_minimum_required | 要求使用至少 3.25 版 CMake |
+| project | 为项目命名，并启用 C++ 语言（CXX） |
+| add_executable | 创建 pressure_report 可执行目标，将 main.cpp 列为它的源文件 |
+| target_compile_features | 对这个目标请求至少 C++23 的语言模式；PRIVATE 表示该要求作用于目标自身 |
+| set_target_properties | 用 CXX_EXTENSIONS OFF 请求标准语言模式，关闭相应的编译器扩展模式 |
+
+项目名与目标名在这里恰好相同。后两条配置中的 pressure_report 都指 add_executable 建立的目标，语言要求由此与它的源文件关联起来。
+
 配置生成构建描述，再执行构建。例如在已安装 Ninja 与相应编译器的环境中：
 
 ```shell
@@ -50,7 +62,9 @@ cmake -S . -B build -G Ninja
 cmake --build build
 ```
 
-build 保存产物，与源目录分开。多源文件加入同一目标或明确的库目标，再用目标关系描述链接；模块等编译产物也需要其实际依赖顺序。
+`-S .` 选择当前源目录，`-B build` 选择保存构建描述与产物的 build 目录，`-G Ninja` 选择 Ninja 生成器。第二条命令按 build 中的描述调用构建工具。
+
+多源文件加入同一目标或明确的库目标，再用目标关系描述链接；模块等编译产物也需要其实际依赖顺序。这里需要理解目标怎样集中源文件、语言要求与依赖，具体命令拼写、生成器和工具链支持可以在使用时核对。
 
 ## 语言模式与库支持分别验证
 

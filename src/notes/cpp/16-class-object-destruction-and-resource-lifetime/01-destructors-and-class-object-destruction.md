@@ -27,7 +27,7 @@ int main() {
     std::cout << "before block\n";
 
     {
-        inspection_trace current{17};
+        const inspection_trace current{17};
         std::cout << "inside block\n";
     }
 

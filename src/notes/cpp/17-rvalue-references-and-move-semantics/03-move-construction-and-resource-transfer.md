@@ -54,7 +54,7 @@ int main() {
         registration source{count};
 
         {
-            registration target{std::move(source)};
+            const registration target{std::move(source)};
 
             std::cout << count << ' ' << source.is_active() << ' ' << target.is_active() << '\n';
         }

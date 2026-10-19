@@ -44,7 +44,7 @@ int main() {
     int count{0};
 
     {
-        registration entry{begin_registration(count)};
+        const registration entry{begin_registration(count)};
         std::cout << count << '\n';
     }
 
@@ -70,7 +70,7 @@ int main() {
 下面这条声明可以替换程序中 `entry` 的声明：
 
 ```cpp
-registration entry = begin_registration(count);
+const registration entry = begin_registration(count);
 ```
 
 声明中的 `=` 仍然是初始化语法。它没有先默认构造 `entry`，也不会因为采用这种写法而多出一次复制。

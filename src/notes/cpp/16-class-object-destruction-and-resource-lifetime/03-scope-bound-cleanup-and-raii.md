@@ -53,7 +53,7 @@ class calibration_registration {
 };
 
 bool inspect_tire(bool sensor_ready, int& active_registration_count) {
-    calibration_registration current_registration{active_registration_count};
+    const calibration_registration current_registration{active_registration_count};
 
     if (!sensor_ready) {
         return false;

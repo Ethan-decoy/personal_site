@@ -37,7 +37,7 @@ class tire_monitor {
 };
 
 int main() {
-    tire_monitor monitor{};
+    const tire_monitor monitor{};
 }
 ```
 

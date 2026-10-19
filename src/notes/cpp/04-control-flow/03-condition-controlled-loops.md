@@ -40,14 +40,14 @@ while (tire_pressure_kpa < 220) {
 `do-while` 从循环体开始执行。循环体沿正常路径完成后，程序求值条件；条件为 `true` 时再次进入循环体，为 `false` 时结束循环：
 
 ```cpp
-int tire_pressure_kpa{215};
+int tire_pressure_kpa{220};
 
 do {
     tire_pressure_kpa += 5;
 } while (tire_pressure_kpa < 220);
 ```
 
-循环体先把气压增加到 `220`，随后条件第一次得到 `false`，循环结束。**只要控制到达一条 `do-while` 语句，循环体就会先被进入一次；条件无法阻止这第一次执行。**
+这里沿用前一个 `while` 示例的初始气压 `220`。`while` 一次也不执行，`do-while` 却先把气压增加到 `225`，随后条件第一次得到 `false`，循环结束。**只要控制到达一条 `do-while` 语句，循环体就会先被进入一次；条件无法阻止这第一次执行。**
 
 右括号后的分号属于 `do-while` 的语法，不能省略。它结束的是整条循环语句，而不是循环体中的某一条语句。
 

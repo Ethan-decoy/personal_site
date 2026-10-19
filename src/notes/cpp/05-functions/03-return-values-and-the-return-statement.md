@@ -76,6 +76,7 @@ int main() {
     print_pressure_check(220);
     print_pressure_check(-1);
     std::cout << "checks complete\n";
+    return 0;
 }
 ```
 

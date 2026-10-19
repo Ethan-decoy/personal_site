@@ -50,7 +50,7 @@ for (int lap{0}; lap < 3; ++lap) {
 int completed_laps{0};
 
 for (int lap{0}; lap < 3; ++lap) {
-    completed_laps += lap;
+    ++completed_laps;
 }
 
 lap = 0; // 错误：这里已经找不到 lap 的声明
@@ -85,13 +85,13 @@ for (; lap < 3;) {
 ```cpp
 int completed_laps{0};
 
-for (int lap{0}; lap < 6; ++lap) {
+for (int lap{0}; lap < 3; ++lap) {
     ++completed_laps;
     ++lap;
 }
 ```
 
-这段代码每轮把 `lap` 修改两次，循环体实际只在 `0`、`2` 和 `4` 时执行。代码没有未定义行为，但读者已经无法只看 `for` 的开头判断推进方式。
+初始状态和上界都与开篇相同，只是在循环体里又增加了一次 `++lap`。现在每轮把 `lap` 修改两次，循环体只在 `0` 和 `2` 时执行，`completed_laps` 最终保存 `2`。代码没有未定义行为，但读者已经无法只看 `for` 的开头判断推进方式。
 
 > [!TIP]
 > 当初始化、判断和一个统一的推进步骤自然成组时，使用 `for`；是否继续主要取决于某个状态，且状态变化没有单一固定位置时，使用 `while`；第一次操作必然发生时，才使用 `do-while`。选择不同循环形式的目的，是让开始、继续、推进和结束的关系直接呈现在结构中。

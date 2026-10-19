@@ -10,7 +10,7 @@ order: 2
 
 ## 写入源文件
 
-C++ 源文件（source file）首先是一份纯文本。新建下面的文件，并将它保存为 `main.cpp`：
+C++ 源文件（source file）首先是一份纯文本。下面的程序会输出一行 `Hello, C++!`，然后正常结束。新建文件，并将它保存为 `main.cpp`：
 
 ```cpp
 #include <iostream>
@@ -23,25 +23,9 @@ int main() {
 
 `.cpp` 是开发者与工具普遍采用的 C++ 源文件扩展名。扩展名本身不会改变文件内容；它告诉编译器驱动程序和其他开发工具，应当把这份文本作为 C++ 源代码处理。
 
-## 先建立程序的最小契约
+本例的用户代码从 `main` 的花括号内开始，依次执行两条语句。`std::cout << "Hello, C++!\n";` 把双引号中的文本写入标准输出（standard output），通常显示在终端；`\n` 使输出换行。`return 0;` 随后结束 `main`，用 `0` 表示成功。
 
-下表给出判断本例构建与运行结果所需的使用契约。
-
-| 代码 | 当前需要知道的含义 |
-| --- | --- |
-| `#include <iostream>` | `#include` 是预处理指令（preprocessing directive）；这里使 `<iostream>` 提供的 `std::cout` 名称可用，本身不是运行时输出操作 |
-| `int` | 指定 `main` 的返回类型（return type）为 `int`；这个整数用于表示程序终止状态 |
-| `main` | 托管实现（hosted implementation）按照特殊规则调用的函数（function）；本例的用户代码从它的函数体开始执行 |
-| `()` | `main` 的参数列表（parameter list）；这里没有写入任何参数 |
-| `{` 与 `}` | 界定 `main` 的函数体（function body），也就是本例需要执行的两条语句 |
-| `std::cout` | `std::` 表示这里使用标准库提供的名称；`std::cout` 是标准输出流对象（standard output stream object），写入其中的文本通常显示在终端 |
-| `<<` | 在当前表达式中，把右侧内容写入左侧输出流 |
-| `"Hello, C++!\n"` | 字符串字面量（string literal），表示需要输出的一串字符 |
-| `\n` | 字符串中的转义序列（escape sequence），表示换行字符 |
-| `;` | 结束当前的输出语句或 `return` 语句 |
-| `return 0;` | 结束 `main`；返回值 `0` 表示程序成功终止 |
-
-这些说明是足以运行当前程序的使用契约。例如，`<<` 在这里负责输出，并不表示它在所有 C++ 表达式中都具有同一种作用。
+上方的 `#include <iostream>` 使输出所需的 `std::cout` 名称可用。这里的 `<<` 负责输出；它的含义取决于当前使用位置，不能据此推断所有 `<<` 都是输出操作。
 
 ## 使用 GCC 编译
 
@@ -50,13 +34,6 @@ int main() {
 ```shell
 g++ -std=c++23 -Wall -Wextra -Wpedantic main.cpp -o hello
 ```
-
-这里，`g++` 是 GCC 的 C++ 编译器驱动程序：
-
-- `-std=c++23` 选择本套笔记采用的 C++23 语言模式；
-- `-Wall -Wextra -Wpedantic` 启用一组有助于发现可疑代码的诊断（diagnostic）；
-- `main.cpp` 是输入的源文件；
-- `-o hello` 指定生成程序的名称。
 
 命令成功完成后，在 Linux 或 macOS 中运行：
 
@@ -77,6 +54,31 @@ Hello, C++!
 ```
 
 随后光标移动到下一行，因为字符串末尾包含 `\n`。
+
+编译命令中的 `g++` 是 GCC 的 C++ 编译器驱动程序，其余部分各有职责：
+
+- `-std=c++23` 选择本套笔记采用的 C++23 语言模式；
+- `-Wall -Wextra -Wpedantic` 启用一组有助于发现可疑代码的诊断（diagnostic）；
+- `main.cpp` 是输入的源文件；
+- `-o hello` 指定生成程序的名称。
+
+## 对照代码的组成
+
+`main` 内先输出问候，再返回成功状态。需要辨认某个名称或符号时，可以按下面的对应关系回看代码：
+
+| 代码 | 当前需要知道的含义 |
+| --- | --- |
+| `#include <iostream>` | `#include` 是预处理指令（preprocessing directive）；这里使 `<iostream>` 提供的 `std::cout` 名称可用，本身不是运行时输出操作 |
+| `int` | 指定 `main` 的返回类型（return type）为 `int`；这个整数用于表示程序终止状态 |
+| `main` | 托管实现（hosted implementation）按照特殊规则调用的函数（function）；本例的用户代码从它的函数体开始执行 |
+| `()` | `main` 的参数列表（parameter list）；这里没有写入任何参数 |
+| `{` 与 `}` | 界定 `main` 的函数体（function body），也就是本例需要执行的两条语句 |
+| `std::cout` | `std::` 表示这里使用标准库提供的名称；`std::cout` 是标准输出流对象（standard output stream object），写入其中的文本通常显示在终端 |
+| `<<` | 在当前表达式中，把右侧内容写入左侧输出流 |
+| `"Hello, C++!\n"` | 字符串字面量（string literal），表示需要输出的一串字符 |
+| `\n` | 字符串中的转义序列（escape sequence），表示换行字符 |
+| `;` | 结束当前的输出语句或 `return` 语句 |
+| `return 0;` | 结束 `main`；返回值 `0` 表示程序成功终止 |
 
 ## Clang 与 MSVC 的对应命令
 

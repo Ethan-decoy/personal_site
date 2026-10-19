@@ -17,6 +17,8 @@ double front_left_pressure{2.4};
 
 C++23 没有为三种浮点类型规定统一的 byte 数和 IEEE 754 格式。下表描述当前主流 Windows x64 与 Linux x86-64 实现中的常见情况：
 
+范围与有效精度的区别需要直接记起；表中的 byte 数、最大有限值和具体精度供比较与查阅，不必逐项记忆。存储格式、外部接口或数值误差要求依赖这些数据时，应核对目标实现。
+
 | C++ 类型 | Windows x64 常见实现 | Linux x86-64 常见实现 | 常见最大有限值数量级 | 有效数折算的十进制精度（约） |
 | --- | ---: | ---: | ---: | ---: |
 | `float` | 4 bytes | 4 bytes | 约 $3.40\times10^{38}$ | 约 6～7 位 |
@@ -42,7 +44,9 @@ C++23 没有为三种浮点类型规定统一的 byte 数和 IEEE 754 格式。�
 
 一般浮点计算通常优先使用 `double`，它在主流实现中比 `float` 提供更高精度。只有存储空间、内存带宽、硬件接口或既有数据格式提出明确约束时，才需要优先考虑 `float`；选择 `long double` 时，则不能假设它一定比 `double` 提供更多有效精度。
 
-二进制小数怎样形成、IEEE 754 怎样组织符号位、指数域与小数域，以及普通值和特殊值怎样由 bit patterns 分类，参见附章：[二进制浮点数的表示（Binary Floating-Point Representation）](deep-dives/01-binary-floating-point-representation.md#binary32-与-binary64-的位结构)。
+若要理解二进制小数怎样形成、`0.1` 为什么通常只能保存为近似值，可继续看附章中的[二进制浮点表示](deep-dives/01-binary-floating-point-representation.md#二进制浮点表示)与[为什么 0.1 无法被精确表示](deep-dives/01-binary-floating-point-representation.md#为什么-01-无法被精确表示)。
+
+需要查看 IEEE 754 的字段组织或辨认特殊值时，分别查阅[位结构](deep-dives/01-binary-floating-point-representation.md#binary32-与-binary64-的位结构)与[数值分类](deep-dives/01-binary-floating-point-representation.md#ieee-754-的数值分类)。
 
 ## 参考资料
 

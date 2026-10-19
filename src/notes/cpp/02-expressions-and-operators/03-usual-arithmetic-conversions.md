@@ -107,6 +107,7 @@ int main() {
     long adjustment{-1};
     unsigned int count{0};
     std::cout << adjustment + count << '\n';
+    return 0;
 }
 ```
 

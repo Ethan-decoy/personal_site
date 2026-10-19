@@ -17,7 +17,9 @@ int displayed_temperature_c{0};
 displayed_temperature_c = measured_temperature_c;
 ```
 
-赋值左侧是 `int` 对象，右侧表达式产生 `double` 值。语言允许在这里把右侧的值转换为 `int`，再写入 `displayed_temperature_c`。代码没有显式写出转换操作，因此这是一次**隐式类型转换（implicit type conversion）**。
+赋值左侧是 `int` 对象，右侧提供 `double` 值 `-3.8`。浮点数转换为非 `bool` 整数时，会向零丢弃小数部分：本例先得到 `-3`，再写入 `displayed_temperature_c`，不是四舍五入后的 `-4`。截断后的值必须能由目标整数类型表示，本例的 `-3` 满足这一条件；否则行为未定义。
+
+代码没有显式写出转换操作，因此这是一次**隐式类型转换（implicit type conversion）**。
 
 当前这些内建类型之间由语言直接规定的隐式转换，属于标准转换（standard conversion）。
 
@@ -29,7 +31,7 @@ displayed_temperature_c = measured_temperature_c;
 
 在当前已经认识的语言结构中，隐式转换主要出现在以下位置：
 
-| 语境 | 当前标量类型中的目标 |
+| 语境 | 当前数值类型中的目标 |
 | --- | --- |
 | 运算符的操作数 | 运算符规则要求的共同类型 |
 | 对象初始化 | 被初始化对象的类型 |
@@ -66,8 +68,6 @@ double measured_pressure_kpa{pressure_to_kpa(measured_pressure_pa)};
 | 算术类型 → `bool` | 零转换为 `false`，其他值转换为 `true` |
 
 表中的“模 $2^N$ 同余”表示转换前后的两个整数相差 $2^N$ 的整数倍。例如，目标是 16 位的 `short` 时，`32768` 减去 $2^{16}=65536$ 得到 `-32768`，它就是该类型范围内的转换结果。
-
-第一段示例中的 `-3.8` 转换为 `int` 时会向零截断，因此 `displayed_temperature_c` 得到 `-3`，不是四舍五入后的 `-4`。
 
 目标为非 `bool` 整数时，整数来源的越界转换遵循模规则；浮点来源则须在截断后仍能由目标类型表示，否则行为未定义。
 

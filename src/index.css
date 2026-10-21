@@ -564,8 +564,8 @@ body {
 	--callout-background: rgba(84, 101, 119, 0.055);
 	max-width: min(80ch, 100%);
 	margin: 1.5em 0;
-	border-inline-start: 3px solid var(--callout-accent);
-	border-radius: 0 6px 6px 0;
+	border: 2px solid var(--callout-accent);
+	border-radius: 6px;
 	padding: 0.8em 1em;
 	background: var(--callout-background);
 	color: var(--tw-prose-body);

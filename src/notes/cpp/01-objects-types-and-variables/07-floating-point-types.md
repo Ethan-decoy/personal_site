@@ -5,10 +5,12 @@ date: 2026-08-25
 
 # 浮点类型（Floating-Point Types）
 
-整数类型适合表示轮胎数量，却不能直接表示 `2.4` 这样的气压。C++ 提供 `float`、`double` 和 `long double` 三种标准浮点类型（floating-point type），用于表示带有小数部分或跨越较大数量级的数值。
+整数类型适合表示图形数量，而绘图程序还可能需要记录 `2.4` 这样的圆半径。C++ 提供 `float`、`double` 和 `long double` 三种标准浮点类型（floating-point type），用于表示带有小数部分或跨越较大数量级的数值。
+
+下面的片段放在 `main` 函数体内，用 `radius` 保存以绘图单位计量的半径：
 
 ```cpp
-double front_left_pressure{2.4};
+double radius{2.4};
 ```
 
 ## 范围与精度

@@ -7,15 +7,15 @@ date: 2026-08-25
 
 ## 两种逻辑状态
 
-有些信息只需要回答一个问题：发动机是否正在运行、车门是否已经关闭、当前数据是否有效。这样的状态只有“是”和“否”两种可能，可以使用布尔类型（Boolean type）`bool` 表示。下面的片段放在 `main` 函数体内：
+有些信息只需要回答一个问题：圆 A 是否被选中、图形是否可见、当前数据是否有效。这样的状态只有“是”和“否”两种可能，可以使用布尔类型（Boolean type）`bool` 表示。下面的片段放在 `main` 函数体内：
 
 ```cpp
-bool engine_running{false};
+bool circle_selected{false};
 
-engine_running = true;
+circle_selected = true;
 ```
 
-`true` 和 `false` 是 `bool` 仅有的两个值。赋值后，`engine_running` 仍然是原来的对象，只是当前值从 `false` 变成了 `true`。
+`true` 和 `false` 是 `bool` 仅有的两个值。赋值后，`circle_selected` 仍然是原来的对象，只是当前值从 `false` 变成了 `true`。
 
 **`bool` 用类型直接表达二元逻辑状态，而不是把普通整数约定为某种状态代码。**
 
@@ -27,7 +27,7 @@ engine_running = true;
 
 ## 值集合与存储大小
 
-像 `engine_running` 这样单独定义的 `bool` 对象至少占用一个 C++ byte；在当前主流实现中，它通常恰好占用 1 byte。
+像 `circle_selected` 这样单独定义的 `bool` 对象至少占用一个 C++ byte；在当前主流实现中，它通常恰好占用 1 byte。
 
 **对象占用多少 bits，与它在语言层面具有多少个有效值，是两个不同的问题。**不能因为一个 `bool` 对象通常占用 8 bits，就推断它能够保存 256 个不同的 `bool` 值。
 

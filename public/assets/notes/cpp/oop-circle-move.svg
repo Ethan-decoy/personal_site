@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="280" viewBox="0 0 440 280" role="img" aria-labelledby="title description">
+  <title id="title">只移动圆 A，圆 B 保持原位</title>
+  <desc id="description">上下两行对照。移动前，圆 A 的横向位置为 20，圆 B 为 60。移动后，圆 A 的横向位置变为 35，圆 B 仍为 60。两个圆的半径均为 10，字母和箭头是说明标记。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#a34120" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: Inter, "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #17303e; text-anchor: middle; }
+    .heading { font-size: 20px; font-weight: 600; text-anchor: start; dominant-baseline: central; }
+    .label { font-size: 26px; font-weight: 600; dominant-baseline: central; }
+    .position { font-size: 21px; }
+    .circle { fill: #eef5f8; stroke: #34586b; stroke-width: 2; }
+  </style>
+  <rect x="0.5" y="0.5" width="439" height="279" rx="8" fill="#f7fafc" stroke="#b9cbd5"/>
+  <path d="M 16 136 H 424" stroke="#d8e3ea"/>
+  <text x="20" y="57" class="heading">移动前</text>
+  <circle cx="158" cy="57" r="44" class="circle"/>
+  <circle cx="334" cy="57" r="44" class="circle"/>
+  <text x="158" y="57" class="label">A</text>
+  <text x="334" y="57" class="label">B</text>
+  <text x="158" y="123" class="position">位置 20</text>
+  <text x="334" y="123" class="position">位置 60</text>
+  <text x="20" y="201" class="heading">移动后</text>
+  <path d="M 158 148 H 224" fill="none" stroke="#a34120" stroke-width="2" marker-end="url(#arrow)"/>
+  <circle cx="224" cy="201" r="44" class="circle"/>
+  <circle cx="334" cy="201" r="44" class="circle"/>
+  <text x="224" y="201" class="label">A</text>
+  <text x="334" y="201" class="label">B</text>
+  <text x="224" y="267" class="position">位置 35</text>
+  <text x="334" y="267" class="position">位置 60</text>
+</svg>

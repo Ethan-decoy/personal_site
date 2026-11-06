@@ -1,0 +1,49 @@
+name: Bug / 故障报告
+description: 报告可复现的页面、笔记或构建问题。
+title: "[Bug] "
+body:
+  - type: checkboxes
+    id: existing
+    attributes:
+      label: 已有记录
+      options:
+        - label: 我已搜索已有 Issue，没有发现相同问题的有效记录。
+          required: true
+  - type: input
+    id: location
+    attributes:
+      label: 问题位置
+      description: 提供含 Hash 的完整页面 URL、笔记路径或失败命令。
+      placeholder: https://www.ethan-chen.me/#notes
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: 实际与预期
+      description: 分别说明实际发生了什么，以及原本期望什么。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现步骤
+      description: 从可确认的初始状态开始，列出操作或最小示例；间歇性问题补充频率。
+      placeholder: |
+        1. 打开……
+        2. 点击或运行……
+        3. 观察到……
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境与版本
+      description: 页面问题填写系统、浏览器、设备及主题；构建问题填写 Node.js / pnpm 版本。提供观察时间及可知的版本或提交，无法确定时写“未知”。
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 补充证据
+      description: 可附截图、相关日志或暂时的解决办法，排除凭据与私人信息。

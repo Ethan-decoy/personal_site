@@ -1,0 +1,40 @@
+name: Task / 维护任务
+description: 跟踪基础设施、文档、内容或依赖维护。
+title: "[Task] "
+body:
+  - type: markdown
+    attributes:
+      value: 请先搜索已有 Issue；一个任务对应一个可验收的交付目标。
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 目的
+      description: 当前存在什么维护问题，为什么需要处理？
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: 工作范围
+      description: 列出涉及的模块、文档或配置，以及范围边界。
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 验收条件
+      description: 写出完成后应具备的结果，可使用任务列表。
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: 验证方式
+      description: 写明准备执行的检查命令或人工核对项目；完成时补充实际结果。
+    validations:
+      required: true
+  - type: textarea
+    id: related
+    attributes:
+      label: 依赖与关联记录
+      description: 有前置任务、关联 Issue 或参考资料时提供链接。

@@ -6,78 +6,92 @@ order: 1
 
 # 成员函数与调用对象（Member Functions and Invocation Objects）
 
-结构体可以把一条轮胎的状态组织成一个对象，普通函数则可以接收这个对象并修改其中的成员：
+绘图程序用 `position` 保存横向位置 `x` 和纵向位置 `y`。向右移动时，程序增加 `x`，保持 `y` 不变。这个操作既可以由接收位置对象的普通函数完成，也可以声明为位置类型的成员。
+
+普通函数 `move_right` 通过 `position&` 接收要修改的位置，通过 `dx` 接收向右移动的距离。以下坐标与位移均使用非负的小整数，并保证相加结果可以由 `int` 表示。下面是完整程序：
 
 ```cpp
-struct tire_state {
-    double pressure_bar;
-    double temperature_c;
-    int wear_percent;
+struct position {
+    int x;
+    int y;
 };
 
-void set_pressure_bar(tire_state& state, double requested_pressure_bar) {
-    state.pressure_bar = requested_pressure_bar;
+void move_right(position& target, const int dx) {
+    target.x += dx;
+}
+
+int main() {
+    position first{20, 10};
+    position second{60, 10};
+
+    move_right(first, 15);
+    move_right(second, 5);
 }
 ```
 
-`set_pressure_bar` 与 `tire_state` 处理的是同一项业务，但它们仍然是两个彼此分离的声明。需要直接访问或维护这种类型状态的操作，可以声明在类型内部，由此建立成员函数（member function）。
+两次调用分别将 `first.x` 改为 `35`、`second.x` 改为 `65`，两个 `y` 都保持 `10`。引用形参 `target` 在本次调用中绑定哪个对象，操作就修改哪个对象。
 
 ## 将操作声明为类型的成员
 
-```cpp
-struct tire_state {
-    double pressure_bar;
-    double temperature_c;
-    int wear_percent;
+同一项移动操作可以写在 `position` 的类型定义中，成为成员函数（member function）。调用时写成 `first.move_right(15)`，由点号左侧的对象提供修改目标。下面是另一个独立的完整程序，与开篇程序分开使用：
 
-    void set_pressure_bar(double requested_pressure_bar) {
-        pressure_bar = requested_pressure_bar;
+```cpp
+struct position {
+    int x;
+    int y;
+
+    void move_right(const int dx) {
+        x += dx;
     }
 };
+
+int main() {
+    position first{20, 10};
+    position second{60, 10};
+
+    first.move_right(15);
+    second.move_right(5);
+}
 ```
 
-`set_pressure_bar` 现在位于 `tire_state` 的类作用域中，是这个类型的成员函数。它不是某个 `tire_state` 对象内部的成员子对象，也不会让每条轮胎分别保存一份函数代码；所有这种类型的对象都使用同一项成员函数定义。
+`move_right` 现在位于 `position` 的类作用域中。函数体中的 `x += dx;` 在调用发生时执行，不会因为写在类体内就在定义类型时自行执行。
 
-仅加入当前这种普通成员函数，不会使这个简单的 `tire_state` 失去 C++23 聚合类型的身份，因此后面的对象仍然沿用第九章建立的聚合初始化。
+> [!IMPORTANT] 成员函数与成员子对象
+> **在这里的 `position` 中，`x` 和 `y` 是数据成员，各对象分别包含自己的整数成员子对象；`move_right` 是成员函数，不是对象内部的成员子对象。**同一项成员函数定义可以用于不同位置对象的调用。
 
-类型定义仍然只是在声明一种对象结构和可用操作。程序执行到成员函数调用之前，函数体中的语句不会因为写在结构体内部而自行执行。
+加入这里的普通成员函数后，`position` 仍满足 C++23 的聚合要求，花括号中的 `20`、`10` 仍按声明顺序初始化数据成员 `x`、`y`。
 
 ## 由成员访问表达式发起调用
 
-成员函数通过对象与成员函数名组成的表达式调用：
+在 `first.move_right(15)` 中，点号左侧的 `first` 提供调用对象；右侧的 `move_right` 在 `position` 的类作用域中确定成员函数，括号里的 `15` 用来初始化形参 `dx`。
 
-```cpp
-tire_state front_left{2.4, 36.0, 18};
-tire_state rear_right{2.2, 32.0, 12};
+两份程序完成相同的移动，目标对象的提供方式不同：
 
-front_left.set_pressure_bar(2.5);
-rear_right.set_pressure_bar(2.1);
-```
+| 对照项 | 普通函数版本 | 成员函数版本 |
+| --- | --- | --- |
+| 调用写法 | `move_right(first, 15)` | `first.move_right(15)` |
+| 目标对象 | 引用形参 `target` 绑定到实参 `first` 指定的对象 | 点号左侧的 `first` 提供调用对象 |
+| 移动距离 | `15` 初始化形参 `dx` | `15` 初始化形参 `dx` |
+| 函数体中的成员访问 | `target.x` | `x` |
 
-在这个成员访问表达式中，`front_left` 提供调用对象；名称查找则在 `tire_state` 的类作用域中确定 `set_pressure_bar`。函数体中的
+成员函数体中的 `dx` 是本次调用初始化的独立形参对象。名称查找把 `x` 确定为 `position` 的数据成员，因此它在第一次调用中指定 `first.x`，在第二次调用中指定 `second.x`。
 
-```cpp
-pressure_bar = requested_pressure_bar;
-```
+> [!IMPORTANT] 调用对象决定成员访问的目标
+> **本节这种成员函数的调用需要有效的目标对象；函数体中确定为数据成员的名称，指代本次调用对象中的相应成员子对象。**本例的 `move_right` 用于可修改的 `position` 对象。同一定义用于不同对象，不会让这些对象共享一份成员状态。
 
-修改的是本次调用对象中的 `pressure_bar` 成员，因此两次调用分别改变两个独立对象：
+逐次追踪成员函数版本的状态：
 
-```text
-front_left.set_pressure_bar(2.5)
-└── front_left.pressure_bar 变为 2.5
+| 执行位置 | `first.x` | `first.y` | `second.x` | `second.y` |
+| --- | ---: | ---: | ---: | ---: |
+| 两个对象初始化后 | `20` | `10` | `60` | `10` |
+| `first.move_right(15);` 后 | `35` | `10` | `60` | `10` |
+| `second.move_right(5);` 后 | `35` | `10` | `65` | `10` |
 
-rear_right.set_pressure_bar(2.1)
-└── rear_right.pressure_bar 变为 2.1
-```
-
-普通函数版本需要把目标对象写成 `tire_state& state` 参数，再通过 `state.pressure_bar` 访问成员。成员函数调用已经由点号左侧提供了目标对象，所以这里只显式保留新的压力值作为参数。
-
-**成员函数定义一种类型能够执行的操作；每次调用仍然必须确定这次操作所作用的具体对象。**
-
-成员函数体位于 `tire_state` 的类作用域中，可以直接使用成员名称。`requested_pressure_bar` 是本次调用创建的形参对象；`pressure_bar` 则表示调用对象中原本存在的成员子对象。赋值读取前者的值，只改变后者的状态，不会让其他 `tire_state` 对象自动同步。
+两个位置对象都由 `main` 创建，并在调用期间保持有效。每次调用只修改对应对象的 `x`，另一对象的状态和两个 `y` 都按上表保留。
 
 ## 参考资料
 
 - [C++23 工作草案：类成员](https://timsong-cpp.github.io/cppwp/n4950/class.mem.general)
 - [C++23 工作草案：非静态成员函数](https://timsong-cpp.github.io/cppwp/n4950/class.mfct.non.static)
 - [C++23 工作草案：成员访问表达式](https://timsong-cpp.github.io/cppwp/n4950/expr.ref)
+- [C++23 工作草案：聚合初始化](https://timsong-cpp.github.io/cppwp/n4950/dcl.init.aggr)

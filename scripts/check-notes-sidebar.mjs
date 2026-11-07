@@ -455,6 +455,52 @@ try {
 		}
 		return { name: `sidebar grouping rejects ${name}`, pass: rejected };
 	});
+	const pythonRoot = tree.find((node) => node.key === "python");
+	const pythonIndex = await notes.loadNote("./python/_index.md");
+	if (!pythonRoot || !pythonIndex) {
+		throw new Error("Fixture requires a public Python book and overview");
+	}
+	const pythonGroups = pythonRoot.children.filter((node) => "key" in node);
+	const pythonChapters = pythonGroups.flatMap((group) => group.children);
+	const pythonOverviewTitles = [
+		...pythonIndex.content.matchAll(/^## (.+)$/gm),
+	].map((match) => match[1]);
+	const pythonDeclaredGroups = parseSidebarGroups(
+		pythonIndex.content,
+		pythonIndex.file,
+	);
+	const pythonPhysicalChapterKeys = Object.keys(notes.notesIndex.notesByFile)
+		.filter((file) => /^\.\/python\/[^/_][^/]*\/_index\.md$/.test(file))
+		.map((file) => file.slice(2, -"/_index.md".length))
+		.sort();
+	const pythonGroupCatalogHtml = renderToStaticMarkup(
+		React.createElement(SidebarCatalog, {
+			...searchCatalogProps,
+			searchQuery: "",
+			searchFocused: false,
+			suggestions: [],
+			searchResults: [],
+			expandedKeys: new Set([pythonRoot.key]),
+		}),
+	);
+	const pythonPaths = sidebarNotePaths(pythonRoot);
+	const pythonArticles = pythonPaths.filter(
+		({ file }) => !file.endsWith("/_index.md"),
+	);
+	const pythonLoadedNotes = await Promise.all(
+		pythonPaths.map(({ file }) => notes.loadNote(file)),
+	);
+	const pythonSearchResults = await Promise.all(
+		pythonArticles.map(async ({ file }) => {
+			const results = await notes.searchNotes(
+				notes.notesIndex.notesByFile[file].title,
+			);
+			return results.find((result) => result.file === file);
+		}),
+	);
+	const pythonPrivatePrefix = "./python/_guidelines/";
+	const pythonPrivateFile = `${pythonPrivatePrefix}book-structure.md`;
+	const loadedPythonPrivateNote = await notes.loadNote(pythonPrivateFile);
 	const desktopCatalogClasses =
 		/className="([^"]*fixed bottom-0 left-8 top-32[^"]*)"/.exec(
 			notesPageSource,
@@ -582,6 +628,119 @@ try {
 					},
 					{ title: "Next part", directories: ["cpp/03-third"] },
 				]),
+		},
+		{
+			name: "Python parts match the overview headings without separate index pages",
+			pass:
+				pythonOverviewTitles.length > 0 &&
+				pythonRoot.children.length === pythonOverviewTitles.length &&
+				pythonGroups.length === pythonOverviewTitles.length &&
+				pythonGroups.every(
+					(group, index) =>
+						group.isGroup === true &&
+						!group.indexFile &&
+						group.title === pythonOverviewTitles[index],
+				),
+		},
+		{
+			name: "Python grouping preserves each physical chapter once in declared order",
+			pass:
+				JSON.stringify(pythonChapters.map((chapter) => chapter.key).sort()) ===
+					JSON.stringify(pythonPhysicalChapterKeys) &&
+				pythonGroups.every(
+					(group, index) =>
+						JSON.stringify(group.children.map((chapter) => chapter.key)) ===
+							JSON.stringify(pythonDeclaredGroups[index]?.directories) &&
+						group.children.every(
+							(chapter) => chapter.indexFile === `./${chapter.key}/_index.md`,
+						),
+				),
+		},
+		{
+			name: "Python part counts retain their chapters' public article totals",
+			pass:
+				pythonArticles.length > 0 &&
+				pythonRoot.noteCount === pythonArticles.length &&
+				pythonGroups.every(
+					(group) =>
+						group.noteCount ===
+						group.children.reduce(
+							(total, chapter) => total + chapter.noteCount,
+							0,
+						),
+				),
+		},
+		{
+			name: "opening only Python mounts part rows while chapters remain collapsed",
+			pass:
+				pythonGroups.every((group) =>
+					pythonGroupCatalogHtml.includes(group.title),
+				) &&
+				pythonChapters.every(
+					(chapter) => !pythonGroupCatalogHtml.includes(chapter.title),
+				),
+		},
+		{
+			name: "Python overviews and articles retain metadata-only entries and lazy bodies",
+			pass: pythonLoadedNotes.every(
+				(note, index) =>
+					note?.file === pythonPaths[index].file &&
+					typeof note.content === "string" &&
+					!("content" in notes.notesIndex.notesByFile[note.file]),
+			),
+		},
+		{
+			name: "Python note links resolve through their physical paths",
+			pass: pythonPaths.every(
+				({ file }) =>
+					notes.resolveNoteHref(
+						file.slice("./python/".length),
+						pythonIndex.file,
+					)?.file === file,
+			),
+		},
+		{
+			name: "opening Python notes reveals the part and every real ancestor",
+			pass: pythonPaths.every(
+				({ file, path }) =>
+					JSON.stringify([...notes.expandedKeysForFile(file)]) ===
+					JSON.stringify(path.map((node) => node.key)),
+			),
+		},
+		{
+			name: "revealing Python notes preserves other manually expanded branches",
+			pass: pythonPaths.every(({ file, path }) => {
+				const revealed = sidebarState.revealFileInExpandedKeys(
+					new Set([cppRoot.key]),
+					file,
+				);
+				return [cppRoot.key, ...path.map((node) => node.key)].every((key) =>
+					revealed.has(key),
+				);
+			}),
+		},
+		{
+			name: "Python search categories follow the part and physical chapter path",
+			pass: pythonArticles.every(
+				({ path }, index) =>
+					pythonSearchResults[index]?.category ===
+					path.map((node) => node.title).join(" › "),
+			),
+		},
+		{
+			name: "Python guidelines stay out of public metadata, search, loading and links",
+			pass:
+				Object.keys(notes.notesIndex.notesByFile).every(
+					(file) => !file.startsWith(pythonPrivatePrefix),
+				) &&
+				searchEntries.every(
+					({ file }) => !file.startsWith(pythonPrivatePrefix),
+				) &&
+				loadedPythonPrivateNote === null &&
+				notes.resolveNoteHref(
+					"_guidelines/book-structure.md",
+					pythonIndex.file,
+				) === null,
 		},
 		...invalidGroupChecks,
 		{

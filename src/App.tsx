@@ -6,7 +6,14 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { Footer, LangToggle, NavBar, ThemeToggle } from "./components";
+import {
+	Footer,
+	LangToggle,
+	LoadingIndicator,
+	NavBar,
+	SectionTitle,
+	ThemeToggle,
+} from "./components";
 import { useI18n } from "./i18n";
 import { I18nProvider } from "./i18n/index";
 import {
@@ -70,7 +77,7 @@ const sectionTheme: Record<Section, ThemeKey> = {
 };
 
 function AppInner() {
-	const { locale, setLocale } = useI18n();
+	const { locale, setLocale, t } = useI18n();
 	const { mode, setMode } = useThemeMode();
 	const [initialRoute] = useState(readInitialRoute);
 	const [active, setActive] = useState<Section>(initialRoute.section);
@@ -108,7 +115,7 @@ function AppInner() {
 			window.scrollTo({ top: 0 });
 		};
 
-		if (section === "home") {
+		if (section === "home" || section === "notes") {
 			commitNavigation();
 			return;
 		}
@@ -156,9 +163,16 @@ function AppInner() {
 			<main className="flex-1">
 				<Suspense
 					fallback={
-						<div aria-busy="true" className="min-h-[calc(100svh-4.75rem)]">
-							<span className="sr-only">Loading page</span>
-						</div>
+						active === "notes" ? (
+							<div className="section-page-frame notes-loading-page pb-16 sm:pb-24 md:pb-32">
+								<SectionTitle theme={theme}>{t("nav.notes")}</SectionTitle>
+								<LoadingIndicator theme={theme} label={t("notes.loading")} />
+							</div>
+						) : (
+							<div aria-busy="true" className="min-h-[calc(100svh-4.75rem)]">
+								<span className="sr-only">Loading page</span>
+							</div>
+						)
 					}
 				>
 					{pageContent}

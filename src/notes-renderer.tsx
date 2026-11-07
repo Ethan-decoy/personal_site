@@ -34,8 +34,10 @@ import swift from "highlight.js/lib/languages/swift";
 import ts from "highlight.js/lib/languages/typescript";
 import xml from "highlight.js/lib/languages/xml";
 import yaml from "highlight.js/lib/languages/yaml";
+import { CodeReferencePin } from "./code-reference";
 import { rehypeMarkdownCallouts } from "./markdown-callouts";
 import { type NoteExcerptOptions, rehypeNoteExcerpt } from "./note-excerpt";
+import type { NoteLinkTarget } from "./notes";
 
 const loadTreeSitterHighlighter = () => import("./highlighter");
 
@@ -277,7 +279,7 @@ async function writeCodeToClipboard(value: string): Promise<void> {
 	if (!copied) throw new Error("Unable to copy code");
 }
 
-function CodeBlockCopyButton({ value }: { value: string }) {
+export function CodeBlockCopyButton({ value }: { value: string }) {
 	const [status, setStatus] = useState<CopyStatus>("idle");
 	const resetTimer = useRef<number | null>(null);
 
@@ -339,11 +341,22 @@ function CodeBlockFrame({
 	language?: string;
 	children: ReactNode;
 }) {
+	const sourceRef = useRef<HTMLElement>(null);
 	return (
-		<figure className="not-prose markdown-code-block syntax-theme-ocean">
+		<figure
+			ref={sourceRef}
+			className="not-prose markdown-code-block syntax-theme-ocean"
+		>
 			<figcaption className="markdown-code-toolbar">
 				<span className="markdown-code-language">{language || "text"}</span>
-				<CodeBlockCopyButton value={value} />
+				<div className="markdown-code-actions">
+					<CodeReferencePin
+						value={value}
+						language={language}
+						sourceRef={sourceRef}
+					/>
+					<CodeBlockCopyButton value={value} />
+				</div>
 			</figcaption>
 			{children}
 		</figure>
@@ -387,17 +400,11 @@ function MarkdownCodeBlock({
 		);
 	}
 
-	if (!lang) {
-		return (
-			<CodeBlockFrame value={value}>
-				<pre>
-					<code>{value}</code>
-				</pre>
-			</CodeBlockFrame>
-		);
-	}
-
-	return <AsyncCodeBlock lang={lang} value={value} className={className} />;
+	return (
+		<CodeBlockFrame language={lang} value={value}>
+			<CodeBlockContent value={value} language={lang} />
+		</CodeBlockFrame>
+	);
 }
 
 const NO_HIGHLIGHTER_ERROR = Symbol("no-highlighter-error");
@@ -412,16 +419,17 @@ function reportHighlighterError(error: unknown) {
 	);
 }
 
-function AsyncCodeBlock({
-	lang,
+export function CodeBlockContent({
+	language: lang,
 	value,
-	className,
-}: { lang: string; value: string; className?: string }) {
+	focusable = false,
+}: { language: string; value: string; focusable?: boolean }) {
 	const [html, setHtml] = useState<string | null>(null);
 
 	useEffect(() => {
 		let cancelled = false;
 		setHtml(null);
+		if (!lang) return;
 		void loadTreeSitterHighlighter()
 			.then(({ highlight }) => highlight(value, lang))
 			.then((result) => {
@@ -441,18 +449,20 @@ function AsyncCodeBlock({
 		};
 	}, [value, lang]);
 
-	const hljsHtml = highlightWithFallback(value, lang);
+	const hljsHtml = lang ? highlightWithFallback(value, lang) : null;
 
 	return (
-		<CodeBlockFrame language={lang} value={value}>
-			<pre>
+		<pre tabIndex={focusable ? 0 : undefined}>
+			{lang ? (
 				<code
-					className={className}
+					className={`language-${lang}`}
 					// biome-ignore lint/security/noDangerouslySetInnerHtml: both highlighters escape source text and only add span markup
-					dangerouslySetInnerHTML={{ __html: html || hljsHtml }}
+					dangerouslySetInnerHTML={{ __html: html || hljsHtml || "" }}
 				/>
-			</pre>
-		</CodeBlockFrame>
+			) : (
+				<code>{value}</code>
+			)}
+		</pre>
 	);
 }
 
@@ -779,12 +789,6 @@ const REHYPE_PLUGINS = [
 	rehypeKatex,
 ];
 
-export interface NoteLinkTarget {
-	file: string;
-	anchor: string | null;
-	isWiki: boolean;
-}
-
 interface NoteLinkAdapter {
 	resolveNoteHref?: (href: string) => NoteLinkTarget | null;
 	onNoteOpen?: (target: NoteLinkTarget, trigger: HTMLAnchorElement) => void;
@@ -917,6 +921,24 @@ function makeComponents(
 				</a>
 			);
 		},
+		img: ({ node: _node, src, alt, ...props }) => (
+			<img
+				{...props}
+				src={
+					src?.startsWith("/assets/")
+						? `${import.meta.env.BASE_URL}${src.slice(1)}`
+						: src
+				}
+				alt={alt ?? ""}
+				loading={props.loading ?? "lazy"}
+				decoding={props.decoding ?? "async"}
+			/>
+		),
+		table: ({ node: _node, children, ...props }) => (
+			<div className="markdown-table-scroll">
+				<table {...props}>{children}</table>
+			</div>
+		),
 		code: ({ className, children }: CodeElementProps) => (
 			<InlineCode className={className}>{children}</InlineCode>
 		),
@@ -936,7 +958,7 @@ interface ThemeColors {
 	borderLight?: string;
 }
 
-function markdownThemeVariables(
+export function markdownThemeVariables(
 	theme: ThemeColors,
 	dark: boolean,
 ): CSSProperties {

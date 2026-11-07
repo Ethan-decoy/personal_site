@@ -60,6 +60,39 @@ try {
 				isDark: false,
 			}),
 		);
+	// Simulate the UI being imported under different URLs after a dev hot update.
+	const { CodeReferenceProvider } = await vite.ssrLoadModule(
+		"/src/code-reference.tsx?context-fixture",
+	);
+	const pinnedCodeHtml = renderToStaticMarkup(
+		React.createElement(
+			CodeReferenceProvider,
+			{
+				theme: { name: "fixture", accent: "#1B3A5C" },
+				isDark: false,
+				note: { file: "./fixture.md", title: "Code reference fixture" },
+				onOpenSource: () => undefined,
+			},
+			React.createElement(MarkdownPreview, {
+				content: "```cpp\nint value = 1;\n```\n\n```\nplain text\n```",
+				theme: { name: "fixture", accent: "#1B3A5C" },
+				isDark: false,
+			}),
+		),
+	);
+	const illustrationHtml = renderMarkdown(
+		[
+			'<figure class="markdown-illustration">',
+			'<div class="markdown-illustration-scroll" tabindex="0" role="region" aria-label="Array states">',
+			'<img src="/assets/notes/diagram.svg" alt="Array states" width="760" height="470" />',
+			"</div>",
+			"<figcaption>Array states and their conditions.</figcaption>",
+			"</figure>",
+		].join("\n"),
+	);
+	const externalImageHtml = renderMarkdown(
+		"![External diagram](https://example.com/diagram.svg)",
+	);
 	const calloutHtml = [
 		["NOTE", "说明"],
 		["TIP", "提示"],
@@ -207,6 +240,35 @@ try {
 
 	const checks = [
 		{
+			name: "code pin controls share note context across independently loaded UI modules",
+			pass:
+				(pinnedCodeHtml.match(/aria-label="固定代码"/g) ?? []).length === 2 &&
+				!html.includes('aria-label="固定代码"'),
+		},
+		{
+			name: "textbook figures preserve the keyboard scroll region, dimensions, alternative text and caption",
+			pass:
+				illustrationHtml.includes('<figure class="markdown-illustration">') &&
+				illustrationHtml.includes('class="markdown-illustration-scroll"') &&
+				illustrationHtml.includes('tabindex="0"') &&
+				illustrationHtml.includes('role="region"') &&
+				illustrationHtml.includes('width="760" height="470"') &&
+				illustrationHtml.includes('alt="Array states"') &&
+				illustrationHtml.includes(
+					"<figcaption>Array states and their conditions.</figcaption>",
+				),
+		},
+		{
+			name: "note images follow the site base path and load lazily without rewriting external URLs",
+			pass:
+				illustrationHtml.includes(
+					`src="${vite.config.base}assets/notes/diagram.svg"`,
+				) &&
+				illustrationHtml.includes('loading="lazy"') &&
+				illustrationHtml.includes('decoding="async"') &&
+				externalImageHtml.includes('src="https://example.com/diagram.svg"'),
+		},
+		{
 			name: "anchored excerpts preserve full-document duplicate slugs for inline and setext headings",
 			pass:
 				anchoredExcerpt.includes('id=":preview:repeated-value-1"') &&
@@ -280,7 +342,9 @@ try {
 			name: "footnote IDs and accessible relationships are namespaced along with headings",
 			pass:
 				footnoteExcerpt.includes('id=":preview:footnote-label"') &&
-				footnoteExcerpt.includes('aria-describedby=":preview:footnote-label"') &&
+				footnoteExcerpt.includes(
+					'aria-describedby=":preview:footnote-label"',
+				) &&
 				footnoteExcerpt.includes('href="#:preview:user-content-fn-term"') &&
 				footnoteExcerpt.includes('id=":preview:user-content-fnref-term"'),
 		},

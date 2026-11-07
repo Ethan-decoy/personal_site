@@ -24,11 +24,13 @@ type NoteManifestRecord = {
 type SidebarGroup = {
 	title: string;
 	directories: string[];
+	groups?: SidebarGroup[];
 };
 
 export function parseSidebarGroups(body: string, file: string): SidebarGroup[] {
 	const groups: SidebarGroup[] = [];
 	const directories = new Set<string>();
+	let currentGroup: SidebarGroup | undefined;
 	let fence: string | undefined;
 	for (const line of body.split("\n")) {
 		const fenceMatch = /^\s*(\x60{3,}|~{3,})/.exec(line);
@@ -42,12 +44,25 @@ export function parseSidebarGroups(body: string, file: string): SidebarGroup[] {
 			continue;
 		}
 		if (fence) continue;
-		const heading = /^##\s+(.+?)\s*$/.exec(line);
+		const heading = /^(#{2,6})\s+(.+?)\s*$/.exec(line);
 		if (heading) {
-			if (groups.some((group) => group.title === heading[1])) {
-				throw new Error(`Duplicate sidebar group ${heading[1]} in ${file}`);
+			const level = heading[1].length;
+			if (level > 3 || (level === 3 && !groups.length)) {
+				throw new Error(
+					`Invalid sidebar heading in ${file}: use level-two groups with optional level-three subgroups`,
+				);
 			}
-			groups.push({ title: heading[1], directories: [] });
+			let siblings = groups;
+			if (level === 3) {
+				const parent = groups[groups.length - 1];
+				parent.groups ??= [];
+				siblings = parent.groups;
+			}
+			if (siblings.some((group) => group.title === heading[2])) {
+				throw new Error(`Duplicate sidebar group ${heading[2]} in ${file}`);
+			}
+			currentGroup = { title: heading[2], directories: [] };
+			siblings.push(currentGroup);
 			continue;
 		}
 		const item = /^\s*(?:[-*+]|\d+[.)])\s+\[([^\]]+)\]\(([^)]+)\)\s*$/.exec(
@@ -55,9 +70,8 @@ export function parseSidebarGroups(body: string, file: string): SidebarGroup[] {
 		);
 		if (!item) continue;
 		const target = /^(?:\.\/)?([^/]+)\/_index\.md$/.exec(item[2]);
-		const group = groups.at(-1);
 		if (
-			!group ||
+			!currentGroup ||
 			!target ||
 			target[1] === "." ||
 			target[1] === ".." ||
@@ -65,7 +79,7 @@ export function parseSidebarGroups(body: string, file: string): SidebarGroup[] {
 			/[:\\?#]/.test(target[1])
 		) {
 			throw new Error(
-				`Invalid sidebar group link ${item[2]} in ${file}: use a direct child directory index under a level-two heading`,
+				`Invalid sidebar group link ${item[2]} in ${file}: use a direct child directory index under a level-two or level-three heading`,
 			);
 		}
 		const directory = path.posix.join(path.posix.dirname(file), target[1]);
@@ -75,11 +89,24 @@ export function parseSidebarGroups(body: string, file: string): SidebarGroup[] {
 			);
 		}
 		directories.add(directory);
-		group.directories.push(directory);
+		currentGroup.directories.push(directory);
 	}
-	if (!groups.length || groups.some((group) => !group.directories.length)) {
+	const allGroups = groups.flatMap((group) => [group, ...(group.groups ?? [])]);
+	if (
+		!groups.length ||
+		allGroups.some(
+			(group) => !group.directories.length && !group.groups?.length,
+		)
+	) {
 		throw new Error(
-			`Invalid sidebar groups in ${file}: each level-two heading needs child directory links`,
+			`Invalid sidebar groups in ${file}: each heading needs child directory links or subgroups`,
+		);
+	}
+	if (
+		allGroups.some((group) => group.directories.length && group.groups?.length)
+	) {
+		throw new Error(
+			`Invalid sidebar groups in ${file}: a heading cannot mix directory links and subgroups`,
 		);
 	}
 	return groups;

@@ -134,6 +134,73 @@ body {
 	}
 }
 
+@keyframes loading-indicator-turn {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes loading-indicator-reveal {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.loading-indicator {
+	display: flex;
+	min-height: 12rem;
+	align-items: center;
+	justify-content: center;
+	animation: loading-indicator-reveal 180ms ease-out 150ms both;
+}
+
+.loading-indicator-icon {
+	width: 28px;
+	height: 28px;
+	flex: none;
+	animation: loading-indicator-turn 1.1s linear infinite;
+}
+
+.notes-loading-page {
+	min-height: calc(100svh - 4.75rem);
+}
+
+.notes-loading-page .loading-indicator {
+	min-height: clamp(14rem, 48svh, 26rem);
+}
+
+.notes-loading-notice {
+	position: fixed;
+	top: 5.25rem;
+	left: 50%;
+	z-index: 30;
+	max-width: calc(100vw - 2rem);
+	transform: translateX(-50%);
+	pointer-events: none;
+}
+
+.loading-indicator-compact {
+	min-height: 0;
+	padding: 0.625rem;
+	border: 1px solid;
+	border-radius: 999px;
+}
+
+.loading-indicator-compact .loading-indicator-icon {
+	width: 16px;
+	height: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.loading-indicator,
+	.loading-indicator-icon {
+		animation: none;
+	}
+}
+
 @keyframes contact-caret-blink {
 	0%,
 	48% {
@@ -546,12 +613,74 @@ body {
 	max-width: none;
 }
 
+@media (min-width: 96rem) {
+	.notes-reading-content {
+		--markdown-text-width: 96ch;
+		width: 66rem;
+	}
+}
+
 .markdown-prose > :where(h1, h2, h3, h4, h5, h6, p, ul, ol, blockquote, hr) {
-	max-width: min(80ch, 100%);
+	max-width: min(var(--markdown-text-width, 80ch), 100%);
 }
 
 .markdown-prose > p:has(> :where(img, .katex-display):only-child) {
 	max-width: none;
+}
+
+.markdown-prose .markdown-illustration {
+	max-width: min(54rem, 100%);
+	margin: 1.5em 0;
+}
+
+.markdown-illustration-scroll {
+	--illustration-background: #ffffff;
+	--illustration-border: #dbe4e5;
+	color-scheme: light;
+	width: 100%;
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	border: 1px solid var(--illustration-border);
+	border-radius: 4px;
+	padding: 12px;
+	background: var(--illustration-background);
+}
+
+.markdown-prose.dark .markdown-illustration-scroll {
+	--illustration-background: #152129;
+	--illustration-border: #324650;
+	color-scheme: dark;
+}
+
+.markdown-illustration-scroll:focus-visible {
+	outline: 2px solid var(--markdown-accent);
+	outline-offset: 3px;
+}
+
+.markdown-illustration-scroll img {
+	display: block;
+	width: 100%;
+	min-width: 40rem;
+	max-width: none;
+	height: auto;
+	margin: 0;
+}
+
+.markdown-prose .markdown-illustration figcaption {
+	margin-top: 0.7em;
+	color: var(--tw-prose-captions);
+	font-size: 13px;
+	line-height: 1.8;
+}
+
+.markdown-illustration-hint {
+	display: none;
+}
+
+@media (max-width: 640px) {
+	.markdown-illustration-hint {
+		display: block;
+	}
 }
 
 .markdown-prose :where(h1, h2, h3, h4, h5, h6) {
@@ -562,7 +691,7 @@ body {
 .markdown-prose .markdown-callout {
 	--callout-accent: #546577;
 	--callout-background: rgba(84, 101, 119, 0.055);
-	max-width: min(80ch, 100%);
+	max-width: min(var(--markdown-text-width, 80ch), 100%);
 	margin: 1.5em 0;
 	border: 2px solid var(--callout-accent);
 	border-radius: 6px;
@@ -675,9 +804,29 @@ body {
 	margin-bottom: 0;
 }
 
-.markdown-callout-body > table {
-	display: block;
+.markdown-table-scroll {
+	max-width: 100%;
+	margin-block: 1.75em;
 	overflow-x: auto;
+}
+
+.markdown-table-scroll > table {
+	width: auto;
+	min-width: min(100%, 22rem);
+	margin: 0;
+	font-variant-numeric: tabular-nums;
+}
+
+.markdown-table-scroll > table :where(th, td) {
+	padding-inline: 1rem;
+}
+
+.markdown-table-scroll > table :where(th, td):first-child {
+	padding-inline-start: 0;
+}
+
+.markdown-table-scroll > table :where(th, td):last-child {
+	padding-inline-end: 0;
 }
 
 .markdown-prose code::before,
@@ -731,6 +880,19 @@ body {
 	padding: 0.25rem 0.45rem 0.25rem 1.25rem;
 	border-bottom: 1px solid var(--syntax-border);
 	background: var(--syntax-header-bg);
+}
+
+.markdown-code-actions {
+	display: flex;
+	flex: none;
+	align-items: center;
+	gap: 0.35rem;
+}
+
+.markdown-code-pin[aria-pressed="true"] {
+	color: var(--syntax-function);
+	border-color: var(--syntax-function);
+	background: color-mix(in srgb, var(--syntax-function) 10%, transparent);
 }
 
 .markdown-code-language {

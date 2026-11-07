@@ -1,14 +1,16 @@
 declare module "virtual:notes-manifest" {
+	interface SidebarGroup {
+		title: string;
+		directories: string[];
+		groups?: SidebarGroup[];
+	}
 	const manifest: Array<{
 		file: string;
 		title: string;
 		date: string;
 		order?: number;
 		sidebarAfter?: string;
-		sidebarGroups?: Array<{
-			title: string;
-			directories: string[];
-		}>;
+		sidebarGroups?: SidebarGroup[];
 	}>;
 	export default manifest;
 }

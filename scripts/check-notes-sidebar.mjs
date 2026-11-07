@@ -133,6 +133,12 @@ try {
 	);
 	const allDirectories = directories(tree);
 	const allFiles = files(tree);
+	const publicDirectoryIndexes = Object.keys(
+		notes.notesIndex.notesByFile,
+	).filter((file) => file.endsWith("/_index.md"));
+	const reachableDirectoryIndexes = new Set(
+		allDirectories.map((node) => node.indexFile),
+	);
 	const sampleFile = allFiles[0];
 	const loadedSample = sampleFile
 		? await notes.loadNote(sampleFile.file)
@@ -432,6 +438,10 @@ try {
 		"## First part\n2. [Second](02-second/_index.md)\n1. [First](01-first/_index.md)\n## Next part\n- [Third](03-third/_index.md)",
 		"./cpp/_index.md",
 	);
+	const nestedGroups = parseSidebarGroups(
+		"## Main\n### First\n- [A](01-a/_index.md)\n### Next\n- [B](02-b/_index.md)\n## Reference\n- [Containers](reference-containers/_index.md)",
+		"./cpp/_index.md",
+	);
 	const invalidGroupFixtures = [
 		[
 			"duplicate chapter",
@@ -445,6 +455,21 @@ try {
 		["nested directory", "## Part\n- [Deep](01-a/deep-dives/_index.md)"],
 		["missing heading", "- [A](01-a/_index.md)"],
 		["empty group", "## Empty\n## Part\n- [A](01-a/_index.md)"],
+		["orphan subgroup", "### Part\n- [A](01-a/_index.md)"],
+		[
+			"duplicate subgroup",
+			"## Main\n### Part\n- [A](01-a/_index.md)\n### Part\n- [B](02-b/_index.md)",
+		],
+		[
+			"duplicate directory across subgroups",
+			"## Main\n### First\n- [A](01-a/_index.md)\n### Next\n- [A](01-a/_index.md)",
+		],
+		["empty subgroup", "## Main\n### Empty\n### Next\n- [A](01-a/_index.md)"],
+		[
+			"mixed directories and subgroups",
+			"## Main\n- [A](01-a/_index.md)\n### Part\n- [B](02-b/_index.md)",
+		],
+		["unsupported heading depth", "## Main\n#### Part\n- [A](01-a/_index.md)"],
 	];
 	const invalidGroupChecks = invalidGroupFixtures.map(([name, body]) => {
 		let rejected = false;
@@ -530,6 +555,31 @@ try {
 		(desktopCatalogRight + desktopCatalogGap);
 
 	const checks = [
+		{
+			name: "every public directory overview is reachable, including categories without articles",
+			pass: publicDirectoryIndexes.every((file) =>
+				reachableDirectoryIndexes.has(file),
+			),
+		},
+		{
+			name: "sidebar grouping preserves mode, part and direct-directory levels",
+			pass:
+				JSON.stringify(nestedGroups) ===
+				JSON.stringify([
+					{
+						title: "Main",
+						directories: [],
+						groups: [
+							{ title: "First", directories: ["cpp/01-a"] },
+							{ title: "Next", directories: ["cpp/02-b"] },
+						],
+					},
+					{
+						title: "Reference",
+						directories: ["cpp/reference-containers"],
+					},
+				]),
+		},
 		{
 			name: "C++ parts match the overview headings without separate index pages",
 			pass:

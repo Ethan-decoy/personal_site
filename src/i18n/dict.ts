@@ -240,6 +240,9 @@ export const dict = {
 		en: "View the slint-math-input source on GitHub",
 	},
 
+	// Notes
+	"notes.loading": { zh: "正在加载笔记", en: "Loading notes" },
+
 	// Contact
 	"contact.title": { zh: "联系", en: "Contact" },
 	"contact.desc": {

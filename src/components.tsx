@@ -2,6 +2,36 @@ import type { ReactNode } from "react";
 import { useI18n } from "./i18n";
 import type { Section, Theme } from "./themes";
 
+export function LoadingIndicator({
+	label,
+	theme,
+	compact = false,
+}: { label: string; theme: Theme; compact?: boolean }) {
+	return (
+		<output
+			className={`loading-indicator${compact ? " loading-indicator-compact" : ""}`}
+			style={{
+				backgroundColor: compact ? theme.bg : undefined,
+				borderColor: compact ? theme.border : undefined,
+			}}
+		>
+			<svg
+				aria-hidden="true"
+				className="loading-indicator-icon"
+				viewBox="0 0 32 32"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				style={{ color: theme.accent }}
+			>
+				<circle cx="16" cy="16" r="11" opacity="0.16" />
+				<path d="M16 5a11 11 0 0 1 11 11" strokeLinecap="round" />
+			</svg>
+			<span className="sr-only">{label}</span>
+		</output>
+	);
+}
+
 export function SectionTitle({
 	children,
 	theme,

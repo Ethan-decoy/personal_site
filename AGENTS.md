@@ -91,7 +91,7 @@ About 页面有独立的 personal/work 分支，不应机械塞入普通页面�
 - `date`
 - 可选 `order`
 - 目录 `_index.md` 可选 `sidebarAfter`，使用相对 Markdown 路径声明该目录在侧栏中跟随的同级正文
-- 目录索引可选 `sidebarGroups: headings`，以正文二级标题及其列表中的直属子目录 `_index.md` 链接定义逻辑分篇；启用后，每个子目录必须恰好归属一篇，目录下只放子目录和索引。侧栏检查按总目录的实际标题验证分篇数量与顺序，不固定分篇数量。
+- 目录索引可选 `sidebarGroups: headings`，以二级标题定义分组，可选三级标题定义子分组，列表中的直属子目录 `_index.md` 链接声明归属；同一标题下使用子分组或目录链接中的一种。启用后，每个子目录必须恰好归属一组，目录下只放子目录和索引。侧栏检查按总目录的实际标题验证层级与顺序，不固定分篇数量。
 
 以下划线开头的目录是内部草稿或测试内容，不进入公开目录、搜索索引或生产 JavaScript。
 
@@ -101,7 +101,11 @@ About 页面有独立的 personal/work 分支，不应机械塞入普通页面�
 2. `src/notes/index.ts` 使用 `import.meta.glob` 为公开正文建立按文件懒加载器，并构造目录树。逻辑分篇保留正文路径，搜索分类与自动展开路径均由实际侧栏树生成。
 3. `src/notes-renderer.tsx` 使用 React Markdown、GFM、KaTeX 与语法高亮渲染正文。
 
+笔记页加载反馈复用 `src/components.tsx` 的 `LoadingIndicator`。调整首次进入、正文等待或切换中的提示时，遵循 `docs/DESIGN.md` 的「笔记加载反馈」，保留页面与正文的按需分包。
+
 正文跨篇引用由 `src/use-note-peek.ts` 管理悬停、聚焦与关闭延迟，通过 `src/note-peek.tsx` 按需打开速览；`src/note-excerpt.ts` 在标题 slug 生成后提取小节并隔离预览 ID。修改引用交互或提取规则时，遵循 `docs/DESIGN.md` 的「笔记引用速览」，并保留 `scripts/check-markdown-renderer.mjs` 中的速览检查。
+
+代码固定入口由 `src/code-reference.tsx` 提供，状态在笔记页内跨文章保留，通过笔记路径与代码块序号定位来源；共享上下文独立保存在 `src/code-reference-context.ts`，避免开发热更新重复加载界面模块时丢失入口。`src/code-reference-window.tsx` 与样式按需加载，复用正文的高亮和复制。修改跨篇保留、来源定位、拖动、缩放、收起或窄屏行为时，遵循 `docs/DESIGN.md` 的「代码参考窗」，保留 Markdown 渲染检查中的上下文复用检查。
 
 C++ 正文的概念引用应指向目标小节的实际标题锚点，目录导航和明确的「返回主线」保留全文入口。修改相关链接或标题后，运行 `pnpm check:cpp-links`；该检查使用页面实际渲染的锚点验证公开 C++ 笔记中的站内链接，已纳入构建。
 
@@ -112,6 +116,8 @@ C++ 附章正文放在章内 `deep-dives/`，通过该目录的 `_index.md` 接�
 Python 书页位于 `src/notes/python/`，复用同一笔记系统，以计算机视觉与 PyTorch 为主要应用方向，Agent 为兴趣分支。规划新章或调整分篇时核对 `_guidelines/book-structure.md`；写作与代码示例分别遵循同目录的 `writing-style.md` 和 `coding-style.md`；新增章节、附章或修改导航时按 `authoring.md` 接入。公开总目录只列已有内容，规划与研究留在下划线目录。修改 Python 链接或标题后运行 `pnpm check:python-links`，该检查由 `scripts/check-note-links.mjs` 提供实际渲染锚点校验，并纳入构建。
 
 Markdown 重点提示使用 `> [!TYPE] 可选标题`，在正文中直接展开。提示块语法与 C++ 笔记使用建议见 `src/notes/cpp/_guidelines/markdown-callouts.md`；调整视觉时参照 `docs/DESIGN.md` 的 Markdown 文档排版约定。
+
+教材式图组的容器、图片加载、窄屏与主题传递约定见 `docs/DESIGN.md` 的 Markdown 文档排版。
 
 不要把全部 Markdown 正文重新打入首包。修改目录、搜索或渲染逻辑后，至少运行 `pnpm build`，确保 Markdown、侧栏、性能预算和私有目录泄漏检查全部通过。
 

@@ -236,17 +236,19 @@ function groupSidebarDirectories(
 	const remaining = new Map(
 		directories.map((directory) => [directory.key, directory]),
 	);
-	const grouped = groups.map((group): NestedTreeNode => {
-		const children = group.directories.map((key) => {
-			const directory = remaining.get(key);
-			if (!directory?.indexFile || directory.sidebarAfter) {
-				throw new Error(
-					`Invalid sidebar group in ${directoryKey}: ${key} must be an unassigned direct child directory with an index`,
-				);
-			}
-			remaining.delete(key);
-			return directory;
-		});
+	function toGroup(group: (typeof groups)[number]): NestedTreeNode {
+		const children = group.groups?.length
+			? group.groups.map(toGroup)
+			: group.directories.map((key) => {
+					const directory = remaining.get(key);
+					if (!directory?.indexFile || directory.sidebarAfter) {
+						throw new Error(
+							`Invalid sidebar group in ${directoryKey}: ${key} must be an unassigned direct child directory with an index`,
+						);
+					}
+					remaining.delete(key);
+					return directory;
+				});
 		return {
 			key: `${directoryKey}/@group-${children[0].key.slice(directoryKey.length + 1)}`,
 			title: group.title,
@@ -255,19 +257,14 @@ function groupSidebarDirectories(
 			isDir: true,
 			isGroup: true,
 		};
-	});
+	}
+	const grouped = groups.map(toGroup);
 	if (remaining.size) {
 		throw new Error(
 			`Ungrouped sidebar directories in ${directoryKey}: ${[...remaining.keys()].join(", ")}`,
 		);
 	}
 	return grouped;
-}
-
-function isNestedTreeNode(
-	node: NestedTreeNode | NestedFileNode,
-): node is NestedTreeNode {
-	return "key" in node;
 }
 
 function buildNotesIndex(): NotesIndex {
@@ -289,13 +286,8 @@ function buildNotesIndex(): NotesIndex {
 			sidebarGroups: manifestRecord.sidebarGroups,
 		};
 
-		if (isIndexFile(file)) {
-			directoryIndexes[directoryKeyForIndexFile(file)] = file;
-			continue;
-		}
 		if (file === WIKI_FILE) continue;
 
-		visibleFiles.push(file);
 		const parts = file.replace(/^\.\//, "").split("/");
 		let current = root;
 		for (let i = 0; i < parts.length - 1; i++) {
@@ -310,6 +302,12 @@ function buildNotesIndex(): NotesIndex {
 			}
 			current = current.dirs[key];
 		}
+		if (isIndexFile(file)) {
+			directoryIndexes[directoryKeyForIndexFile(file)] = file;
+			continue;
+		}
+
+		visibleFiles.push(file);
 		current.files.push({
 			title,
 			date: manifestRecord.date,
@@ -368,7 +366,7 @@ function buildNotesIndex(): NotesIndex {
 			directoryTitles[node.key] = node.title;
 			if (node.indexFile) ancestorKeysByFile[node.indexFile] = keys;
 			for (const child of node.children) {
-				if (isNestedTreeNode(child)) indexSidebarPaths([child], keys);
+				if (isDirectoryNode(child)) indexSidebarPaths([child], keys);
 				else ancestorKeysByFile[child.file] = keys;
 			}
 		}
@@ -381,7 +379,7 @@ function buildNotesIndex(): NotesIndex {
 		directoryTitles,
 		ancestorKeysByFile,
 		visibleFiles,
-		isEmpty: visibleFiles.length === 0,
+		isEmpty: visibleFiles.length === 0 && sidebarTree.length === 0,
 	};
 }
 
@@ -430,7 +428,7 @@ export function expandedKeysForFile(file: string): Set<string> {
 export function isDirectoryNode(
 	node: NestedTreeNode | NestedFileNode,
 ): node is NestedTreeNode {
-	return isNestedTreeNode(node);
+	return "key" in node;
 }
 
 let searchBodyIndexPromise: Promise<Map<string, string>> | null = null;

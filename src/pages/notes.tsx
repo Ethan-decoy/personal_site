@@ -7,7 +7,12 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { SectionTitle } from "../components";
+import {
+	CodeReferenceProvider,
+	findCodeReferenceBlock,
+} from "../code-reference";
+import { LoadingIndicator, SectionTitle } from "../components";
+import { useI18n } from "../i18n";
 import {
 	type NestedTreeNode,
 	type NoteContent,
@@ -552,6 +557,7 @@ export default function NotesPage({
 	theme,
 	mode,
 }: { theme: Theme; onNavigate: (s: Section) => void; mode?: ThemeMode }) {
+	const { t } = useI18n();
 	const [expandedKeys, setExpandedKeys] = useState<Set<string>>(
 		getInitialExpandedKeys,
 	);
@@ -635,6 +641,7 @@ export default function NotesPage({
 	const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
 	const [pendingAnchor, setPendingAnchor] = useState<string | null>(null);
+	const [pendingCodeIndex, setPendingCodeIndex] = useState<number | null>(null);
 
 	useEffect(() => {
 		if (!pendingAnchor) return;
@@ -673,6 +680,17 @@ export default function NotesPage({
 		return () => clearTimeout(timer);
 	}, [pendingAnchor]);
 
+	useEffect(() => {
+		if (pendingCodeIndex === null || !selectedNote) return;
+		const element = findCodeReferenceBlock(selectedNote.file, pendingCodeIndex);
+		if (!element) return;
+		element.scrollIntoView({ block: "center", behavior: "instant" });
+		element
+			.querySelector<HTMLButtonElement>(".markdown-code-pin")
+			?.focus({ preventScroll: true });
+		setPendingCodeIndex(null);
+	}, [pendingCodeIndex, selectedNote]);
+
 	const toggleKey = useCallback((key: string) => {
 		setExpandedKeys((previous) => toggleExpandedKey(previous, key));
 	}, []);
@@ -682,6 +700,7 @@ export default function NotesPage({
 			file: string,
 			options: {
 				anchor?: string | null;
+				codeIndex?: number;
 				query?: string;
 				rememberSource?: boolean;
 				restoreScrollY?: number;
@@ -695,6 +714,7 @@ export default function NotesPage({
 			setSearchFocused(false);
 			closePeek();
 			setPendingAnchor(null);
+			setPendingCodeIndex(null);
 
 			void Promise.all([loadNote(file), loadMarkdownRenderer()])
 				.then(([note]) => {
@@ -717,6 +737,11 @@ export default function NotesPage({
 						setExpandedKeys((previous) =>
 							revealFileInExpandedKeys(previous, file),
 						);
+					}
+
+					if (options.codeIndex !== undefined) {
+						setPendingCodeIndex(options.codeIndex);
+						return;
 					}
 
 					const pendingTarget = options.anchor || options.query || null;
@@ -743,6 +768,13 @@ export default function NotesPage({
 				});
 		},
 		[closePeek],
+	);
+
+	const openCodeSource = useCallback(
+		(file: string, blockIndex: number) => {
+			openNote(file, { codeIndex: blockIndex, rememberSource: true });
+		},
+		[openNote],
 	);
 
 	const prefetchNote = useCallback((file: string) => {
@@ -786,6 +818,11 @@ export default function NotesPage({
 
 	return (
 		<div>
+			{noteLoading && selectedNote && (
+				<div className="notes-loading-notice">
+					<LoadingIndicator theme={theme} label={t("notes.loading")} compact />
+				</div>
+			)}
 			{peek && (
 				<Suspense fallback={null}>
 					<NotePeek
@@ -880,7 +917,7 @@ export default function NotesPage({
 			)}
 
 			<div className="section-page-frame pb-16 sm:pb-24 md:pb-32">
-				<SectionTitle theme={theme}>笔记</SectionTitle>
+				<SectionTitle theme={theme}>{t("nav.notes")}</SectionTitle>
 				{isNotesEmpty() ? (
 					<div
 						style={{
@@ -963,14 +1000,28 @@ export default function NotesPage({
 							</div>
 						)}
 
-						{selectedNote ? (
-							<div key={selectedNote.file}>
+						<CodeReferenceProvider
+							theme={theme}
+							isDark={mode === "dark"}
+							note={selectedNote}
+							onOpenSource={openCodeSource}
+						>
+							{selectedNote ? (
 								<div
+									key={selectedNote.file}
 									data-note-content
+									data-note-file={selectedNote.file}
 									aria-busy={noteLoading}
-									className="2xl:relative 2xl:left-10"
+									className="notes-reading-content 2xl:relative 2xl:left-10"
 								>
-									<Suspense fallback={null}>
+									<Suspense
+										fallback={
+											<LoadingIndicator
+												theme={theme}
+												label={t("notes.loading")}
+											/>
+										}
+									>
 										<MarkdownPreview
 											content={selectedNote.content}
 											theme={theme}
@@ -984,17 +1035,19 @@ export default function NotesPage({
 										/>
 									</Suspense>
 								</div>
-							</div>
-						) : (
-							<div className="flex items-center justify-center h-48">
-								<p
-									className="text-sm"
-									style={{ color: theme.textSec, opacity: 0.3 }}
-								>
-									{noteLoading ? "正在准备笔记" : "选择一篇笔记开始阅读"}
-								</p>
-							</div>
-						)}
+							) : noteLoading ? (
+								<LoadingIndicator theme={theme} label={t("notes.loading")} />
+							) : (
+								<div className="flex items-center justify-center h-48">
+									<p
+										className="text-sm"
+										style={{ color: theme.textSec, opacity: 0.3 }}
+									>
+										选择一篇笔记开始阅读
+									</p>
+								</div>
+							)}
+						</CodeReferenceProvider>
 					</div>
 				)}
 			</div>

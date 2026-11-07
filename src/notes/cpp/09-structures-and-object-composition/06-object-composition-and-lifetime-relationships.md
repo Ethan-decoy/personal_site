@@ -6,104 +6,117 @@ order: 6
 
 # 对象组合与生命周期关系（Object Composition and Lifetime Relationships）
 
-用户定义类型不仅能包含基本类型成员，也能直接包含另一种结构体对象。由完整对象与成员子对象逐层建立更大对象的方式称为对象组合（object composition）。
+绘图程序可以用中心位置和半径描述一个圆。中心位置本身包含横向、纵向两个分量，可以作为圆对象中的一个成员。由完整对象与成员子对象逐层建立更大对象的方式称为对象组合（object composition）。
 
 ## 以值包含建立成员子对象
 
-这里沿用[包含压力、温度和磨损比例的 `tire_state`](01-user-defined-types-and-struct-definitions.md#用-struct-定义一种类型)。将 `wheel_state` 定义放在该类型定义之后，就能让一份完整的轮胎状态成为车轮对象的成员：
+这里使用[包含横向、纵向两个分量的 `position`](01-user-defined-types-and-struct-definitions.md#用-struct-定义一种类型)。将下面的 `circle` 定义放在 `position` 定义之后、`main` 之前，对象定义放在 `main` 中，后面的更新片段接在对象定义之后：
 
 ```cpp
-struct wheel_state {
-    tire_state tire;
-    int rotation_count;
+struct circle {
+    position center;
+    int radius;
 };
 
-wheel_state front_left_wheel{tire_state{2.4, 36.0, 18}, 120};
+circle marker{position{20, 10}, 5};
 ```
 
-`front_left_wheel` 是完整 `wheel_state` 对象，其中直接包含：
+`marker` 是完整 `circle` 对象，其中直接包含：
 
-- 一个 `tire_state` 成员子对象 `front_left_wheel.tire`；
-- 一个 `int` 成员子对象 `front_left_wheel.rotation_count`。
+- 一个 `position` 成员子对象 `marker.center`；
+- 一个 `int` 成员子对象 `marker.radius`。
 
-`front_left_wheel.tire` 又包含自己的三个成员子对象。成员访问可以沿组合关系继续确定目标：
+`marker.center` 又包含自己的两个整数成员子对象。
+
+最外层的两个初始化器按 `circle` 的成员声明顺序对应：`position{20, 10}` 用于初始化 `marker.center`，`5` 用于初始化 `marker.radius`。内层 `position{20, 10}` 中的 `20`、`10` 又分别用于初始化 `marker.center.x`、`marker.center.y`。
+
+成员访问可以沿组合关系继续确定目标：
 
 ```cpp
-front_left_wheel.tire.pressure_bar = 2.5;
+marker.center.x = 35;
 ```
 
-第一个 `.` 在 `front_left_wheel` 中确定 `tire`，第二个 `.` 再在这个 `tire_state` 成员子对象中确定 `pressure_bar`。最终被赋值的是唯一的 `double` 成员子对象 `front_left_wheel.tire.pressure_bar`。
+第一个 `.` 在 `marker` 中确定 `center`，第二个 `.` 再在这个 `position` 成员子对象中确定 `x`。最终被赋值的是整数成员 `marker.center.x`；中心的 `y` 仍为 `10`，半径仍为 `5`。
 
 ```text
-front_left_wheel
-├── tire
-│   ├── pressure_bar
-│   ├── temperature_c
-│   └── wear_percent
-└── rotation_count
+marker
+├── center
+│   ├── x    35
+│   └── y    10
+└── radius    5
 ```
 
-**以值包含另一种对象，会在完整对象内部建立一个真正的成员子对象。**
+复制 `circle` 时，成员复制规则会逐层应用：新的 `center` 由源对象的 `center` 初始化，其中的两个整数成员再按各自语义复制；若某一层包含指针成员，复制到该层时仍然只复制指针值。
 
-复制 `wheel_state` 时，成员复制规则会逐层应用：新的 `tire` 成员由源对象的 `tire` 初始化，其中的基本类型成员再按各自语义复制；若某一层包含指针成员，复制到该层时仍然只复制指针值。
+创建 `marker` 时，直接成员按声明顺序初始化，先建立 `marker.center`，再建立 `marker.radius`。`marker.center` 的存储期与 `marker` 相同，并在外层对象的初始化和销毁过程中完成自身的初始化与销毁。
 
-创建 `front_left_wheel` 时，直接成员按照声明顺序初始化，先建立 `front_left_wheel.tire`，再建立 `front_left_wheel.rotation_count`。`front_left_wheel.tire` 的存储期与 `front_left_wheel` 相同，并在外层对象的初始化和销毁过程中自动完成自身的初始化与销毁；引用或指针不会把它保留到包含它的存储期结束之后。
+> [!IMPORTANT] 以值包含建立成员子对象
+> **直接声明对象类型的数据成员，会在这里的完整对象内部建立真正的成员子对象。**中心位置是这个圆对象的一部分，其存储期随完整对象；引用或指针不能把它保留到包含它的存储期结束之后。
 
 ## 指针成员只建立外部关联
 
-结构体也可以把指针对象作为成员：
+程序还可以保存当前选中的位置，让选择记录指向一个独立的位置对象。下面是独立示例：保留 `position` 定义，将新类型定义放在 `main` 之前，其余定义放在 `main` 中：
 
 ```cpp
-struct tire_monitor {
-    const tire_state* observed_tire{nullptr};
+struct position_selection {
+    const position* target{nullptr};
 };
 
-tire_state current{2.4, 36.0, 18};
-tire_monitor monitor{&current};
+const position current{20, 10};
+const position_selection selected{&current};
 ```
 
-`monitor` 直接包含的是 `const tire_state*` 指针成员子对象。在当前类型设计中，这个裸指针用于观察外部对象；`current` 仍然是位于 `monitor` 外部的独立完整对象：
+`selected` 直接包含的是 `const position*` 指针成员子对象。在当前设计中，这个裸指针用于观察外部对象；`current` 仍然位于 `selected` 外部，是独立的完整对象：
 
 ```text
-monitor
-└── observed_tire  ──指向──>  current
-    指针成员子对象             独立 tire_state 对象
+selected
+└── target  ──指向──>  current
+    指针成员子对象       独立 position 对象
 ```
 
-销毁 `monitor` 会结束指针成员的生命周期，不会因此销毁 `current`。反过来，`current` 先结束生命周期时，指针成员不会自动变为空。下面的片段位于函数体内：
+销毁 `selected` 会结束指针成员的生命周期，不会因此销毁 `current`。反过来，`current` 先结束生命周期时，指针成员也不会自动变为空。
+
+下面是独立的错误片段，使用相同的类型定义，放在 `main` 中仅作生命周期分析；不执行最后一行读取：
 
 ```cpp
-tire_monitor monitor{nullptr};
+position_selection selected{nullptr};
 
 {
-    tire_state temporary{2.4, 36.0, 18};
-    monitor.observed_tire = &temporary;
+    const position local_position{20, 10};
+    selected.target = &local_position;
 }
 
-double pressure_bar{monitor.observed_tire->pressure_bar}; // 未定义行为
+const int x{selected.target->x}; // 未定义行为：原目标的生命周期已结束
 ```
 
-离开内部代码块后，`temporary` 已经销毁，`monitor.observed_tire` 成为悬空指针。它仍然保存一个非空指针值，但不再具有可访问的目标。
+离开内层代码块后，`local_position` 的生命周期和自动存储期结束，`selected.target` 成为悬空指针。外层的选择记录仍然存在，但原来选中的位置已经不存在。
 
-**指针成员属于完整对象；被它指向的外部对象并不因此成为成员，也不会因此获得相同的生命周期。**
+> [!IMPORTANT] 指针成员与外部目标的独立性
+> **指针成员属于完整对象，被它指向的外部对象并不因此成为这个完整对象的成员子对象。**指针只记录访问关系，不会使外部目标获得与选择记录相同的生命周期。
+
+> [!WARNING] 选择记录仍在，目标也可能已经销毁
+> 指针成员没有自动清空，不能证明原目标仍然有效。继续通过上面的旧指针值读取原成员，会产生未定义行为；读取已因存储期结束而失效的旧值再与 `nullptr` 比较，也不是可移植的有效性检查。
 
 ## 组合表达强生命周期关系
 
 直接成员与指针成员表达两种不同关系：
 
-| 成员形式 | 完整对象直接包含什么 | 轮胎状态能否缺少 | 轮胎状态对象是否为成员子对象 |
+| 成员形式 | 完整对象直接包含什么 | 位置对象能否缺少 | 该声明是否直接建立位置子对象 |
 | --- | --- | --- | --- |
-| `tire_state tire;` | `tire_state` 成员子对象 | 不能 | 是 |
-| `const tire_state* observed_tire;` | 指针成员子对象 | 可以为空 | 否 |
+| `position center;` | `position` 成员子对象 | 不能 | 是 |
+| `const position* target;` | 指针成员子对象 | 可以没有目标 | 否 |
 
-> [!PRACTICE]
-> 对象在概念上就是完整状态的一部分，并且应当与外层对象共同存在时，以值组合能够直接表达这项约束。只是观察某个独立对象、允许没有目标，或目标由其他作用域维持时，指针成员表达的是外部关联，使用者必须另外保证目标有效。
+选择记录也可以指向其他对象的成员，例如 `marker.center`。这个中心仍是 `marker` 的成员子对象，选择记录直接包含的仍只有指针；访问关系不会改变目标原有的成员归属。
 
-简单结构体能够把状态组织、复制并逐层组合，却不会自动阻止互相矛盾的成员值。例如，代码仍然可以同时写入负压力和超过合理范围的磨损比例。公开成员适合直接表示没有额外约束的数据；类型需要持续维护成员之间的业务条件时，仅有这种数据组合还不够。
+> [!PRACTICE] 根据包含关系选择成员形式
+> 中心位置是圆的状态组成部分，应随圆对象一起建立和结束，以值包含能够直接表达这项关系。选择记录只观察独立位置、允许没有目标时，指针成员表达外部关联；使用者必须另外保证目标在访问期间有效。
+
+简单结构体能够把状态组织、复制并逐层组合，却不会自动保证成员值符合业务条件。例如，`radius` 的 `int` 类型允许保存负数，而绘图程序可以要求半径非负。类型需要持续维护这样的条件时，仅有数据组合还不够，还需要安排相应的操作接口。
 
 ## 参考资料
 
 - [C++23 工作草案：对象与子对象](https://timsong-cpp.github.io/cppwp/n4950/intro.object)
 - [C++23 工作草案：类成员](https://timsong-cpp.github.io/cppwp/n4950/class.mem.general)
+- [C++23 工作草案：聚合初始化](https://timsong-cpp.github.io/cppwp/n4950/dcl.init.aggr)
 - [C++23 工作草案：对象生命周期](https://timsong-cpp.github.io/cppwp/n4950/basic.life)
 - [C++23 工作草案：成员初始化顺序](https://timsong-cpp.github.io/cppwp/n4950/class.base.init)

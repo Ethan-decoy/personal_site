@@ -6,85 +6,138 @@ order: 4
 
 # 结构体对象的复制与赋值（Copying and Assigning Struct Objects）
 
-结构体把多个成员组织为一个完整对象，因此同类型对象之间的初始化和赋值也能够作用于整个结构体。对于本章中只含可复制基本类型成员的简单结构体，C++ 会提供相应的复制行为。
+绘图程序可以保存移动前的位置，再更新当前位置。对于这里仅包含可复制基本类型成员的简单结构体，C++ 提供的复制行为能够把一组坐标保存到独立对象中。
 
 ## 用已有对象初始化新对象
 
+下面的类型定义放在 `main` 之前，对象定义放在 `main` 的函数体内；后续位置修改和恢复片段按顺序接在对象定义之后：
+
 ```cpp
-struct tire_state {
-    double pressure_bar{2.3};
-    double temperature_c{20.0};
-    int wear_percent{};
+struct position {
+    int x{};
+    int y{};
 };
 
-tire_state current{2.4, 36.0, 18};
-const tire_state saved{current};
+position current{20, 10};
+const position saved{current};
 ```
 
-第二条对象声明创建新的 `tire_state` 对象 `saved`。虽然初始化器使用花括号，但这里只有一个同类型表达式 `current`；C++23 会直接用它初始化整个 `saved`，而不是把它当成 `pressure_bar` 的位置初始化器。当前简单类型由语言提供的复制操作会用 `current` 中对应成员的状态初始化 `saved` 的各成员子对象：
+`const position saved{current};` 的初始化形式是直接列表初始化（direct-list-initialization）。本例中，花括号里只有一个指定已有 `position` 对象的表达式；C++23 用该对象初始化整个 `saved`，形成副本。
+
+`saved.x`、`saved.y` 分别以 `current.x`、`current.y` 的当前值初始化。这次使用的是源对象的状态，不使用本例成员声明中的默认成员初始化器：
 
 ```text
-current                       saved
-├── pressure_bar    2.4  ──>  ├── pressure_bar    2.4
-├── temperature_c 36.0  ──>  ├── temperature_c 36.0
-└── wear_percent    18   ──>  └── wear_percent    18
+current               saved
+├── x    20   ──>     ├── x    20
+└── y    10   ──>     └── y    10
 ```
 
-箭头表示初始化时读取对应成员的状态，不表示两个对象之间保留同步关系：
+箭头表示初始化时读取对应成员的状态。接着修改当前位置：
 
 ```cpp
-current.pressure_bar = 1.9;
-current.wear_percent = 25;
+current.x = 35;
+current.y = 15;
 ```
 
-执行后，`saved` 的成员仍然是 `2.4`、`36.0` 和 `18`。两个完整对象身份不同，它们内部的基本类型成员子对象也彼此独立。
+执行后，`current` 的两个分量为 `35`、`15`，`saved` 仍保存原来的 `20`、`10`。
+
+> [!IMPORTANT] 用已有对象建立副本
+> **用已有对象建立当前简单结构体的副本，会创建新的完整对象，并用源对象中对应成员的状态初始化新成员。**这里的两个位置及各自的整数成员具有独立身份；复制不建立持续同步关系，修改 `current` 不会改写 `saved`。
 
 ## 赋值修改已有结构体对象
 
-继续使用这两个对象：`current` 的状态已经变为 `1.9`、`36.0`、`25`，`saved` 仍保留 `2.4`、`36.0`、`18`。若要让当前状态恢复为保存的快照，可以给已有的 `current` 赋值：
+继续使用这两个对象。若要让当前位置恢复为保存的快照，可以执行复制赋值（copy assignment），把 `saved` 中的状态赋给已经存在的 `current`：
 
 ```cpp
 current = saved;
 ```
 
-赋值不会创建新的 `tire_state` 对象。它读取 `saved` 各成员的状态，赋给 `current` 中对应的已有成员子对象。执行后，`current` 恢复为 `2.4`、`36.0`、`18`，两个对象仍具有各自身份；之后修改 `current`，也不会改变 `saved`。
+这次赋值读取 `saved` 的两个整数，赋给 `current` 中对应的已有成员子对象。执行后，`current` 恢复为横向 `20`、纵向 `10`；两个完整对象仍具有各自身份，之后修改 `current` 也不会改变 `saved`。
 
-这与基本类型对象上的区别一致：初始化创建对象并建立初始状态，赋值修改已经存在的对象。结构体只把这项行为扩展到了由多个成员组成的完整对象。
+> [!IMPORTANT] 建立副本与复制赋值
+> **建立副本会创建新对象，复制赋值修改已经存在的对象。**对于这里的简单结构体，`position copy{current};` 创建副本，`current = saved;` 则修改原来的 `current` 及其中已有的成员，保留它们原有的身份。
+
+这里 `saved` 是 `const position` 对象，作为源对象只需要被读取；被修改的是允许赋值的 `current`。把赋值方向反过来，下面这条位于 `main` 中的错误语句须单独考察：
+
+```cpp
+saved = current; // 错误：目标对象为 const
+```
+
+即使完整对象自身没有声明为 `const`，成员自身的限定仍会约束赋值。下面是独立示例，类型定义放在 `main` 之前，对象定义放在 `main` 中：
+
+```cpp
+struct fixed_position {
+    const int x{};
+    const int y{};
+};
+
+const fixed_position source{20, 10};
+fixed_position target{source};
+```
+
+`source` 和新建的 `target` 都保存横向 `20`、纵向 `10`。`target` 的完整对象类型没有 `const` 限定，但它的两个成员自身都是 `const int`。这些成员可以在对象创建时取得初值，因此建立副本合法。
+
+给这个已有的 `target` 赋值则需要修改已有成员。当前类型由语言默认提供的赋值操作不可用，因为它不能给两个 `const int` 成员赋新值。沿用这组定义，下面的错误语句单独考察：
+
+```cpp
+target = source; // 错误：当前类型的默认赋值操作不可用
+```
+
+> [!WARNING] 建立副本与给已有对象赋值的条件不同
+> 能从已有对象建立副本，不保证能给这种类型的已有对象赋值。对这里由语言提供的赋值，既要允许修改目标对象，也要有可用的逐成员赋值操作。`saved` 的 `const` 限定使第一条错误赋值不成立；`fixed_position` 的 `const int` 成员使第二条默认赋值不可用。两条错误都必须得到编译诊断。
 
 ## 成员复制遵循成员自己的语义
 
-“逐成员复制”不表示复制操作会追踪每个成员最终关联的外部对象。若成员本身是指针，复制的是指针值：
+指针成员保存的是指针值。判断复制后共享的是什么，需要区分指针成员自身与它指向的外部对象。
+
+一个坐标观察记录可以通过指针读取外部的横向坐标。下面是独立示例：类型定义放在 `main` 之前，其余定义放在 `main` 中，后面的更新与改向片段按顺序接在这些定义之后：
 
 ```cpp
-struct pressure_observer {
-    const double* observed_pressure_bar{nullptr};
+struct coordinate_observer {
+    const int* target{nullptr};
 };
 
-double measured_pressure_bar{2.4};
+int x{20};
 
-pressure_observer primary{&measured_pressure_bar};
-pressure_observer secondary{primary};
-
-const bool same_target{primary.observed_pressure_bar == secondary.observed_pressure_bar};
+const coordinate_observer primary{&x};
+coordinate_observer secondary{primary};
 ```
 
-`primary` 与 `secondary` 是两个独立的 `pressure_observer` 对象，各自包含一个独立的指针成员子对象。不过两个指针成员保存相同的指针值，因此 `same_target == true`，并且都指向唯一的 `measured_pressure_bar`：
+`primary` 与 `secondary` 是两个独立的 `coordinate_observer` 对象，各自包含一个独立的指针成员子对象。复制建立 `secondary` 时，复制的是 `primary.target` 的指针值。因此，此时 `primary.target == secondary.target` 为 `true`，两者都指向外部整数 `x`。
+
+接着更新这个外部整数，再通过观察对象读取：
 
 ```cpp
-measured_pressure_bar = 1.9;
-const double observed_pressure_bar{*(secondary.observed_pressure_bar)};
+x = 35;
+const int observed_x{*(secondary.target)};
 ```
 
-`observed_pressure_bar == 1.9`，`primary` 经自己的指针成员也能观察到同一个值。不是两个结构体对象在同步，而是复制后的两条指针路径仍然指定同一个外部对象。
+`observed_x` 保存 `35`，`primary` 经自己的指针成员也能观察到相同的值。两个观察对象各自保存的指针值未变；两条路径访问的是同一个外部整数。
 
-> [!IMPORTANT]
-> 结构体复制让完整对象及其成员子对象具有独立身份，但每个成员值中原有的别名关系仍按该成员类型的规则保留。
+现在让副本观察另一份横向坐标，继续在同一个 `main` 中执行：
+
+```cpp
+const int other_x{60};
+secondary.target = &other_x;
+```
+
+这次改向只修改 `secondary` 中的指针成员。`primary.target` 仍指向 `x`，经它读取 `35`；`secondary.target` 改指 `other_x`，经它读取 `60`。先前创建的整数对象 `observed_x` 仍保存 `35`。
+
+| 执行位置 | `primary` 的目标／目标值 | `secondary` 的目标／目标值 |
+| --- | --- | --- |
+| 刚建立副本 | `x`／`20` | `x`／`20` |
+| `x = 35;` 后 | `x`／`35` | `x`／`35` |
+| 副本改向后 | `x`／`35` | `other_x`／`60` |
+
+> [!IMPORTANT] 成员复制保留各自类型的语义
+> **建立当前结构体的副本时，新对象及其成员子对象各有身份；指针成员复制的是指针值，外部目标仍可能共享。**修改一个指针成员的指向，只改变这个成员自身；经两条指向同一目标的路径读取，得到的是同一个外部对象的当前值。
 >
-> 上述复制按成员语义建立结果，并不等于逐字节复制对象存储。填充区域与对象表示为何不能代替成员语义，见附章[对象布局、对齐与填充](deep-dives/01-object-layout-alignment-and-padding.md#对象表示值表示与填充不是同一层概念)。
->
-> 本篇结论限定于成员均支持相应操作的简单结构体；成员自身的类型约束会继续约束完整结构体能否复制初始化或复制赋值。
+> 给允许赋值的结构体对象进行复制赋值时，指针成员也按指针赋值规则接收源指针值，外部目标不会因此产生副本。
+
+成员语义规定复制后应有的状态，实现可以选择满足这些语义的具体指令。成员值与填充区域、对象表示的关系，见附章[对象布局、对齐与填充](deep-dives/01-object-layout-alignment-and-padding.md#对象表示值表示与填充不是同一层概念)。
 
 ## 参考资料
 
-- [C++23 工作草案：复制初始化的成员语义](https://timsong-cpp.github.io/cppwp/n4950/class.copy.ctor)
+- [C++23 工作草案：列表初始化](https://timsong-cpp.github.io/cppwp/n4950/dcl.init.list)
+- [C++23 工作草案：复制构造的成员语义](https://timsong-cpp.github.io/cppwp/n4950/class.copy.ctor)
 - [C++23 工作草案：复制赋值运算符](https://timsong-cpp.github.io/cppwp/n4950/class.copy.assign)

@@ -307,12 +307,12 @@ const PROJECT_TOOLS = [
 		stack: "TypeScript / Node.js",
 	},
 	{
-		id: "spec-authoring",
-		name: "spec-authoring",
-		href: "https://github.com/Ethan-decoy/spec-authoring-skill",
-		descriptionKey: "projects.specAuthoring.description",
-		sourceLabelKey: "projects.specAuthoring.sourceLabel",
-		stack: "Agent Skill / Markdown",
+		id: "spec-skills",
+		name: "Spec Skills",
+		href: "https://github.com/Ethan-decoy/spec-skills",
+		descriptionKey: "projects.specSkills.description",
+		sourceLabelKey: "projects.specSkills.sourceLabel",
+		stack: "Agent Skills / Markdown",
 	},
 ] as const;
 

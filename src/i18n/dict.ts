@@ -206,13 +206,13 @@ export const dict = {
 		zh: "在 GitHub 查看 QuestBranch 的 DeepSeek Harness 扩展",
 		en: "View QuestBranch for DeepSeek Harness on GitHub",
 	},
-	"projects.specAuthoring.description": {
-		zh: "规范编写、修订与评审技能",
-		en: "A skill for drafting, revising, and reviewing guidelines",
+	"projects.specSkills.description": {
+		zh: "规范构建与审阅技能集",
+		en: "Skills for authoring guidelines and reviewing work against them",
 	},
-	"projects.specAuthoring.sourceLabel": {
-		zh: "在 GitHub 查看 spec-authoring",
-		en: "View spec-authoring on GitHub",
+	"projects.specSkills.sourceLabel": {
+		zh: "在 GitHub 查看 Spec Skills",
+		en: "View Spec Skills on GitHub",
 	},
 	"projects.sessionWeave.description": {
 		zh: "模型会话持久化与上下文压缩",

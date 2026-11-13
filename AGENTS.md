@@ -95,6 +95,8 @@ About 页面有独立的 personal/work 分支，不应机械塞入普通页面�
 
 以下划线开头的目录是内部草稿或测试内容，不进入公开目录、搜索索引或生产 JavaScript。
 
+AI 基础学习直接使用[《动手学深度学习》中文站](https://zh.d2l.ai/chapter_introduction/index.html)，本站不再维护独立的 AI 通用教程分类。
+
 笔记加载分为三层：
 
 1. `scripts/notes-manifest-plugin.ts` 在构建期扫描公开 Markdown，生成 `virtual:notes-manifest`；`virtual:notes-search-index` 在搜索时并行加载按序列化大小划分的索引块，合并完整正文索引。开发时 Markdown 修改会使索引快照及全部分块失效，新增或删除文件会刷新目录和分块清单。

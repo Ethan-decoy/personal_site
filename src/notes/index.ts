@@ -11,7 +11,6 @@ const rawModuleLoaders = import.meta.glob<string>(
 const WIKI_FILE = "./wiki.md";
 const INDEX_FILE_SUFFIX = "/_index.md";
 const DIRECTORY_LABELS: Record<string, string> = {
-	ai: "AI",
 	books: "书籍",
 	cpp: "C++",
 	math: "数学",

@@ -14,3 +14,9 @@ sidebarGroups: headings
 2. [源码与程序执行](01-source-code-and-execution/_index.md)
 3. [名称、对象与赋值](02-names-objects-and-assignment/_index.md)
 4. [基本值与表达式](03-basic-values-and-expressions/_index.md)
+5. [序列、映射与集合](04-sequences-mappings-and-sets/_index.md)
+6. [条件与循环](05-conditionals-and-loops/_index.md)
+
+## 02 · 函数与小型程序
+
+1. [函数、参数与作用域](06-functions-parameters-and-scope/_index.md)

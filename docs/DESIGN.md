@@ -347,13 +347,14 @@ Markdown 重点提示沿用 `> [!TYPE] 可选标题` 写法，内容始终展开
 
 ### 4.6 工具与玩具
 
-- 项目页在贡献图下方依次展示「工具」与「玩具」，以简短介绍呈现公开项目。工具按展示优先级依次排列为 QuestBranch、SessionWeave、Spec Skills；玩具保留 Try 与 slint-math-input。不预告尚未公开的项目，也不设置代表作或精选项目占位。
+- 项目页在贡献图下方依次展示「工具」与「玩具」，以简短介绍呈现公开项目。工具按展示优先级依次排列为 QuestBranch、SessionWeave、Spec Skills、TelegramMediaRecovery；玩具保留 Try 与 slint-math-input。不预告尚未公开的项目，也不设置代表作或精选项目占位。
 - QuestBranch 在中英文界面均显示为「QuestBranch」。Spec Skills 对应 [`spec-skills`](https://github.com/Ethan-decoy/spec-skills) 仓库，包含 `spec-authoring` 与 `spec-review` 两项技能。
 - 两个分区复用同一套仓库卡片，项目清单分别显式维护。网格共用贡献图的内容宽度，左右边缘与贡献图对齐；视口宽度从 64rem 起排三列，40rem 至 64rem 排两列，其余按原顺序单列堆叠，列间距为 16px。卡片填满所在列，同一分区中不足一行的卡片仍沿用相同列宽，每行按实际内容等高；沿用 12px 圆角、1px 浅色边框和极轻阴影。卡片使用 Projects 的 `bgCard`、文字与边框主题色，内边距 16px、内容层间距 12px，名称字号 18px，技术栈贴齐卡片底部；悬停只加深边框并上移 2px，遵循减少动态偏好。
 - QuestBranch 独立工作台与 DSH 扩展共用一张斜切铭牌卡片。主面保留 QB 原有标志、名称、简介和技术栈，标题提示标明「独立工作台」，名称链接覆盖主面；右侧较窄的侧面以 DeepSeek 原有鲸鱼标志进入扩展仓库，仅保留图形，悬停提示与无障碍名称说明 DSH 扩展。鲸鱼取自[官方 SVG](https://github.com/deepseek-ai/DeepSeek-V2/blob/main/figures/logo.svg)，保留原始形状与蓝色 `#4D6BFE`，本地资源位于 `public/assets/projects/deepseek-whale.svg`。斜线从右上向左下切分两面，使用细边框色和轻微底色区分，保持主次，不添加翻转动画。侧面由清单中的可选 `companion` 显式维护，净宽 3.5rem、切角 1.125rem；主面内容自然换行，两面保留独立键盘焦点。
 - 信息按「名称（可带项目原有图标）→ 简短介绍 → 技术栈」收纳在同一块内，介绍优先沿用公开仓库的 About 或 README 简写。仅在项目提供原有图标时展示；没有图标时直接展示名称，不补造图标或保留空白占位。Try 使用公开仓库中的「跃点」标志，不采用大幅封面或产品宣传式主视觉。
 - QuestBranch 沿用公开仓库的原始标志形状与明暗双主题配色，按站点当前主题切换：浅色使用深玉绿 `#156146`，深色使用亮玉绿 `#55e9b0`，保持透明背景。颜色来源为仓库的 [`scripts/export-app-icon.mjs`](https://github.com/Ethan-decoy/QuestBranch/blob/main/scripts/export-app-icon.mjs)。
 - 所有项目主面共用整卡链接，名称、介绍、技术栈与卡片内空白均可进入对应公开源码，使用边框、轻微位移和键盘焦点提示交互；名称保持无下划线，不显示外链箭头、版本标签或预发布入口。
+- 以贡献者身份参与的项目通过可选 `contribution` 字段声明上游仓库，在左下角以「左缘续面」显示贡献身份：主面左边框自然延续至署名面，底部保留 12px 圆角，右侧以平滑曲线收回主面下沿。署名面下伸 24px，最小宽度 120px，随中英文文字自然扩展；文字与正文左边缘对齐，使用 11px 常规字重和 Projects 次级文字色。署名面以卡片纸面混入 4% 主文字色形成浅灰层，与主面之间只保留细接缝，沿用整体极轻阴影；主面与署名面一起悬停移动、加深边框。粗指针下扩展透明点击区域，不放大可见署名面。支持 `subgrid` 时，卡片主面和身份署名共用两条行轨道，保持同排主面等高；其余浏览器保留上下排列。身份链接可独立聚焦并进入原项目，其他项目保留现有信息层级。TelegramMediaRecovery 的卡片与贡献者署名均进入 [Alirezatz 的原项目](https://github.com/Alirezatz/TelegramMediaRecovery)，署名明确参与身份。
 - 窄屏卡片收缩到可用宽度，文字允许自然换行；中英文保持相同信息层级。项目列表只消费显式维护的公开资料，不在浏览器中请求账户仓库列表。
 
 ## 5. 动效（已确认：柔和轻快之间）

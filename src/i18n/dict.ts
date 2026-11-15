@@ -186,6 +186,11 @@ export const dict = {
 		en: "Scroll horizontally to explore the year",
 	},
 	"projects.tools.title": { zh: "工具", en: "Tools" },
+	"projects.contributor.label": { zh: "贡献者", en: "Contributor" },
+	"projects.contributor.sourceLabel": {
+		zh: "以贡献者身份参与，查看原项目",
+		en: "Contributor · View the upstream project",
+	},
 	"projects.questBranch.description": {
 		zh: "AI 原生分支式研究工作台",
 		en: "An AI-native branching research workspace",
@@ -221,6 +226,14 @@ export const dict = {
 	"projects.sessionWeave.sourceLabel": {
 		zh: "在 GitHub 查看 SessionWeave",
 		en: "View SessionWeave on GitHub",
+	},
+	"projects.telegramMediaRecovery.description": {
+		zh: "Telegram Desktop 与 64Gram 缓存媒体恢复",
+		en: "Recover cached media from Telegram Desktop and 64Gram",
+	},
+	"projects.telegramMediaRecovery.sourceLabel": {
+		zh: "在 GitHub 查看 TelegramMediaRecovery 原项目",
+		en: "View the original TelegramMediaRecovery project on GitHub",
 	},
 	"projects.toys.title": { zh: "玩具", en: "Toys" },
 	"projects.try.description": {

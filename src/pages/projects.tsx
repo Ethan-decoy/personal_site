@@ -276,6 +276,9 @@ type ProjectListing = {
 	sourceLabelKey: DictKey;
 	stack: string;
 	editionLabelKey?: DictKey;
+	contribution?: {
+		upstreamHref: string;
+	};
 	companion?: {
 		href: string;
 		logoSrc: string;
@@ -313,6 +316,17 @@ const PROJECT_TOOLS = [
 		descriptionKey: "projects.specSkills.description",
 		sourceLabelKey: "projects.specSkills.sourceLabel",
 		stack: "Agent Skills / Markdown",
+	},
+	{
+		id: "telegram-media-recovery",
+		name: "TelegramMediaRecovery",
+		href: "https://github.com/Alirezatz/TelegramMediaRecovery",
+		descriptionKey: "projects.telegramMediaRecovery.description",
+		sourceLabelKey: "projects.telegramMediaRecovery.sourceLabel",
+		stack: "C# / .NET / WPF",
+		contribution: {
+			upstreamHref: "https://github.com/Alirezatz/TelegramMediaRecovery",
+		},
 	},
 ] as const;
 
@@ -363,124 +377,166 @@ function ProjectSection({
 					<article
 						key={project.id}
 						aria-labelledby={`project-${project.id}-title`}
-						className={`project-card flex w-full flex-col rounded-xl border border-[var(--experiment-border)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-[border-color,transform] duration-200 ease-out hover:border-[var(--experiment-hover-border)] focus-within:border-[var(--experiment-hover-border)] motion-safe:hover:-translate-y-0.5 motion-reduce:transition-none ${project.companion ? "project-card--paired" : ""}`}
+						className={`project-card-entry transition-transform duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-reduce:transition-none ${project.contribution ? "project-card-entry--contribution" : ""}`}
 						style={
 							{
-								backgroundColor: theme.bgCard,
 								"--experiment-border": theme.borderLight,
 								"--experiment-hover-border": theme.border,
 								"--project-paper": theme.bgCard,
 								"--project-ink": theme.text,
+								"--project-muted-ink": theme.textSec,
 								"--project-companion-bg": theme.accentLight,
 								"--project-divider": theme.border,
 							} as CSSProperties
 						}
 					>
-						<div className="project-card-main flex min-w-0 flex-1 flex-col gap-3 p-4">
-							<div className="flex items-center gap-2">
-								{project.id === "questbranch" && (
-									<div className="flex h-8 w-8 shrink-0 items-center justify-center">
-										{/* Original geometry and theme colors: https://github.com/Ethan-decoy/QuestBranch/blob/main/scripts/export-app-icon.mjs */}
-										<svg
-											aria-hidden="true"
-											viewBox="-48 -90 696 696"
-											className="h-7 w-7"
-											fill={mode === "dark" ? "#55e9b0" : "#156146"}
+						<div
+							className={`project-card flex w-full flex-col rounded-xl border border-[var(--experiment-border)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-[border-color] duration-200 ease-out motion-reduce:transition-none ${project.companion ? "project-card--paired" : ""}`}
+						>
+							<div className="project-card-main flex min-w-0 flex-1 flex-col gap-3 p-4">
+								<div className="flex items-center gap-2">
+									{project.id === "questbranch" && (
+										<div className="flex h-8 w-8 shrink-0 items-center justify-center">
+											{/* Original geometry and theme colors: https://github.com/Ethan-decoy/QuestBranch/blob/main/scripts/export-app-icon.mjs */}
+											<svg
+												aria-hidden="true"
+												viewBox="-48 -90 696 696"
+												className="h-7 w-7"
+												fill={mode === "dark" ? "#55e9b0" : "#156146"}
+											>
+												<path d="M 256 0 A 256 256 0 0 0 0 256 A 256 256 0 0 0 256 512 C 198 477 166 425 166 360 C 166 284 216 243 278 210 C 340 177 366 144 366 98 C 366 38 327 0 256 0 Z" />
+												<path d="M 455.442719 0 L 560 0 A 40 40 0 0 1 600 40 L 600 135.27864 A 64.72136 64.72136 0 0 1 535.27864 200 C 465.27864 200 419 234 371 275 C 331 309.166667 314 350 314 390 C 380 330 447 270 515 270 L 560 270 A 40 40 0 0 1 600 310 C 600 394 523 473 447 502 C 420 512.302632 389 516 352 516 C 288 516 240 471 240 408 C 240 344 293 298 345 253 C 397 208 430.72136 169 430.72136 105 L 430.72136 24.72136 A 24.72136 24.72136 0 0 1 455.442719 0 Z" />
+											</svg>
+										</div>
+									)}
+									{project.id === "try" && (
+										<div
+											className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+											style={{
+												backgroundColor: theme.bgDeep,
+												color: theme.text,
+											}}
 										>
-											<path d="M 256 0 A 256 256 0 0 0 0 256 A 256 256 0 0 0 256 512 C 198 477 166 425 166 360 C 166 284 216 243 278 210 C 340 177 366 144 366 98 C 366 38 327 0 256 0 Z" />
-											<path d="M 455.442719 0 L 560 0 A 40 40 0 0 1 600 40 L 600 135.27864 A 64.72136 64.72136 0 0 1 535.27864 200 C 465.27864 200 419 234 371 275 C 331 309.166667 314 350 314 390 C 380 330 447 270 515 270 L 560 270 A 40 40 0 0 1 600 310 C 600 394 523 473 447 502 C 420 512.302632 389 516 352 516 C 288 516 240 471 240 408 C 240 344 293 298 345 253 C 397 208 430.72136 169 430.72136 105 L 430.72136 24.72136 A 24.72136 24.72136 0 0 1 455.442719 0 Z" />
-										</svg>
-									</div>
-								)}
-								{project.id === "try" && (
-									<div
-										className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-										style={{ backgroundColor: theme.bgDeep, color: theme.text }}
+											{/* Try's public mark: https://github.com/Ethan-decoy/Try/blob/main/assets/logo.svg */}
+											<svg
+												aria-hidden="true"
+												viewBox="0 0 256 256"
+												className="h-7 w-7"
+												fill={theme.bgCard}
+												stroke="currentColor"
+												strokeWidth="8"
+												strokeLinejoin="round"
+											>
+												<path d="M 207.7668998 36.9719554 A 8 8 0 0 1 219.0280446 48.2331002 L 164.4877097 114.4550895 A 48 48 0 0 0 161.3132815 171.1599365 L 185.6159905 208.4879198 A 8 8 0 0 1 174.5467914 219.5571189 L 137.2188081 195.2544099 A 48 48 0 0 0 84.8400635 195.2544099 L 47.5120802 219.5571189 A 8 8 0 0 1 36.4428811 208.4879198 L 60.7455901 171.1599365 A 48 48 0 0 0 60.7455901 118.7811919 L 36.4428811 81.4532086 A 8 8 0 0 1 47.5120802 70.3840095 L 84.8400635 94.6867185 A 48 48 0 0 0 141.5449105 91.5122903 L 207.7668998 36.9719554 Z" />
+											</svg>
+										</div>
+									)}
+									<h3
+										id={`project-${project.id}-title`}
+										lang="en"
+										className="min-w-0 text-lg font-semibold tracking-tight"
+										style={{ color: theme.text }}
 									>
-										{/* Try's public mark: https://github.com/Ethan-decoy/Try/blob/main/assets/logo.svg */}
-										<svg
-											aria-hidden="true"
-											viewBox="0 0 256 256"
-											className="h-7 w-7"
-											fill={theme.bgCard}
-											stroke="currentColor"
-											strokeWidth="8"
-											strokeLinejoin="round"
+										<a
+											href={project.href}
+											target="_blank"
+											rel="noreferrer"
+											aria-label={t(project.sourceLabelKey)}
+											aria-describedby={
+												project.contribution
+													? `project-${project.id}-contributor`
+													: undefined
+											}
+											title={
+												project.editionLabelKey
+													? t(project.editionLabelKey)
+													: undefined
+											}
+											className="project-card-source inline-flex min-h-8 max-w-full items-center rounded-sm no-underline [overflow-wrap:anywhere] focus-visible:outline-2 focus-visible:outline-offset-4"
 										>
-											<path d="M 207.7668998 36.9719554 A 8 8 0 0 1 219.0280446 48.2331002 L 164.4877097 114.4550895 A 48 48 0 0 0 161.3132815 171.1599365 L 185.6159905 208.4879198 A 8 8 0 0 1 174.5467914 219.5571189 L 137.2188081 195.2544099 A 48 48 0 0 0 84.8400635 195.2544099 L 47.5120802 219.5571189 A 8 8 0 0 1 36.4428811 208.4879198 L 60.7455901 171.1599365 A 48 48 0 0 0 60.7455901 118.7811919 L 36.4428811 81.4532086 A 8 8 0 0 1 47.5120802 70.3840095 L 84.8400635 94.6867185 A 48 48 0 0 0 141.5449105 91.5122903 L 207.7668998 36.9719554 Z" />
-										</svg>
-									</div>
-								)}
-								<h3
-									id={`project-${project.id}-title`}
-									lang="en"
-									className="min-w-0 text-lg font-semibold tracking-tight"
+											{project.name}
+										</a>
+									</h3>
+								</div>
+								<p
+									className="text-[13px] leading-6"
 									style={{ color: theme.text }}
 								>
+									{t(project.descriptionKey)}
+								</p>
+								<p
+									lang="en"
+									className="mt-auto font-mono text-[11px]"
+									style={{ color: theme.textSec }}
+								>
+									{project.stack}
+								</p>
+							</div>
+							{project.companion && (
+								<>
 									<a
-										href={project.href}
+										href={project.companion.href}
 										target="_blank"
 										rel="noreferrer"
-										aria-label={t(project.sourceLabelKey)}
-										title={
-											project.editionLabelKey
-												? t(project.editionLabelKey)
-												: undefined
-										}
-										className="project-card-source inline-flex min-h-8 max-w-full items-center rounded-sm no-underline [overflow-wrap:anywhere] focus-visible:outline-2 focus-visible:outline-offset-4"
+										aria-label={t(project.companion.sourceLabelKey)}
+										title={t(project.companion.sourceLabelKey)}
+										className="project-card-companion"
 									>
-										{project.name}
+										<span className="project-card-companion-copy">
+											<img
+												src={`${import.meta.env.BASE_URL}${project.companion.logoSrc}`}
+												alt=""
+												width={36}
+												height={27}
+												className="project-card-companion-logo"
+											/>
+										</span>
 									</a>
-								</h3>
-							</div>
-							<p
-								className="text-[13px] leading-6"
-								style={{ color: theme.text }}
-							>
-								{t(project.descriptionKey)}
-							</p>
-							<p
-								lang="en"
-								className="mt-auto font-mono text-[11px]"
-								style={{ color: theme.textSec }}
-							>
-								{project.stack}
-							</p>
-						</div>
-						{project.companion && (
-							<>
-								<a
-									href={project.companion.href}
-									target="_blank"
-									rel="noreferrer"
-									aria-label={t(project.companion.sourceLabelKey)}
-									title={t(project.companion.sourceLabelKey)}
-									className="project-card-companion"
-								>
-									<span className="project-card-companion-copy">
-										<img
-											src={`${import.meta.env.BASE_URL}${project.companion.logoSrc}`}
-											alt=""
-											width={36}
-											height={27}
-											className="project-card-companion-logo"
+									<svg
+										aria-hidden="true"
+										className="project-card-divider"
+										viewBox="0 0 24 180"
+										preserveAspectRatio="none"
+									>
+										<path
+											d="M24 0 0 180"
+											fill="none"
+											stroke="currentColor"
+											vectorEffect="non-scaling-stroke"
 										/>
-									</span>
-								</a>
+									</svg>
+								</>
+							)}
+						</div>
+						{project.contribution && (
+							<a
+								id={`project-${project.id}-contributor`}
+								href={project.contribution.upstreamHref}
+								target="_blank"
+								rel="noreferrer"
+								className="project-card-contributor"
+								aria-label={`${project.name} · ${t("projects.contributor.sourceLabel")}`}
+								title={t("projects.contributor.sourceLabel")}
+							>
 								<svg
 									aria-hidden="true"
-									className="project-card-divider"
-									viewBox="0 0 24 180"
+									className="project-card-contributor-shoulder"
+									viewBox="0 0 24 25"
 									preserveAspectRatio="none"
 								>
 									<path
-										d="M24 0 0 180"
+										className="project-card-contributor-face"
+										d="M0 0 H24 V.5 H23.5 C14.5 .5 14 24.5 0 24.5 Z"
+									/>
+									<path
+										className="project-card-contributor-outline"
+										d="M0 .5 H23.5 C14.5 .5 14 24.5 0 24.5"
 										fill="none"
-										stroke="currentColor"
 										vectorEffect="non-scaling-stroke"
 									/>
 								</svg>
-							</>
+								{t("projects.contributor.label")}
+							</a>
 						)}
 					</article>
 				))}

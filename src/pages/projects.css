@@ -4,8 +4,35 @@
 	gap: 1rem;
 }
 
+.project-card-entry {
+	display: flex;
+	min-width: 0;
+	flex-direction: column;
+}
+
+.project-card-entry--contribution {
+	--project-contribution-paper: color-mix(
+		in srgb,
+		var(--project-paper) 96%,
+		var(--project-ink)
+	);
+	filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
+}
+
+.project-card-entry--contribution .project-card {
+	border-bottom-left-radius: 0;
+	box-shadow: none;
+}
+
 .project-card {
 	min-width: 0;
+	flex: 1;
+	background-color: var(--project-paper);
+}
+
+.project-card-entry:hover .project-card,
+.project-card-entry:focus-within .project-card {
+	border-color: var(--experiment-hover-border);
 }
 
 .project-card-main {
@@ -41,6 +68,112 @@
 	content: "";
 	position: absolute;
 	inset: 0;
+}
+
+.project-card-contributor {
+	position: relative;
+	z-index: 1;
+	display: inline-flex;
+	align-self: flex-start;
+	justify-self: start;
+	align-items: center;
+	width: max-content;
+	min-width: 7.5rem;
+	max-width: 100%;
+	height: 1.5625rem;
+	margin-top: -1px;
+	padding: 0.25rem 3.4375rem 0.3125rem calc(1rem + 1px);
+	color: var(--project-muted-ink);
+	font-size: 0.6875rem;
+	font-weight: 400;
+	line-height: 1rem;
+	letter-spacing: 0.01em;
+	text-decoration: none;
+	white-space: nowrap;
+	transition: color 180ms ease-out;
+}
+
+.project-card-contributor::before {
+	content: "";
+	position: absolute;
+	inset: 0 1.5rem auto 0;
+	z-index: -1;
+	height: 1.5625rem;
+	border: 1px solid var(--experiment-border);
+	border-right: 0;
+	border-bottom-left-radius: 0.75rem;
+	background-color: var(--project-contribution-paper);
+	transition: border-color 180ms ease-out;
+}
+
+.project-card-contributor-shoulder {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: -1;
+	width: 1.5rem;
+	height: 1.5625rem;
+	pointer-events: none;
+}
+
+.project-card-contributor-face {
+	fill: var(--project-contribution-paper);
+}
+
+.project-card-contributor-outline {
+	stroke: var(--experiment-border);
+	stroke-width: 1;
+	transition: stroke 180ms ease-out;
+}
+
+.project-card-entry:hover .project-card-contributor,
+.project-card-entry:focus-within .project-card-contributor {
+	color: var(--project-ink);
+}
+
+.project-card-entry:hover .project-card-contributor::before,
+.project-card-entry:focus-within .project-card-contributor::before {
+	border-color: var(--experiment-hover-border);
+}
+
+.project-card-entry:hover .project-card-contributor-outline,
+.project-card-entry:focus-within .project-card-contributor-outline {
+	stroke: var(--experiment-hover-border);
+}
+
+.project-card-contributor:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 3px;
+}
+
+@media (pointer: coarse) {
+	.project-card-contributor {
+		min-height: 2.75rem;
+		align-items: flex-start;
+	}
+}
+
+/* Keep card bodies aligned when only some entries have attribution below. */
+@supports (grid-template-rows: subgrid) {
+	.project-card-grid {
+		row-gap: 0;
+		margin-bottom: -1rem;
+	}
+
+	.project-card-entry {
+		display: grid;
+		grid-row: span 2;
+		grid-template-rows: subgrid;
+	}
+
+	.project-card {
+		margin-bottom: 1rem;
+	}
+
+	.project-card-contributor {
+		margin-top: calc(-1rem - 1px);
+		margin-bottom: 1rem;
+	}
 }
 
 .project-card-companion {
@@ -101,6 +234,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+	.project-card-contributor,
+	.project-card-contributor::before,
+	.project-card-contributor-outline,
 	.project-card-companion {
 		transition: none;
 	}

@@ -6,73 +6,134 @@ order: 5
 
 # 混合类型运算与转换对称性（Mixed-Type Operations and Conversion Symmetry）
 
-普通二元成员 `operator+` 由调用对象提供左操作数，只有右操作数对应显式形参；非成员 `operator+` 则用两个显式形参接收左右操作数。混合类型运算需要用户定义转换时，这项差异直接决定哪一侧能够通过形参初始化完成转换。
+一个保存整数的类对象可以与整数 `3` 相加。把 `current + 3` 换成 `3 + current`，两个输入的值没有变，表达式却可能从合法变为不合法。差别来自操作数怎样进入运算符函数，而不是整数加法的计算规则。
 
-以下示例允许 `int` 隐式转换为 `pressure_delta_kpa`，只用来说明操作数位置怎样影响函数匹配。裸整数不携带单位，因此这项接口不代表压力类型的推荐设计：
+普通成员 `operator+` 由调用对象提供左操作数，右操作数初始化显式形参；非成员形式则用两个显式形参接收左右操作数。用户定义转换能否用于相应的匹配位置，决定了混合类型运算是否具有对称的转换机会。
+
+## 成员形式只为右侧提供用户定义转换入口
+
+下面是完整程序，类定义放在 `main` 之前。`integer_value` 保存一个 `int`，构造函数保存传入值，`value()` 读取它；相加产生新的值对象。这个小类型的显式输入按值接收。示例只使用小整数，所有相加结果均可由 `int` 表示：
 
 ```cpp
-class pressure_delta_kpa {
+#include <iostream>
+
+class integer_value {
   public:
-    pressure_delta_kpa(int value_kpa);
-    pressure_delta_kpa operator+(const pressure_delta_kpa& right) const;
+    integer_value(const int value) : stored_value{value} {}
+
+    int value() const {
+        return stored_value;
+    }
+
+    integer_value operator+(const integer_value right) const {
+        return integer_value{stored_value + right.stored_value};
+    }
+
+  private:
+    int stored_value;
 };
+
+int main() {
+    const integer_value current{8};
+    const integer_value total{current + 3};
+
+    std::cout << total.value() << '\n';
+}
 ```
 
-## 成员形式只为右侧提供形参转换入口
+在 `current + 3` 中，`current` 是调用对象，提供整数值 `8`；`3` 则要初始化按值形参 `right`。构造函数没有声明为 `explicit`，所以可以用 `integer_value(int)` 从 `3` 建立这个形参对象。成员函数把两个整数相加，返回保存 `11` 的新对象，程序输出 `11`。
 
-左操作数已经是类对象时，右侧整数可以初始化成员函数参数列表中的形参：
+> [!IMPORTANT] 调用对象与右形参分别匹配
+> **对这里采用[隐式对象形参](../10-class-interfaces-and-encapsulation/deep-dives/01-implicit-object-parameter-this-and-implementation-model.md#语言模型中的隐式对象形参)的普通成员 `operator+`，左操作数是调用对象，右操作数初始化显式形参。**隐式对象形参不能借助用户定义转换达成类型匹配；右侧普通形参则可以采用符合其初始化规则的隐式转换。
+>
+> 对本例的左值调用，隐式对象形参可按 `const integer_value&` 理解，`current` 能满足要求。调用对象也需要匹配，不能把成员形式简单记成“左侧没有形参”。
+
+保留类与 `main` 的其余部分，只把 `total` 的定义替换为下面的错误声明，单独检查：
 
 ```cpp
-const pressure_delta_kpa current_delta{8};
-
-const pressure_delta_kpa right_mixed{current_delta + 3};
-const pressure_delta_kpa left_mixed{3 + current_delta}; // 错误
+const integer_value total{3 + current}; // 错误：当前没有可行的加法入口
 ```
 
-在第一条表达式中，`current_delta` 是调用对象，`3` 对应形参 `right`。`pressure_delta_kpa(int)` 可以建立临时对象，再把它绑定到 `const pressure_delta_kpa&`。
+成员候选根据左操作数的类型查找。这里左侧是 `int`，无法从中找到 `integer_value` 的成员 `operator+`；编译器不会先把 `3` 转换为这个类，再去查找它的成员。这份程序也没有其他可行的加法入口，因此表达式不合法。
 
-交换操作数后，左侧 `3` 应当承担调用对象角色，但这项成员接口的参数列表中没有接收左操作数的形参。用于初始化 `right` 的转换能力不能移到调用对象一侧，因此 `3 + current_delta` 不会选中这项成员 `operator+`。
+这里的左右匹配结论限于普通二元 `+`。相等与关系比较可能按专门规则增加其他比较运算的候选，或交换候选的操作数顺序，不能直接套用这套模型。
 
-这里关于左右转换机会的结论只适用于普通二元 `operator+`。相等与关系比较会按专门规则额外尝试由其他比较运算生成、或交换了操作数顺序的候选，不能直接套用这套模型。
+## 非成员形式为两侧提供用户定义转换入口
 
-## 非成员形式为两侧提供形参转换入口
-
-若移除上面的成员 `operator+` 声明，改为一项非成员运算符函数，两个操作数会分别对应参数列表中的两个形参：
+回到开篇的正常程序，删除类内 `operator+` 的整个定义，保留构造函数、读取函数和数据成员。在类定义之后、`main` 之前加入下面的非成员函数：
 
 ```cpp
-pressure_delta_kpa operator+(const pressure_delta_kpa& left,
-                             const pressure_delta_kpa& right);
+integer_value operator+(const integer_value left, const integer_value right) {
+    return integer_value{left.value() + right.value()};
+}
 ```
 
-在这份替代设计中，交换整数所在位置不会消除相应的形参转换机会：
+再用以下定义整体替换 `main`，不保留前面的错误声明：
 
 ```cpp
-const pressure_delta_kpa current_delta{8};
+int main() {
+    const integer_value current{8};
+    const integer_value right_mixed{current + 3};
+    const integer_value left_mixed{3 + current};
 
-const pressure_delta_kpa right_mixed{current_delta + 3};
-const pressure_delta_kpa left_mixed{3 + current_delta};
+    std::cout << right_mixed.value() << ' ' << left_mixed.value() << '\n';
+}
 ```
 
-第一条表达式用 `3` 初始化右形参，第二条表达式用 `3` 初始化左形参。因此，两项调用都能用 `pressure_delta_kpa(int)` 建立缺少的一侧，均为可行调用。
+> [!IMPORTANT] 非成员形式为两侧提供普通形参转换机会
+> **非成员 `operator+` 没有调用对象，两个操作数分别初始化相应的显式形参。**只要从源类型到对应形参类型的隐式转换可用，两侧都能采用这条路径。本例的两个形参类型相同，因此同一项 `int` 到 `integer_value` 的构造能力可以用于任一侧。
 
-这里的转换发生在运算符函数的形参初始化中。两个操作数都只有内建类型时，表达式仍按内建运算规则处理，不会仅凭它们能够转换为某个类类型就改用该类的非成员运算符。
+两个表达式分别建立以下匹配关系：
+
+| 表达式 | 左形参 `left` | 右形参 `right` |
+| --- | --- | --- |
+| `current + 3` | 由 `current` 初始化，取得值 `8` | 经 `integer_value(int)` 由 `3` 初始化 |
+| `3 + current` | 经 `integer_value(int)` 由 `3` 初始化 | 由 `current` 初始化，取得值 `8` |
+
+两项调用都可行，函数分别计算 `8 + 3` 与 `3 + 8`，程序输出 `11 11`。转换发生在各自的形参初始化中，操作数互换后，对应的转换入口仍然存在。
+
+> [!WARNING] 两个 int 操作数仍使用内建加法
+> `8 + 3` 的两个操作数都是 `int`，结果仍是 `int` 值 `11`。即使整数能隐式构造 `integer_value`，语言也不会先把这两个操作数转换为类对象，再调用类的非成员加法。
+>
+> 在 `const integer_value total{8 + 3};` 中，先完成内建加法，再用结果初始化类对象；后面发生了构造，不能证明前面的加法采用了类运算符。
 
 ## 对称转换不等于对称业务含义
 
-非成员形式让左右两侧具有对称的形参角色，不表示每项二元运算都应接受两种方向，也不能证明操作满足交换律。接口是否对称，首先取决于两个操作数在业务中是否承担同一种角色。
+> [!WARNING] 两种顺序都能调用，不等于结果相同
+> **转换对称性描述的是匹配机会，不是交换律的证明。**例如，整数减法 `8 - 3` 与 `3 - 8` 都合法，结果却分别为 `5` 与 `-5`。
+>
+> 本例的两项加法都得到 `11`，是因为函数体实际按整数加法组合数值；仅有非成员形式的声明，不能保证这种数学性质。
 
-真实的压力单位类型通常应把这项构造函数声明为 `explicit`，而不是为了缩短混合表达式就让裸整数隐式进入单位类型；调用者仍然可以明确写出单位：
+对称的形参角色也不要求接受裸整数。继续使用非成员版本，仅把类内的构造函数定义替换为下面一行，其他成员与非成员加法保持不变：
 
 ```cpp
-const pressure_delta_kpa increased_delta{current_delta + pressure_delta_kpa{3}};
+explicit integer_value(const int value) : stored_value{value} {}
 ```
 
-选择非成员形式仍然有助于同类型值之间的对称运算，却不要求同时放宽其他类型进入该值类型的构造边界。
+若此时仍使用前面的 `main`，`current + 3` 与 `3 + current` 都不合法：两个普通形参都不能再通过这项 `explicit` 构造函数，由裸整数隐式初始化。
 
-**对于普通二元 `operator+`，成员形式只为右操作数提供形参转换入口，非成员形式则让左右操作数都通过形参参与匹配。只有业务关系与转换本身都适合隐式发生时，这种对称的转换机会才应成为公开接口。**
+以以下定义整体替换 `main`，由调用者明确构造整数所在的一侧：
+
+```cpp
+int main() {
+    const integer_value current{8};
+    const integer_value right_mixed{current + integer_value{3}};
+    const integer_value left_mixed{integer_value{3} + current};
+
+    std::cout << right_mixed.value() << ' ' << left_mixed.value() << '\n';
+}
+```
+
+程序再次输出 `11 11`。明确构造后，两侧实参都已经具有 `integer_value` 类型，仍能分别初始化非成员函数的两个形参。
+
+> [!PRACTICE] 分别决定运算符形式与隐式转换边界
+> 对两个地位相同、只读取输入并返回新值的二元运算，非成员形式便于让两侧遵循相同的形参匹配规则。是否允许其他类型隐式进入，还要分别判断含义是否自然、是否隐藏单位或信息损失，以及对相关重载的影响。
+>
+> 当前 `integer_value` 表达普通整数值，从 `int` 进入的含义直接。若类型表达按千帕计的压力增量，例如 `pressure_delta_kpa`，要求调用者明确写出单位类型，可以保留数值的解释，代价是表达式更长。这样的类型仍可采用非成员加法，同时用 `explicit` 保留构造边界。
 
 ## 参考资料
 
 - [C++23 工作草案：表达式中的运算符重载决议](https://timsong-cpp.github.io/cppwp/n4950/over.match.oper)
-- [C++23 工作草案：候选函数与实参列表](https://timsong-cpp.github.io/cppwp/n4950/over.match.funcs)
+- [C++23 工作草案：隐式对象形参的匹配限制](https://timsong-cpp.github.io/cppwp/n4950/over.match.funcs.general#5)
+- [C++23 工作草案：构造函数提供的转换](https://timsong-cpp.github.io/cppwp/n4950/class.conv.ctor)
 - [C++ Core Guidelines：为对称运算使用非成员函数](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Ro-symmetric)

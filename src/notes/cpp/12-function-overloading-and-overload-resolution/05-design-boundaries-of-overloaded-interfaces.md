@@ -6,142 +6,268 @@ order: 5
 
 # 重载接口的设计边界（Design Boundaries of Overloaded Interfaces）
 
-函数重载允许多个函数共享一个名称，但共享名称也意味着这些函数向调用者作出了共同的语义承诺。对本章给出的这些调用，编译器根据实参数量、类型、值类别和绑定关系选择函数，无法理解这些类型在业务中分别代表什么。
+设计重载接口时，需要同时确定两件事：调用会选中哪个函数，以及选中的函数是否完成调用者所需的操作。前者依据语言规则判断，后者取决于接口的含义与约束。
 
-**重载适合表达同一项操作能够接受的不同输入形式，不适合用类型差异隐藏彼此无关的行为。**重载决议得到唯一最佳函数，只说明重载选择本身具有唯一目标；访问控制等其余语言规则仍须满足，接口语义也仍须由设计保证。
+> [!IMPORTANT] 匹配规则与接口含义承担不同职责
+> **唯一最佳函数只证明重载选择有确定目标。**编译器根据声明、实参的类型、值类别与允许的转换进行匹配，不会根据变量名称判断一个数值原本代表哪种单位。
+>
+> 选中的函数仍须满足访问控制等其余语言规则；单位、范围和操作含义是否符合需求，也需要由接口约定与调用代码共同保证。
+
+以下完整程序彼此独立。只展示接口声明的片段放在文件作用域，用于比较签名与含义，不提供运行实现；其他片段按标明的位置替换使用。
 
 ## 同一个名称应当表达同一项操作
 
-下面两个函数都表示判断压力是否处于有效范围，区别只在于能够接受的数值表示：
+判断数值是否非负，可以接受整数，也可以接受浮点数。下面的两个重载保持相同的判断含义：
 
 ```cpp
-bool is_pressure_valid(int pressure_kpa) {
-    return pressure_kpa >= 0 && pressure_kpa <= 500;
+#include <iostream>
+
+bool is_nonnegative(const int value) {
+    return value >= 0;
 }
 
-bool is_pressure_valid(double pressure_kpa) {
-    return pressure_kpa >= 0.0 && pressure_kpa <= 500.0;
+bool is_nonnegative(const double value) {
+    return value >= 0.0;
+}
+
+int main() {
+    std::cout << is_nonnegative(3) << ' ' << is_nonnegative(3.0) << '\n';
+    std::cout << is_nonnegative(-1) << ' ' << is_nonnegative(-1.0) << '\n';
 }
 ```
 
-无论调用最终选择哪一项重载，名称 `is_pressure_valid` 都保持同一项业务含义。
+程序依次输出 `1 1` 和 `0 0`：两种表示的 `3` 都满足判断，两种表示的 `-1` 都不满足。输入的数值表示不同，函数名称所承诺的操作保持一致。
 
-若同名函数实际完成不同工作，参数类型只会掩盖这项差异：
+若类型差异被用来区分不相关的操作，调用位置就难以看清含义。下面只比较两组独立的接口声明：
 
 ```cpp
-void update(int retry_count);
-void update(double pressure_bar);
+void update(int retry_count); // 设置重试次数
+void update(double length_m); // 设置以米计的线段长度
 ```
 
-`update(3)` 与 `update(3.0)` 会选择不同函数，但调用位置无法直接说明一次调用是在修改重试次数还是轮胎压力。不同操作应当由名称直接表达：
+`update(3)` 与 `update(3.0)` 都能选出唯一函数，却分别设置重试次数和线段长度。把字面量从整数改成浮点数，连执行的操作都变了。更明确的接口是：
 
 ```cpp
 void set_retry_count(int retry_count);
-void set_pressure_bar(double pressure_bar);
+void set_length_m(double length_m);
 ```
 
-名称首先承担接口语义，重载只在这项语义确实相同时统一不同输入形式。
+> [!PRACTICE] 重载统一同一项操作的不同输入形式
+> 当不同实参形式表达同一项操作时，可以用重载统一名称，让调用者围绕操作理解接口。若各项函数实际承担不同任务，应让名称直接表达任务差异，避免由数值类型偶然决定业务含义。
+>
+> 同一项操作可以接受不同数值表示，不要求这些类型必须对应不同的业务概念。是否提供多项入口，还要看调用者的实际输入与必要的转换边界。
 
-## 参数名称不能表达单位差异
+## 参数名称不能区分不同单位的重载
 
-参数名称不参与区分函数，因此下面两行只是对同一个函数的重复声明：
+参数名称可以向读者说明单位，但不能仅靠它形成不同重载。以下两行都是同一个 `set_length(double)` 的声明：
 
 ```cpp
-void set_pressure(double pressure_bar);
-void set_pressure(double pressure_kpa);
+void set_length(double length_m);
+void set_length(double length_cm);
 ```
 
-把参数分别改成 `float` 和 `double` 虽然能够形成重载，却会错误地把单位寄托在数值表示形式上：
+> [!IMPORTANT] 参数名称记录约定，参数类型参与匹配
+> **普通函数的参数名称不参与区分重载。**同一函数在不同声明中的形参可以使用不同名称；编译器不会根据实参或形参名称中出现的单位选择另一项函数。
+>
+> `length_m` 与 `length_cm` 能帮助人理解约定，却没有把两个 `double` 入口变成不同函数。
+
+把单位寄托在 `float`、`double` 的差异上，虽然能形成重载，却容易让相近写法表达不同长度。下面是语言上合法的反例：两项函数都返回以米计的数值，却分别把输入解释为米和厘米。换算关系为 **1 米 = 100 厘米**。
 
 ```cpp
-void set_pressure(float pressure_bar);
-void set_pressure(double pressure_kpa);
+#include <iostream>
+
+double to_meters(const float length_m) {
+    return length_m;
+}
+
+double to_meters(const double length_cm) {
+    return length_cm / 100.0;
+}
+
+int main() {
+    std::cout << to_meters(2.0F) << ' ' << to_meters(2.0) << '\n';
+}
 ```
 
-调用者书写 `2.3F` 还是 `2.3` 将决定所使用的单位。编译器只能看到 `float` 与 `double`，无法知道调用者真正想表达 bar 还是 kPa。
+程序输出 `2 0.02`。`2.0F` 选中 `float` 入口，被解释为 2 米；`2.0` 选中 `double` 入口，被解释为 2 厘米，转换后只有 0.02 米。
 
-在单位尚未由类型表达时，名称应当保留单位信息：
+> [!WARNING] 数值类型变化可能悄悄改变单位
+> 在这组错误的接口约定中，若原意一直是 2 米，仅去掉 `F` 就会改选厘米入口。调用仍可编译，得到的长度却变了。浮点字面量的后缀说明数值类型，不能据此判断调用者原本使用什么单位。
+
+一种做法是把单位写进函数名称。以下是另一组独立的设置长度接口：
 
 ```cpp
-void set_pressure_bar(double pressure_bar);
-void set_pressure_kpa(double pressure_kpa);
+void set_length_m(double length_m);
+void set_length_cm(double length_cm);
 ```
 
-用户定义类型也可以让单位成为实参类型的一部分：
+另一种做法是声明不同的单位类型，使单位标注成为实参类型的一部分。下面两个包装类型都保存 `double`，差别只在明确表达的单位：
 
 ```cpp
-struct pressure_bar {
+#include <iostream>
+
+struct length_m {
     double value;
 };
 
-struct pressure_kpa {
-    int value;
+struct length_cm {
+    double value;
 };
 
-double to_bar(pressure_bar pressure) {
-    return pressure.value;
+double to_meters(const length_m length) {
+    return length.value;
 }
 
-double to_bar(pressure_kpa pressure) {
-    return static_cast<double>(pressure.value) / 100.0;
+double to_meters(const length_cm length) {
+    return length.value / 100.0;
 }
 
-const double first{to_bar(pressure_bar{2.3})};
-const double second{to_bar(pressure_kpa{230})};
+int main() {
+    const double first{to_meters(length_m{2.0})};
+    const double second{to_meters(length_cm{200.0})};
+
+    std::cout << first << ' ' << second << '\n';
+}
 ```
 
-两个 `to_bar` 重载仍然表达同一项转换操作，而 `pressure_bar` 与 `pressure_kpa` 已经在类型层面说明输入单位。调用不再依赖字面量后缀偶然决定业务语义。
+程序输出 `2 2`，两项结果都以米为单位：2 米与 200 厘米被转换为同一种表示。两个函数执行同一项单位归一操作，选择依据是明确的单位类型。
 
-**类型只有真正表达了不同概念时，才适合承担重载选择的依据。**
+> [!IMPORTANT] 独立类型让单位标注参与匹配
+> `length_m` 与 `length_cm` 是不同类型，即使内部都保存 `double`，对应的两个形参仍能形成重载。本例的 `to_meters(2.0)` 无法把裸 `double` 隐式转换为任一形参类型，因此没有可行函数；调用者必须明确提供相应的包装值。
+>
+> 类型能够检查采用了哪种标注，不能核实测量值原本的单位。把厘米数错误地包装成 `length_m`，仍然是调用者需要避免的含义错误。
+
+函数名包含单位，声明与调用较直接，但调用者仍需按约定提供数值。独立单位类型增加了声明与包装代码，也让单位进入类型匹配；同一长度需要经过多个接口传递时，这项区别更容易被保留下来。应根据接口规模与误用后果选择，而不是用不同数值类型代替单位设计。
 
 ## 相近数值类型会扩大选择边界
 
-由多个相近算术类型构成的重载集，常常比接口表面呈现的更难调用：
+相近算术类型之间存在隐式转换，调用者持有的类型不一定与某项形参完全相同。下面只根据声明分析匹配：声明放在文件作用域，变量与调用片段放在 `main` 中，函数约定输出给定整数，此处不提供运行实现。
 
 ```cpp
-int normalize_limit(int requested_limit);
-int normalize_limit(long requested_limit);
+void print_value(int value);
+void print_value(long value);
 
-short requested_limit{8};
-const int normalized{normalize_limit(requested_limit)};
+const short value{8};
+print_value(value);
 ```
 
-这里选择 `normalize_limit(int)`，因为 `short` 到 `int` 属于整数提升，而 `short` 到 `long` 属于 Conversion 等级。选择来自语言的排序规则，不取决于数值 `8` 能被哪个类型表示，也不说明 `int` 在业务上必然更适合。
+这里选择 `print_value(int)`，因为 `short` 到 `int` 属于整数提升，优于到 `long` 的 Conversion 等级整数转换。数值 `8` 能被两种类型表示，不会因此让两条转换同样好；语言选择也不能替接口设计者回答为什么需要同时提供这两个数值入口。
 
-重载集还是一个整体接口。新增函数会改变相应名称的候选集合，原本通过转换选中某项函数的调用，在重新编译后可能选择新增的精确匹配，或者变成没有唯一最佳函数的歧义调用。
-
-相近数值类型的重载只有在调用者本来就自然持有这些不同类型，并且所有重载确实保持同一语义时才容易维护。若接口内部最终只需要一种表示形式，一个明确的参数类型通常更容易理解。
+> [!PRACTICE] 根据实际输入决定数值入口
+> 调用者自然持有多种表示、接口也确实需要保留相应范围或处理方式时，可以提供语义一致的数值重载。还应核对常见的其他实参类型会怎样匹配。
+>
+> 若内部最终只需要一种表示，一个明确的参数类型通常更容易理解，也减少了调用者追踪多项转换关系的负担。提供更多重载本身不保证接口更易用。
 
 ## 显式转换只能表达本次选择
 
-面对没有唯一最佳函数的调用，显式转换可以使某项重载获得更直接的匹配：
+下面是一份独立的错误程序。两项声明分别表示按整数或浮点表示输出数值；仅根据声明就能诊断调用歧义，因此不需要函数体：
 
 ```cpp
-int select_limit(long requested_limit);
-int select_limit(double requested_limit);
+void print_value(long value);
+void print_value(double value);
 
-int requested_limit{8};
-const int selected{select_limit(static_cast<long>(requested_limit))};
+int main() {
+    const int value{8};
+
+    print_value(value); // 错误：调用存在歧义
+}
 ```
 
-`static_cast<long>(requested_limit)` 明确产生 `long` 结果，因此选择第一项函数。在这个例子中，`int` 到 `long` 能够保留原值；但这个写法仍然只表达了本次转换和重载选择，不能回答为什么业务上应当使用 `long`。更一般地，显式转换本身也不会替程序证明目标类型、数值范围和精度符合业务要求。
+`int` 到 `long`、`int` 到 `double` 在这里都属于 Conversion，两条序列没有能分出优劣的其他关系，因此不存在唯一最佳函数。
 
-若大量调用位置都必须依靠显式转换才能选中预期函数，问题通常已经从调用语法转移到接口设计。增加转换只能控制当前表达式的静态类型，不能使含义不同的重载自动成为统一接口。
+若调用需求已经明确为按整数表示输出 `8`，可以在调用处显式产生 `long` 实参。下面的独立完整程序为两个入口提供函数体，并在输出中加上参数类型，便于辨认调用目标：
+
+```cpp
+#include <iostream>
+
+void print_value(const long value) {
+    std::cout << "long: " << value << '\n';
+}
+
+void print_value(const double value) {
+    std::cout << "double: " << value << '\n';
+}
+
+int main() {
+    const int value{8};
+
+    print_value(static_cast<long>(value));
+}
+```
+
+`static_cast<long>(value)` 产生 `long` 结果，使整数入口获得 Exact Match，程序输出 `long: 8`。这里转换保留了原值，且符合当前的整数输出需求。
+
+若需求变为保留小数，只能选中某项函数还不够。保留这个完整程序的函数定义与头文件，把 `main` 的函数体替换为下面的片段，作为另一次独立运行：
+
+```cpp
+const double value{8.5};
+
+print_value(value);
+print_value(static_cast<long>(value));
+```
+
+两次调用分别输出 `double: 8.5` 和 `long: 8`。第二次先把 `8.5` 转换为 `long` 值 `8`，再选中整数入口；目标唯一，但已丢失需要保留的小数。
+
+> [!WARNING] 显式选中函数不证明转换符合需求
+> `static_cast` 使目标类型写得明确，数值仍按转换规则处理。本例的转换合法，却把 `8.5` 变成 `8`；需要保留小数时，这次调用仍不符合需求。
+>
+> 更一般的数值转换还须核对范围与精度条件，见[显式不等于合理](../06-constants-literals-and-type-conversions/06-explicit-type-conversions.md#显式不等于合理)。消除歧义不能代替这些判断，也不能替数值补回正确单位。
+
+如果添加转换只是为了绕过难以预测的匹配，调用者本身并没有改变数值表示的需求，就应重新检查重载集合是否符合实际输入。
 
 ## 重载集也是可演进的接口
 
-> [!PRACTICE]
-> 设计重载接口时，需要同时检查：
+新增重载会改变调用位置能看到的候选集合。下面是一份独立的初始版本，目前只有 `long` 入口：
+
+```cpp
+#include <iostream>
+
+void print_value(const long value) {
+    std::cout << "long: " << value << '\n';
+}
+
+int main() {
+    const int value{8};
+
+    print_value(value);
+}
+```
+
+调用通过 `int` 到 `long` 的转换完成，程序输出 `long: 8`。现在保留原有代码，在 `main` 之前加入下面的函数定义：
+
+```cpp
+void print_value(const double value) {
+    std::cout << "double: " << value << '\n';
+}
+```
+
+原来的 `print_value(value)` 没有改动，重新编译却会报告歧义：新增的 `double` 入口也可行，两条匹配都是无法进一步区分的 Conversion。增加一个函数，反而使已有调用不再合法。
+
+再从只有 `long` 入口的初始版本出发，建立另一个独立变体，在 `main` 之前只加入下面的 `int` 版本：
+
+```cpp
+void print_value(const int value) {
+    std::cout << "int: " << value << '\n';
+}
+```
+
+这一次，原调用仍能编译，输出却变为 `int: 8`：新增入口获得 Exact Match，优于原来的 Conversion。操作仍是输出数值，选中的函数已经改变。
+
+> [!IMPORTANT] 候选集合变化会影响已有调用
+> **新增重载的声明对调用位置可见，并重新编译该调用时，要依据新的候选集合重新确定目标。**实参源码不变，也可能改选另一函数或变成歧义调用。
 >
-> - 所有重载是否表达同一项操作；
-> - 参数类型本身是否准确表达不同输入形式；
-> - 常见实参能否自然得到唯一且可预期的最佳匹配；
-> - 隐式转换是否仍然保留业务所需的范围、精度和单位含义。
+> 选择发生在编译期；对象中保存的运行时数值不会重新决定调用目标。
+
+> [!PRACTICE] 修改重载集时复核已有调用
+> 新增或调整入口时，保留已有调用的实际类型、限定和值类别，用改动前后的候选集合核对可行性、选中目标和必要转换。常见字面量与对象表达式都应纳入比较。
 >
-> 重载解决的是同一语义面对多种输入形式时的名称统一；不同操作、单位或策略仍应由不同名称或真正不同的类型表达。语言能够完成重载决议，只是正确接口的必要条件之一。
+> 若目标改变，确认新函数是否仍满足原调用所依赖的含义与数据约束；若出现歧义，重新判断新增参数类型是否必要，或是否应采用不同名称、明确的单位类型。仅给调用加上转换，并不能证明原有语义得到保留。
 
 ## 参考资料
 
-- [C++23 工作草案：函数重载](https://timsong-cpp.github.io/cppwp/n4950/over)
-- [C++ Core Guidelines：重载应当执行等价操作](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Ro-equivalent)
-- [C++ Core Guidelines：避免对参数含义产生歧义](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#i4-make-interfaces-precisely-and-strongly-typed)
+- [C++23 工作草案：重载选择与其余语言约束](https://timsong-cpp.github.io/cppwp/n4950/over.match.general#1)
+- [C++23 工作草案：参数名称与函数声明](https://timsong-cpp.github.io/cppwp/n4950/dcl.fct#19)
+- [C++23 工作草案：转换序列的匹配等级](https://timsong-cpp.github.io/cppwp/n4950/over.ics.rank#4)
+- [C++23 工作草案：浮点到整数转换](https://timsong-cpp.github.io/cppwp/n4950/conv.fpint#1)
+- [C++ Core Guidelines：重载保持相同的操作含义](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Ro-equivalent)
+- [C++ Core Guidelines：接口应精确表达类型含义](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#i4-make-interfaces-precisely-and-strongly-typed)

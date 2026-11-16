@@ -44,6 +44,7 @@ export const dict = {
 		en: "Leisure index",
 	},
 	"about.personal.tab.playing": { zh: "在玩", en: "Playing" },
+	"about.playing.carousel": { zh: "游戏海报轮播", en: "Game artwork carousel" },
 	"about.personal.tab.watching": { zh: "在看", en: "Watching" },
 	"about.personal.tab.listening": { zh: "在听", en: "Listening" },
 	"about.personal.back": { zh: "返回", en: "Back" },
@@ -110,6 +111,14 @@ export const dict = {
 	"about.watching.now": { zh: "现在", en: "Now" },
 	"about.watching.earlier": { zh: "此前", en: "Earlier" },
 	"about.favorites.music": { zh: "音乐", en: "Music" },
+	"about.favorites.game.citiesSkylinesII": {
+		zh: "《都市：天际线 II》官方主视觉，阳光下的滨海城市、跨海大桥与远山",
+		en: "Official Cities: Skylines II key art showing a sunlit coastal city, bridges and distant mountains",
+	},
+	"about.favorites.game.rainbowSixSiege": {
+		zh: "《彩虹六号：围攻》主视觉，五名干员在破碎墙体两侧协同推进",
+		en: "Rainbow Six Siege key art with five operators advancing on either side of a breached wall",
+	},
 	"about.favorites.series.rickAndMorty": {
 		zh: "《Rick and Morty》官方主视觉，瑞克的巨大头像连着线缆，家人站在火焰包围的沙发上",
 		en: "Official Rick and Morty key art with a giant wired Rick head above the family on a sofa surrounded by flames",

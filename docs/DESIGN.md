@@ -88,6 +88,12 @@ About 共享同一页框、切换控件和排版秩序，但生活面与工作�
 
 两面切换不模拟实体纸张翻面；转场只负责改变章节气质，不引入持续三维效果或额外装饰层。
 
+#### 在玩海报
+
+「在玩」沿用宽版海报轮播，当前依次展示 Cities: Skylines II 与 Rainbow Six Siege。海报切换、自动轮播和图片预热只消费 `MAGNETIC_POSTERS` 中的当前游戏；新增当前游戏放在清单开头，保持首张可见图片优先加载和减少动态偏好。
+
+Cities: Skylines II 使用 [Paradox Interactive 官方媒体页](https://www.paradoxinteractive.com/games/cities-skylines-ii/press)的无字主视觉，以 1440 × 810 WebP 保存为 `public/assets/favorites/games/cities-skylines-ii-key-art.webp`。轮播沿用生活页的主题色阶、宽度与双语图片描述。
+
 #### 在看的年度收纳
 
 「在看」按观看年份分组，从 2026 年开始，每年建立新的一组并保留往年记录。年份与年内记录均按观看先后倒序排列，最新在看的放在最上方；新增记录插入对应年份的开头。年份由内容显式维护，不随系统日期自动改写，也不按半年拆分。

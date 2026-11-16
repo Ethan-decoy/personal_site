@@ -193,7 +193,7 @@ function focusAdjacentTab<T extends string>(
 
 type MagneticPoster = {
 	accent: string;
-	alt: string;
+	altKey: DictKey;
 	credit: string;
 	sourceUrl: string;
 	src: string;
@@ -207,17 +207,17 @@ type MagneticTransition = {
 
 const MAGNETIC_POSTERS: MagneticPoster[] = [
 	{
-		accent: "#C83225",
-		alt: "《荒野大镖客：救赎 2》红色主视觉，亚瑟·摩根举枪面向画面",
-		credit: "Rockstar Games",
+		accent: "#386C9D",
+		altKey: "about.favorites.game.citiesSkylinesII",
+		credit: "Paradox Interactive",
 		sourceUrl:
-			"https://media-rockstargames-com.akamaized.net/rockstargames-newsite/img/global/downloads/wallpapers/games/rdr2_officialart_3840x2160.jpg",
-		src: "assets/favorites/games/rdr2-official-art.webp",
-		title: "Red Dead Redemption 2",
+			"https://www.paradoxinteractive.com/games/cities-skylines-ii/press",
+		src: "assets/favorites/games/cities-skylines-ii-key-art.webp",
+		title: "Cities: Skylines II",
 	},
 	{
 		accent: "#C4473D",
-		alt: "《彩虹六号：围攻》主视觉，五名干员在破碎墙体两侧协同推进",
+		altKey: "about.favorites.game.rainbowSixSiege",
 		credit: "Ubisoft Montréal",
 		sourceUrl:
 			"https://staticctf.ubisoft.com/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/1lKKKfKHD5f84ViM2NHBOJ/b9c76f9a1e2356f1338d82122041282a/R6_KEYART_1920x1080.jpg",
@@ -428,6 +428,7 @@ function GamePosterCarousel({
 	theme: Theme;
 	label: string;
 }) {
+	const { t } = useI18n();
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [transition, setTransition] = useState<MagneticTransition | null>(null);
 	const [postersReady, setPostersReady] = useState(false);
@@ -520,7 +521,7 @@ function GamePosterCarousel({
 		<figure
 			ref={figureRef}
 			className="mx-auto w-full max-w-4xl"
-			aria-label={`${label} · 游戏艺术轮转海报`}
+			aria-label={`${label} · ${t("about.playing.carousel")}`}
 			data-source={current.sourceUrl}
 			onPointerDownCapture={() => setHasKeyboardFocusWithin(false)}
 			onFocusCapture={(event) =>
@@ -548,7 +549,7 @@ function GamePosterCarousel({
 			>
 				<img
 					src={resolvePosterSrc(current)}
-					alt={current.alt}
+					alt={t(current.altKey)}
 					className="block h-full w-full object-cover"
 					width={1440}
 					height={810}

@@ -83,10 +83,10 @@ try {
 	const illustrationHtml = renderMarkdown(
 		[
 			'<figure class="markdown-illustration">',
-			'<div class="markdown-illustration-scroll" tabindex="0" role="region" aria-label="Array states">',
-			'<img src="/assets/notes/diagram.svg" alt="Array states" width="760" height="470" />',
+			'<div class="markdown-illustration-scroll" tabindex="0" role="region" aria-label="Diagram states">',
+			'<img src="/assets/notes/diagram.svg" alt="Diagram states" width="760" height="470" />',
 			"</div>",
-			"<figcaption>Array states and their conditions.</figcaption>",
+			"<figcaption>Diagram states and their conditions.</figcaption>",
 			"</figure>",
 		].join("\n"),
 	);
@@ -253,9 +253,9 @@ try {
 				illustrationHtml.includes('tabindex="0"') &&
 				illustrationHtml.includes('role="region"') &&
 				illustrationHtml.includes('width="760" height="470"') &&
-				illustrationHtml.includes('alt="Array states"') &&
+				illustrationHtml.includes('alt="Diagram states"') &&
 				illustrationHtml.includes(
-					"<figcaption>Array states and their conditions.</figcaption>",
+					"<figcaption>Diagram states and their conditions.</figcaption>",
 				),
 		},
 		{

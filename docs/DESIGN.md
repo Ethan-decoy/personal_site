@@ -206,7 +206,25 @@ Markdown 重点提示沿用 `> [!TYPE] 可选标题` 写法，内容始终展开
 
 提示块跟随所在阅读区的正文行宽，默认 `80ch`，宽屏主阅读区为 `96ch`；保留原有列表、代码和公式渲染，块内宽表格可以横向滚动。显式填写的自定义标题略小于正文，采用 `14px / 1.6`，正文沿用原字号。不使用阴影、折叠或入场动画。语法与 C++ 笔记使用建议见 [Markdown 重点提示](../src/notes/cpp/_guidelines/markdown-callouts.md)。
 
-正文示意图使用 `figure.markdown-illustration`，最大宽度为 `54rem`。图面置于可键盘聚焦的 `markdown-illustration-scroll` 内，以随主题切换的图面、细边框和 `12px` 内边距保留边界。图组通过显式 `color-scheme` 将阅读区的模式传给 SVG，图内以 `prefers-color-scheme` 切换颜色变量，使手动主题选择独立于系统偏好，机制见 [MDN 的 SVG 嵌入说明](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-color-scheme#embedded_elements)。图像维持比例，最小阅读宽度为 `40rem`，窄容器中仅在图内横向滚动。图注使用 `13px / 1.8`，宽度随图组，窄屏显示横向查看提示。图片保留原始宽高以预留空间，默认延迟加载、异步解码；`/assets/` 图片由 Markdown 渲染器统一补齐站点基础路径。
+正文示意图使用 `figure.markdown-illustration`，最大宽度为 `54rem`。图面置于可键盘聚焦的 `markdown-illustration-scroll` 内，以随主题切换的图面、细边框和 `12px` 内边距保留边界，色值遵循下方视觉基准。图组通过显式 `color-scheme` 将阅读区的模式传给 SVG，图内以 `prefers-color-scheme` 切换颜色变量，使手动主题选择独立于系统偏好，机制见 [MDN 的 SVG 嵌入说明](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-color-scheme#embedded_elements)。图像维持比例，最小阅读宽度为 `40rem`，窄容器中仅在图内横向滚动。图注使用 `13px / 1.8`，宽度随图组，窄屏显示横向查看提示。图片保留原始宽高以预留空间，默认延迟加载、异步解码；`/assets/` 图片由 Markdown 渲染器统一补齐站点基础路径。
+
+#### 教材示意图的视觉基准
+
+独立图面、对象、文字与连接采用以下明暗配色，保持相同的关系与强调层级；色值不承担特定学科的对象语义。
+
+| 用途 | 浅色 | 深色 |
+| --- | --- | --- |
+| 图面 | `#ffffff` | `#152129` |
+| 对象底色 | `#ffffff` | `#192a34` |
+| 主要文字 | `#243b49` | `#d3dfe5` |
+| 次级说明 | `#637a85` | `#9aafb9` |
+| 普通连接 | `#3f5360` | `#a2b6c1` |
+| 强调连接与边框 | `#137e77` | `#7cc6b8` |
+| 强调底色 | `#edf7f5` | `#203e39` |
+| 普通边框 | `#98a7ae` | `#5a717e` |
+| 外框与分隔线 | `#dbe4e5` | `#324650` |
+
+线宽、字号与对象尺寸按最终阅读宽度校准。图面跟随阅读区的明暗模式；透明的小幅机制图可采用 Notes 主题色，具体适配与语义要求由各学科图文规范维护。
 
 ### 2.5 笔记目录交互
 

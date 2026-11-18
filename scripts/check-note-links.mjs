@@ -1,4 +1,4 @@
-import { mkdir, readdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import React from "react";
@@ -6,22 +6,6 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { createServer } from "vite";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const notesRoot = path.join(root, "src/notes");
-
-async function publicMarkdownFiles(directory) {
-	const files = [];
-	for (const entry of await readdir(directory, { withFileTypes: true })) {
-		const absolute = path.join(directory, entry.name);
-		if (entry.isDirectory() && !entry.name.startsWith("_")) {
-			files.push(...(await publicMarkdownFiles(absolute)));
-		} else if (entry.isFile() && entry.name.endsWith(".md")) {
-			files.push(
-				`./${path.relative(notesRoot, absolute).replaceAll("\\", "/")}`,
-			);
-		}
-	}
-	return files.sort();
-}
 
 function decodeHtml(value) {
 	const named = { amp: "&", quot: '"', apos: "'", lt: "<", gt: ">" };
@@ -72,6 +56,14 @@ export async function checkNoteLinks({
 		const { loadNote, resolveNoteHref } = await vite.ssrLoadModule(
 			"/src/notes/index.ts",
 		);
+		const { default: manifest } = await vite.ssrLoadModule("virtual:notes-manifest");
+		const sourceFiles = manifest
+			.map(({ file }) => file)
+			.filter((file) => file.startsWith(`./${subject}/`))
+			.sort();
+		if (sourceFiles.length === 0) {
+			throw new Error(`No public notes found for ${label} (${subject})`);
+		}
 		const rendered = new Map();
 		async function readNote(file) {
 			if (rendered.has(file)) return rendered.get(file);
@@ -133,9 +125,7 @@ export async function checkNoteLinks({
 			directoryLinks: 0,
 			localAnchors: 0,
 		};
-		for (const file of await publicMarkdownFiles(
-			path.join(notesRoot, subject),
-		)) {
+		for (const file of sourceFiles) {
 			const source = await readNote(file);
 			summary.files++;
 			const links = [];

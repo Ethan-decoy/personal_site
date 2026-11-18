@@ -2,6 +2,7 @@ import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
 
+const NOTES_DIRECTORY = "src/notes";
 const NOTES_MANIFEST_ID = "virtual:notes-manifest";
 const NOTES_SEARCH_INDEX_ID = "virtual:notes-search-index";
 const RESOLVED_NOTES_MANIFEST_ID = `\0${NOTES_MANIFEST_ID}`;
@@ -152,16 +153,24 @@ function parseNote(
 	};
 }
 
+function isPublicDirectory(name: string): boolean {
+	return !name.startsWith("_") && !name.startsWith(".") && name !== "node_modules";
+}
+
+function isMarkdownFile(name: string): boolean {
+	return !name.startsWith(".") && name.endsWith(".md");
+}
+
 async function collectNoteFiles(directory: string): Promise<string[]> {
 	const entries = await readdir(directory, { withFileTypes: true });
 	const files = await Promise.all(
 		entries.map(async (entry) => {
 			const absolutePath = path.join(directory, entry.name);
 			if (entry.isDirectory()) {
-				if (entry.name.startsWith("_")) return [];
+				if (!isPublicDirectory(entry.name)) return [];
 				return collectNoteFiles(absolutePath);
 			}
-			if (!entry.isFile() || !entry.name.endsWith(".md")) return [];
+			if (!entry.isFile() || !isMarkdownFile(entry.name)) return [];
 			return [absolutePath];
 		}),
 	);
@@ -226,12 +235,12 @@ export function notesManifestPlugin(): Plugin {
 		return snapshot;
 	}
 
-	function isNotePath(file: string) {
+	function isPublicNotePath(file: string) {
 		const relativePath = path.relative(notesRoot, file);
 		return (
-			!relativePath.startsWith("..") &&
 			!path.isAbsolute(relativePath) &&
-			file.endsWith(".md")
+			isMarkdownFile(path.basename(relativePath)) &&
+			relativePath.split(path.sep).slice(0, -1).every(isPublicDirectory)
 		);
 	}
 
@@ -251,14 +260,14 @@ export function notesManifestPlugin(): Plugin {
 	return {
 		name: "notes-manifest",
 		configResolved(config) {
-			notesRoot = path.resolve(config.root, "src/notes");
+			notesRoot = path.resolve(config.root, NOTES_DIRECTORY);
 		},
 		buildStart() {
 			snapshot = undefined;
 		},
 		configureServer(server) {
 			const refreshStructure = (file: string) => {
-				if (!isNotePath(file)) return;
+				if (!isPublicNotePath(file)) return;
 				invalidateIndexes(server);
 				server.ws.send({ type: "full-reload" });
 			};
@@ -302,7 +311,12 @@ export function notesManifestPlugin(): Plugin {
 						sidebarGroups,
 					}),
 				);
-				return `export default ${JSON.stringify(manifest)};`;
+				const loaders = notes.map(({ file }) => {
+					const source = JSON.stringify(`/${NOTES_DIRECTORY}/${file.slice(2)}?raw`);
+					return `${JSON.stringify(file)}: () => import(${source}).then(({ default: body }) => body)`;
+				});
+				return `export default ${JSON.stringify(manifest)};
+					export const noteBodyLoaders = { ${loaders.join(",\n")} };`;
 			}
 
 			if (isSearchChunk) {
@@ -325,7 +339,7 @@ export function notesManifestPlugin(): Plugin {
 			}`;
 		},
 		handleHotUpdate({ file, server }) {
-			if (!isNotePath(file)) return;
+			if (!isPublicNotePath(file)) return;
 			return invalidateIndexes(server);
 		},
 	};

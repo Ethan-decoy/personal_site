@@ -12,6 +12,9 @@ declare module "virtual:notes-manifest" {
 		sidebarAfter?: string;
 		sidebarGroups?: SidebarGroup[];
 	}>;
+	export const noteBodyLoaders: Readonly<
+		Record<string, (() => Promise<string>) | undefined>
+	>;
 	export default manifest;
 }
 

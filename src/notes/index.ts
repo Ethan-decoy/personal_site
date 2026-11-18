@@ -1,12 +1,4 @@
-import noteManifest from "virtual:notes-manifest";
-
-const rawModuleLoaders = import.meta.glob<string>(
-	["./**/*.md", "!./**/_*/**"],
-	{
-		query: "?raw",
-		import: "default",
-	},
-);
+import noteManifest, { noteBodyLoaders } from "virtual:notes-manifest";
 
 const WIKI_FILE = "./wiki.md";
 const INDEX_FILE_SUFFIX = "/_index.md";
@@ -404,7 +396,7 @@ export function loadNote(file: string): Promise<NoteContent | null> {
 	if (cached) return cached;
 
 	const metadata = notesIndex.notesByFile[normalizedFile];
-	const loadRaw = rawModuleLoaders[normalizedFile];
+	const loadRaw = noteBodyLoaders[normalizedFile];
 	if (!metadata || !loadRaw) return Promise.resolve(null);
 
 	const promise = loadRaw()

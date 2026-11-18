@@ -101,8 +101,8 @@ AI 基础学习直接使用[《动手学深度学习》中文站](https://zh.d2l
 
 笔记加载分为三层：
 
-1. `scripts/notes-manifest-plugin.ts` 在构建期扫描公开 Markdown，生成 `virtual:notes-manifest`；`virtual:notes-search-index` 在搜索时并行加载按序列化大小划分的索引块，合并完整正文索引。开发时 Markdown 修改会使索引快照及全部分块失效，新增或删除文件会刷新目录和分块清单。
-2. `src/notes/index.ts` 使用 `import.meta.glob` 为公开正文建立按文件懒加载器，并构造目录树。逻辑分篇保留正文路径，搜索分类与自动展开路径均由实际侧栏树生成。
+1. `scripts/notes-manifest-plugin.ts` 从同一份公开笔记清单生成目录元数据、按篇正文加载函数和按需搜索分块。生成与刷新约定见 [笔记系统维护](docs/notes.md)。
+2. `src/notes/index.ts` 按目录元数据构造目录树，打开笔记时调用对应的正文加载函数。逻辑分篇保留正文路径，搜索分类与自动展开路径均由实际侧栏树生成。
 3. `src/notes-renderer.tsx` 使用 React Markdown、GFM、KaTeX 与语法高亮渲染正文。
 
 笔记页加载反馈复用 `src/components.tsx` 的 `LoadingIndicator`。调整首次进入、正文等待或切换中的提示时，遵循 `docs/DESIGN.md` 的「笔记加载反馈」，保留页面与正文的按需分包。
@@ -140,7 +140,7 @@ Markdown 重点提示使用 `> [!TYPE] 可选标题`，在正文中直接展开�
 `pnpm build` 当前依次执行：
 
 1. `tsc -b`
-2. Markdown 渲染检查
+2. Markdown 渲染与笔记清单同步检查
 3. C++ 与 Python 笔记链接与锚点检查
 4. 笔记侧栏检查
 5. 项目页贡献图与图片来源检查

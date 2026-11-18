@@ -317,17 +317,6 @@ const PROJECT_TOOLS = [
 		sourceLabelKey: "projects.specSkills.sourceLabel",
 		stack: "Agent Skills / Markdown",
 	},
-	{
-		id: "telegram-media-recovery",
-		name: "TelegramMediaRecovery",
-		href: "https://github.com/Alirezatz/TelegramMediaRecovery",
-		descriptionKey: "projects.telegramMediaRecovery.description",
-		sourceLabelKey: "projects.telegramMediaRecovery.sourceLabel",
-		stack: "C# / .NET / WPF",
-		contribution: {
-			upstreamHref: "https://github.com/Alirezatz/TelegramMediaRecovery",
-		},
-	},
 ] as const;
 
 const PROJECT_TOYS = [
@@ -346,6 +335,17 @@ const PROJECT_TOYS = [
 		descriptionKey: "projects.mathInput.description",
 		sourceLabelKey: "projects.mathInput.sourceLabel",
 		stack: "Rust / Slint",
+	},
+	{
+		id: "telegram-media-recovery",
+		name: "TelegramMediaRecovery",
+		href: "https://github.com/Alirezatz/TelegramMediaRecovery",
+		descriptionKey: "projects.telegramMediaRecovery.description",
+		sourceLabelKey: "projects.telegramMediaRecovery.sourceLabel",
+		stack: "C# / .NET / WPF",
+		contribution: {
+			upstreamHref: "https://github.com/Alirezatz/TelegramMediaRecovery",
+		},
 	},
 ] as const;
 

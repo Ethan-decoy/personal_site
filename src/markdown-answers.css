@@ -1,0 +1,122 @@
+.markdown-prose .markdown-answer {
+	--answer-paper: #e3f1ee;
+	--answer-accent: #17645d;
+	margin-block-start: 0.5rem;
+	border: 1px solid color-mix(in srgb, var(--answer-accent) 36%, transparent);
+	border-radius: 6px;
+	background: var(--answer-paper);
+}
+
+.markdown-prose.dark .markdown-answer {
+	--answer-paper: #172a28;
+	--answer-accent: #7cc6b8;
+}
+
+.markdown-prose .markdown-answer > summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	min-block-size: 44px;
+	list-style: none;
+	padding: 0.5rem 0.75rem;
+	border-block-end: 1px solid transparent;
+	border-radius: 5px;
+	color: var(--answer-accent);
+	font-size: 0.875rem;
+	font-weight: 600;
+	line-height: 1.4;
+	cursor: pointer;
+}
+
+.markdown-prose .markdown-answer > summary::-webkit-details-marker {
+	display: none;
+}
+
+.markdown-prose .markdown-answer > summary::after {
+	content: "";
+	flex: none;
+	inline-size: 0.5rem;
+	block-size: 0.5rem;
+	margin-inline-end: 0.25rem;
+	border-inline-end: 1.5px solid currentColor;
+	border-block-end: 1.5px solid currentColor;
+	transform: translateY(-2px) rotate(45deg);
+}
+
+.markdown-prose .markdown-answer > summary:focus-visible {
+	outline: 2px solid var(--answer-accent);
+	outline-offset: 2px;
+}
+
+.markdown-prose .markdown-answer[open] > summary {
+	border-radius: 5px 5px 0 0;
+	border-block-end-color: color-mix(
+		in srgb,
+		var(--answer-accent) 20%,
+		transparent
+	);
+}
+
+.markdown-prose .markdown-answer[open] > summary::after {
+	transform: translateY(2px) rotate(225deg);
+}
+
+.markdown-prose .markdown-answer-body {
+	padding: 0.75rem;
+	overflow-wrap: anywhere;
+}
+
+.markdown-prose .markdown-answer-body > :first-child {
+	margin-block-start: 0;
+}
+
+.markdown-prose .markdown-answer-body > :last-child {
+	margin-block-end: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.markdown-prose .markdown-answer > summary:hover {
+		background: color-mix(in srgb, var(--answer-accent) 9%, var(--answer-paper));
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.markdown-prose .markdown-answer {
+		--answer-duration: 160ms;
+		--answer-easing: cubic-bezier(0.23, 1, 0.32, 1);
+	}
+
+	.markdown-prose .markdown-answer[open] {
+		--answer-duration: 200ms;
+	}
+
+	.markdown-prose .markdown-answer:has(> summary:focus-visible) {
+		--answer-duration: 0ms;
+	}
+
+	.markdown-prose .markdown-answer > summary {
+		transition: border-block-end-color var(--answer-duration)
+			var(--answer-easing);
+	}
+
+	.markdown-prose .markdown-answer > summary::after {
+		transition: transform var(--answer-duration) var(--answer-easing);
+	}
+
+	@supports selector(::details-content) and
+		(interpolate-size: allow-keywords) and
+		(transition-behavior: allow-discrete) {
+		.markdown-prose .markdown-answer::details-content {
+			block-size: 0;
+			overflow: clip;
+			interpolate-size: allow-keywords;
+			transition: block-size var(--answer-duration) var(--answer-easing),
+				content-visibility var(--answer-duration) allow-discrete;
+		}
+
+		.markdown-prose .markdown-answer[open]::details-content {
+			block-size: auto;
+		}
+	}
+}

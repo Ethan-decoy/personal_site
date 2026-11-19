@@ -206,6 +206,8 @@ Markdown 重点提示沿用 `> [!TYPE] 可选标题` 写法，内容始终展开
 
 提示块跟随所在阅读区的正文行宽，默认 `80ch`，宽屏主阅读区为 `96ch`；保留原有列表、代码和公式渲染，块内宽表格可以横向滚动。显式填写的自定义标题略小于正文，采用 `14px / 1.6`，正文沿用原字号。不使用阴影、折叠或入场动画。语法与 C++ 笔记使用建议见 [Markdown 重点提示](../src/notes/cpp/_guidelines/markdown-callouts.md)。
 
+[参考解答](notes.md#参考解答)由公共 Markdown 渲染器生成，入口紧跟题目，整行可点，右侧箭头随开合转动。边框和入口采用青绿强调色，浅色纸面为 `#E3F1EE`，深色纸面为 `#172A28`。解答使用单色纸面，代码块通过语言栏和独立代码面呈现。支持高度过渡时，展开约 200ms，收起约 160ms。键盘操作和系统减弱动态效果模式即时切换。
+
 正文示意图使用 `figure.markdown-illustration`，最大宽度为 `54rem`。图面置于可键盘聚焦的 `markdown-illustration-scroll` 内，以随主题切换的图面、细边框和 `12px` 内边距保留边界，色值遵循下方视觉基准。图组通过显式 `color-scheme` 将阅读区的模式传给 SVG，图内以 `prefers-color-scheme` 切换颜色变量，使手动主题选择独立于系统偏好，机制见 [MDN 的 SVG 嵌入说明](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-color-scheme#embedded_elements)。图像维持比例，最小阅读宽度为 `40rem`，窄容器中仅在图内横向滚动。图注使用 `13px / 1.8`，宽度随图组，窄屏显示横向查看提示。图片保留原始宽高以预留空间，默认延迟加载、异步解码；`/assets/` 图片由 Markdown 渲染器统一补齐站点基础路径。
 
 #### 教材示意图的视觉基准

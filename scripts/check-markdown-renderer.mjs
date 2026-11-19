@@ -237,8 +237,61 @@ try {
 		"# Short note\n\nDefinition[^term].\n\n[^term]: Footnote definition.",
 		null,
 	);
+	const exerciseSource = [
+		"# Exercise fixture",
+		"",
+		"## Practice",
+		"",
+		"1. First question.",
+		"",
+		"   > [!ANSWER]",
+		"   > **A reason** and $x^2$.",
+		"   >",
+		"   > - An item in the answer",
+		"   >",
+		"   > ```python",
+		"   > result = True",
+		"   > ```",
+		"",
+		"2. Second question.",
+		"",
+		"   > [!ANSWER] Second answer text.",
+	].join("\n");
+	const exerciseRenders = [
+		renderMarkdown(exerciseSource),
+		renderExcerpt(exerciseSource, "practice"),
+	];
 
 	const checks = [
+		{
+			name: "notes and excerpts render answers immediately after their own question, closed and independent",
+			pass: exerciseRenders.every((rendered) => {
+				const answers = [
+					...rendered.matchAll(
+						/<li>\s*<p>(First|Second) question\.<\/p>\s*<details([^>]*)>\s*<summary>参考解答<\/summary>\s*<div class="markdown-answer-body">([\s\S]*?)<\/details>\s*<\/li>/g,
+					),
+				];
+				return (
+					answers.length === 2 &&
+					answers.every(
+						([, , attributes]) => attributes === ' class="markdown-answer"',
+					) &&
+					answers[1][3].includes("<p>Second answer text.</p>") &&
+					!rendered.includes("[!ANSWER]")
+				);
+			}),
+		},
+		{
+			name: "answer bodies preserve Markdown formatting, lists, math, and fenced code",
+			pass: exerciseRenders.every(
+				(rendered) =>
+					rendered.includes("<strong>A reason</strong>") &&
+					rendered.includes("<li>An item in the answer</li>") &&
+					rendered.includes('class="katex"') &&
+					rendered.includes("markdown-code-block") &&
+					rendered.includes("markdown-code-copy"),
+			),
+		},
 		{
 			name: "code pin controls share note context across independently loaded UI modules",
 			pass:

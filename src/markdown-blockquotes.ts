@@ -138,18 +138,19 @@ function transformBlockquote(node: MarkdownNode): void {
 	}
 
 	const marker =
-		/^\[!(NOTE|TIP|PRACTICE|IMPORTANT|WARNING|CAUTION)\](?:[\t ]+|(?=\r?\n|$))/.exec(
+		/^\[!(NOTE|TIP|PRACTICE|IMPORTANT|WARNING|CAUTION|ANSWER)\](?:[\t ]+|(?=\r?\n|$))/.exec(
 			firstText.value,
 		);
 	if (!marker) return;
 
-	const type = marker[1] as CalloutType;
-	const { label } = CALLOUTS[type];
-	const { line, rest } = splitFirstLine([
+	const afterMarker = [
 		{ ...firstText, value: firstText.value.slice(marker[0].length) },
 		...(paragraph.children?.slice(1) ?? []),
-	]);
-	const titleText = textContent(line).trim();
+	];
+	const isAnswer = marker[1] === "ANSWER";
+	const { line, rest } = isAnswer
+		? { line: [], rest: afterMarker }
+		: splitFirstLine(afterMarker);
 	const body = [
 		...(rest.some((child) => !isWhitespace(child))
 			? [{ ...paragraph, children: rest }]
@@ -157,6 +158,19 @@ function transformBlockquote(node: MarkdownNode): void {
 		...children.slice(firstIndex + 1),
 	];
 
+	if (isAnswer) {
+		node.tagName = "details";
+		node.properties = { className: ["markdown-answer"] };
+		node.children = [
+			element("summary", {}, [{ type: "text", value: "参考解答" }]),
+			element("div", { className: ["markdown-answer-body"] }, body),
+		];
+		return;
+	}
+
+	const type = marker[1] as CalloutType;
+	const { label } = CALLOUTS[type];
+	const titleText = textContent(line).trim();
 	node.tagName = "aside";
 	node.properties = {
 		...node.properties,
@@ -180,8 +194,8 @@ function transformBlockquote(node: MarkdownNode): void {
 	];
 }
 
-/** GitHub alert markers plus PRACTICE, with an optional inline Markdown title. */
-export function rehypeMarkdownCallouts() {
+/** Convert marked blockquotes into callouts or collapsed exercise answers. */
+export function rehypeMarkdownBlockquotes() {
 	return (tree: MarkdownNode) => {
 		function visit(node: MarkdownNode): void {
 			for (const child of node.children ?? []) visit(child);

@@ -35,7 +35,8 @@ import ts from "highlight.js/lib/languages/typescript";
 import xml from "highlight.js/lib/languages/xml";
 import yaml from "highlight.js/lib/languages/yaml";
 import { CodeReferencePin } from "./code-reference";
-import { rehypeMarkdownCallouts } from "./markdown-callouts";
+import "./markdown-answers.css";
+import { rehypeMarkdownBlockquotes } from "./markdown-blockquotes";
 import { type NoteExcerptOptions, rehypeNoteExcerpt } from "./note-excerpt";
 import type { NoteLinkTarget } from "./notes";
 
@@ -784,7 +785,7 @@ function Plot({
 const REMARK_PLUGINS = [remarkMath, remarkGfm, remarkCjkFriendly];
 const REHYPE_PLUGINS = [
 	rehypeRaw,
-	rehypeMarkdownCallouts,
+	rehypeMarkdownBlockquotes,
 	rehypeSlug,
 	rehypeKatex,
 ];
@@ -1045,7 +1046,7 @@ export function MarkdownPreview({
 			excerptIdPrefix
 				? [
 						rehypeRaw,
-						rehypeMarkdownCallouts,
+						rehypeMarkdownBlockquotes,
 						rehypeSlug,
 						() =>
 							rehypeNoteExcerpt({

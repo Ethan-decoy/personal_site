@@ -119,6 +119,8 @@ C++ 附章正文放在章内 `deep-dives/`，通过该目录的 `_index.md` 接�
 
 Python 书页位于 `src/notes/python/`，复用同一笔记系统，以计算机视觉与 PyTorch 为主要应用方向，Agent 为兴趣分支。规划新章或调整分篇时核对 `_guidelines/book-structure.md`；写作与代码示例分别遵循同目录的 `writing-style.md` 和 `coding-style.md`；新增章节、附章或修改导航时按 `authoring.md` 接入。公开总目录只列已有内容，规划与研究留在下划线目录。修改 Python 链接或标题后运行 `pnpm check:python-links`，该检查由 `scripts/check-note-links.mjs` 提供实际渲染锚点校验，并纳入构建。
 
+深度学习内容规划、写作、审阅或维护见 [深度学习内容维护与验证](src/notes/deep-learning/_guidelines/authoring.md)。
+
 Markdown 重点提示使用 `> [!TYPE] 可选标题`，在正文中直接展开。提示块语法与 C++ 笔记使用建议见 `src/notes/cpp/_guidelines/markdown-callouts.md`；调整视觉时参照 `docs/DESIGN.md` 的 Markdown 文档排版约定。
 
 教材式图组的容器、图片加载、窄屏与主题传递约定见 `docs/DESIGN.md` 的 Markdown 文档排版。
@@ -141,7 +143,7 @@ Markdown 重点提示使用 `> [!TYPE] 可选标题`，在正文中直接展开�
 
 1. `tsc -b`
 2. Markdown 渲染与笔记清单同步检查
-3. C++ 与 Python 笔记链接与锚点检查
+3. 笔记链接与锚点检查
 4. 笔记侧栏检查
 5. 项目页贡献图与图片来源检查
 6. Vite 生产构建

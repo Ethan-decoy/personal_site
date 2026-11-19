@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="386" viewBox="0 0 480 386" role="img" aria-labelledby="title description">
+  <title id="title">环境中的数据、离线训练与模型使用</title>
+  <desc id="description">上方实线从环境指向含输入和标签的训练数据，再指向拟合参数的训练过程。虚线表示训练得到下方的模型。下方实线从新的输入经参数固定的预测模型指向预测。本图只画一次监督训练和后续预测，不表示以后不能再采集或训练。</desc>
+  <style>
+    :root {
+      --ink: #172436;
+      --muted: #546577;
+      --cell: #e0e9f0;
+      --model: #d9e4ec;
+      --border: #8fa5b5;
+      --edge: #546577;
+      --accent: #2f5d7c;
+      --rule: #b7c8d5;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #d8dee5;
+        --muted: #adb9c4;
+        --cell: #151e27;
+        --model: #1b2c39;
+        --border: #536879;
+        --edge: #adb9c4;
+        --accent: #8cbbd2;
+        --rule: #324650;
+      }
+    }
+    text { font-family: "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: var(--ink); }
+    .heading { font-size: 19px; font-weight: 600; }
+    .label { font-size: 18px; text-anchor: middle; }
+    .detail { font-size: 16px; fill: var(--muted); text-anchor: middle; }
+    .node { fill: var(--cell); stroke: var(--border); stroke-width: 1.5; }
+    .model { fill: var(--model); stroke: var(--accent); stroke-width: 1.7; }
+    .flow { fill: none; stroke: var(--edge); stroke-width: 1.9; }
+    .result { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 6 4; }
+  </style>
+  <defs>
+    <marker id="data-arrow" viewBox="0 0 8 8" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 8 4 L 0 8 Z" fill="var(--edge)" />
+    </marker>
+    <marker id="model-arrow" viewBox="0 0 8 8" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 8 4 L 0 8 Z" fill="var(--accent)" />
+    </marker>
+  </defs>
+
+  <text x="16" y="26" class="heading">采集与离线训练</text>
+
+  <rect x="16" y="64" width="112" height="76" rx="5" class="node" />
+  <text x="72" y="98" class="label">环境</text>
+  <text x="72" y="122" class="detail">采集与标注</text>
+
+  <rect x="184" y="64" width="136" height="76" rx="5" class="node" />
+  <text x="252" y="98" class="label">训练数据</text>
+  <text x="252" y="122" class="detail">输入与标签</text>
+
+  <rect x="376" y="64" width="88" height="76" rx="5" class="node" />
+  <text x="420" y="98" class="label">训练</text>
+  <text x="420" y="122" class="detail">拟合参数</text>
+
+  <path d="M 128 102 H 184" class="flow" marker-end="url(#data-arrow)" />
+  <path d="M 320 102 H 376" class="flow" marker-end="url(#data-arrow)" />
+  <path d="M 420 140 V 176 H 252 V 286" class="result" marker-end="url(#model-arrow)" />
+  <text x="270" y="207" font-size="16" style="fill: var(--accent)">训练得到模型</text>
+
+  <path d="M 16 236 H 232 M 272 236 H 464" fill="none" stroke="var(--rule)" stroke-width="1" />
+  <text x="16" y="265" class="heading">固定参数进行预测</text>
+
+  <rect x="16" y="286" width="112" height="70" rx="5" class="node" />
+  <text x="72" y="328" class="label">新的输入</text>
+
+  <rect x="184" y="286" width="136" height="70" rx="5" class="model" />
+  <text x="252" y="315" class="label">预测模型</text>
+  <text x="252" y="340" class="detail">参数固定</text>
+
+  <rect x="376" y="286" width="88" height="70" rx="5" class="node" />
+  <text x="420" y="328" class="label">预测</text>
+
+  <path d="M 128 321 H 184" class="flow" marker-end="url(#data-arrow)" />
+  <path d="M 320 321 H 376" class="flow" marker-end="url(#data-arrow)" />
+</svg>

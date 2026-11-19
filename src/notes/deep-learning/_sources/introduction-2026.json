@@ -1,0 +1,233 @@
+{
+  "title": "引言的时效性更新与事实校正",
+  "checkedOn": "2026-11-13",
+  "sourceSnapshotRecord": "introduction.json",
+  "scope": "围绕现有引言核对历史语境、框架状态、生成式模型、训练与交互的关系，以及上一轮发现的具体事实问题。",
+  "limits": [
+    "核对日期记录实际读取资料的日期，不代表覆盖截至该日期的所有研究或产品。未维护模型排行榜或性能纪录。",
+    "新增能力与实验结论依据对应一手论文或官方资料，本站未重新训练这些模型、复现实验或验证其全部产品行为。",
+    "原书数据与算力表保留为历史数量级示意，未拼接新的硬件规格或将不同精度、硬件规模的指标直接比较。",
+    "本次是局部更新，未对所有未改动段落的数学、历史与应用事实逐一重新取证。"
+  ],
+  "sources": [
+    {
+      "id": "transformer",
+      "title": "Attention Is All You Need",
+      "url": "https://arxiv.org/abs/1706.03762v7",
+      "firstPublishedOn": "2017-06-12",
+      "versionUpdatedOn": "2023-08-02",
+      "supports": "Transformer以注意力机制组织序列计算；不据此声称所有现代模型均使用该架构。"
+    },
+    {
+      "id": "gpt3",
+      "title": "Language Models are Few-Shot Learners",
+      "url": "https://arxiv.org/abs/2005.14165v4",
+      "firstPublishedOn": "2020-05-28",
+      "versionUpdatedOn": "2020-07-22",
+      "supports": "GPT-3通过文本交互中的任务说明与示例进行少样本评估，评估时不进行梯度更新或微调。"
+    },
+    {
+      "id": "instructgpt",
+      "title": "Training language models to follow instructions with human feedback",
+      "url": "https://arxiv.org/abs/2203.02155v1",
+      "firstPublishedOn": "2022-03-04",
+      "supports": "监督示范微调与人类反馈强化学习的组合；模型规模与符合用户意图需分别评估。"
+    },
+    {
+      "id": "deepseek-r1",
+      "title": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+      "url": "https://arxiv.org/abs/2501.12948v2",
+      "firstPublishedOn": "2025-01-22",
+      "versionUpdatedOn": "2026-01-04",
+      "supports": "以强化学习促进数学、代码等可验证任务上的推理表现；不外推为意识、任意任务可靠自主或无限自我改进。"
+    },
+    {
+      "id": "llama3",
+      "title": "The Llama 3 Herd of Models",
+      "url": "https://arxiv.org/abs/2407.21783v3",
+      "fullTextUrl": "https://arxiv.org/html/2407.21783v3",
+      "firstPublishedOn": "2024-07-31",
+      "versionUpdatedOn": "2024-11-23",
+      "sections": ["2 General Overview", "4 Post-Training", "7 Vision Experiments", "8 Speech Experiments"],
+      "supports": "词元与下一个词元预测的预训练；语言、代码、工具使用和多模态实验；有限参数模型的具体例子。多模态实验不等同于同名产品的全部发布能力。"
+    },
+    {
+      "id": "latent-diffusion",
+      "title": "High-Resolution Image Synthesis with Latent Diffusion Models",
+      "url": "https://arxiv.org/abs/2112.10752v2",
+      "firstPublishedOn": "2021-12-20",
+      "versionUpdatedOn": "2022-04-13",
+      "supports": "潜在空间中的去噪生成与文本等条件引导，是区别于GAN的生成路线；不据此否定GAN的历史与当前用途。"
+    },
+    {
+      "id": "react",
+      "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+      "url": "https://arxiv.org/abs/2210.03629v3",
+      "firstPublishedOn": "2022-10-06",
+      "versionUpdatedOn": "2023-03-10",
+      "supports": "语言模型生成的推理过程与行动交替组织、调用外部知识源或环境；少量提示示例可驱动交互，交互本身不必更新参数。"
+    },
+    {
+      "id": "rag",
+      "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+      "url": "https://arxiv.org/abs/2005.11401v4",
+      "firstPublishedOn": "2020-05-22",
+      "versionUpdatedOn": "2021-04-12",
+      "supports": "参数化模型与外部检索信息的组合；系统组件和训练范围需按实际方案区分。"
+    },
+    {
+      "id": "mxnet-attic",
+      "title": "Apache MXNet — The Apache Attic",
+      "url": "https://attic.apache.org/projects/mxnet.html",
+      "supports": "MXNet于2023年9月退休，2024年2月完成移入Attic。用于替换把旧框架名单当作当前生态的表述。"
+    },
+    {
+      "id": "pytorch-docs",
+      "title": "PyTorch documentation",
+      "url": "https://docs.pytorch.org/docs/stable/index.html",
+      "resolvedUrl": "https://docs.pytorch.org/docs/2.15/index.html",
+      "version": "核对时stable入口转向2.15文档；本站示例的实际运行环境另行记录。",
+      "supports": "张量、自动微分、编译与硬件执行等框架能力；选作本站主要示例框架是学习组织选择，不是市场份额排名。"
+    },
+    {
+      "id": "jax-docs",
+      "title": "Quickstart: How to think in JAX",
+      "url": "https://docs.jax.dev/en/latest/notebooks/thinking_in_jax.html",
+      "version": "核对时的官方在线文档",
+      "supports": "可组合的jax.grad、jax.jit和jax.vmap变换，不将JAX简单归为只支持命令式逐步执行的工具。"
+    },
+    {
+      "id": "keras3-docs",
+      "title": "Keras 3: Multi-backend deep learning",
+      "url": "https://keras.io/keras_3/",
+      "version": "Keras 3官方介绍，核对时在线版本",
+      "supports": "Keras支持JAX、TensorFlow和PyTorch等后端，不再把它仅描述为TensorFlow的高级API。"
+    },
+    {
+      "id": "alphafold3",
+      "title": "AlphaFold 3 predicts the structure and interactions of all of life’s molecules",
+      "url": "https://blog.google/innovation-and-ai/products/google-deepmind-isomorphic-alphafold-3-ai-model/",
+      "firstPublishedOn": "2024-05-08",
+      "versionUpdatedOn": "2024-11-11",
+      "paperUrl": "https://doi.org/10.1038/s41586-024-07487-w",
+      "supports": "AlphaFold 3用于蛋白质与其他生物分子相互作用的结构预测。只取研究目标与能力范围，不转述宣传性最高级或临床效用结论。"
+    },
+    {
+      "id": "waymo-service",
+      "title": "Waymo rides and FAQ",
+      "url": "https://waymo.com/faq/",
+      "serviceUrl": "https://waymo.com/rides/",
+      "version": "核对时的官方服务说明，不复制持续变动的城市名单或里程数字。",
+      "supports": "Waymo在公布运营范围提供无人驾驶出行服务；不能据此推广为任意道路、天气和交通条件均适用。"
+    },
+    {
+      "id": "nist-generative-ai",
+      "title": "Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile",
+      "url": "https://doi.org/10.6028/NIST.AI.600-1",
+      "documentUrl": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf",
+      "publishedIn": "2024-07",
+      "sections": ["2.2 Confabulation", "2.4 Data Privacy", "2.6 Harmful Bias and Homogenization", "2.7 Human-AI Configuration", "MEASURE 2.5"],
+      "supports": "错误生成、隐私、偏见、过度依赖及评价外推的风险；不据此对不同长期风险给出无条件排序。"
+    },
+    {
+      "id": "speech-recognition",
+      "title": "The Microsoft 2017 Conversational Speech Recognition System",
+      "url": "https://arxiv.org/abs/1708.06073v2",
+      "firstPublishedOn": "2017-08-21",
+      "versionUpdatedOn": "2017-08-24",
+      "conferenceYear": 2018,
+      "supports": "原书2018年引用对应的会话语音识别研究，实验任务为Switchboard；保持与人类表现比较的评估范围，不外推到所有语音情境。"
+    },
+    {
+      "id": "td-gammon",
+      "title": "TD-Gammon, A Self-Teaching Backgammon Program, Achieves Master-Level Play",
+      "url": "https://research.ibm.com/publications/td-gammon-a-self-teaching-backgammon-program-achieves-master-level-play",
+      "firstPublishedOn": "1993-10-22",
+      "supports": "TD-Gammon对应西洋双陆棋（backgammon），校正原文五子棋的译名。"
+    },
+    {
+      "id": "audio-sample-rate",
+      "title": "BaseAudioContext: sampleRate property — MDN Web Docs",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/sampleRate",
+      "versionUpdatedOn": "2026-09-29",
+      "supports": "采样率以每秒采样点数表示；正文的44.1 kHz是明确选定的示例条件，44100由单位换算得到，不声称所有麦克风采用同一采样率。"
+    },
+    {
+      "id": "classification-calibration",
+      "title": "On Calibration of Modern Neural Networks",
+      "url": "https://arxiv.org/abs/1706.04599v2",
+      "firstPublishedOn": "2017-06-14",
+      "versionUpdatedOn": "2017-08-03",
+      "supports": "模型输出与实际正确概率的对应需要另行评估；猫狗例子采用声明的带符号分数，不把接近零自动当作可靠的不确定性结论。"
+    },
+    {
+      "id": "iris-uci",
+      "title": "Iris — UCI Machine Learning Repository",
+      "url": "https://archive.ics.uci.edu/dataset/53/iris",
+      "supports": "数据集说明标识Fisher, 1936；校正正文中与同节1936年矛盾的1932年。1988年是入库日期，不是Fisher发表年份。"
+    }
+  ],
+  "changes": [
+    {
+      "note": "01-introduction/01-from-rules-to-machine-learning.md",
+      "kind": "时效性、概念修饰与分节承接",
+      "change": "区分语言模型辅助写代码与用数据学习参数，并恢复特点一节的实际入口；按本篇审阅补足学习效果的条件，区分振幅采样点与带标签的训练样本，明确猫狗分类分数的约定。该轮整理保留原图和例子；后续配图取舍与改绘另见introduction-figures.json。模型与训练概念通过分层标题和就地重点组织。",
+      "relatedNotes": ["01-introduction/03-objective-functions-and-optimization.md#目标函数", "01-introduction/05-classification-and-multiple-labels.md#分类", "01-introduction/11-development-of-deep-learning.md#预训练后训练与生成式模型"],
+      "sourceIds": ["llama3", "audio-sample-rate", "classification-calibration"]
+    },
+    {
+      "note": "01-introduction/06-search-and-recommendation.md",
+      "kind": "历史语境与表达修饰",
+      "change": "将如今和目前改为具体机制与条件，恢复曝光、购买记录和后续推荐之间的反馈关系；不增加当前搜索产品或用户行为比例的结论。",
+      "sourceIds": []
+    },
+    {
+      "note": "01-introduction/08-unsupervised-learning.md",
+      "kind": "概念澄清与补充",
+      "change": "区分没有任务标签与没有目标函数，补充从数据自身构造训练信号的自监督学习。",
+      "sourceIds": ["llama3"]
+    },
+    {
+      "note": "01-introduction/09-interaction-and-reinforcement-learning.md",
+      "kind": "概念澄清与补充",
+      "change": "限定前文离线学习例子的适用范围；补充语言模型工具交互，区分智能体行为与强化学习训练。",
+      "sourceIds": ["react", "gpt3"]
+    },
+    {
+      "note": "01-introduction/10-origins-of-machine-learning.md",
+      "kind": "事实校正",
+      "change": "区分数据建模的较长历史与20世纪的神经网络思想，移除开头未限定的最近；将Iris的1932年校正为1936年。",
+      "sourceIds": ["iris-uci"]
+    },
+    {
+      "note": "01-introduction/11-development-of-deep-learning.md",
+      "kind": "历史语境与时效性更新",
+      "change": "把最近十年等相对时间落到2010年代，保留原表为历史数量级示意；补充预训练、后训练、生成式与多模态路线，更新框架状态。",
+      "sourceIds": ["transformer", "gpt3", "instructgpt", "deepseek-r1", "llama3", "latent-diffusion", "mxnet-attic", "pytorch-docs", "jax-docs", "keras3-docs"]
+    },
+    {
+      "note": "01-introduction/12-successes-of-deep-learning.md",
+      "kind": "应用更新与事实校正",
+      "change": "补充语言、代码、生成、多模态、工具与科学应用，限定历史基准和自动驾驶部署的能力范围；校正TD-Gammon译名，替换关于推理与长期影响的绝对判断。",
+      "sourceIds": ["gpt3", "llama3", "latent-diffusion", "react", "alphafold3", "waymo-service", "deepseek-r1", "nist-generative-ai", "speech-recognition", "td-gammon"]
+    },
+    {
+      "note": "01-introduction/13-characteristics-of-deep-learning.md",
+      "kind": "概念澄清与历史语境",
+      "change": "限定端到端训练与手工特征替代的范围；用RAG连接组合系统，澄清大型参数模型不等于完全非参数模型。",
+      "sourceIds": ["rag", "llama3"]
+    },
+    {
+      "note": "01-introduction/14-summary-and-exercises.md",
+      "kind": "小结同步",
+      "change": "同步本次补充的学习信号、训练阶段及交互区别；保留四道原有练习。",
+      "sourceIds": ["llama3", "instructgpt", "react", "rag"]
+    },
+    {
+      "note": "_index.md",
+      "kind": "来源说明同步",
+      "change": "区分首次原文迁移与此后的局部适配，保留固定源码快照、原作者归属和许可。",
+      "sourceIds": []
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "title": "搜索与推荐系统的概念及图文修订",
+  "adaptedOn": "2026-11-17",
+  "checkedOn": "2026-11-17",
+  "sourceSnapshotRecord": "introduction.json",
+  "note": "01-introduction/06-search-and-recommendation.md",
+  "scope": "保留排序、电影兴趣、商品、歌曲及推荐反馈循环的解释主线，校正历史机制和观测偏差，整理阅读层次并归档不承担机制解释的截图；不改写其他引言正文。",
+  "sources": [
+    {
+      "id": "google-anatomy-1998",
+      "title": "The anatomy of a large-scale hypertextual Web search engine",
+      "url": "https://snap.stanford.edu/class/cs224w-readings/Brin98Anatomy.pdf",
+      "catalogUrl": "https://research.google/pubs/the-anatomy-of-a-large-scale-hypertextual-web-search-engine/",
+      "publishedIn": "Computer Networks and ISDN Systems 30 (1998), 107–117",
+      "version": "Stanford保存、Google Research出版页面直接链接的11页印刷版。核对PageRank与Searching部分，包含印刷页113的多信号排序说明。",
+      "supports": "经典PageRank利用链接结构衡量网页重要性，不是某个查询的相关概率；1998年的Google已结合PageRank、锚文本和词语位置及邻近程度等信号排序，不能简化为仅按PageRank排序。"
+    },
+    {
+      "id": "recommendations-as-treatments",
+      "title": "Recommendations as Treatments: Debiasing Learning and Evaluation",
+      "url": "https://proceedings.mlr.press/v48/schnabel16.html",
+      "pdfUrl": "https://proceedings.mlr.press/v48/schnabel16.pdf",
+      "publishedIn": "ICML 2016, PMLR 48:1670–1679",
+      "version": "会议出版页与论文正文，核对摘要、引言及选择性观测下的训练和评价；不在引言展开因果估计或加权公式。",
+      "supports": "推荐反馈可能因用户自行选择以及系统展示策略而存在选择偏差；已有反馈不自动代表全部偏好，观测机制会影响训练和评价。用选择性观测到的反馈替换容易误解为内容审核的审查后的反馈。"
+    },
+    {
+      "id": "youtube-recommendations-2016",
+      "title": "Deep Neural Networks for YouTube Recommendations",
+      "url": "https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/",
+      "pdfUrl": "https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/45530.pdf",
+      "publishedIn": "Proceedings of the 10th ACM Conference on Recommender Systems (2016)",
+      "version": "Google Research出版页及论文的系统概览；正文限定为2016年的工程例子，不宣称代表截至修订日的YouTube系统。",
+      "supports": "候选生成与排序的分工；先从大物品库中产生候选，再用用户、物品和情境特征估计所选目标下的排序得分。"
+    },
+    {
+      "id": "d2l-movielens-statistics",
+      "title": "The MovieLens Dataset — Dive into Deep Learning",
+      "url": "https://en.d2l.ai/chapter_recommender-systems/movielens.html#statistics-of-the-dataset",
+      "version": "核对时英文版1.0.3，第21.2.2节；该节展示MovieLens 100K的评分分布主要集中在3～4星。未在本次下载、统计或训练该数据集。",
+      "supports": "原文五星和一星多、三星明显少不能写成全部五分制电影评分的普遍规律。只用于说明需要保留数据范围，正文不引入新的普遍分布判断。"
+    }
+  ],
+  "changes": [
+    "将源码单换行合并的长段按排序、历史信号、个性化、反馈、候选分工、观测偏差与反馈循环分开，保留搜索、推荐系统和原Sphinx推荐锚点。",
+    "保留字母集合相同而顺序不同的例子，明确候选得分与系统最终有序列表的职责；不把排序任务等同于返回一个类别或单个数值。",
+    "区分经典PageRank的链接重要性与查询相关性，引用1998年原始论文校正仅按PageRank排序的历史描述。",
+    "以个性化推荐为当前例子，保留电影风格和原书推荐深度学习书籍的叙述用途；不以个人截图证明通用推荐效果。",
+    "明确推荐得分的含义取决于预测目标，不把任意分数都解释为可靠概率；回指已有类别概率解释。",
+    "用显性与隐性反馈的关系和对照表说明数据来源，保留跳过歌曲可能反映当时需求的条件，并补足未交互不自动表示真实负偏好的边界。",
+    "以候选生成、排序与展示的职责替换工业系统先进得多的泛泛评价，2016年YouTube论文只作有年代的工程例子。",
+    "将审查后的反馈校正为选择性观测与选择偏差，分别说明用户自行选择和系统曝光的作用；移除无数据范围的评分两极分布断言。",
+    "保留展示、购买与后续推荐可能相互强化的例子，区分用户原有偏好与曝光影响，说明行为记录、状态或统计更新与模型参数更新并非同一环节。",
+    "移除没有在前文解释的激励开放问题收尾，不额外扩写高级算法、模型排行榜或当前产品功能。"
+  ],
+  "figure": {
+    "number": "图1.3.4",
+    "originalFile": "deeplearning-amazon.jpg",
+    "originalGitBlob": "2eca8601908e107038ccc24283c5b4bab455d218",
+    "originalArchive": "introduction-images/deeplearning-amazon.jpg",
+    "action": "removed",
+    "reason": "截图只展示一位作者的推荐结果；在手机上十张书卡缩至约五分之一，书名等细节难辨，且不帮助追踪排序或反馈机制。保留其文字例子，并将原图逐字节转入私有来源归档。",
+    "appearanceDecision": "界面截图保留原色本身符合图文规范；本次移除依据是解释用途与阅读尺寸，不对历史截图改色或伪装成当前界面。"
+  },
+  "examples": {
+    "ordering": {
+      "kind": "说明顺序要求的示意例子，不是排序模型实验",
+      "expectedOrder": ["A", "B", "C", "D", "E"],
+      "differentOrder": ["C", "A", "B", "E", "D"],
+      "relation": "两组都含相同的五个字母，只有前者满足所声明的字母顺序。"
+    },
+    "feedbackLoop": {
+      "kind": "可能出现的因果路径示意，不是已测量的商品推荐实验",
+      "sequence": ["优先展示某商品", "曝光可能带来新增购买", "新增记录可能影响统计、用户状态或模型", "后续推荐可能进一步偏向该商品"],
+      "condition": "新增记录实际参与后续统计、状态更新或训练；不把每次交互自动等同于立即更新神经网络参数。"
+    }
+  },
+  "limits": [
+    "本次不训练或部署搜索、推荐模型，不验证点击率、推荐准确性或用户满意度。",
+    "PageRank与YouTube论文均为指定年份的历史机制例子，不描述截至修订日某产品的完整系统。",
+    "评分分布核对限于原书的MovieLens 100K案例，未据此推断其他平台或人群的评分分布。",
+    "原始迁移快照、图号、计数与图片哈希继续保留在introduction.json，后续适配独立记录。"
+  ]
+}

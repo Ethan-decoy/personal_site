@@ -1,0 +1,29 @@
+{
+  "adaptedOn": "2026-11-14",
+  "sourceSnapshotRecord": "introduction.json",
+  "note": "01-introduction/01-from-rules-to-machine-learning.md",
+  "scope": "按照解释用途选择配图，并适配Notes页面的明暗主题。未改变其他引言小节中的原图。",
+  "figures": [
+    {
+      "originalNumber": "图1.1.1",
+      "originalFile": "wake-word.svg",
+      "originalGitBlob": "01fb83a8fe893d499e27422d807ee3398ed26b76",
+      "originalArchive": "introduction-images/wake-word.svg",
+      "action": "removed",
+      "reason": "只重复正文中已明确列出的音频输入与是或否输出，未增加需要追踪的机制或关系。"
+    },
+    {
+      "originalNumber": "图1.1.2",
+      "originalFile": "ml-loop.svg",
+      "originalGitBlob": "7638bf65e5a70dd9552dfdb9d0820355ac024f2e",
+      "originalArchive": "introduction-images/ml-loop.svg",
+      "action": "redrawn",
+      "currentAsset": "/assets/notes/deep-learning/introduction/training-and-inference.svg",
+      "anchor": "fig-ml-loop",
+      "purpose": "让读者追踪预测、真实标签与参数更新的反馈，并与同一模型固定参数时的预测路径对照。",
+      "semantics": "以本节的音频监督训练和固定参数预测为例。实线表示数据传递，青绿虚线表示参数更新；未把所有机器学习或交互过程都表示为这种训练设置。",
+      "appearance": "透明图面；文字、节点和连接使用明暗配色，复用图组容器的color-scheme传递。480px固有宽度，窄屏按比例缩小。",
+      "provenance": "在原书训练过程图的讲解位置重新组织关系，新增训练与使用的对照。原图完整保存在私有来源归档；归属及许可继续在分类索引集中维护。"
+    }
+  ]
+}

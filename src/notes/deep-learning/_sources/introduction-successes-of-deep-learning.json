@@ -1,0 +1,108 @@
+{
+  "title": "深度学习成功案例的历史、评测与部署范围修订",
+  "adaptedOn": "2026-11-19",
+  "checkedOn": "2026-11-19",
+  "sourceSnapshotRecord": "introduction.json",
+  "previousUpdateRecord": "introduction-2026.json",
+  "note": "01-introduction/12-successes-of-deep-learning.md",
+  "scope": "保留早期专用应用、现代生成与交互、历史基准与部署及可靠性讨论。校正数据来源，恢复各案例的任务、系统职责与证据条件。",
+  "sources": [
+    {
+      "id": "postal-automation",
+      "references": [
+        { "url": "https://postalmuseum.si.edu/the-20th-century-mechanization-and-early-automation", "version": "Smithsonian 国家邮政博物馆的美国邮政史概述。核对公开索引可见的 1965 年打印地址识别与 1990 年代手写地址识别说明。", "supports": "早期 OCR 已用于打印地址，手写地址识别在后来扩展部署。" },
+        { "url": "https://cedar.buffalo.edu/~srihari/Postal-Research.html", "version": "合作研究者的 CEDAR 邮政研究项目时间线，含 1989 年早期论文与 1995 年部署记录。", "supports": "手写地址识别是独立的邮政应用，有可追溯的研究和部署时间。" }
+      ]
+    },
+    {
+      "id": "document-recognition-mnist",
+      "url": "https://princetonuniversity.github.io/NEU-PSY-502/_static/pdf/Class%204/LeCunn1998.pdf",
+      "version": "LeCun、Bottou、Bengio 与 Haffner，Proceedings of the IEEE，1998 年 11 月，MNIST 数据库与支票识别部分。",
+      "supports": "手写数字基准由 NIST 的 SD-1 和 SD-3 整理，含训练集和测试集；论文另有支票金额识别应用。"
+    },
+    {
+      "id": "stripe-radar",
+      "url": "https://docs.stripe.com/radar/transaction-risk-prevention",
+      "version": "2026-11-19 核对的 Stripe Radar 官方交易风险文档。",
+      "supports": "模型给支付交易估计风险，业务规则及产品配置决定拦截或进入人工复核等处理。该文档说明系统功能。"
+    },
+    {
+      "id": "gpt3-llama3",
+      "references": [
+        { "year": 2020, "url": "https://arxiv.org/abs/2005.14165v4", "supports": "GPT-3 在参数固定的实验中用文本说明与示例指定翻译、问答等任务。" },
+        { "year": 2024, "url": "https://arxiv.org/html/2407.21783v3#S5.SS2.SSS3", "version": "Llama 3 报告 v3，§5.2.3", "supports": "含 HumanEval、MBPP 等函数级代码生成评测，以测试检查候选代码行为。" },
+        { "year": 2024, "url": "https://arxiv.org/html/2407.21783v3#S7", "version": "Llama 3 报告 v3，§7", "supports": "评估图像及视频输入的视觉任务。" },
+        { "year": 2024, "url": "https://arxiv.org/html/2407.21783v3#S8", "version": "Llama 3 报告 v3，§8", "supports": "另行评估语音输入的任务，包括自动语音识别。" }
+      ]
+    },
+    {
+      "id": "latent-diffusion",
+      "url": "https://arxiv.org/abs/2112.10752v2",
+      "version": "Rombach 等，CVPR 2022，arXiv v2。",
+      "supports": "文本可作为条件引导潜在扩散模型生成图像。"
+    },
+    {
+      "id": "react",
+      "url": "https://arxiv.org/html/2210.03629v3#S3",
+      "version": "Yao 等，2022 年预印本，ICLR 2023，arXiv v3 §3。",
+      "supports": "问答提示实验将查询 Wikipedia 和读取观察结果加入上下文，后续调用依赖已有交互，而推理使用固定模型参数。"
+    },
+    {
+      "id": "alphafold3",
+      "url": "https://doi.org/10.1038/s41586-024-07487-w",
+      "readUrl": "https://www.nature.com/articles/s41586-024-07487-w.pdf",
+      "version": "Abramson 等，Nature 630，2024 年，摘要与复合物结构评测。",
+      "supports": "预测指定分子组成的复合物三维结构，并用有实验结构的测试数据评估预测。"
+    },
+    {
+      "id": "microsoft-conversational-speech",
+      "url": "https://www.microsoft.com/en-us/research/wp-content/uploads/2018/04/ms_swbd17_icassp18.pdf",
+      "version": "Xiong 等，ICASSP 2018，摘要、导言和结果。研究对象为微软 2017 年的会话语音识别系统。",
+      "supports": "在 NIST 2000 电话语音评测上，Switchboard 与 CallHome 子集的词错误率分别为 5.1% 与 9.8%。导言所述 IBM/Appen 人工转写对照在 Switchboard 上为 5.1%，允许更多轮聆听并使用对话上下文。"
+    },
+    {
+      "id": "imagenet-classification",
+      "references": [
+        { "url": "https://www.image-net.org/challenges/LSVRC/2010/results.php", "version": "主办方的 2010 年分类赛结果，核对索引所见的 NEC-UIUC 获胜行。", "supports": "Flat Top-5 错误率 0.28191，约合 28.2%。方案使用人工设计的图像特征及 SVM。" },
+        { "url": "https://arxiv.org/html/1409.0575", "version": "Russakovsky 等，2014 年预印本、2015 年期刊论文。任务定义、数据统计及跨年结果说明。", "supports": "Top-5 评价按真实类别是否落在前五个预测类别中计算。参赛类别和测试数据在早期届次间有变化。" },
+        { "url": "https://arxiv.org/html/1709.01507", "version": "Hu 等，2017 年预印本，2018 年 CVPR，ILSVRC 2017 分类赛结果。", "supports": "测试集上的 2.251% 属于获胜的 SENet 模型集成。" }
+      ]
+    },
+    {
+      "id": "games",
+      "references": [
+        { "year": 1993, "url": "https://research.ibm.com/publications/td-gammon-a-self-teaching-backgammon-program-achieves-master-level-play", "supports": "TD-Gammon 通过自我对弈，以时序差分学习更新神经网络。" },
+        { "year": 2002, "url": "https://research.ibm.com/publications/deep-blue", "supports": "1997 年比赛的专用搜索硬件、并行搜索及局面评估方法。" },
+        { "url": "https://deepmind.google/research/alphago/", "version": "AlphaGo 作者项目历史和 2016 年论文的训练与搜索说明，原论文关联见强化学习笔记。", "supports": "早期版本从人类棋谱和自我对弈中学习，策略与价值估计辅助树搜索。" },
+        { "year": 2017, "url": "https://www.ijcai.org/proceedings/2017/772", "supports": "Libratus 在单挑无限注德州扑克中预先计算策略，并在对局中求解子博弈。" }
+      ]
+    },
+    {
+      "id": "limited-autonomous-service",
+      "references": [
+        { "url": "https://waymo.com/faq/", "version": "2026-11-19 核对的 Waymo 官方 FAQ，乘车方式与运营范围。", "supports": "在其公布的范围内提供无人驾驶乘车。实时服务范围以该入口为准。" },
+        { "url": "https://www.nhtsa.gov/vehicle-safety/automated-vehicle-safety", "version": "2026-11-19 核对的 NHTSA 驾驶自动化级别说明。", "supports": "辅助驾驶与限定场景自动化由不同主体承担驾驶任务，自动化等级涉及其可用操作范围。" }
+      ]
+    },
+    {
+      "id": "reasoning-and-risk",
+      "references": [
+        { "url": "https://arxiv.org/html/2501.12948v2#S2.SS2", "firstPublishedOn": "2025-01-22", "versionUpdatedOn": "2026-01-04", "supports": "R1-Zero 对数学和代码等可验证任务使用正确性及格式奖励；训练反馈与下节的任务评测分别说明。" },
+        { "url": "https://arxiv.org/html/2501.12948v2#S2.SS3", "version": "同一报告的 §2.3，图 1(a)。", "supports": "AIME 2024 的平均 pass@1 从 15.6% 升到 77.9%，另报的多次采样一致性成绩采用不同口径。" },
+        { "url": "https://doi.org/10.6028/NIST.AI.600-1", "publishedIn": "2024-07", "supports": "NIST AI 600-1 所列的错误生成、数据隐私、有害偏见及过度依赖。用于说明风险对象与评估环节。" }
+      ]
+    }
+  ],
+  "changes": [
+    "分开说明邮政 OCR、支票识别和 MNIST 来源，使用有官方说明的支付风控实例阐明风险评分与业务处置的职责。",
+    "按语言与代码、图像生成与多模态、工具交互、科学结构预测分小节，区分输入、输出和评测所依据的任务。",
+    "解释词错误率和 Top-5 错误率。补充语音测试子集及人工转写条件，以短表对照 ImageNet 届次、获胜方案与测试结果。",
+    "把四个游戏案例拆为可独立阅读的条目，交代自我对弈、专用搜索、学习与搜索结合及隐藏信息求解各自的职责。",
+    "记录 Waymo 服务范围的核对日期，按自动化责任描述辅助驾驶与限定条件的无人驾驶。保留风险讨论并用过期检索内容说明可靠性外推的具体失效条件。"
+  ],
+  "limits": [
+    "固定迁移快照、原始计数和既有修订记录由 introduction.json 保留。",
+    "会话语音和 ImageNet 数字来自指定论文与竞赛记录。跨届成绩用于历史对照，以各届任务和评测条件解释。",
+    "当前产品事实核对到所列官方文档。Waymo 的服务地域和运行条件可变化，预测结构及生成实验的结果对应论文所列任务。"
+  ]
+}

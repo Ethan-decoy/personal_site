@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="278" viewBox="0 0 480 278" role="img" aria-labelledby="title description">
+  <title id="title">语音与文本的示意对应</title>
+  <desc id="description">上排按时间排列十二个示意声学帧，下排按词表示Deep Learning。括线将第一至第五帧与Deep相连，第六至第十二帧与Learning相连，表示多个声学时间位置可以对应一个词。数量与边界均为示意，不是实测录音，也不表示逐字母对齐。</desc>
+  <style>
+    :root {
+      --ink: #172436;
+      --muted: #546577;
+      --cell: #e0e9f0;
+      --word: #d9e4ec;
+      --border: #8fa5b5;
+      --edge: #546577;
+      --accent: #2f5d7c;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #d8dee5;
+        --muted: #adb9c4;
+        --cell: #151e27;
+        --word: #1b2c39;
+        --border: #536879;
+        --edge: #adb9c4;
+        --accent: #8cbbd2;
+      }
+    }
+    text { font-family: "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: var(--ink); }
+    .heading { font-size: 19px; font-weight: 600; }
+    .detail { font-size: 17px; fill: var(--muted); }
+    .index { font-size: 16px; text-anchor: middle; }
+    .word-label { font-size: 21px; text-anchor: middle; }
+    .frame { fill: var(--cell); stroke: var(--border); stroke-width: 1.5; }
+    .word { fill: var(--word); stroke: var(--accent); stroke-width: 1.5; }
+    .correspondence { fill: none; stroke: var(--edge); stroke-width: 1.9; }
+  </style>
+
+  <text x="16" y="27" class="heading">语音与文本的示意对应</text>
+  <text x="16" y="66" class="detail">声学帧：按时间从左向右排列</text>
+
+  <g aria-label="十二个按时间排列的示意声学帧">
+    <rect x="16" y="84" width="30" height="40" rx="3" class="frame" />
+    <rect x="54" y="84" width="30" height="40" rx="3" class="frame" />
+    <rect x="92" y="84" width="30" height="40" rx="3" class="frame" />
+    <rect x="130" y="84" width="30" height="40" rx="3" class="frame" />
+    <rect x="168" y="84" width="30" height="40" rx="3" class="frame" />
+    <rect x="206" y="84" width="30" height="40" rx="3" class="frame" />
+    <rect x="244" y="84" width="30" height="40" rx="3" class="frame" />
+    <rect x="282" y="84" width="30" height="40" rx="3" class="frame" />
+    <rect x="320" y="84" width="30" height="40" rx="3" class="frame" />
+    <rect x="358" y="84" width="30" height="40" rx="3" class="frame" />
+    <rect x="396" y="84" width="30" height="40" rx="3" class="frame" />
+    <rect x="434" y="84" width="30" height="40" rx="3" class="frame" />
+    <g class="index">
+      <text x="31" y="110">1</text>
+      <text x="69" y="110">2</text>
+      <text x="107" y="110">3</text>
+      <text x="145" y="110">4</text>
+      <text x="183" y="110">5</text>
+      <text x="221" y="110">6</text>
+      <text x="259" y="110">7</text>
+      <text x="297" y="110">8</text>
+      <text x="335" y="110">9</text>
+      <text x="373" y="110">10</text>
+      <text x="411" y="110">11</text>
+      <text x="449" y="110">12</text>
+    </g>
+  </g>
+
+  <path d="M 16 138 V 150 H 198 V 138 M 107 150 V 184" class="correspondence" />
+  <path d="M 206 138 V 150 H 464 V 138 M 335 150 V 184" class="correspondence" />
+
+  <rect x="16" y="184" width="182" height="46" rx="4" class="word" />
+  <rect x="206" y="184" width="258" height="46" rx="4" class="word" />
+  <text x="107" y="213" class="word-label">Deep</text>
+  <text x="335" y="213" class="word-label">Learning</text>
+
+  <text x="16" y="264" class="detail">文本按词计数；括线仅表示示意对应</text>
+</svg>

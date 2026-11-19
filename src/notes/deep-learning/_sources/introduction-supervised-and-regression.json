@@ -1,0 +1,85 @@
+{
+  "title": "监督学习与回归的概念及图文修订",
+  "adaptedOn": "2026-11-14",
+  "checkedOn": "2026-11-14",
+  "sourceSnapshotRecord": "introduction.json",
+  "note": "01-introduction/04-supervised-learning-and-regression.md",
+  "scope": "保留监督训练与预测、房屋、电影评分、住院及排水管计费的例子，补足条件和计算关系；重绘原书监督学习图，未对其他小节作内容修订。",
+  "sources": [
+    {
+      "id": "d2l-english-introduction",
+      "title": "Introduction — Dive into Deep Learning",
+      "url": "https://d2l.ai/chapter_introduction/index.html",
+      "version": "核对时在线英文版1.0.3，Supervised Learning与Regression小节；旧版0.17.6包含相同房屋单位说明。",
+      "supports": "房屋输入的面积为平方英尺，到镇中心的步行量是分钟数；对应原例向量[600,1,1,60]与[3000,4,3,10]。监督学习图表示成对训练数据产生模型，再使用模型预测新输入。"
+    },
+    {
+      "id": "d2l-linear-regression",
+      "title": "线性回归 — 动手学深度学习",
+      "url": "https://zh.d2l.ai/chapter_linear-networks/linear-regression.html",
+      "version": "核对时在线中文版2.0.0，第3.1.1节",
+      "supports": "样本、输入特征、标签和线性模型参数的区分；数值预测与观测误差；由参数与模型形式形成预测。"
+    },
+    {
+      "id": "d2l-softmax",
+      "title": "softmax回归 — 动手学深度学习",
+      "url": "https://zh.d2l.ai/chapter_linear-networks/softmax-regression.html",
+      "version": "核对时在线中文版2.0.0，第3.4.1节与第3.4.4节",
+      "supports": "类别可用整数编码，编码为数值不自动使任务成为回归；分类判断与类别概率估计需要区分。"
+    },
+    {
+      "id": "netflix-prize-2009",
+      "title": "Netflix Turned to Computer Science Professor for Million Dollar Competition",
+      "url": "https://jacobsschool.ucsd.edu/news/release/888?id=888",
+      "firstPublishedOn": "2009-09-21",
+      "version": "UC San Diego Jacobs School of Engineering同期新闻稿，涉及该校参与设计与评审的竞赛。",
+      "supports": "Netflix在2009年向BellKor’s Pragmatic Chaos颁发100万美元大奖；正文保留年份和金额，作为电影评分预测的历史例子，不宣称当前仍在举行同一竞赛。"
+    }
+  ],
+  "changes": [
+    "合并开头的重复背景，按预测关系、输出形式、训练过程、回归目标、房屋表示与账单推演分段。",
+    "用输入与标签的配对关系说明监督训练，区分标签、预测与可能的错误；将心脏病例子明确为从检查时点起的一年内事件。",
+    "不再把所有监督学习输出称为条件概率；保留类别、翻译与价格预测的任务例子，补足预测时输入信息的可获得性。",
+    "移除缺少统计时间、口径与一手依据的工业应用占比判断；未据此推断当前监督学习在全行业的实际份额。",
+    "明确回归目标的数量意义，并以数字编码类别说明表示形式与任务含义的区别。",
+    "保留两组房屋示意向量，依据英文原书补回平方英尺与步行分钟单位，将成交价格另作为标签。",
+    "保留奈飞奖的历史例子，并改为竞赛参与机构同期资料作为核对入口。",
+    "把排水管例子中的两个特征校正为两个样本与一个输入特征，明确两个模型参数，并展开费率、固定费与重建账单的计算。",
+    "将平方误差的作用限定到当前回归例子，并回指前一节的损失解释与训练评估职责。"
+  ],
+  "figure": {
+    "number": "图1.3.1",
+    "anchor": "fig-supervised-learning",
+    "originalFile": "supervised-learning.svg",
+    "originalGitBlob": "65fc73aa7eb3d194318ef68f317aefdeaaecf160",
+    "originalArchive": "introduction-images/supervised-learning.svg",
+    "action": "redrawn",
+    "currentAsset": "/assets/notes/deep-learning/introduction/supervised-training-and-prediction.svg",
+    "purpose": "保留训练输入与标签共同进入学习算法、训练得到模型、新输入经过模型产生预测的关系。",
+    "semantics": "实线表示数据传递，蓝色虚线表示训练得到模型的关系；预测行中参数固定，不把标签画成新样本预测路径的输入。",
+    "appearance": "透明图面，使用Notes明暗配色及图组color-scheme传递；固有尺寸480×352，窄屏按比例缩小。",
+    "provenance": "根据原书图1.3.1重新组织并标注，原始SVG逐字节保存到私有来源归档；归属与许可仍在分类索引集中维护。"
+  },
+  "numericalExample": {
+    "kind": "两笔账单的示意手算，不是实际收费数据或模型训练实验",
+    "input": "工时，单位为小时",
+    "target": "费用，单位为美元",
+    "assumption": "两笔账单遵循同一固定费用加按小时收费的线性规则",
+    "model": "predictedCost(t) = fixedFee + hourlyRate * t",
+    "samples": [
+      { "hours": 2, "cost": 250 },
+      { "hours": 3, "cost": 350 }
+    ],
+    "sampleCount": 2,
+    "inputFeatureCount": 1,
+    "parameterCount": 2,
+    "hourlyRate": 100,
+    "fixedFee": 50,
+    "verification": "按(350-250)/(3-2)计算小时费率，再由250-100×2计算固定费；已用Node.js核对两参数及两笔重建费用。"
+  },
+  "limits": [
+    "房屋向量为教学示意，不是截至修订日的地区住房统计或市场价格结论。",
+    "医学、翻译与股票例子只定义输入和预测目标，没有训练模型或验证其实际预测性能。",
+    "两点恰好拟合只能在指定线性假设下确定参数，不能证明所有收费情况都遵循该规律。"
+  ]
+}

@@ -1,0 +1,172 @@
+{
+  "title": "环境交互与强化学习的概念及图文修订",
+  "adaptedOn": "2026-11-17",
+  "checkedOn": "2026-11-17",
+  "sourceSnapshotRecord": "introduction.json",
+  "note": "01-introduction/09-interaction-and-reinforcement-learning.md",
+  "scope": "保留环境交互、工具调用、分类构造、棋局与晋升、清洁机器人、探索与利用及历史案例的解释用途；补足奖励与回报、策略和状态的条件，校正问题类型并重绘两幅机制图。只涉及本节及相应资源和来源说明。",
+  "sources": [
+    {
+      "id": "spinning-up-rl-definitions",
+      "title": "Part 1: Key Concepts in RL — OpenAI Spinning Up",
+      "url": "https://spinningup.openai.com/en/latest/spinningup/rl_intro.html",
+      "version": "核对官方在线文档的States and Observations、Action Spaces、Policies、Reward and Return、The RL Problem与Markov Decision Processes；只使用概念定义，不引入软件安装、接口或性能结论。",
+      "supports": "区分环境状态与观测、确定与随机策略、逐步奖励与累计回报及期望目标。MDP的马尔可夫性质要求给定当前状态与动作后，后续转移和奖励不再依赖更早历史；可观测性与该条件分别解释。"
+    },
+    {
+      "id": "d2l-distribution-shift",
+      "title": "环境和分布偏移 — 动手学深度学习",
+      "url": "https://zh.d2l.ai/chapter_multilayer-perceptrons/environment.html",
+      "version": "核对中文版2.0.0的环境和分布偏移讨论，包括训练与测试分布的记号以及模型决策对后续数据的影响；不扩写具体医疗或金融案例。",
+      "supports": "不同样本可以来自相同分布；分布偏移指数据分布改变。系统决策可能改变后续接触到的数据，离线训练的预测模型也可以成为交互系统的一部分。"
+    },
+    {
+      "id": "react-2023",
+      "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+      "url": "https://arxiv.org/abs/2210.03629v3",
+      "firstPublishedOn": "2022-10-06",
+      "versionUpdatedOn": "2023-03-10",
+      "version": "沿用此前核对的v3 ICLR camera-ready摘要及少量提示例子驱动交互的设置；不把所有ReAct实现都概括为从不进行微调。",
+      "supports": "语言模型可以交替生成推理和行动，查询外部知识源并利用工具观察；上下文中的交互变化本身不等于执行模型参数优化。"
+    },
+    {
+      "id": "offline-rl-2020",
+      "title": "Offline Reinforcement Learning: Tutorial, Review, and Perspectives on Open Problems",
+      "url": "https://arxiv.org/abs/2005.01643v3",
+      "firstPublishedOn": "2020-05-04",
+      "versionUpdatedOn": "2020-11-01",
+      "version": "核对v3摘要关于从预先收集数据学习、训练时不再进行在线数据收集的定义；不引用某种离线算法的效果或泛化保证。",
+      "supports": "强化学习不一定边运行边采集新经验或更新参数；训练数据的收集方式与部署时是否固定参数需要分别判断。"
+    },
+    {
+      "id": "contextual-bandits-2010",
+      "title": "A Contextual-Bandit Approach to Personalized News Article Recommendation",
+      "url": "https://arxiv.org/abs/1003.0146v2",
+      "readUrl": "https://arxiv.org/html/1003.0146v2",
+      "firstPublishedOn": "2010-02-28",
+      "versionUpdatedOn": "2012-03-01",
+      "publishedIn": "WWW 2010",
+      "version": "核对v2第2.1节逐轮上下文、选择动作和仅观测所选奖励的形式，以及第2.2节的探索利用关系；不引用点击提升或LinUCB性能。",
+      "supports": "基本上下文赌博机每轮按上下文选动作并收到所选反馈，不对动作引起的后续状态变化建模；经典多臂赌博机去掉变化上下文，在固定动作中学习未知奖励分布。新闻推荐为简化建模例子，不声称用户长期兴趣不受推荐影响。"
+    },
+    {
+      "id": "dqn-2015",
+      "title": "Human-level control through deep reinforcement learning",
+      "url": "https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf",
+      "publishedOn": "2015-02-26",
+      "publishedIn": "Nature 518, 529–533; DOI 10.1038/nature14236",
+      "version": "DeepMind作者托管的原始Nature论文副本；核对摘要、第1页与49款Atari游戏的比较范围。",
+      "supports": "DQN使用像素观察和游戏得分反馈学习动作价值；49款游戏的总体比较不能概括成每款游戏均超过人类。正文不将论文中29款游戏超过75%人类得分误写为29款均超人类。"
+    },
+    {
+      "id": "alphago-2016",
+      "title": "AlphaGo — Google DeepMind",
+      "url": "https://deepmind.google/research/alphago/",
+      "eventDate": "2016-03",
+      "version": "核对官方研究介绍的神经网络与搜索、人类棋谱与自我对弈，以及2016年3月李世石比赛记录；不把2015年樊麾比赛与2016年李世石比赛混同。",
+      "supports": "AlphaGo结合策略和价值网络、搜索及强化学习；2016年3月以4比1战胜李世石。历史结果保留系统、对手与日期，不推定当前通用能力。"
+    }
+  ],
+  "changes": [
+    "按数据收集与使用、动作的后续影响、工具交互、奖励策略回报、学习困难、训练方式和问题形式、历史例子组织真实段落与标题，保留语言模型与工具调用的跨篇引用锚点。",
+    "将分布偏移从训练和测试数据不同校正为数据分布改变；说明预测模型也可参与会影响环境的决策，监督与无监督的学习信号不规定数据采集方式。",
+    "统一采用o_t、a_t、r_{t+1}和o_{t+1}的时间顺序，区分交互信息与参数更新；保留工具交互不自动意味着学习参数的重点关系。",
+    "定义策略可为确定或随机、可使用历史或内部状态；在奖励定义之后补足有限步无折扣回报和期望目标，并使用两步确定性任务显示即时奖励与累计回报的区别。",
+    "将监督学习的泛化构造具体限定为单步0–1分类损失及奖励r=-L，区分目标对应与反馈、算法和效率的对应，说明类别动作本身不能原样保留交叉熵。",
+    "保留国际象棋的延迟奖励和晋升类比，补上和棋及中间奖励，表明这是可选择的奖励设置；用信用分配描述较早动作与后续回报的归因问题。",
+    "区分环境状态和实际观测，保留相似走廊、壁橱和清洁机器人；历史可帮助位置估计但不保证消除歧义。",
+    "说明探索与利用的收益和代价，补足在线采集、离线强化学习和固定参数部署的区别，不将所有强化学习都写成使用时持续主动探索并更新。",
+    "为MDP补足马尔可夫性质，并将可观测性作为另一个条件；按逐轮上下文、动作和反馈说明上下文赌博机及多臂赌博机，限定不建模动作对未来情境长期影响的基本设置。",
+    "将DQN与AlphaGo作为有日期和条件的历史例子，修正仅视觉输入和泛化击败人类的描述，避免把价值网络等同于直接输出动作的策略。"
+  ],
+  "figures": [
+    {
+      "number": "图1.3.6",
+      "anchor": "fig-data-collection",
+      "originalFile": "data-collection.svg",
+      "originalGitBlob": "5a686523cc894d2f906c53ce0341ee0c521bb90a",
+      "originalArchive": "introduction-images/data-collection.svg",
+      "action": "replaced-with-schematic",
+      "currentAsset": "/assets/notes/deep-learning/introduction/offline-training-and-use.svg",
+      "purpose": "追踪环境中的记录如何通过采集标注进入一次离线监督训练，再由固定参数模型处理新的输入。",
+      "semantics": "上方实线为环境到成对训练数据再到训练的数据流；虚线为训练得到模型；下方实线为新输入经模型得到预测。不表示预测必定不影响环境，也不表示以后不能重新收集与训练。",
+      "appearance": "480×386透明可编辑SVG，借用现有Notes文字、节点和连线层级，沿用图组的color-scheme主题传递；实线与虚线兼有文字说明。",
+      "provenance": "在原书图1.3.6位置重新布局采集、训练和预测关系，沿用图号与锚点；原SVG逐字节移入私有来源归档。"
+    },
+    {
+      "number": "图1.3.7",
+      "anchor": "fig-rl-environment",
+      "originalFile": "rl-environment.svg",
+      "originalGitBlob": "1cd26f47152f4c6042a30dd13d7732b68c40355a",
+      "originalArchive": "introduction-images/rl-environment.svg",
+      "action": "replaced-with-schematic",
+      "currentAsset": "/assets/notes/deep-learning/introduction/agent-environment-loop.svg",
+      "purpose": "沿闭环追踪动作和后续奖励观测的方向、时间索引及接收方。",
+      "semantics": "智能体向环境发送a_t，环境向智能体返回r_{t+1}和o_{t+1}；这些是交互信息，不是梯度或参数更新。环境产生结果允许同时依赖先前情形、所选动作及随机性，不把奖励画成仅由观测决定。",
+      "appearance": "480×332透明可编辑SVG，与图1.3.6共用视觉层级和主题取色，图内直接标明方向、时间索引及参数更新的边界。",
+      "provenance": "根据原书图1.3.7的智能体环境关系重新设计，沿用图号与锚点；原SVG逐字节移入私有来源归档。"
+    }
+  ],
+  "examples": {
+    "twoStepReturn": {
+      "kind": "本站自编的确定性示意，不是强化学习实验",
+      "horizon": 2,
+      "discounted": false,
+      "condition": "第一次选择决定其后两步奖励，第二步结束；没有第二个待选择的分支。",
+      "choices": [
+        {
+          "action": "A",
+          "rewards": [
+            2,
+            0
+          ],
+          "return": 2
+        },
+        {
+          "action": "B",
+          "rewards": [
+            0,
+            5
+          ],
+          "return": 5
+        }
+      ],
+      "relation": "第一步奖励A较大，未折扣累计回报B较大；一般随机任务以期望回报比较策略。"
+    },
+    "singleStepClassification": {
+      "kind": "目标之间的数学构造，不是训练算法复现",
+      "horizon": 1,
+      "loss": "0–1分类损失",
+      "reward": "r = -L(a, y)",
+      "outcomes": [
+        {
+          "correct": true,
+          "loss": 0,
+          "reward": 0
+        },
+        {
+          "correct": false,
+          "loss": 1,
+          "reward": -1
+        }
+      ],
+      "condition": "动作是预测类别；交叉熵的概率依赖不被这个类别动作奖励原样保留。"
+    },
+    "chessReward": {
+      "kind": "沿用原书用途并补全条件的奖励示意",
+      "intermediateReward": 0,
+      "terminalRewards": {
+        "win": 1,
+        "loss": -1,
+        "draw": 0
+      },
+      "condition": "只是一种选定的奖励设置；不声称实际训练只能使用终局奖励。"
+    }
+  },
+  "limits": [
+    "没有训练或评估强化学习、语言模型或机器人，不把两步奖励、分类构造与棋局设置当成复现实验或策略性能证据。",
+    "只建立有限无折扣回报及折扣可选的概念，不展开价值函数推导、具体强化学习算法或POMDP求解。",
+    "历史案例依赖原论文与官方比赛记录，不比较截至修订日的产品、排行榜或通用智能能力。",
+    "固定迁移快照、原图字节数和哈希、原始计数及全部既有修订继续保留在introduction.json；本次为独立后续适配。"
+  ]
+}

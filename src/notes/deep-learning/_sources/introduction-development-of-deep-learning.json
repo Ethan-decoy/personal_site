@@ -1,0 +1,138 @@
+{
+  "title": "深度学习发展的历史规格、模型机制与训练阶段修订",
+  "adaptedOn": "2026-11-18",
+  "checkedOn": "2026-11-18",
+  "sourceSnapshotRecord": "introduction.json",
+  "previousUpdateRecord": "introduction-2026.json",
+  "note": "01-introduction/11-development-of-deep-learning.md",
+  "scope": "保留数据与算力、模型与训练方法、生成式模型和框架四条主线。核对本节涉及的历史规格、论文结果和在线文档，明确各数字和实验的适用范围。",
+  "sources": [
+    {
+      "id": "nvidia-c2050",
+      "url": "https://www.nvidia.com/docs/IO/43395/NV_DS_Tesla_C2050_C2070_jul10_lores.pdf",
+      "version": "NVIDIA Tesla C2050/C2070 数据表，2010 年 7 月，Technical Specifications。",
+      "supports": "C2050 单卡标称显存 3 GB，单精度峰值 1.03 TFLOPS。表中采用厂商标称显存，启用 ECC 后的可用容量另有说明。"
+    },
+    {
+      "id": "nvidia-dgx2",
+      "url": "https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/dgx-2/dgx-2-print-datasheet-738070-nvidia-a4-web-uk.pdf",
+      "readAlongside": "https://developer.nvidia.com/blog/hgx-2-fuses-ai-computing/",
+      "version": "NVIDIA DGX-2 数据表，2018 年 10 月，System Specifications。另核对 2018 年 5 月的 NVIDIA 技术文章表 1 对 16 卡张量峰值的说明。",
+      "supports": "DGX-2 整机配备 16 张 Tesla V100，GPU 总显存 512 GB，主机内存 1.5 TB，整机张量运算峰值 2 PFLOPS。"
+    },
+    {
+      "id": "alexnet",
+      "url": "https://papers.neurips.cc/paper_files/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html",
+      "version": "NeurIPS 2012 论文摘要中的 LSVRC-2010 实验。",
+      "supports": "训练集为百万量级的标注图像，任务有 1000 个类别。"
+    },
+    {
+      "id": "early-methods",
+      "references": [
+        { "year": 1943, "url": "https://doi.org/10.1007/BF02478259", "role": "McCulloch 与 Pitts 的阈值神经元与逻辑模型。" },
+        { "year": 1998, "url": "https://bottou.org/papers/lecun-98h", "role": "LeCun 等人的卷积网络与文档识别研究。" },
+        { "year": 2005, "url": "https://www.sciencedirect.com/science/article/pii/S0893608005001206", "role": "Graves 与 Schmidhuber 的双向 LSTM 音素分类研究，文中把 LSTM 架构追溯到 1997 年。" },
+        { "year": 1992, "url": "https://www.gatsby.ucl.ac.uk/~dayan/papers/wd92.html", "role": "Watkins 与 Dayan 的 Q 学习论文。" }
+      ]
+    },
+    {
+      "id": "dropout",
+      "url": "https://www.jmlr.org/papers/v15/srivastava14a.html",
+      "version": "Srivastava 等，JMLR 2014，摘要与方法说明。",
+      "supports": "训练时随机屏蔽单元，以减轻共同适应和过拟合。论文中的推理缩放与训练期缩放的实现约定可以分别表达。"
+    },
+    {
+      "id": "bahdanau-attention",
+      "url": "https://arxiv.org/html/1409.0473v7#S3.SS1",
+      "version": "2014 年预印本，2015 年 ICLR 论文，核对 arXiv v7 的 §3.1 和英译法句长分析。",
+      "supports": "打分网络可训练，上下文由编码表示加权求和得到。长句表现来自论文指定的英译法任务及对照。"
+    },
+    {
+      "id": "multi-step-models",
+      "references": [
+        { "year": 2015, "url": "https://arxiv.org/abs/1503.08895", "role": "端到端记忆网络，用上一次读出的内容更新查询并继续读取。" },
+        { "year": 2016, "url": "https://arxiv.org/html/1511.06279v4", "role": "神经程序解释器，核对模型及附录的冒泡排序调用轨迹，初稿发表于 2015 年。" }
+      ]
+    },
+    {
+      "id": "gan",
+      "url": "https://arxiv.org/abs/1406.2661",
+      "version": "Goodfellow 等，2014，模型和训练目标。",
+      "supports": "生成器将随机输入变为样本，判别器区分样本来源，判别反馈为生成器提供训练信号。"
+    },
+    {
+      "id": "gan-applications",
+      "references": [
+        { "year": 2017, "url": "https://junyanz.github.io/CycleGAN/", "role": "原作者项目页中的马与斑马未配对域转换。" },
+        { "year": 2017, "url": "https://arxiv.org/abs/1710.10196", "role": "Progressive GAN 预印本中的合成人脸示例，会议发表在 2018 年。" },
+        { "year": 2019, "url": "https://nvlabs.github.io/SPADE/", "role": "SPADE 原作者项目页的语义布局到图像合成。" }
+      ]
+    },
+    {
+      "id": "synchronous-data-parallel",
+      "url": "https://docs.pytorch.org/tutorials/beginner/ddp_series_theory.html",
+      "version": "2026-11-18 核对的 PyTorch 官方教程。",
+      "supports": "同步数据并行以模型副本处理各自数据，汇总梯度后执行本地参数更新。"
+    },
+    {
+      "id": "jia-imagenet-2018",
+      "url": "https://arxiv.org/html/1807.11205v1#S5.SS2",
+      "version": "2018 年 arXiv v1，§5.2 表 5、§5.4 和结论。",
+      "supports": "ResNet-50、ImageNet、2048 张 Tesla P40、64K 全局批量、混合精度和 90 轮，对应论文报告的 6.6 分钟与 75.8% Top-1 准确率。表 5 另列出 1024 卡实验的 8.7 分钟和 76.2%。"
+    },
+    {
+      "id": "reinforcement-learning-examples",
+      "relatedNoteRecord": "introduction-interaction-and-reinforcement-learning.json",
+      "references": [
+        { "year": 2019, "url": "https://deepmind.google/blog/alphastar-grandmaster-level-in-starcraft-ii-using-multi-agent-reinforcement-learning/", "role": "AlphaStar 作者对 Battle.net 评测和宗师级成绩的说明。" },
+        { "url": "https://mujoco.readthedocs.io/en/stable/overview.html#introduction", "role": "MuJoCo 官方文档将其定义为物理引擎。" }
+      ]
+    },
+    {
+      "id": "language-models",
+      "references": [
+        { "year": 2017, "url": "https://arxiv.org/abs/1706.03762", "role": "Transformer 架构与注意力。" },
+        { "year": 2020, "url": "https://arxiv.org/abs/2005.14165v4", "role": "GPT-3 实验用文本说明或示例构造上下文，评估时保持参数固定。" },
+        { "year": 2022, "url": "https://arxiv.org/abs/2203.02155", "role": "InstructGPT 的示范、人工排序、奖励模型与强化学习流程。" },
+        { "year": 2025, "versionUpdatedOn": "2026-01-04", "url": "https://arxiv.org/html/2501.12948v2#S2.SS2", "role": "DeepSeek-R1 报告 v2，§2.2 的可验证正确性奖励属于 R1-Zero 实验。" }
+      ]
+    },
+    {
+      "id": "image-and-speech",
+      "references": [
+        { "year": 2022, "url": "https://arxiv.org/abs/2112.10752v2", "role": "潜在扩散论文，图像编码、潜空间去噪、解码与条件生成。" },
+        { "year": 2024, "url": "https://arxiv.org/html/2407.21783v3#S7", "role": "Llama 3 报告 v3 的视觉实验。" },
+        { "year": 2024, "url": "https://arxiv.org/html/2407.21783v3#S8", "role": "同一报告版本的语音实验。" }
+      ]
+    },
+    {
+      "id": "framework-docs",
+      "version": "2026-11-18 核对的官网文档。PyTorch stable 入口当时跳转到 2.15 文档。",
+      "references": [
+        { "url": "https://attic.apache.org/projects/mxnet.html", "role": "Apache Attic 记录 MXNet 已退休。" },
+        { "url": "https://docs.pytorch.org/docs/stable/index.html", "role": "PyTorch 官方文档入口。" },
+        { "url": "https://docs.jax.dev/en/latest/notebooks/thinking_in_jax.html", "role": "JAX 的自动微分、编译与向量化变换。" },
+        { "url": "https://keras.io/keras_3/", "role": "Keras 3 的 JAX、TensorFlow 与 PyTorch 后端。" }
+      ]
+    }
+  ],
+  "changes": [
+    "把数据容量、显存约束和计算吞吐量的作用分段。用已有方法及早期应用说明算力扩展的历史意义。",
+    "沿用表 1.5.1 和 tab-intro-decade，采用厂商规格说明单卡、整机、运算类型、主机内存和显存的口径，表题补顶部滚动留白。",
+    "按正则化、注意力与多步读取、GAN、数据并行、强化学习经验采集组织历史方法，改用各论文能支持的机制和案例。",
+    "区分每卡批量、全局批量手算与历史实验配置，去除来源不能支持的训练优先权和笼统耗时对照。",
+    "用同一提示块突出训练参数与推理上下文的区别，补全监督微调、偏好与可验证反馈的关系，以及潜在扩散和 Llama 3 两类实验的引用。"
+  ],
+  "batchExample": {
+    "kind": "同步数据并行示例",
+    "condition": "每卡处理不同图像，各卡计算一个小批量后同步更新一次。",
+    "gpuCount": 1024,
+    "imagesPerGPU": 32,
+    "globalBatchSize": 32768
+  },
+  "limits": [
+    "固定快照保留原书六行历史概览和原始计数。早期 CPU 数值的测试口径，以及原表部分数据量的计量对象，缺少可追溯依据。",
+    "设备数字属于指定配置的厂商峰值或容量。本站按论文转述历史训练结果，验证范围为来源、口径和手算。",
+    "框架资料的核对范围为本节列出的文档与项目状态。模型能力叙述限于引用的实验。"
+  ]
+}

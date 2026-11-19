@@ -1,0 +1,73 @@
+{
+  "title": "深度学习特点的概念与阅读层次修订",
+  "adaptedOn": "2026-11-19",
+  "checkedOn": "2026-11-19",
+  "sourceSnapshotRecord": "introduction.json",
+  "previousUpdateRecord": "introduction-2026.json",
+  "note": "01-introduction/13-characteristics-of-deep-learning.md",
+  "scope": "用图像分类贯穿多层表示和端到端训练，补足 RAG 微调范围、固定结构与统计估计方法的关系，厘清优化进展和泛化结果。",
+  "sources": [
+    {
+      "id": "convnet-representations",
+      "url": "https://arxiv.org/html/1311.2901",
+      "version": "Zeiler 与 Fergus，ECCV 2014，卷积网络特征可视化部分及图 2。",
+      "supports": "在论文所分析的图像分类网络中，不同层可呈现边缘与颜色组合、纹理或狗脸等结构的响应。逐层解释限定为该网络的观察。"
+    },
+    {
+      "id": "canny",
+      "url": "https://doi.org/10.1109/TPAMI.1986.4767851",
+      "readUrl": "https://www.cs.princeton.edu/courses/archive/fall13/cos429/papers/Canny86.pdf",
+      "version": "John Canny，IEEE Transactions on Pattern Analysis and Machine Intelligence，1986 年 11 月，卷 8 期 6，679–698 页。原书引用对应 1987 年选集版。",
+      "originalReference": "https://zh.d2l.ai/chapter_references/zreferences.html#id20",
+      "supports": "边缘检测是可查证的历史例子。正文的年份与引用的期刊版本对应。"
+    },
+    {
+      "id": "sift",
+      "url": "https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf",
+      "version": "David Lowe，Distinctive Image Features from Scale-Invariant Keypoints，IJCV 2004。",
+      "supports": "从图像提取关键点及局部描述子，支持匹配和识别等后续任务。"
+    },
+    {
+      "id": "rag-training",
+      "url": "https://arxiv.org/html/2005.11401v4#S2.SS4",
+      "version": "Lewis 等，NeurIPS 2020，arXiv v4 于 2021-04-12 修订，核对 §2.2–§2.4。",
+      "supports": "原论文方案使用文档编码器和查询编码器组织检索，生成器根据问题和检索内容生成输出。微调时只更新查询编码器和生成器，文档编码器及索引固定。"
+    },
+    {
+      "id": "llama3-model-architecture",
+      "url": "https://arxiv.org/html/2407.21783v3#S3.SS2",
+      "version": "The Llama 3 Herd of Models，2024 年，arXiv v3 §3.2 与表 3。",
+      "supports": "报告列出分别选定的 8B、70B 和 405B 结构配置。正文用固定结构的参数数量和形状说明参数模型。"
+    },
+    {
+      "id": "nonparametric-regression",
+      "url": "https://arxiv.org/abs/1708.06633",
+      "version": "Schmidt-Hieber，2017 年预印本，Annals of Statistics 2020，摘要。",
+      "supports": "在特定的非参数回归方案中，网络深度可随样本规模变化。各次选定的有限网络用于估计相应的目标函数。"
+    },
+    {
+      "id": "optimization-and-evaluation",
+      "references": [
+        { "url": "https://zh.d2l.ai/chapter_optimization/optimization-intro.html", "version": "《动手学深度学习》中文版第二版 §11.1.1–§11.1.2。", "supports": "训练目标与泛化误差的区别、局部和全局最优的定义。" },
+        { "url": "https://arxiv.org/abs/1605.07110", "version": "Kawaguchi，NeurIPS 2016，摘要。", "supports": "深层网络中可出现非凸训练目标。论文结论依赖网络、损失与所述假设，用于校准正文对全局最优的表述。" }
+      ]
+    }
+  ],
+  "trainingComparison": {
+    "kind": "同一个有监督图像分类任务中的训练范围示意",
+    "condition": "输入图像、类别标签和分类损失类型对应，表中说明哪部分参数可由该分类损失驱动更新。",
+    "fixedFeatures": "按固定规则计算特征，只更新分类器。",
+    "jointTraining": "通过参与训练的网络计算特征，更新特征提取器与分类器。"
+  },
+  "changes": [
+    "按多层表示、端到端训练范围、模型容量与建模假设、优化结果与泛化表现分节。",
+    "用同一图像分类任务串起输入、中间表示和类别分数，增加固定特征与联合训练的参数更新对照，把 IMPORTANT 放在端到端训练的定义处。",
+    "按一手来源保留 Canny 和 SIFT 的用途，使用 Canny 的 1986 年期刊版，收束手工特征被普遍取代及精确度统一提高的表述。",
+    "交代 RAG 两个编码器及生成器的职责，把文档编码器和索引的固定状态落到原论文的微调方案。",
+    "用固定结构和随样本量变化的估计方案解释参数模型与非参数回归。以训练目标和独立评价说明候选参数的用途，结尾交代实现、权重与复现实验条件。"
+  ],
+  "limits": [
+    "固定迁移快照、原始计数和既有修订由 introduction.json 保存。",
+    "图像分类对照是参数更新范围示意。卷积表示和 RAG 微调依据论文的具体方案。"
+  ]
+}

@@ -1,0 +1,215 @@
+{
+  "title": "机器学习起源的史实、概念与表达修订",
+  "adaptedOn": "2026-11-17",
+  "checkedOn": "2026-11-17",
+  "sourceSnapshotRecord": "introduction.json",
+  "note": "01-introduction/10-origins-of-machine-learning.md",
+  "scope": "保留概率统计、量尺、费舍尔与鸢尾花、信息与计算、生物联想、赫布和感知器、多层网络及资源条件的主线；校正学习机制和历史归属，按四条关系组织正文，并修复图号跳转。没有扩写其他引言正文或改变共享渲染、主题与代码。",
+  "sources": [
+    {
+      "id": "legendre-least-squares-1805",
+      "title": "On the Method of Least Squares — Legendre",
+      "url": "https://en.wikisource.org/wiki/A_Source_Book_in_Mathematics/Legendre_on_Least_Squares",
+      "publishedYear": 1805,
+      "version": "A Source Book in Mathematics所收原文英文译本及编者说明，译自原书第72–75页；核对误差平方和最小化与1805年勒让德、1809年高斯的出版顺序。",
+      "supports": "最小二乘准则是平方误差拟合的依据，不能归作高斯发明的Widrow–Hoff LMS算法；只说明发表顺序与相关贡献，不裁定未发表工作的优先权。"
+    },
+    {
+      "id": "gauss-estimation-history-2022",
+      "title": "Gauss on least-squares and maximum-likelihood estimation",
+      "url": "https://link.springer.com/article/10.1007/s00407-022-00291-w",
+      "publishedYear": 2022,
+      "version": "Jan R. Magnus的研究论文，核对开头对勒让德1805、高斯1809以及概率和观测误差的说明；不扩写论文对高斯推导的全部论证。",
+      "supports": "高斯将最小二乘与概率误差模型联系；历史工作与现代算法名称分别表述。"
+    },
+    {
+      "id": "normal-curve-history-1933",
+      "title": "De Moivre's Miscellanea Analytica, and the Origin of the Normal Curve",
+      "url": "https://www.nature.com/articles/132713a0",
+      "publishedOn": "1933-11-04",
+      "version": "W. Edwards Deming在Nature 132, 713发表的历史研究通信，核对可读摘要对德莫弗早期正态曲线工作的归属；不复述其对其他定理或数值近似的全部历史判断。",
+      "supports": "正态分布早期发展早于高斯的误差模型，不能根据高斯分布这一名称推定其由高斯一人发现。"
+    },
+    {
+      "id": "widrow-lms-1975",
+      "title": "The Complex LMS Algorithm",
+      "url": "https://isl.stanford.edu/people/widrow/papers/j1975thecomplex.pdf",
+      "publishedYear": 1975,
+      "version": "Bernard Widrow、John McCool与Michael Ball的原论文，核对原始Widrow–Hoff LMS更新、瞬时梯度估计及对1960年Adaptive Switching Circuits的引用；正文不讲复数算法。",
+      "supports": "LMS是递归调整权重的具体自适应算法，与最小二乘拟合问题处在不同层面。"
+    },
+    {
+      "id": "ohm-law-conditions",
+      "title": "Ohm's Law — OpenStax University Physics Volume 2",
+      "url": "https://openstax.org/books/university-physics-volume-2/pages/9-4-ohms-law",
+      "version": "官方教材第9.4节的Description of Ohm's Law与欧姆、非欧姆元件说明；仅用于模型适用条件，不引入测量实验。",
+      "supports": "电流电压线性关系依赖欧姆元件及近似不变的电阻条件，不能称为对所有器件完美成立的模型。"
+    },
+    {
+      "id": "kobel-measuring-rod-quotation",
+      "title": "Ueber die Einführung allgemeiner Masse, Gewichte und Münzen",
+      "author": "Karl Joseph Kreutzer",
+      "publishedYear": 1863,
+      "url": "https://doi.org/10.3931/e-rara-111631",
+      "readUrl": "https://www.e-rara.ch/download/pdf/29684116.pdf",
+      "version": "Wien: Carl Helf, 1863；ETH-Bibliothek馆藏Rar 15116的e-rara影印。在线检索可见第19页引述克贝尔1556年版Blatt 4，包含十六人合计脚长、测量杆及等分十六份的说明；相关影印下载约19 MB，工具全文提取超限，未通读全书。持久标识来自馆藏自身元信息，工具不能直接读取DOI跳转页。",
+      "supports": "将量尺方法置于16世纪具体做法，区分地方单位的约定和现代英尺换算；原木刻未重新鉴定具体印本，不宣称来自这份1863年引文或1535年版。"
+    },
+    {
+      "id": "maa-kobel-catalogue",
+      "title": "Mathematical Treasure: Jacob Kobel's Geometrei",
+      "url": "https://old.maa.org/node/1914462",
+      "publishedIn": "Convergence, September 2019",
+      "version": "Cynthia J. Huffman的MAA馆藏说明；只能读取检索缓存，旧站直读返回521。缓存说明1535版题页、16人确定rood与Linda Hall Library藏本；仅作关联背景，不替代克贝尔原图的既有来源，也不作为已通读原书的证明。",
+      "supports": "量尺场景具有历史材料的解释作用，可保留木刻原貌；没有支持后来删去最高最低脚长、或最早修剪均值的首创归属。"
+    },
+    {
+      "id": "fisher-iris-1936",
+      "title": "The Use of Multiple Measurements in Taxonomic Problems",
+      "url": "https://digital.library.adelaide.edu.au/server/api/core/bitstreams/1801cd68-028a-4380-a9c6-30ca9b0aa0d3/content",
+      "publishedYear": 1936,
+      "version": "Adelaide大学所藏原论文，核对可检索首段对Dr E. Anderson测量数据与费舍尔分析的说明；没有复现线性判别分析。",
+      "supports": "区分鸢尾花数据的采集贡献与1936年的方法分析；保留经典数据对后续教学的联系。"
+    },
+    {
+      "id": "uci-iris",
+      "title": "Iris — UCI Machine Learning Repository",
+      "url": "https://archive.ics.uci.edu/dataset/53/iris",
+      "version": "核对官方数据页的经典分类数据、Fisher 1936与实例信息；1988年的UCI捐入日期不写成原始研究年份。",
+      "supports": "鸢尾花数据作为经典分类材料的用途；不声称本站训练或评估了该数据上的模型。"
+    },
+    {
+      "id": "fisher-eugenics-archive",
+      "title": "Series 12.2: Paper Nationalism and eugenics read to Science and Arts Society",
+      "url": "https://digital.library.adelaide.edu.au/items/e6863dd4-e026-45dd-b2a9-960d7e1505fa",
+      "version": "核对Adelaide大学Fisher个人档案的文稿馆藏条目；沿用原文的优生学背景，不增加未读书信或文稿的引文。",
+      "supports": "保留统计贡献与用途伦理需要分别判断的历史背景，不把技术有效性当作应用目的合理性的证明。"
+    },
+    {
+      "id": "shannon-information-1948",
+      "title": "A Mathematical Theory of Communication",
+      "url": "https://doi.org/10.1002/j.1538-7305.1948.tb01338.x",
+      "publishedIn": "The Bell System Technical Journal 27, 379–423, 623–656, July and October 1948",
+      "readUrl": "https://cs-www.cs.yale.edu/homes/yry/readings/general/shannon1948.pdf",
+      "version": "核对出版社出版元信息、MPI书目及可检索原论文导言，限于消息、统计结构、信息度量、编码与通信的研究对象。Yale副本直接读取返回502，IEEE转引的Bell Labs旧副本返回410，正文使用出版DOI，不声称本次通读原论文。",
+      "supports": "信息与通信可以作为定量研究对象，为数据表示与规律研究提供工具；不把信息量直接等同于语义理解。"
+    },
+    {
+      "id": "turing-imitation-game-1950",
+      "title": "Computing Machinery and Intelligence",
+      "url": "https://www.cs.mcgill.ca/~dprecup/courses/AI/Materials/turing1950.pdf",
+      "publishedIn": "Mind 59(236), 433–460, October 1950",
+      "version": "沿用本轮审阅对1950年原论文开头模仿游戏及机器思考表述的核对；计算理论背景来自原书保留内容，不新增计算复杂性结论。",
+      "supports": "图灵用模仿游戏替代对抽象机器思考问题的直接讨论；这是一种设置相关的行为判据，不是智能全部含义的完整定义。"
+    },
+    {
+      "id": "william-james-1890",
+      "title": "The Principles of Psychology, Chapter XIV: Association",
+      "url": "https://psychclassics.yorku.ca/James/Principles/prin14.htm",
+      "publishedYear": 1890,
+      "version": "York University的原著转录，核对作者William James及共同、相继脑活动影响联想的段落；原书贝恩背景仅保留为19世纪的一般联系，不声称本次通读贝恩著作。",
+      "supports": "校正詹姆斯·谢林顿这一人名，区分19世纪联想思想与后来的具体计算模型。"
+    },
+    {
+      "id": "hebb-1949",
+      "title": "The Organization of Behavior",
+      "url": "https://www.cs.cmu.edu/~bhiksha/courses/deeplearning/Fall.2016/pdfs/Hebb.1949.pdf",
+      "publishedYear": 1949,
+      "version": "Neurocomputing所收原著导言与第4章节选，核对细胞A反复参与激发B时连接效率增强的假说；原著作者为Donald O. Hebb，修正重复作者显示。",
+      "supports": "赫布学习源于连接可塑性的生物学假说，与现代奖励策略学习或损失梯度优化分别解释，不据名称或参数调整相似性直接建立算法等同关系。"
+    },
+    {
+      "id": "rosenblatt-1958",
+      "title": "The Perceptron: A Probabilistic Model for Information Storage and Organization in the Brain",
+      "url": "https://www.cs.cmu.edu/~epxing/Class/10715/reading/Rosenblatt.perceptron.pdf",
+      "publishedIn": "Psychological Review 65(6), 386–408, November 1958",
+      "version": "核对原论文开头、连接主义背景及感知器组织和可改变连接的讨论；不把原文所有模型都压成一个现代单层感知器实现。",
+      "supports": "感知器是将输入模式与响应通过可学习连接联系起来的早期计算模型；这里只给历史例子，不展开收敛证明或实现。"
+    },
+    {
+      "id": "pytorch-autograd-and-optimizer",
+      "title": "Automatic Differentiation and Optimizing Model Parameters — PyTorch Tutorials",
+      "url": "https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html",
+      "relatedUrl": "https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html",
+      "version": "核对官方教程的链式求导、loss.backward计算梯度与optimizer.step更新参数的职责；只用于概念说明，不新增代码、框架版本或运行环境要求。",
+      "supports": "反向传播组织链式求导，优化器按梯度更新待训练参数；二者在通常反复迭代的训练中各有职责。"
+    },
+    {
+      "id": "lstm-1997",
+      "title": "Long Short-Term Memory",
+      "url": "https://www.bioinf.jku.at/publications/older/2604.pdf",
+      "publishedIn": "Neural Computation 9(8), 1735–1780, 1997",
+      "version": "核对作者机构原论文的可检索摘要及出版目录；不复现长时间依赖实验，不引用性能数字。",
+      "supports": "1995至2005年间仍有循环神经网络的明确研究进展，历史不能概括为这段时间完全停滞。"
+    },
+    {
+      "id": "lecun-document-recognition-1998",
+      "title": "Gradient Based Learning Applied to Document Recognition",
+      "url": "https://bottou.org/papers/lecun-98h",
+      "readUrl": "https://leon.bottou.org/publications/pdf/ieee-1998.pdf",
+      "publishedIn": "Proceedings of the IEEE 86(11), 2278–2324, 1998",
+      "version": "核对作者Bottou的出版页和原论文，限于卷积网络、梯度学习和文档识别的历史联系；PDF文本抽取不适合按数字检索，不据其乱码核定样本计数。",
+      "supports": "1998年的卷积网络文档识别工作是期内进展；不据此声称所有神经网络在所有任务上更优。"
+    },
+    {
+      "id": "mnist-splits",
+      "title": "tf.keras.datasets.mnist.load_data — TensorFlow",
+      "url": "https://www.tensorflow.org/api_docs/python/tf/keras/datasets/mnist/load_data",
+      "version": "核对官方数据说明中的60000张训练图和10000张测试图；只使用数据划分事实，不引入TensorFlow代码或接口版本要求。",
+      "supports": "MNIST的60000应注明训练集，训练与测试计数分别表达；不外推当时所有任务的数据规模。"
+    }
+  ],
+  "changes": [
+    "按统计与估计、信息与计算、生物启发与神经网络、数据与计算条件组织四个二级主题及相应小标题，按完整关系分段；日期、标题和order保持不变。",
+    "保留伯努利、正态分布、最小二乘和欧姆定律的解释用途，校正高斯单一发现归属与LMS名称，补足欧姆元件及工作条件。",
+    "保留16人量尺木刻与平均脚长，补明地方长度约定、样本平均与现代单位换算的区别；修剪均值改作现代演示，明确各删一个后剩14个观测。",
+    "移除后来改进与最早修剪均值之一的未核实历史断言；研究限制保存在本记录，正文直接解释历史方法与统计规则。",
+    "保留费舍尔、鸢尾花数据和伦理背景，区分安德森的采集与费舍尔的分析，替换异常人物链接为与知识判断相关的原文和馆藏入口。",
+    "补足信息论与计算背景的作用，保留图灵模仿游戏，限定行为判据的交互设置及解释范围。",
+    "校正威廉·詹姆斯人名、赫布著作作者显示与生物解释不再肤浅的译意，区分联想可塑性、奖励学习和损失梯度优化；保留感知器为早期计算模型例子。",
+    "在多层模型建立处突出反向传播求梯度、优化器更新及反复训练的关系，回指目标函数与优化算法，不增加实现代码。",
+    "以1997LSTM与1998文档识别说明期内研究进展，删除1995至2005年完全停滞、其他方法统一更优或必定短时训练的概括；注明MNIST训练与测试划分。",
+    "为fig-koebel增加顶部滚动留白，完善替代说明与图注；原JPG的字节、外观、固有尺寸和图号保持不变。"
+  ],
+  "figure": {
+    "number": "图1.4.1",
+    "anchor": "fig-koebel",
+    "action": "retained-historical-image",
+    "asset": "/assets/notes/deep-learning/introduction/koebel.jpg",
+    "originalGitBlob": "c9c52ce7eab0df339471e3b9d268753889c5edcb",
+    "purpose": "保留历史木刻中人们用合计脚长构造丈量尺度的场景；它不负责显示数值数据、模型计算或参数更新。",
+    "semantics": "正文将十六个同单位脚长的合计与十六等分联系，统计平均及修剪规则另由文字和公式表达；不从图上推导现代英尺的固定长度。",
+    "presentation": "保留原始黑白木刻外观和500×397嵌入尺寸，窄屏等比缩小；scroll-margin-top为6rem，使图号跳转后图顶避开固定导航。",
+    "provenance": "沿用D2L固定源码快照中的原图与来源记录；没有替换为MAA 2019馆藏题页或1863年引文图片，未重新鉴定原木刻的具体印本。"
+  },
+  "examples": {
+    "meanFootLength": {
+      "kind": "将既有历史做法写为数学关系，不是新测量实验",
+      "count": 16,
+      "unit": "所有脚长使用同一长度单位",
+      "formula": "mean = (l1 + ... + l16) / 16",
+      "interpretation": "首先是所选十六人的平均脚长；地方单位约定、总体均值推断与现代英尺换算的前提分别说明。"
+    },
+    "trimmedMean": {
+      "kind": "本站的现代统计演示，不是已核实的算法发明史",
+      "inputCount": 16,
+      "removeSmallest": 1,
+      "removeLargest": 1,
+      "remainingCount": 14,
+      "operation": "排序，去掉两端各一个值，再对剩余十四个值取平均。",
+      "condition": "极端值不自动等于错误；采用规则依赖数据分布、测量误差与估计对象，不保证更接近任意真值。"
+    },
+    "mnistCounts": {
+      "training": 60000,
+      "test": 10000,
+      "kind": "来源中的基准数据划分，不是本站取得数据或运行训练的记录"
+    }
+  },
+  "limits": [
+    "本次未通读克贝尔原书、贝恩著作、Kreutzer整本影印或全部费舍尔档案；量尺依据为可见原文引述和书目，不能宣称已确认修剪均值的最早历史归属。",
+    "部分旧馆藏和论文副本入口受工具读取、站点或体积限制；版本和实际核对范围逐项记录，不把链接存在等同于全文阅读。",
+    "没有测量脚长、运行统计拟合、训练感知器或复现LSTM与卷积网络实验；公式与计数只支持正文明确声明的关系。",
+    "不比较2026年的产品能力、排行榜或训练效率，不将历史材料自动改写成当前统一结论。",
+    "固定源码快照、原图哈希与字节、原始计数和此前十条修订保留在introduction.json，本次仅追加独立适配。"
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "title": "分类与多标签学习的概念及图文修订",
+  "adaptedOn": "2026-11-16",
+  "checkedOn": "2026-11-16",
+  "sourceSnapshotRecord": "introduction.json",
+  "note": "01-introduction/05-classification-and-multiple-labels.md",
+  "scope": "保留字符、猫狗、蘑菇决策、犬种层次、动物合照及文章主题标注的解释主线，补足概念和计算条件；更新MEDLINE索引流程，不对其他引言小节作内容修订。",
+  "sources": [
+    {
+      "id": "d2l-softmax",
+      "title": "softmax回归 — 动手学深度学习",
+      "url": "https://zh.d2l.ai/chapter_linear-networks/softmax-regression.html#sec-softmax",
+      "version": "核对时在线中文版2.0.0，第3.4节。",
+      "supports": "类别可用数字编码；概率输出、按最大概率选类和交叉熵的作用需要分别解释，不把所有分类器都视为直接输出概率。"
+    },
+    {
+      "id": "classification-calibration",
+      "title": "On Calibration of Modern Neural Networks",
+      "url": "https://arxiv.org/abs/1706.04599v2",
+      "firstPublishedOn": "2017-06-14",
+      "versionUpdatedOn": "2017-08-03",
+      "version": "ICML 2017论文，arXiv v2；正文只借此说明概率估计与实际正确比例的对应需要检验。",
+      "supports": "不把模型输出0.9直接写成实际判断有90%正确率的保证；校准属于另外需要评估的问题。"
+    },
+    {
+      "id": "multilabel-definition",
+      "title": "Multiclass and multioutput algorithms — scikit-learn",
+      "url": "https://scikit-learn.org/stable/modules/multiclass.html#multilabel-classification",
+      "version": "核对时文档标识1.9.1，1.12.1与1.12.2节；仅采用任务与目标表示的定义，不引用实现性能或API行为。",
+      "supports": "单标签多分类与多标签的区别；多标签允许多个类别同时成立，可按任务允许空标签集；标签非互斥不等于标签统计独立。"
+    },
+    {
+      "id": "hierarchical-classification",
+      "title": "A Survey of Hierarchical Classification Across Different Application Domains",
+      "url": "https://www.cs.kent.ac.uk/people/staff/aaf/pub_papers.dir/DMKD-J-2010-Silla.pdf",
+      "publishedIn": "Data Mining and Knowledge Discovery 22, 31–72 (2011), DOI 10.1007/s10618-010-0175-9",
+      "version": "作者所在University of Kent保存的论文稿；核对引言和类别层次定义。",
+      "supports": "类别可组织为树或有向无环图；先定义类别结构，再讨论层次中的错误，不能把不等错误代价本身当作层次分类的定义。"
+    },
+    {
+      "id": "mushroom-example-boundary",
+      "title": "Amanita Species Mushroom Poisonings — Northern California, November 2025–March 2026",
+      "url": "https://www.cdc.gov/mmwr/volumes/75/wr/mm7520a2.htm",
+      "firstPublishedOn": "2026-05-28",
+      "version": "CDC MMWR 75(20), 258–263，调查覆盖2025年11月至2026年3月。",
+      "supports": "报告涉及不同有毒鹅膏物种与不同临床后果；不是死帽蕈不能推出可食用，类别预测概率也不是实际死亡概率。正文不引用病例比例作为一般风险。"
+    },
+    {
+      "id": "nlm-automated-indexing",
+      "title": "Automated Indexing FAQs — NLM Customer Support Center",
+      "url": "https://support.nlm.nih.gov/knowledgebase/article/KA-05326/en-us",
+      "version": "2026-11-16读取的在线FAQ；页面未提供可辨认的发布日期。事件日期分别为2022年4月全面自动索引和2024年4月引入MTIX。",
+      "supports": "MEDLINE期刊索引已采用自动处理，人工按需检查与修订部分结果；MTIX基于神经网络。替换逐篇人工标注、统一滞后一年、临时机器标签等待全部人工重审的旧描述。"
+    },
+    {
+      "id": "nlm-pubmed-coverage",
+      "title": "How Do I Search the Non-MEDLINE Set In PubMed? — NLM",
+      "url": "https://www.nlm.nih.gov/oet/ed/pubmed/mesh/mod02/04-000.html",
+      "version": "2026-11-16读取的NLM PubMed与MeSH培训页面；不采用页面中随时间变化的记录数量。",
+      "supports": "PubMed包含MEDLINE与非MEDLINE记录，并非所有PubMed记录都有MeSH索引。"
+    },
+    {
+      "id": "bioasq",
+      "title": "The Challenge — BioASQ",
+      "url": "https://bioasq.org/",
+      "version": "2026-11-16读取的官方首页，介绍生物医学语义索引与问答评测；正文只保留曾组织语义索引评测的背景，不把历年任务写成当前任务。",
+      "supports": "生物医学语义索引是BioASQ研究和评测过的任务，不保留缺少时间范围的近几年表述。"
+    }
+  ],
+  "changes": [
+    "以二分类与多分类、概率与类别、概率与决策、类别层次、多标签和文本标注组织段落；保留分类标题锚点供前文回指。",
+    "将二项分类与多项分类统一为二分类与多分类；字符分类例子限定为已经分割的单个字符，不把整段OCR输出默认为单标签。",
+    "明确单标签分类的互斥类别设定，区分类别编码与数量目标；猫狗标签改为普通文本，移除Unicode中文处于数学模式的KaTeX警告。",
+    "区分分类器的类别、分数与概率输出；将0.9解释为模型估计，以校准边界替换实际正确率保证，最大概率类别不再称为最常见类别。",
+    "保留蘑菇决策的示意用途，改为显式二状态假设和有限代价表；概率与代价全部标明为教学设定，不将死帽蕈类别概率当作死亡概率。",
+    "比较两个动作的期望损失，并区分固定概率估计下的行动比较与训练阶段的参数更新；回指已有目标函数解释。",
+    "先定义上下位类别结构，再说明类别距离与实际错误代价的区别；移除不承担必要论证且亲缘比较尺度不明的蛇类旁支。",
+    "保留动物合照并明确其多标签集合含义；区分多标签、未知类别、定位计数与自然语言描述，不宣称改变输出形式即可获得未知类别识别能力。",
+    "保留博客标签的相关性，移除没有统计口径且非必要的典型标签数量；补足标签可同时成立但不必独立的边界。",
+    "区分MEDLINE与PubMed覆盖范围，更新自动索引和人工质检职责，统一MeSH名称；不以未经核对的新数量替换旧词表规模。"
+  ],
+  "figures": [
+    {
+      "number": "图1.3.2",
+      "originalFile": "death-cap.jpg",
+      "originalGitBlob": "2448731b6971bceda1d1fbc64487a77373bf2a44",
+      "originalArchive": "introduction-images/death-cap.jpg",
+      "action": "removed",
+      "reason": "照片只显示蘑菇外观，不帮助追踪概率、状态、行动与代价的对应；用代价表和分步计算解释决策，原图逐字节保存在私有归档。"
+    },
+    {
+      "number": "图1.3.3",
+      "anchor": "fig-stackedanimals",
+      "originalFile": "stackedanimals.png",
+      "originalGitBlob": "00cf65d4b518957f4bec75fc57c2ee7e8fcc8498",
+      "action": "retained",
+      "currentAsset": "/assets/notes/deep-learning/introduction/stackedanimals.png",
+      "purpose": "同一个图像样本中四种动物同时出现，帮助解释多个类别标签可以同时成立。",
+      "appearance": "保留照片原色和300×408显示尺寸；移除不必要的显式白色底色，补足图注及替代说明。未新增或重绘机制图。"
+    }
+  ],
+  "numericalExample": {
+    "kind": "假想决策的手算，不是真实食用风险或训练实验",
+    "assumptions": [
+      "仅设有毒与可食用两个互斥且覆盖示意场景的状态，不将该简化应用到真实野生蘑菇。",
+      "暂按模型估计的0.2与0.8概率比较动作，不声称概率已校准或等于实际风险。",
+      "代价使用同一套人为规定的单位；100与1不是医学、经济测量或死亡率。",
+      "比较期间模型参数和概率估计保持不变。"
+    ],
+    "states": [
+      { "name": "有毒", "estimatedProbability": 0.2, "eatCost": 100, "discardCost": 0 },
+      { "name": "可食用", "estimatedProbability": 0.8, "eatCost": 0, "discardCost": 1 }
+    ],
+    "expectedEatLoss": 20,
+    "expectedDiscardLoss": 0.8,
+    "preferredActionUnderAssumptions": "丢弃",
+    "verification": "逐项计算概率乘以动作代价后求和，核对两项概率之和、20与0.8、类别最大概率与最小期望损失动作的差别。"
+  },
+  "limits": [
+    "本次不训练分类器，不验证概率校准、识别精度或未知类别能力。",
+    "没有用照片识别真实蘑菇，也没有计算或建议实际食用风险。",
+    "MEDLINE更新限于官方材料确认的索引流程；不宣称整个PubMed库都采用MeSH索引或每条自动结果均经人工重审。",
+    "原始迁移快照、图号及历史数量保留在introduction.json，本记录只描述该小节的后续适配。"
+  ]
+}

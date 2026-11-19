@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="484" viewBox="0 0 480 484" role="img" aria-labelledby="title description">
+  <title id="title">监督训练与固定参数的预测</title>
+  <desc id="description">训练时，音频经过当前模型得到预测。预测与真实标签一起送入比较过程，学习算法据此调整模型参数，虚线回到模型表示参数更新。使用时，新的音频经过同一模型，参数保持固定，只产生是或否的判断。</desc>
+  <style>
+    :root {
+      --ink: #172436;
+      --muted: #546577;
+      --cell: #e0e9f0;
+      --model: #d9e4ec;
+      --border: #8fa5b5;
+      --edge: #546577;
+      --accent: #2f5d7c;
+      --update: #137e77;
+      --rule: #b7c8d5;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #d8dee5;
+        --muted: #adb9c4;
+        --cell: #151e27;
+        --model: #1b2c39;
+        --border: #536879;
+        --edge: #adb9c4;
+        --accent: #8cbbd2;
+        --update: #7cc6b8;
+        --rule: #324650;
+      }
+    }
+    text { font-family: "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: var(--ink); }
+    .heading { font-size: 19px; font-weight: 600; }
+    .label { font-size: 18px; text-anchor: middle; }
+    .detail { font-size: 16px; fill: var(--muted); text-anchor: middle; }
+    .legend { font-size: 16px; fill: var(--muted); }
+    .node { fill: var(--cell); stroke: var(--border); stroke-width: 1.5; }
+    .model { fill: var(--model); stroke: var(--accent); stroke-width: 1.7; }
+    .flow { fill: none; stroke: var(--edge); stroke-width: 1.9; stroke-linejoin: round; }
+    .update { fill: none; stroke: var(--update); stroke-width: 2.2; stroke-dasharray: 6 4; stroke-linejoin: round; }
+  </style>
+  <defs>
+    <marker id="data-arrow" viewBox="0 0 8 8" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 8 4 L 0 8 Z" fill="var(--edge)" />
+    </marker>
+    <marker id="update-arrow" viewBox="0 0 8 8" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 8 4 L 0 8 Z" fill="var(--update)" />
+    </marker>
+  </defs>
+
+  <text x="16" y="25" class="heading">训练：根据标签调整参数</text>
+  <path d="M 184 236 H 8 V 50 H 254 V 80" class="update" marker-end="url(#update-arrow)" />
+  <text x="32" y="221" class="legend" style="fill: var(--update)">参数更新</text>
+
+  <rect x="16" y="80" width="116" height="60" rx="5" class="node" />
+  <text x="74" y="116" class="label">训练音频</text>
+
+  <rect x="184" y="80" width="140" height="60" rx="5" class="model" />
+  <text x="254" y="105" class="label">模型</text>
+  <text x="254" y="127" class="detail">当前参数</text>
+
+  <rect x="376" y="80" width="88" height="60" rx="5" class="node" />
+  <text x="420" y="116" class="label">预测</text>
+
+  <path d="M 132 110 H 184" class="flow" marker-end="url(#data-arrow)" />
+  <path d="M 324 110 H 376" class="flow" marker-end="url(#data-arrow)" />
+  <path d="M 420 140 V 166 H 254 V 200" class="flow" marker-end="url(#data-arrow)" />
+
+  <rect x="184" y="200" width="140" height="72" rx="5" class="node" />
+  <text x="254" y="229" class="label" style="font-size: 16px">比较预测与标签</text>
+  <text x="254" y="253" class="detail">学习算法调整参数</text>
+
+  <rect x="368" y="208" width="96" height="56" rx="5" class="node" />
+  <text x="416" y="242" class="label">真实标签</text>
+  <path d="M 368 236 H 324" class="flow" marker-end="url(#data-arrow)" />
+
+  <path d="M 16 302 H 45" class="flow" marker-end="url(#data-arrow)" />
+  <text x="55" y="308" class="legend">数据传递</text>
+  <path d="M 188 302 H 217" class="update" marker-end="url(#update-arrow)" />
+  <text x="227" y="308" class="legend">参数更新</text>
+
+  <path d="M 16 330 H 464" fill="none" stroke="var(--rule)" stroke-width="1" />
+  <text x="16" y="365" class="heading">使用：保持参数不变</text>
+
+  <rect x="16" y="396" width="116" height="60" rx="5" class="node" />
+  <text x="74" y="432" class="label">新的音频</text>
+
+  <rect x="184" y="396" width="140" height="60" rx="5" class="model" />
+  <text x="254" y="421" class="label">已训练模型</text>
+  <text x="254" y="443" class="detail">参数固定</text>
+
+  <rect x="376" y="396" width="88" height="60" rx="5" class="node" />
+  <text x="420" y="432" class="label">是 / 否</text>
+
+  <path d="M 132 426 H 184" class="flow" marker-end="url(#data-arrow)" />
+  <path d="M 324 426 H 376" class="flow" marker-end="url(#data-arrow)" />
+</svg>

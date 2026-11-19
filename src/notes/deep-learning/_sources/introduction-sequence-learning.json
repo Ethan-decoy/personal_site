@@ -1,0 +1,110 @@
+{
+  "title": "序列学习的概念及图文修订",
+  "adaptedOn": "2026-11-17",
+  "checkedOn": "2026-11-17",
+  "sourceSnapshotRecord": "introduction.json",
+  "note": "01-introduction/07-sequence-learning.md",
+  "scope": "保留视频、病人监测、命名实体、语音、德英翻译、文档和对话的解释用途，校正概念边界并整理阅读层次；不扩写具体序列模型算法或其他引言正文。",
+  "sources": [
+    {
+      "id": "d2l-sequence-models",
+      "title": "序列模型 — 动手学深度学习",
+      "url": "https://zh.d2l.ai/chapter_recurrent-neural-networks/sequence.html",
+      "version": "核对时中文版2.0.0，第8.1.1.1节与第8.1.2节；后者以固定历史窗口构造特征并训练前馈网络。",
+      "supports": "固定长度输入可以包含历史观测；利用窗口与维护历史状态是不同的组织方式。序列内部的时间依赖与不同样本间是否独立不能因输入维度固定而混同。"
+    },
+    {
+      "id": "transformer-2017",
+      "title": "Attention Is All You Need",
+      "url": "https://arxiv.org/abs/1706.03762",
+      "publishedOn": "2017-06-12",
+      "version": "核对arXiv摘要，当前为v7，修订于2023-08-02；正文只引用2017年提出的注意力序列架构，不引用性能纪录。",
+      "supports": "Transformer用注意力组织序列计算，不依赖循环结构；不能将序列学习定义为必须逐步维护循环状态。模型的上下文、临时状态与拟合的参数分别解释。"
+    },
+    {
+      "id": "stanza-constituency",
+      "title": "Constituency Parser — Stanza",
+      "url": "https://stanfordnlp.github.io/stanza/constituency.html",
+      "version": "核对官方在线文档的Description与Example Usage，仅使用输出句法树的概念说明，不引用API版本或效果。",
+      "supports": "句法成分分析可为句子产生短语结构树，不能把所有解析输出都概括为与输入词数相同的逐词标签。"
+    },
+    {
+      "id": "whisper-2022",
+      "title": "Robust Speech Recognition via Large-Scale Weak Supervision",
+      "url": "https://arxiv.org/abs/2212.04356",
+      "readUrl": "https://arxiv.org/html/2212.04356v1",
+      "publishedOn": "2022-12-06",
+      "version": "核对arXiv HTML v1第2.2节：16,000 Hz音频、25毫秒窗口、10毫秒步长，以及由此计算的声学表示。",
+      "supports": "波形采样点、声学帧与文本词元是不同粒度的表示；采样率不是声学帧率。只用明确年代和条件的预处理例子说明区别，不将这些参数写成所有语音系统的统一规格。"
+    },
+    {
+      "id": "ids-german-sentence-bracket",
+      "title": "Stellungsfelder und Satzklammer — IDS Grammis",
+      "url": "https://grammis.ids-mannheim.de/systematische-grammatik/1241",
+      "version": "德国莱布尼茨德语研究所的在线语法条目，核对Stellungsfelder und Satzklammer部分及动词首位、第二位和末位的例句表。",
+      "supports": "德语问句中的有限动词可位于句首，非限定动词成分位于句框右侧；原书的Haben与angeschaut不能被概括为所有动词都在句尾。翻译例子用于说明按目标语言重排，而非整体反转。"
+    },
+    {
+      "id": "layoutreader-2021",
+      "title": "LayoutReader: Pre-training of Text and Layout for Reading Order Detection",
+      "url": "https://aclanthology.org/2021.emnlp-main.389/",
+      "publishedIn": "EMNLP 2021",
+      "version": "核对ACL Anthology出版页及摘要，限于文本、布局与文档阅读顺序的任务关系。",
+      "supports": "将二维文档布局联系到内容的逻辑阅读顺序预测；与预测某个用户实际的视线轨迹区分，不引用论文精度或推广到任意网页行为。"
+    }
+  ],
+  "changes": [
+    "按顺序与上下文、输入输出形式、序列对应关系组织标题与段落，在建立处突出需要直接调用的关系。",
+    "移除固定尺寸意味着不会记忆、样本独立即可能完美无缺的推断，区分序列内部元素与完整样本；补足固定窗口和注意力的解释入口。",
+    "保留视频与重症监护的任务例子，明确监测记录在预测时已可获得，未来24小时结果用于标签；不把未来标签当作预测输入。",
+    "说明输入输出可以仅一侧为序列，也不必都变长，以本节已有任务比较单个输出、逐位置标签与序列输出。",
+    "将序列的数据组织角度与监督学习的训练信号角度联系；区分固定参数预测时的上下文变化与参数训练。",
+    "保留七词七标签的命名实体例子，解释Ent与短横线及其简化范围；将句法结构解析单独说明。",
+    "区分波形采样点、声学帧与字词子词等文本单位，按Whisper论文中的明确条件举例；保留语音识别与文本转语音的方向对照和长度条件。",
+    "保留原书德英句子和逐词直译的幽默，改用可换行引用段落，解释词序重排与德语句框；不把输入输出整体反转或词数必定不同作为结论。",
+    "将文档内容的逻辑阅读顺序与个人实际阅读行为区分，保留对话历史对后续回应的作用，不列举产品能力或宣称效果。"
+  ],
+  "figure": {
+    "number": "图1.3.5",
+    "anchor": "fig-speech",
+    "originalFile": "speech.png",
+    "originalGitBlob": "acc6d41ca258d7f0a6b7f1ab7a1f9132ab359d4a",
+    "originalArchive": "introduction-images/speech.png",
+    "action": "replaced-with-schematic",
+    "currentAsset": "/assets/notes/deep-learning/introduction/speech-and-text-alignment.svg",
+    "reason": "原彩色波形没有可追踪的词边界、时间刻度或对齐标注，不能帮助解释声学帧与词的数量差异；固定白底在深色页面中突兀。",
+    "purpose": "使同一段语音中多个声学时间位置可以对应较少文本单位的关系可追踪；不重复绘制输入、模型、输出清单。",
+    "semantics": "十二个编号声学帧按时间从左到右排列，第一至第五帧与Deep相连，第六至第十二帧与Learning相连。括线表示示意对应，没有模型计算、因果流或注意力权重含义。",
+    "appearance": "480×278透明SVG，沿用Notes文字和节点层级，明暗颜色通过现有图组color-scheme传递；窄屏按比例缩小。",
+    "provenance": "在原书图1.3.5的讲解位置重新设计示意关系，沿用Deep Learning文本及原图号、锚点；原PNG逐字节转入私有归档，原始快照信息不变。"
+  },
+  "examples": {
+    "entityLabels": {
+      "kind": "简化的逐词实体标记，不是模型预测实验",
+      "words": ["Tom", "has", "dinner", "in", "Washington", "with", "Sally"],
+      "labels": ["Ent", "-", "-", "-", "Ent", "-", "Ent"],
+      "condition": "每词一个标签，只标记是否为实体，不编码实体类型或多词实体边界。"
+    },
+    "speechCorrespondence": {
+      "kind": "概念分组示意，不是实测音频或强制对齐结果",
+      "frameIndices": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      "wordSpans": [
+        { "word": "Deep", "firstFrame": 1, "lastFrame": 5 },
+        { "word": "Learning", "firstFrame": 6, "lastFrame": 12 }
+      ],
+      "condition": "帧数和分组由示意布局选定，不表示真实语速、时长、字母边界或原始波形的测量；不从Whisper的采样率和窗口参数推导这十二帧。"
+    },
+    "germanTranslation": {
+      "kind": "沿用原书的翻译与按源语言词序直译示例，不是翻译模型输出",
+      "unit": "按空格分词、标点留在相邻词上",
+      "wordCounts": { "german": 8, "english": 8, "literalRendering": 8 },
+      "relation": "本例主要显示对应内容的位置变化，不能用来证明翻译前后的词数必定不同。"
+    }
+  },
+  "limits": [
+    "本次不训练、评估或部署序列模型，不声称任何任务的识别率、生成质量或临床可用性。",
+    "未取得原PNG对应的原始录音，未验证其发音内容、时间边界或声学对齐；新图明确为示意，不作为该录音的分析。",
+    "Whisper参数仅来自2022年论文的指定预处理，不描述截至修订日所有语音模型或实现。",
+    "固定迁移快照、原图哈希、图号与计数继续保留在introduction.json，后续适配独立记录。"
+  ]
+}

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="332" viewBox="0 0 480 332" role="img" aria-labelledby="title description">
+  <title id="title">智能体与环境的交互闭环</title>
+  <desc id="description">智能体按策略选择时间步t的动作a_t，并沿上方箭头送入环境；环境产生奖励r_{t+1}和新观测o_{t+1}，沿下方箭头返回智能体。两条箭头均表示交互信息，本图不画参数更新。</desc>
+  <style>
+    :root {
+      --ink: #172436;
+      --muted: #546577;
+      --cell: #e0e9f0;
+      --model: #d9e4ec;
+      --border: #8fa5b5;
+      --edge: #546577;
+      --accent: #2f5d7c;
+      --rule: #b7c8d5;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #d8dee5;
+        --muted: #adb9c4;
+        --cell: #151e27;
+        --model: #1b2c39;
+        --border: #536879;
+        --edge: #adb9c4;
+        --accent: #8cbbd2;
+        --rule: #324650;
+      }
+    }
+    text { font-family: "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: var(--ink); }
+    .heading { font-size: 19px; font-weight: 600; }
+    .label { font-size: 18px; text-anchor: middle; }
+    .detail { font-size: 16px; fill: var(--muted); text-anchor: middle; }
+    .node { fill: var(--cell); stroke: var(--border); stroke-width: 1.5; }
+    .model { fill: var(--model); stroke: var(--accent); stroke-width: 1.7; }
+    .flow { fill: none; stroke: var(--edge); stroke-width: 1.9; }
+  </style>
+  <defs>
+    <marker id="info-arrow" viewBox="0 0 8 8" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 8 4 L 0 8 Z" fill="var(--edge)" />
+    </marker>
+  </defs>
+
+  <text x="16" y="27" class="heading">观测、动作与奖励的闭环</text>
+  <text x="240" y="60" class="label">动作 aₜ</text>
+  <path d="M 82 116 V 72 H 398 V 116" class="flow" marker-end="url(#info-arrow)" />
+
+  <rect x="16" y="116" width="132" height="80" rx="5" class="model" />
+  <text x="82" y="148" class="label">智能体</text>
+  <text x="82" y="172" class="detail">按策略选动作</text>
+
+  <rect x="332" y="116" width="132" height="80" rx="5" class="node" />
+  <text x="398" y="148" class="label">环境</text>
+  <text x="398" y="172" class="detail">产生后续结果</text>
+
+  <path d="M 398 196 V 248 H 82 V 196" class="flow" marker-end="url(#info-arrow)" />
+  <text x="240" y="280" class="label">奖励 rₜ₊₁ 与新观测 oₜ₊₁</text>
+  <text x="16" y="318" font-size="16" style="fill: var(--muted)">箭头表示交互信息，不表示参数更新</text>
+</svg>

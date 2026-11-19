@@ -1,0 +1,48 @@
+{
+  "title": "引言小结与四道练习的修订",
+  "adaptedOn": "2026-11-19",
+  "checkedOn": "2026-11-19",
+  "sourceSnapshotRecord": "introduction.json",
+  "previousUpdateRecord": "introduction-2026.json",
+  "note": "01-introduction/14-summary-and-exercises.md",
+  "original": {
+    "url": "https://zh.d2l.ai/chapter_introduction/index.html",
+    "sections": ["1.8 小结", "1.9 练习"],
+    "exerciseCount": 4
+  },
+  "basis": [
+    {
+      "notes": ["02-data-and-models.md#机器学习中的关键组件", "03-objective-functions-and-optimization.md#训练表现与新数据表现"],
+      "supports": "对应数据、模型、目标函数和优化算法的分工，以及训练和最终评价的数据职责。"
+    },
+    {
+      "notes": ["04-supervised-learning-and-regression.md#监督学习", "08-unsupervised-learning.md#从数据自身构造学习信号", "09-interaction-and-reinforcement-learning.md#强化学习"],
+      "supports": "从预测输出和训练信号回顾学习问题，明确给定标签、自身构造目标与环境奖励各自的作用。"
+    },
+    {
+      "notes": ["11-development-of-deep-learning.md#预训练后训练与生成式模型", "13-characteristics-of-deep-learning.md#端到端训练的范围"],
+      "supports": "归纳训练阶段、固定参数推理、分组件更新和多层表示。"
+    },
+    {
+      "notes": ["01-from-rules-to-machine-learning.md#fig-ml-loop", "13-characteristics-of-deep-learning.md#固定特征与联合训练"],
+      "supports": "图 1.1.2 展示监督训练反馈及固定参数预测。第四题借该图回顾如何更新参数，再由学习者分析新任务中参与联合训练的组件。"
+    }
+  ],
+  "exercises": [
+    { "number": 1, "theme": "从代码中的人工启发式选择出发", "adaptation": "明确既有规则、所需经验和用同样的评估条件对比改进。" },
+    { "number": 2, "theme": "寻找有实例可供学习的自动化问题", "adaptation": "明确样本输入、期望输出、标签或反馈、覆盖情境和评价指标。" },
+    { "number": 3, "theme": "讨论蒸汽机与煤的类比", "adaptation": "选具体学习系统说明数据、算法的职责以及类比的适用处和限度。" },
+    { "number": 4, "theme": "把端到端训练应用到其他领域", "adaptation": "保留图号和原书所举领域，区分训练反馈、任务目标及联合更新范围。" }
+  ],
+  "referenceAnswers": {
+    "addedOn": "2026-11-19",
+    "kind": "本站编写的四道开放题示例解答",
+    "placement": "每题题干下方，默认折叠。",
+    "examples": [
+      { "number": 1, "scenario": "邮件过滤", "focus": "用独立测试样本比较原规则与分类模型的误拦和漏过。" },
+      { "number": 2, "scenario": "公交到站时间预测", "focus": "区分预测当时的输入、到站后获得的标签及按时间保留的测试数据。" },
+      { "number": 3, "scenario": "沿用公交到站例子", "focus": "说明数据提供的信息、优化算法的职责及和燃料类比的限度。" },
+      { "number": 4, "scenario": "电机振动异常识别", "focus": "给出训练目标、共同更新的组件及固定的采样与分段规则。" }
+    ]
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "title": "无监督学习的概念与表达修订",
+  "adaptedOn": "2026-11-17",
+  "checkedOn": "2026-11-17",
+  "sourceSnapshotRecord": "introduction.json",
+  "note": "01-introduction/08-unsupervised-learning.md",
+  "scope": "保留无标签数据、老板比喻、照片与浏览记录、裁缝、国家首都类比、人口统计、生成与自监督的解释用途，校正方法和任务边界；只修改该节正文及相应来源说明。",
+  "sources": [
+    {
+      "id": "sklearn-clustering",
+      "title": "Clustering — scikit-learn",
+      "url": "https://scikit-learn.org/stable/modules/clustering.html",
+      "version": "核对时1.9.1文档，第2.3节的方法概览与K-means目标及结构假设；只使用概念说明，不新增代码或依赖要求。",
+      "supports": "聚类可处理无标签数据，不同方法对几何结构与相似性采用不同假设；聚类结果不能自动解释为人类指定的语义类别。照片的颜色、纹理与语义分组作为有条件的解释例子，不是已验证实验。"
+    },
+    {
+      "id": "sklearn-pca",
+      "title": "Decomposing signals in components — scikit-learn",
+      "url": "https://scikit-learn.org/stable/modules/decomposition.html#pca",
+      "version": "核对时1.9.1文档，第2.5.1节的PCA定义、中心化、正交方向与线性投影；不引用特定数据集上的效果。",
+      "supports": "PCA从中心化数据中依次寻找保留方差的正交方向，可通过选取部分方向进行线性降维；减少的是每个样本的表示坐标数，少量物理参数或词向量类比不自动构成PCA的例子。"
+    },
+    {
+      "id": "word-vectors-2013",
+      "title": "Efficient Estimation of Word Representations in Vector Space",
+      "url": "https://arxiv.org/abs/1301.3781v3",
+      "readUrl": "https://arxiv.org/html/1301.3781v3",
+      "firstPublishedOn": "2013-01-16",
+      "versionUpdatedOn": "2013-09-07",
+      "version": "核对v3的第1.1节、第4节与第5节，包含向量偏移、余弦近邻检索及国家首都关系。",
+      "supports": "类比通过学得的词向量做偏移后检索近邻，不是字符串恒等式，也不保证所有类比都成功。原书罗马、意大利、法国、巴黎的关系保留为类比示意，未下载词向量或声称实测检索到巴黎。"
+    },
+    {
+      "id": "gan-2014",
+      "title": "Generative Adversarial Nets",
+      "url": "https://arxiv.org/abs/1406.2661v1",
+      "readUrl": "https://arxiv.org/html/1406.2661v1",
+      "publishedOn": "2014-06-10",
+      "version": "核对v1摘要、第3节与Algorithm 1，限于原始GAN的随机输入、生成器、判别器和交替更新的职责。",
+      "supports": "生成器由随机输入产生样本；判别器区分真实数据和生成样本；生成器利用判别反馈学习。真假来源可直接确定，不要求真实数据的语义类别标签。不将理论最优分布恢复解释为有限训练必然达到的结果。"
+    },
+    {
+      "id": "pgm-book-2009",
+      "title": "Probabilistic Graphical Models: Principles and Techniques",
+      "url": "https://mitpress.mit.edu/9780262013192/probabilistic-graphical-models/",
+      "publishedOn": "2009-07-31",
+      "version": "核对MIT Press出版页，作者Daphne Koller与Nir Friedman，描述涵盖贝叶斯网络、无向模型以及表示、推断与学习；本次未通读全书。",
+      "supports": "概率图模型是组织和使用概率模型的框架，因果推理属于需要进一步解释的用途；不将其整体当作仅靠无标签数据即可发现根本原因的单一算法。因果边界另由Pearl论文支持。"
+    },
+    {
+      "id": "pearl-causal-inference-2010",
+      "title": "An Introduction to Causal Inference",
+      "url": "https://ftp.cs.ucla.edu/pub/stat_ser/r354-reprint-corrected.pdf",
+      "publishedIn": "The International Journal of Biostatistics, Volume 6, Issue 2, Article 7 (2010)",
+      "version": "作者UCLA网站的校正版，封面技术报告R-354标记March 2011；核对第1节与第2.1、2.2节关于关联、干预和因果假设的区别。",
+      "supports": "仅凭观测联合分布不能自动确定干预后的因果效果，因果判断需要额外因果假设；统计预测关系、概率结构与根本原因不能直接等同。不声称必须做实验才能进行任何因果推断。"
+    },
+    {
+      "id": "llama3-next-token-pretraining",
+      "title": "The Llama 3 Herd of Models",
+      "url": "https://arxiv.org/abs/2407.21783v3",
+      "readUrl": "https://arxiv.org/html/2407.21783v3#S2",
+      "firstPublishedOn": "2024-07-31",
+      "versionUpdatedOn": "2024-11-23",
+      "version": "核对v3第2节，保留已有的词元序列与下一个词元预测预训练入口；不引用参数规模、训练量或能力纪录。",
+      "supports": "从文本中构造下一个词元预测目标，预训练后可用不同目标和数据进行后训练；不需要为每个预测位置另请人工写出答案。具体四词元例子为本站自编示意，不是该模型分词器的输出。"
+    }
+  ],
+  "changes": [
+    "将开头所有例子与巨大数据集的绝对概括改为前文主要以监督任务说明输入目标关系；保留老板比喻，区分训练信号与数据量。",
+    "按任务标签与学习目标、无标签数据中的结构表示分布、统计与因果边界、自监督信号组织段落和标题；保留从数据自身构造学习信号锚点。",
+    "在定义处突出无任务标签仍需学习目标，沿用组内差异与重建误差，并回指目标函数的主要讲解入口。",
+    "保留照片和用户浏览记录，说明表示、相似性与结构假设会影响聚类；分组不自动等于猫狗等指定语义类别。",
+    "保留裁缝例子的简洁表示用途，另行解释PCA的中心化、正交投影与方差目标，不把已命名的身体属性直接当作学得的主成分。",
+    "移除仅凭球的速度、直径和质量就描述轨迹的说法；它既未建立所需运动条件，也未说明PCA如何从观测中学习方向。",
+    "把国家首都类比移到表示学习，以同维向量运算定义u，再解释希望通过近邻检索得到巴黎；不写为字符串或向量的严格类比恒等式。",
+    "将生成建模作为任务，GAN作为一种方法，按原始论文解释生成器与判别器的分工和真假来源；不宣称训练必定得到真实分布。",
+    "保留人口统计中的变量关系，区分统计关联、概率结构与因果干预效果，并就地说明因果假设的必要性。",
+    "保留自监督学习的定义、已有重点框和预训练后训练入口，新增三组可逐项核对的上下文目标训练对，并说明示意分词与实际分词器的区别。"
+  ],
+  "examples": {
+    "wordAnalogy": {
+      "kind": "沿用国家首都关系的向量类比示意，不是词向量实验",
+      "assumptions": "所有v(w)来自同一个学得的向量空间，维数相同；正文不指定数值、语料、向量模型或实测检索结果。",
+      "operation": "u = v(罗马) - v(意大利) + v(法国)",
+      "desiredRetrievedWord": "巴黎",
+      "relation": "等式只定义u，之后尝试近邻检索；不声明u严格等于v(巴黎)。"
+    },
+    "nextTokenPairs": {
+      "kind": "本站自编的下一个词元训练对，不是实际模型输出或训练记录",
+      "tokens": ["我", "在", "学习", "。"],
+      "pairs": [
+        { "context": ["我"], "target": "在" },
+        { "context": ["我", "在"], "target": "学习" },
+        { "context": ["我", "在", "学习"], "target": "。" }
+      ],
+      "condition": "各行上下文是原序列从头开始的非空真前缀，目标是紧随前缀的下一个词元；该位置不包含在该行输入中。分词仅为示意，不声称是Llama 3的实际分词。"
+    },
+    "ganTraining": {
+      "kind": "原始GAN训练职责概述，不是复现实验",
+      "flow": ["生成器由随机输入产生样本", "判别器学习区分真实和生成来源", "生成器利用判别反馈调整，两个模型交替训练"],
+      "condition": "原始无类别条件的GAN例子，不概括全部条件GAN、训练变体或当前产品。"
+    }
+  },
+  "presentation": {
+    "choice": "用分层标题、局部强调和三重要提示一易错提示组织关系，用两列表格对齐上下文与目标；向量构造使用可渲染的数学表达。",
+    "assets": "本节原本没有图片。未新增图片或交互，任务概览与训练对可直接用正文、列表和表格表达，不改动其他小节的图文资源。"
+  },
+  "limits": [
+    "本次不拟合聚类或PCA模型，不训练GAN或语言模型，不验证聚类语义、保留方差、生成质量或下游性能。",
+    "没有运行词向量检索，不把国家首都类比或其数学构造当作已复现结果。",
+    "人口统计例子只说明任务边界，未取得相关数据、估计因果效果或为任何具体干预提供判断。",
+    "固定迁移快照、原文计数、图表与既有修订保留在introduction.json，本次适配作为独立后续记录。"
+  ]
+}

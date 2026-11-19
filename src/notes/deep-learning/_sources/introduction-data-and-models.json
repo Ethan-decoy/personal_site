@@ -1,0 +1,69 @@
+{
+  "title": "数据与模型的概念修订",
+  "adaptedOn": "2026-11-14",
+  "checkedOn": "2026-11-14",
+  "sourceSnapshotRecord": "introduction.json",
+  "note": "01-introduction/02-data-and-models.md",
+  "scope": "保留原书的数据表示、数据质量与模型主线，核对会影响理解的假设与比较条件；不据此宣称原书整章已全面复核。",
+  "sources": [
+    {
+      "id": "d2l-linear-regression",
+      "title": "Linear Regression — Dive into Deep Learning",
+      "url": "https://d2l.ai/chapter_linear-regression/linear-regression.html",
+      "version": "核对时在线英文版1.0.3，第3.1.1节与第3.1.4节",
+      "supports": "单样本特征向量的维数与数据集的样本数量分别表示；模型、训练损失、参数优化及未见数据表现具有不同职责。"
+    },
+    {
+      "id": "d2l-iid",
+      "title": "模型选择、欠拟合和过拟合 — 统计学习理论",
+      "url": "https://zh.d2l.ai/chapter_multilayer-perceptrons/underfit-overfit.html",
+      "version": "核对时在线中文版2.0.0，第4.4.1.1节",
+      "supports": "独立同分布作为对采样过程的假设；训练与测试分布、泛化判断的前提，不把所有实际样本自动视为独立同分布。"
+    },
+    {
+      "id": "d2l-fine-tuning",
+      "title": "微调 — 动手学深度学习",
+      "url": "https://zh.d2l.ai/chapter_computer-vision/fine-tuning.html",
+      "version": "核对时在线中文版2.0.0，第13.2.1节与第13.2.2节",
+      "supports": "目标数据集较小时可利用源模型的结构与预训练参数进行适配；不能把小型目标数据集直接等同于深度学习无效。正文未复制原书实验数字或声称本站复现实验。"
+    },
+    {
+      "id": "d2l-sequences",
+      "title": "序列模型 — 动手学深度学习",
+      "url": "https://zh.d2l.ai/chapter_recurrent-neural-networks/sequence.html",
+      "version": "核对时在线中文版2.0.0，第8.1.1节与第8.1.2节",
+      "supports": "序列观测间可以存在依赖，输入表示与模型组织需要根据任务选择；不把变长输入处理描述成所有深度模型天然具有的能力。"
+    },
+    {
+      "id": "d2l-mlp",
+      "title": "多层感知机 — 动手学深度学习",
+      "url": "https://zh.d2l.ai/chapter_multilayer-perceptrons/mlp.html",
+      "version": "核对时在线中文版2.0.0，第4.1.1节",
+      "supports": "以逐层连接的网络说明中间表示及其与预测器的联合学习；不把所有神经网络限制为单一串联结构，也不保证复杂模型一定更好。"
+    },
+    {
+      "id": "ddi-2022",
+      "title": "Disparities in dermatology AI performance on a diverse, curated clinical image set",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/35960806/",
+      "doi": "10.1126/sciadv.abq6147",
+      "firstPublishedOn": "2022-08-12",
+      "version": "PubMed收录的原研究摘要；PMC全文入口受访问验证限制，未作为已读全文使用。",
+      "supports": "原研究评估不同肤色与疾病数据上的皮肤病变识别表现差异。用于把原文未见某类人群就一定完全失效的表述改为有条件的性能风险，不外推任何临床诊断建议。"
+    }
+  ],
+  "changes": [
+    "将四个组件改为有职责对应的核心关系，区分训练目标改善与新数据上的表现。",
+    "补齐分节后需要的唤醒词上下文，用对照表明确样本、特征与标签；患者标签给定预测时间范围。",
+    "将特征类别数量校正为数值表示下的特征维数，保留200×200×3=120000的原例，明确展平表示与多维数组的区别。",
+    "将固定长度改为表示与计算的选择，不再断言原始变长数据无法形成固定表示或所有深度模型均能处理任意长度。",
+    "为更多数据的收益补充相关性、质量、训练与评价条件；利用原书微调内容校正小数据集上深度学习必然不优于传统方法的笼统判断。",
+    "保留数据质量与历史招聘记录的条件性例子，区分代表性不足与记录总量；用DDI研究支持肤色表现差异的风险表述。",
+    "把独立同分布明确为采样假设，补充序列相关与采集条件变化的反例。",
+    "以多层变换和表示学习替换复杂神经网络必然强大的笼统描述，并恢复模型族与后续章节的实际入口。"
+  ],
+  "limits": [
+    "本次是概念与表达修订，没有新增模型排行榜、硬件规格或工具版本结论。",
+    "图片维数为手算示例；对照表只定义任务与数据的对应，没有构造实际患者数据或训练实验。",
+    "没有重新训练或复现所引用论文与原书的实验；文献结果仅用于相应解释边界。"
+  ]
+}

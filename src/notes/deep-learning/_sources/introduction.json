@@ -1,0 +1,567 @@
+{
+  "source": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_introduction/index.md",
+  "commit": "e6b18ccea71451a55fcd861d7b96fddf2587b09a",
+  "checkedOn": "2026-11-13",
+  "sourceGitBlob": "3374953b2182c44cf8f31f36dbd6a8ec798ff594",
+  "sourceSha256": "23ae7be4b1d1645182bee398d3e11f2eb9efc093e2372241f932112a3ab33d40",
+  "originalPage": "https://zh.d2l.ai/chapter_introduction/index.html",
+  "originalCopyright": "2022, All authors. Licensed under CC-BY-SA-4.0 and MIT-0.",
+  "copyrightSource": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/config.ini",
+  "importedContentLicense": "CC-BY-SA-4.0",
+  "adaptations": [
+    "首次迁移后按学习主题分节，保持当时迁移正文的顺序与措辞；标题省略章节与小节编号，图号与表号沿用原书。后续实质修订单独记录。",
+    "Sphinx 标签、图表引用和文献引用转换为 Markdown 或 HTML 链接。",
+    "图表留在对应小节，跨节引用指向实际正文与锚点；尚未迁移的章节与文献指向原书。",
+    "首次迁移逐字节保留10张原始图片，使用原有显示宽度，补齐尺寸和替代说明。后续移除或重绘的原图转入私有来源归档，实际展示见各次图文适配记录。",
+    "正文不附讨论、原文和来源许可入口；来源、固定快照与许可集中在分类索引维护。"
+  ],
+  "revisions": [
+    {
+      "checkedOn": "2026-11-13",
+      "record": "introduction-2026.json",
+      "scope": "时效性局部更新、相关概念澄清与已核实的事实校正；不代表原书整章事实均已重新核实。"
+    },
+    {
+      "adaptedOn": "2026-11-14",
+      "record": "introduction-figures.json",
+      "scope": "第一节配图取舍与主题适配：移除重复输入输出清单的图，改绘监督训练与固定参数预测的对照图。"
+    },
+    {
+      "adaptedOn": "2026-11-14",
+      "checkedOn": "2026-11-14",
+      "record": "introduction-data-and-models.json",
+      "scope": "数据与模型的概念修订：明确样本与特征维数、独立同分布假设，补足数据规模、表示与代表性的条件。"
+    },
+    {
+      "adaptedOn": "2026-11-14",
+      "checkedOn": "2026-11-14",
+      "record": "introduction-objectives-and-optimization.json",
+      "scope": "目标函数与优化算法的概念修订：区分损失、优化目标与评价指标，补足训练评估职责、泛化条件和梯度更新边界，并加入单参数手算例子。"
+    },
+    {
+      "adaptedOn": "2026-11-14",
+      "checkedOn": "2026-11-14",
+      "record": "introduction-supervised-and-regression.json",
+      "scope": "监督学习与回归的概念及图文修订：明确训练与预测、回归目标的数量意义，补齐房屋例子单位和账单推演，并重绘图1.3.1。"
+    },
+    {
+      "adaptedOn": "2026-11-16",
+      "checkedOn": "2026-11-16",
+      "record": "introduction-classification-and-multiple-labels.json",
+      "scope": "分类与多标签学习的概念及图文修订：区分概率估计、决策代价与训练损失，显式计算假想代价，澄清类别层次与标签关系，更新MEDLINE索引流程，并移除不承担计算解释的蘑菇照片。"
+    },
+    {
+      "adaptedOn": "2026-11-17",
+      "checkedOn": "2026-11-17",
+      "record": "introduction-search-and-recommendation.json",
+      "scope": "搜索与推荐系统的概念及图文修订：明确排序输出与得分含义，校正PageRank历史描述、选择性反馈和评分分布的适用范围，补充候选与排序分工，归档亚马逊截图。"
+    },
+    {
+      "adaptedOn": "2026-11-17",
+      "checkedOn": "2026-11-17",
+      "record": "introduction-sequence-learning.json",
+      "scope": "序列学习的概念及图文修订：区分长度、上下文、状态与参数更新，明确序列输入输出形式、逐词标记和解析、语音表示粒度及翻译重排；以主题适配的示意对应图替换原始波形图。"
+    },
+    {
+      "adaptedOn": "2026-11-17",
+      "checkedOn": "2026-11-17",
+      "record": "introduction-unsupervised-learning.json",
+      "scope": "无监督学习的概念与表达修订：按任务目标组织聚类、降维、词向量表示和生成建模，校正PCA例子的归属，区分概率结构与因果解释，补足GAN训练分工和自监督训练对。"
+    },
+    {
+      "adaptedOn": "2026-11-17",
+      "checkedOn": "2026-11-17",
+      "record": "introduction-interaction-and-reinforcement-learning.json",
+      "scope": "环境交互与强化学习的概念及图文修订：补足策略、奖励与期望回报，校正状态、马尔可夫条件和赌博机边界，区分交互、离线训练与参数更新，重绘数据采集和环境闭环示意图并限定历史案例。"
+    },
+    {
+      "adaptedOn": "2026-11-17",
+      "checkedOn": "2026-11-17",
+      "record": "introduction-origins-of-machine-learning.json",
+      "scope": "机器学习起源的史实、概念与表达修订：厘清统计估计、信息计算和生物启发，校正最小二乘与LMS、赫布学习及反向传播，限定量尺史料、研究年代与方法比较，并修复历史插图的图号跳转。"
+    },
+    {
+      "adaptedOn": "2026-11-18",
+      "checkedOn": "2026-11-18",
+      "record": "introduction-development-of-deep-learning.json",
+      "scope": "深度学习发展部分的历史规格、模型机制和训练条件修订，重整语言模型训练与使用的对照，补足扩散与多模态实验依据。"
+    },
+    {
+      "adaptedOn": "2026-11-19",
+      "checkedOn": "2026-11-19",
+      "record": "introduction-successes-of-deep-learning.json",
+      "scope": "成功案例部分的史实、评测口径和部署边界修订，按任务整理生成、多模态、工具交互、科学和游戏案例。"
+    },
+    {
+      "adaptedOn": "2026-11-19",
+      "checkedOn": "2026-11-19",
+      "record": "introduction-characteristics-of-deep-learning.json",
+      "scope": "特点部分的表示学习、训练范围、模型容量及优化评估修订，按一手论文补足卷积表示和 RAG 的具体例证。"
+    },
+    {
+      "adaptedOn": "2026-11-19",
+      "checkedOn": "2026-11-19",
+      "record": "introduction-summary-and-exercises.json",
+      "scope": "小结同步章节的关键关系，保留四道练习的顺序及主旨，补充作答范围、图文前提和本站示例解答。"
+    }
+  ],
+  "countsScope": "固定上游快照，不代表后续修订后的本站正文计数。",
+  "counts": {
+    "sections": 9,
+    "headings": 24,
+    "figures": 10,
+    "tables": 1,
+    "inlineFormulas": 12,
+    "codeExamples": 2,
+    "exerciseQuestions": 4,
+    "citationOccurrences": 27,
+    "uniqueCitations": 26
+  },
+  "images": [
+    {
+      "file": "wake-word.svg",
+      "sourceGitBlob": "01fb83a8fe893d499e27422d807ee3398ed26b76",
+      "bytes": 22037,
+      "natural": {
+        "width": 385.3333333333333,
+        "height": 65.33333333333333
+      },
+      "width": 385,
+      "height": 65,
+      "anchor": "fig-wake-word",
+      "caption": "识别唤醒词",
+      "number": "图1.1.1",
+      "note": "01-introduction/01-from-rules-to-machine-learning.md"
+    },
+    {
+      "file": "ml-loop.svg",
+      "sourceGitBlob": "7638bf65e5a70dd9552dfdb9d0820355ac024f2e",
+      "bytes": 30569,
+      "natural": {
+        "width": 396,
+        "height": 126.66666666666667
+      },
+      "width": 396,
+      "height": 127,
+      "anchor": "fig-ml-loop",
+      "caption": "一个典型的训练过程",
+      "number": "图1.1.2",
+      "note": "01-introduction/01-from-rules-to-machine-learning.md"
+    },
+    {
+      "file": "supervised-learning.svg",
+      "sourceGitBlob": "65fc73aa7eb3d194318ef68f317aefdeaaecf160",
+      "bytes": 26451,
+      "natural": {
+        "width": 406.66666666666663,
+        "height": 124
+      },
+      "width": 407,
+      "height": 124,
+      "anchor": "fig-supervised-learning",
+      "caption": "监督学习",
+      "number": "图1.3.1",
+      "note": "01-introduction/04-supervised-learning-and-regression.md"
+    },
+    {
+      "file": "death-cap.jpg",
+      "sourceGitBlob": "2448731b6971bceda1d1fbc64487a77373bf2a44",
+      "bytes": 171555,
+      "natural": {
+        "width": 600,
+        "height": 658
+      },
+      "width": 200,
+      "height": 219,
+      "anchor": "fig-death-cap",
+      "caption": "死帽蕈——不能吃！！",
+      "number": "图1.3.2",
+      "note": "01-introduction/05-classification-and-multiple-labels.md"
+    },
+    {
+      "file": "stackedanimals.png",
+      "sourceGitBlob": "00cf65d4b518957f4bec75fc57c2ee7e8fcc8498",
+      "bytes": 793656,
+      "natural": {
+        "width": 620,
+        "height": 843
+      },
+      "width": 300,
+      "height": 408,
+      "anchor": "fig-stackedanimals",
+      "caption": "一只猫、一只公鸡、一只狗、一头驴",
+      "number": "图1.3.3",
+      "note": "01-introduction/05-classification-and-multiple-labels.md"
+    },
+    {
+      "file": "deeplearning-amazon.jpg",
+      "sourceGitBlob": "2eca8601908e107038ccc24283c5b4bab455d218",
+      "bytes": 378777,
+      "natural": {
+        "width": 1770,
+        "height": 1122
+      },
+      "width": 1770,
+      "height": 1122,
+      "anchor": "fig-deeplearning-amazon",
+      "caption": "亚马逊推荐的深度学习书籍",
+      "number": "图1.3.4",
+      "note": "01-introduction/06-search-and-recommendation.md"
+    },
+    {
+      "file": "speech.png",
+      "sourceGitBlob": "acc6d41ca258d7f0a6b7f1ab7a1f9132ab359d4a",
+      "bytes": 309058,
+      "natural": {
+        "width": 1913,
+        "height": 445
+      },
+      "width": 700,
+      "height": 163,
+      "anchor": "fig-speech",
+      "caption": "-D-e-e-p- L-ea-r-ni-ng- 在录音中。",
+      "number": "图1.3.5",
+      "note": "01-introduction/07-sequence-learning.md"
+    },
+    {
+      "file": "data-collection.svg",
+      "sourceGitBlob": "5a686523cc894d2f906c53ce0341ee0c521bb90a",
+      "bytes": 31712,
+      "natural": {
+        "width": 402.66666666666663,
+        "height": 182.66666666666666
+      },
+      "width": 403,
+      "height": 183,
+      "anchor": "fig-data-collection",
+      "caption": "从环境中为监督学习收集数据。",
+      "number": "图1.3.6",
+      "note": "01-introduction/09-interaction-and-reinforcement-learning.md"
+    },
+    {
+      "file": "rl-environment.svg",
+      "sourceGitBlob": "1cd26f47152f4c6042a30dd13d7732b68c40355a",
+      "bytes": 24082,
+      "natural": {
+        "width": 382.66666666666663,
+        "height": 171.99999999999997
+      },
+      "width": 383,
+      "height": 172,
+      "anchor": "fig-rl-environment",
+      "caption": "强化学习和环境之间的相互作用",
+      "number": "图1.3.7",
+      "note": "01-introduction/09-interaction-and-reinforcement-learning.md"
+    },
+    {
+      "file": "koebel.jpg",
+      "sourceGitBlob": "c9c52ce7eab0df339471e3b9d268753889c5edcb",
+      "bytes": 345521,
+      "natural": {
+        "width": 800,
+        "height": 635
+      },
+      "width": 500,
+      "height": 397,
+      "anchor": "fig-koebel",
+      "caption": "估计一英尺的长度",
+      "number": "图1.4.1",
+      "note": "01-introduction/10-origins-of-machine-learning.md"
+    }
+  ],
+  "citations": {
+    "Turing.1950": {
+      "label": "Turing, 1950",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id171"
+    },
+    "Hebb.Hebb.1949": {
+      "label": "Hebb and Hebb, 1949",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id62"
+    },
+    "McCulloch.Pitts.1943": {
+      "label": "McCulloch and Pitts, 1943",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id106"
+    },
+    "LeCun.Bottou.Bengio.ea.1998": {
+      "label": "LeCun et al., 1998",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id90"
+    },
+    "Graves.Schmidhuber.2005": {
+      "label": "Graves and Schmidhuber, 2005",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id51"
+    },
+    "Watkins.Dayan.1992": {
+      "label": "Watkins and Dayan, 1992",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id179"
+    },
+    "Srivastava.Hinton.Krizhevsky.ea.2014": {
+      "label": "Srivastava et al., 2014",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id155"
+    },
+    "Bishop.1995": {
+      "label": "Bishop, 1995",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id9"
+    },
+    "Bahdanau.Cho.Bengio.2014": {
+      "label": "Bahdanau et al., 2014",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id6"
+    },
+    "Sukhbaatar.Weston.Fergus.ea.2015": {
+      "label": "Sukhbaatar et al., 2015",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id158"
+    },
+    "Reed.De-Freitas.2015": {
+      "label": "Reed and De Freitas, 2015",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id136"
+    },
+    "Goodfellow.Pouget-Abadie.Mirza.ea.2014": {
+      "label": "Goodfellow et al., 2014",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id48"
+    },
+    "Zhu.Park.Isola.ea.2017": {
+      "label": "Zhu et al., 2017",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id199"
+    },
+    "Karras.Aila.Laine.ea.2017": {
+      "label": "Karras et al., 2017",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id81"
+    },
+    "Park.Liu.Wang.ea.2019": {
+      "label": "Park et al., 2019",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id120"
+    },
+    "Li.2017": {
+      "label": "Li, 2017",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id91"
+    },
+    "You.Gitman.Ginsburg.2017": {
+      "label": "You et al., 2017",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id192"
+    },
+    "Jia.Song.He.ea.2018": {
+      "label": "Jia et al., 2018",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id79"
+    },
+    "Silver.Huang.Maddison.ea.2016": {
+      "label": "Silver et al., 2016",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id152"
+    },
+    "Xiong.Wu.Alleva.ea.2018": {
+      "label": "Xiong et al., 2018",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id190"
+    },
+    "Lin.Lv.Zhu.ea.2010": {
+      "label": "Lin et al., 2010",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id96"
+    },
+    "Hu.Shen.Sun.2018": {
+      "label": "Hu et al., 2018",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id72"
+    },
+    "Campbell.Hoane-Jr.Hsu.2002": {
+      "label": "Campbell et al., 2002",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id19"
+    },
+    "Brown.Sandholm.2017": {
+      "label": "Brown and Sandholm, 2017",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id18"
+    },
+    "Canny.1987": {
+      "label": "Canny, 1987",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id20"
+    },
+    "Lowe.2004": {
+      "label": "Lowe, 2004",
+      "href": "https://zh.d2l.ai/chapter_references/zreferences.html#id102"
+    }
+  },
+  "numberedReferences": {
+    "fig_wake_word": {
+      "label": "图1.1.1",
+      "href": "#fig-wake-word",
+      "note": "01-introduction/01-from-rules-to-machine-learning.md"
+    },
+    "fig_ml_loop": {
+      "label": "图1.1.2",
+      "href": "#fig-ml-loop",
+      "note": "01-introduction/01-from-rules-to-machine-learning.md"
+    },
+    "fig_supervised_learning": {
+      "label": "图1.3.1",
+      "href": "#fig-supervised-learning",
+      "note": "01-introduction/04-supervised-learning-and-regression.md"
+    },
+    "sec_softmax": {
+      "label": "3.4节",
+      "href": "https://zh.d2l.ai/chapter_linear-networks/softmax-regression.html#sec-softmax"
+    },
+    "fig_death_cap": {
+      "label": "图1.3.2",
+      "href": "#fig-death-cap",
+      "note": "01-introduction/05-classification-and-multiple-labels.md"
+    },
+    "fig_stackedanimals": {
+      "label": "图1.3.3",
+      "href": "#fig-stackedanimals",
+      "note": "01-introduction/05-classification-and-multiple-labels.md"
+    },
+    "fig_deeplearning_amazon": {
+      "label": "图1.3.4",
+      "href": "#fig-deeplearning-amazon",
+      "note": "01-introduction/06-search-and-recommendation.md"
+    },
+    "fig_speech": {
+      "label": "图1.3.5",
+      "href": "#fig-speech",
+      "note": "01-introduction/07-sequence-learning.md"
+    },
+    "fig_data_collection": {
+      "label": "图1.3.6",
+      "href": "#fig-data-collection",
+      "note": "01-introduction/09-interaction-and-reinforcement-learning.md"
+    },
+    "fig_rl-environment": {
+      "label": "图1.3.7",
+      "href": "#fig-rl-environment",
+      "note": "01-introduction/09-interaction-and-reinforcement-learning.md"
+    },
+    "fig_koebel": {
+      "label": "图1.4.1",
+      "href": "#fig-koebel",
+      "note": "01-introduction/10-origins-of-machine-learning.md"
+    },
+    "tab_intro_decade": {
+      "label": "表1.5.1",
+      "href": "#tab-intro-decade",
+      "note": "01-introduction/11-development-of-deep-learning.md"
+    }
+  },
+  "organization": {
+    "updatedOn": "2026-11-13",
+    "chapterIndex": "01-introduction/_index.md",
+    "sections": [
+      {
+        "file": "01-introduction/01-from-rules-to-machine-learning.md",
+        "title": "从规则编程到机器学习",
+        "order": 1,
+        "originalHeadings": [
+          "引言",
+          "日常生活中的机器学习"
+        ]
+      },
+      {
+        "file": "01-introduction/02-data-and-models.md",
+        "title": "数据与模型",
+        "order": 2,
+        "originalHeadings": [
+          "机器学习中的关键组件",
+          "数据",
+          "模型"
+        ]
+      },
+      {
+        "file": "01-introduction/03-objective-functions-and-optimization.md",
+        "title": "目标函数与优化算法",
+        "order": 3,
+        "originalHeadings": [
+          "目标函数",
+          "优化算法"
+        ]
+      },
+      {
+        "file": "01-introduction/04-supervised-learning-and-regression.md",
+        "title": "监督学习与回归",
+        "order": 4,
+        "originalHeadings": [
+          "各种机器学习问题",
+          "监督学习",
+          "回归"
+        ]
+      },
+      {
+        "file": "01-introduction/05-classification-and-multiple-labels.md",
+        "title": "分类与多标签学习",
+        "order": 5,
+        "originalHeadings": [
+          "分类",
+          "标记问题"
+        ]
+      },
+      {
+        "file": "01-introduction/06-search-and-recommendation.md",
+        "title": "搜索与推荐系统",
+        "order": 6,
+        "originalHeadings": [
+          "搜索",
+          "推荐系统"
+        ]
+      },
+      {
+        "file": "01-introduction/07-sequence-learning.md",
+        "title": "序列学习",
+        "order": 7,
+        "originalHeadings": [
+          "序列学习"
+        ]
+      },
+      {
+        "file": "01-introduction/08-unsupervised-learning.md",
+        "title": "无监督学习",
+        "order": 8,
+        "originalHeadings": [
+          "无监督学习"
+        ]
+      },
+      {
+        "file": "01-introduction/09-interaction-and-reinforcement-learning.md",
+        "title": "环境交互与强化学习",
+        "order": 9,
+        "originalHeadings": [
+          "与环境互动",
+          "强化学习"
+        ]
+      },
+      {
+        "file": "01-introduction/10-origins-of-machine-learning.md",
+        "title": "机器学习的起源",
+        "order": 10,
+        "originalHeadings": [
+          "起源"
+        ]
+      },
+      {
+        "file": "01-introduction/11-development-of-deep-learning.md",
+        "title": "深度学习的发展",
+        "order": 11,
+        "originalHeadings": [
+          "深度学习的发展"
+        ]
+      },
+      {
+        "file": "01-introduction/12-successes-of-deep-learning.md",
+        "title": "深度学习的成功案例",
+        "order": 12,
+        "originalHeadings": [
+          "深度学习的成功案例"
+        ]
+      },
+      {
+        "file": "01-introduction/13-characteristics-of-deep-learning.md",
+        "title": "深度学习的特点",
+        "order": 13,
+        "originalHeadings": [
+          "特点"
+        ]
+      },
+      {
+        "file": "01-introduction/14-summary-and-exercises.md",
+        "title": "小结与练习",
+        "order": 14,
+        "originalHeadings": [
+          "小结",
+          "练习"
+        ]
+      }
+    ]
+  }
+}

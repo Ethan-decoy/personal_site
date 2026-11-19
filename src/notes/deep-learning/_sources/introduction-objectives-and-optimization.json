@@ -1,0 +1,78 @@
+{
+  "title": "目标函数与优化算法的概念修订",
+  "adaptedOn": "2026-11-14",
+  "checkedOn": "2026-11-14",
+  "sourceSnapshotRecord": "introduction.json",
+  "note": "01-introduction/03-objective-functions-and-optimization.md",
+  "scope": "保留目标函数、训练与测试、过拟合和梯度下降的讲解主线，校正概念与优化保证的边界；保留并细化考试类比，新增一个可重建的数值例子。",
+  "sources": [
+    {
+      "id": "d2l-softmax",
+      "title": "softmax回归 — 动手学深度学习",
+      "url": "https://zh.d2l.ai/chapter_linear-networks/softmax-regression.html",
+      "version": "核对时在线中文版2.0.0，第3.4.6节与第3.4.8节",
+      "supports": "交叉熵作为分类训练损失，准确率作为模型评价指标；避免把分类训练普遍描述为直接最小化离散错误率。"
+    },
+    {
+      "id": "d2l-optimization-intro",
+      "title": "优化和深度学习 — 动手学深度学习",
+      "url": "https://zh.d2l.ai/chapter_optimization/optimization-intro.html",
+      "version": "核对时在线中文版2.0.0，第11.1.1节与第11.1.2节",
+      "supports": "训练目标与泛化目标的区别、最大化与对目标取负后最小化的关系，以及数值优化面对局部最优、鞍点等限制；不承诺找到神经网络的全局最优参数。"
+    },
+    {
+      "id": "d2l-gradient-descent",
+      "title": "梯度下降 — 动手学深度学习",
+      "url": "https://zh.d2l.ai/chapter_optimization/gd.html",
+      "version": "核对时在线中文版2.0.0，第11.3.1节",
+      "supports": "以一维可微函数说明负梯度更新和学习率；下降依赖步长等条件，过大的学习率可能使目标值增加或迭代发散。"
+    },
+    {
+      "id": "d2l-model-selection",
+      "title": "模型选择、欠拟合和过拟合 — 动手学深度学习",
+      "url": "https://zh.d2l.ai/chapter_multilayer-perceptrons/underfit-overfit.html",
+      "version": "核对时在线中文版2.0.0，第4.4.1节与第4.4.2节",
+      "supports": "训练、泛化与过拟合的关系，验证集辅助模型选择，测试数据不用于模型选择；不把所有未见样本都直接命名为测试集。"
+    },
+    {
+      "id": "d2l-distribution-shift",
+      "title": "环境和分布偏移 — 动手学深度学习",
+      "url": "https://zh.d2l.ai/chapter_multilayer-perceptrons/environment.html",
+      "version": "核对时在线中文版2.0.0，第4.9.1节与第4.9.2节",
+      "supports": "数据分布与使用环境变化也会导致模型失效；训练与新数据表现存在差距不能单独作为过拟合的充分诊断。"
+    }
+  ],
+  "changes": [
+    "明确监督学习例子中的样本损失、训练目标与评价指标职责，保留最小化和最大化的取负关系。",
+    "用分类交叉熵训练与准确率评价连接替代目标的用途，不在引言中展开交叉熵推导。",
+    "按用途区分训练集、验证集与测试集，并将原有模拟考试类比落回参数拟合、模型选择与最终评价。",
+    "保留过拟合概念，补足同分布未见样本的语境，并与分布偏移造成的失效区分。",
+    "将搜索出最佳参数改为寻找使目标值更低的参数，说明损失形式与模型共同决定参数优化问题。",
+    "明确梯度的局部性质与学习率的步幅职责，通过一个单样本、单参数模型对照两种学习率。",
+    "新增小节训练表现与新数据表现，并将前两节的对应概念回指改为这一实际入口；保留目标函数与优化算法原有锚点。"
+  ],
+  "relatedNotes": [
+    "01-introduction/01-from-rules-to-machine-learning.md#训练之后还要检查效果",
+    "01-introduction/02-data-and-models.md#独立同分布是一种假设"
+  ],
+  "numericalExample": {
+    "kind": "单样本、单参数示意计算，不是训练实验",
+    "model": "prediction = theta",
+    "label": 3,
+    "objective": "L(theta) = (theta - 3)^2",
+    "gradient": "L'(theta) = 2 * (theta - 3)",
+    "initialParameter": 1,
+    "initialLoss": 4,
+    "initialGradient": -4,
+    "updates": [
+      { "learningRate": 0.25, "parameterAfterUpdate": 2, "lossAfterUpdate": 1 },
+      { "learningRate": 2, "parameterAfterUpdate": 9, "lossAfterUpdate": 36 }
+    ],
+    "verification": "按相同初始值分别计算 theta - learningRate * gradient，已用Node.js核对参数、预测与平方误差；单参数示例不外推为所有神经网络目标的形状。"
+  },
+  "limits": [
+    "没有新增或更新产品、框架版本、模型榜单与性能纪录。",
+    "没有训练神经网络或复现原书实验；数值计算仅验证文中明确给定的示意关系。",
+    "没有把降低训练目标、改善特定评价指标与改善实际使用环境中的表现视为同一种保证。"
+  ]
+}

@@ -155,7 +155,7 @@
 .code-reference-drag:focus-visible,
 .code-reference-resize:focus-visible,
 .code-reference-code pre:focus-visible {
-	outline: 2px solid var(--syntax-function);
+	outline: 2px solid var(--syntax-accent);
 	outline-offset: -2px;
 }
 

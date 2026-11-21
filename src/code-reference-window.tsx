@@ -381,6 +381,8 @@ export default function CodeReferenceWindow({
 				<CodeBlockContent
 					value={source.value}
 					language={source.language}
+					highlightedHtml={source.highlightedHtml}
+					isDark={isDark}
 					focusable
 				/>
 			</div>

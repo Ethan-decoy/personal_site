@@ -1,6 +1,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
+import { prepareNoteBody } from "./notes-highlighting";
 
 const NOTES_DIRECTORY = "src/notes";
 const NOTES_MANIFEST_ID = "virtual:notes-manifest";
@@ -9,6 +10,7 @@ const RESOLVED_NOTES_MANIFEST_ID = `\0${NOTES_MANIFEST_ID}`;
 const RESOLVED_NOTES_SEARCH_INDEX_ID = `\0${NOTES_SEARCH_INDEX_ID}`;
 const NOTES_SEARCH_CHUNK_PREFIX = `${NOTES_SEARCH_INDEX_ID}/`;
 const RESOLVED_NOTES_SEARCH_CHUNK_PREFIX = `\0${NOTES_SEARCH_CHUNK_PREFIX}`;
+const NOTE_BODY_QUERY = "?note-body";
 const SEARCH_CHUNK_TARGET_BYTES = 256 * 1024;
 
 type NoteManifestRecord = {
@@ -287,6 +289,13 @@ export function notesManifestPlugin(): Plugin {
 			}
 		},
 		async load(id) {
+			if (id.endsWith(NOTE_BODY_QUERY)) {
+				const file = id.slice(0, -NOTE_BODY_QUERY.length);
+				if (!isPublicNotePath(file)) return;
+				this.addWatchFile(file);
+				const body = await prepareNoteBody(await readFile(file, "utf8"));
+				return `export default ${JSON.stringify(body)};`;
+			}
 			const isSearchChunk = id.startsWith(RESOLVED_NOTES_SEARCH_CHUNK_PREFIX);
 			if (
 				id !== RESOLVED_NOTES_MANIFEST_ID &&
@@ -312,7 +321,9 @@ export function notesManifestPlugin(): Plugin {
 					}),
 				);
 				const loaders = notes.map(({ file }) => {
-					const source = JSON.stringify(`/${NOTES_DIRECTORY}/${file.slice(2)}?raw`);
+					const source = JSON.stringify(
+						`/${NOTES_DIRECTORY}/${file.slice(2)}${NOTE_BODY_QUERY}`,
+					);
 					return `${JSON.stringify(file)}: () => import(${source}).then(({ default: body }) => body)`;
 				});
 				return `export default ${JSON.stringify(manifest)};
@@ -338,9 +349,9 @@ export function notesManifestPlugin(): Plugin {
 				return chunks.flatMap((chunk) => chunk.default);
 			}`;
 		},
-		handleHotUpdate({ file, server }) {
+		handleHotUpdate({ file, modules, server }) {
 			if (!isPublicNotePath(file)) return;
-			return invalidateIndexes(server);
+			return [...new Set([...modules, ...invalidateIndexes(server)])];
 		},
 	};
 }

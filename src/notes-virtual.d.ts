@@ -13,7 +13,10 @@ declare module "virtual:notes-manifest" {
 		sidebarGroups?: SidebarGroup[];
 	}>;
 	export const noteBodyLoaders: Readonly<
-		Record<string, (() => Promise<string>) | undefined>
+		Record<
+			string,
+			(() => Promise<import("./note-markdown").NoteBody>) | undefined
+		>
 	>;
 	export default manifest;
 }

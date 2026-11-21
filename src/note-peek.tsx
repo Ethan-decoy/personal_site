@@ -378,6 +378,7 @@ export default function NotePeek({
 				{note ? (
 					<MarkdownPreview
 						content={note.content}
+						codeHighlights={note.codeHighlights}
 						theme={theme}
 						isDark={mode === "dark"}
 						excerpt={{

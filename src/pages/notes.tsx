@@ -1024,6 +1024,7 @@ export default function NotesPage({
 									>
 										<MarkdownPreview
 											content={selectedNote.content}
+											codeHighlights={selectedNote.codeHighlights}
 											theme={theme}
 											isDark={mode === "dark"}
 											resolveNoteHref={resolveMarkdownNoteHref}

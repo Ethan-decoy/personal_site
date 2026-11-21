@@ -1,8 +1,6 @@
 import {
 	type CSSProperties,
-	type ReactElement,
 	type ReactNode,
-	isValidElement,
 	useEffect,
 	useMemo,
 	useRef,
@@ -12,162 +10,47 @@ import ReactMarkdown, { type Components } from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
 import rehypeSlug from "rehype-slug";
-import remarkCjkFriendly from "remark-cjk-friendly/parseOnly";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
 import "katex/dist/katex.min.css";
-import hljs from "highlight.js/lib/core";
-import bash from "highlight.js/lib/languages/bash";
-import cpp from "highlight.js/lib/languages/cpp";
-import css from "highlight.js/lib/languages/css";
-import go from "highlight.js/lib/languages/go";
-import java from "highlight.js/lib/languages/java";
-import json from "highlight.js/lib/languages/json";
-import kotlin from "highlight.js/lib/languages/kotlin";
-import markdown from "highlight.js/lib/languages/markdown";
-import python from "highlight.js/lib/languages/python";
-import ruby from "highlight.js/lib/languages/ruby";
-import rust from "highlight.js/lib/languages/rust";
-import shell from "highlight.js/lib/languages/shell";
-import sql from "highlight.js/lib/languages/sql";
-import swift from "highlight.js/lib/languages/swift";
-import ts from "highlight.js/lib/languages/typescript";
-import xml from "highlight.js/lib/languages/xml";
-import yaml from "highlight.js/lib/languages/yaml";
 import { CodeReferencePin } from "./code-reference";
 import "./markdown-answers.css";
 import { rehypeMarkdownBlockquotes } from "./markdown-blockquotes";
 import { type NoteExcerptOptions, rehypeNoteExcerpt } from "./note-excerpt";
+import {
+	type NoteBody,
+	codeHighlightKey,
+	noteRemarkPlugins,
+	readMarkdownCodeBlock,
+} from "./note-markdown";
 import type { NoteLinkTarget } from "./notes";
 
-const loadTreeSitterHighlighter = () => import("./highlighter");
-
-/* ---- highlight.js language registrations ---- */
-hljs.registerLanguage("typescript", ts);
-hljs.registerLanguage("ts", ts);
-hljs.registerLanguage("javascript", ts);
-hljs.registerLanguage("js", ts);
-hljs.registerLanguage("bash", bash);
-hljs.registerLanguage("sh", shell);
-hljs.registerLanguage("shell", shell);
-hljs.registerLanguage("json", json);
-hljs.registerLanguage("xml", xml);
-hljs.registerLanguage("html", xml);
-hljs.registerLanguage("css", css);
-hljs.registerLanguage("yaml", yaml);
-hljs.registerLanguage("yml", yaml);
-hljs.registerLanguage("markdown", markdown);
-hljs.registerLanguage("md", markdown);
-hljs.registerLanguage("python", python);
-hljs.registerLanguage("py", python);
-hljs.registerLanguage("rust", rust);
-hljs.registerLanguage("rs", rust);
-hljs.registerLanguage("cpp", cpp);
-hljs.registerLanguage("c++", cpp);
-hljs.registerLanguage("c", cpp);
-hljs.registerLanguage("java", java);
-hljs.registerLanguage("sql", sql);
-hljs.registerLanguage("go", go);
-hljs.registerLanguage("ruby", ruby);
-hljs.registerLanguage("swift", swift);
-hljs.registerLanguage("kotlin", kotlin);
-hljs.registerLanguage("cmake", (hljs) => ({
-	name: "CMake",
-	case_insensitive: true,
-	keywords: {
-		keyword:
-			"if else elseif endif foreach endwhile while endwhile endforeach endfunction endmacro endblock cmake_minimum_required project set option macro function include find_package add_executable add_library target_link_libraries target_include_directories target_compile_definitions target_compile_options add_subdirectory install export configure_file file message string list math execute_process add_definitions remove_definitions add_compile_options source_group set_property get_property get_target_property set_target_properties get_directory_property include_directories link_directories link_libraries aux_source_directory create_test_sourcelist add_test enable_testing",
-		built_in:
-			"TRUE FALSE ON OFF AND OR NOT COMMAND POLICY TARGET PROPERTY CACHE ENV VARIABLE IN_LIST APPEND PREPEND REMOVE_AT REMOVE_ITEM REPLACE REGEX MATCH MATCHALL LESS GREATER EQUAL STRLESS STRGREATER STREQUAL VERSION_LESS VERSION_GREATER VERSION_EQUAL",
-	},
-	contains: [
-		hljs.HASH_COMMENT_MODE,
-		{ className: "variable", begin: /\$\{/, end: /\}/, contains: ["self"] },
-		hljs.QUOTE_STRING_MODE,
-		hljs.NUMBER_MODE,
-	],
-}));
-
-/* ---- Code highlighter themes ---- */
-// Syntax roles follow the familiar VS Code Light+/Dark+ convention. Comment
-// greens are luminance-calibrated to the Notes backgrounds for small web text.
-export const HLJS_THEMES = {
+// Notes supplies the frame. The code surface uses the stock Shiki themes.
+const CODE_FRAME_THEMES = {
 	light: {
-		bg: "#F8FAFC",
+		bg: "#FFFFFF",
+		text: "#000000",
 		headerBg: "#D5E1E9",
-		text: "#1F2328",
-		comment: "#006400",
-		keyword: "#A31525",
-		string: "#075B1D",
-		number: "#864000",
-		function: "#004C9E",
-		class_: "#6F36B3",
-		type: "#6F36B3",
-		builtIn: "#6F36B3",
-		variable: "#1F2328",
-		templateVar: "#6F36B3",
-		attr: "#864000",
-		meta: "#4B5560",
-		metaKeyword: "#A31525",
-		metaString: "#075B1D",
-		punctuation: "#3F4850",
-		operator: "#3F4850",
-		bullet: "#005A50",
-		link: "#004C9E",
-		deletion: "#A31525",
-		addition: "#075B1D",
 		border: "#718A9B",
-		langBar: "#293E4B",
-		shadow: "none",
+		label: "#293E4B",
+		accent: "#004C9E",
+		success: "#075B1D",
+		error: "#A31525",
 	},
 	dark: {
-		bg: "#16232D",
+		bg: "#1E1E1E",
+		text: "#D4D4D4",
 		headerBg: "#0D171F",
-		text: "#F0F6FC",
-		comment: "#84BA70",
-		keyword: "#FF8A82",
-		string: "#7EE787",
-		number: "#FFA657",
-		function: "#79C0FF",
-		class_: "#D2A8FF",
-		type: "#D2A8FF",
-		builtIn: "#D2A8FF",
-		variable: "#F0F6FC",
-		templateVar: "#D2A8FF",
-		attr: "#FFA657",
-		meta: "#A7B1BB",
-		metaKeyword: "#FF8A82",
-		metaString: "#7EE787",
-		punctuation: "#C9D1D9",
-		operator: "#C9D1D9",
-		bullet: "#56D4C2",
-		link: "#79C0FF",
-		deletion: "#FF8A82",
-		addition: "#7EE787",
 		border: "#526877",
-		langBar: "#A7B1BB",
-		shadow: "none",
+		label: "#A7B1BB",
+		accent: "#79C0FF",
+		success: "#7EE787",
+		error: "#FF8A82",
 	},
 };
-
-function extractText(node: ReactNode): string {
-	if (typeof node === "string") return node;
-	if (Array.isArray(node)) return node.map(extractText).join("");
-	if (node && typeof node === "object" && "props" in node)
-		return extractText(
-			(node as { props: { children?: ReactNode } }).props.children,
-		);
-	return "";
-}
 
 /* ---- Code blocks: <pre> is the only block-level rendering seam ---- */
 interface CodeElementProps {
 	className?: string;
 	children?: ReactNode;
-}
-
-function languageFromClassName(className?: string): string {
-	return /(?:^|\s)language-([^\s]+)/.exec(className ?? "")?.[1] ?? "";
 }
 
 function InlineCode({ className, children }: CodeElementProps) {
@@ -336,166 +219,66 @@ export function CodeBlockCopyButton({ value }: { value: string }) {
 function CodeBlockFrame({
 	value,
 	language,
-	children,
+	highlightedHtml,
+	isDark,
 }: {
 	value: string;
-	language?: string;
-	children: ReactNode;
+	language: string;
+	highlightedHtml?: string;
+	isDark: boolean;
 }) {
 	const sourceRef = useRef<HTMLElement>(null);
 	return (
-		<figure
-			ref={sourceRef}
-			className="not-prose markdown-code-block syntax-theme-ocean"
-		>
+		<figure ref={sourceRef} className="not-prose markdown-code-block">
 			<figcaption className="markdown-code-toolbar">
 				<span className="markdown-code-language">{language || "text"}</span>
 				<div className="markdown-code-actions">
 					<CodeReferencePin
 						value={value}
 						language={language}
+						highlightedHtml={highlightedHtml}
 						sourceRef={sourceRef}
 					/>
 					<CodeBlockCopyButton value={value} />
 				</div>
 			</figcaption>
-			{children}
+			<CodeBlockContent
+				value={value}
+				language={language}
+				highlightedHtml={highlightedHtml}
+				isDark={isDark}
+			/>
 		</figure>
 	);
 }
 
-function findCodeElement(
-	children: ReactNode,
-): ReactElement<CodeElementProps> | null {
-	const candidates = Array.isArray(children) ? children : [children];
-	for (const candidate of candidates) {
-		if (isValidElement<CodeElementProps>(candidate)) {
-			return candidate;
-		}
-	}
-	return null;
-}
-
-function MarkdownCodeBlock({
-	children,
-	isDark,
-	accent,
-}: {
-	children?: ReactNode;
-	isDark: boolean;
-	accent: string;
-}) {
-	const code = findCodeElement(children);
-	const className = code?.props.className;
-	const value = extractText(code?.props.children ?? children).replace(
-		/\n$/,
-		"",
-	);
-	const lang = languageFromClassName(className);
-
-	if (lang === "plot") {
-		return (
-			<div className="not-prose markdown-plot-block">
-				<Plot fn={value.trim()} accent={accent} isDark={isDark} />
-			</div>
-		);
-	}
-
-	return (
-		<CodeBlockFrame language={lang} value={value}>
-			<CodeBlockContent value={value} language={lang} />
-		</CodeBlockFrame>
-	);
-}
-
-const NO_HIGHLIGHTER_ERROR = Symbol("no-highlighter-error");
-let lastReportedHighlighterError: unknown = NO_HIGHLIGHTER_ERROR;
-
-function reportHighlighterError(error: unknown) {
-	if (Object.is(error, lastReportedHighlighterError)) return;
-	lastReportedHighlighterError = error;
-	console.warn(
-		"Tree-sitter highlighting failed; using highlight.js fallback.",
-		error,
-	);
-}
-
 export function CodeBlockContent({
-	language: lang,
+	language,
 	value,
+	highlightedHtml,
+	isDark,
 	focusable = false,
-}: { language: string; value: string; focusable?: boolean }) {
-	const [html, setHtml] = useState<string | null>(null);
-
-	useEffect(() => {
-		let cancelled = false;
-		setHtml(null);
-		if (!lang) return;
-		void loadTreeSitterHighlighter()
-			.then(({ highlight }) => highlight(value, lang))
-			.then((result) => {
-				if (cancelled) return;
-				if (result) {
-					setHtml(result);
-					lastReportedHighlighterError = NO_HIGHLIGHTER_ERROR;
-				}
-			})
-			.catch((error: unknown) => {
-				if (import.meta.env.DEV) {
-					reportHighlighterError(error);
-				}
-			});
-		return () => {
-			cancelled = true;
-		};
-	}, [value, lang]);
-
-	const hljsHtml = lang ? highlightWithFallback(value, lang) : null;
-
+}: {
+	language: string;
+	value: string;
+	highlightedHtml?: string;
+	isDark: boolean;
+	focusable?: boolean;
+}) {
+	const markup =
+		highlightedHtml === undefined ? undefined : { __html: highlightedHtml };
 	return (
 		<pre tabIndex={focusable ? 0 : undefined}>
-			{lang ? (
-				<code
-					className={`language-${lang}`}
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: both highlighters escape source text and only add span markup
-					dangerouslySetInnerHTML={{ __html: html || hljsHtml || "" }}
-				/>
-			) : (
-				<code>{value}</code>
-			)}
+			<code
+				className={language ? "language-" + language : undefined}
+				data-code-theme={markup && (isDark ? "dark" : "light")}
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: the build generates escaped Shiki markup from the original code
+				dangerouslySetInnerHTML={markup}
+			>
+				{markup ? undefined : value}
+			</code>
 		</pre>
 	);
-}
-
-function escapeHtml(value: string): string {
-	return value.replace(/[&<>"']/g, (char) => {
-		switch (char) {
-			case "&":
-				return "&amp;";
-			case "<":
-				return "&lt;";
-			case ">":
-				return "&gt;";
-			case '"':
-				return "&quot;";
-			case "'":
-				return "&#39;";
-			default:
-				return char;
-		}
-	});
-}
-
-function highlightWithFallback(value: string, lang: string): string {
-	if (!hljs.getLanguage(lang)) return escapeHtml(value);
-	try {
-		return hljs.highlight(value, {
-			language: lang,
-			ignoreIllegals: true,
-		}).value;
-	} catch {
-		return escapeHtml(value);
-	}
 }
 
 /* ---- Function Plot component ---- */
@@ -782,7 +565,6 @@ function Plot({
 }
 
 /* ---- Stable plugin arrays (prevents ReactMarkdown re-processing) ---- */
-const REMARK_PLUGINS = [remarkMath, remarkGfm, remarkCjkFriendly];
 const REHYPE_PLUGINS = [
 	rehypeRaw,
 	rehypeMarkdownBlockquotes,
@@ -814,6 +596,7 @@ function makeComponents(
 	dark: boolean,
 	theme: { accent: string },
 	noteLinks: NoteLinkAdapter,
+	codeHighlights: NoteBody["codeHighlights"] | undefined,
 ): Components {
 	return {
 		a: ({ node: _node, href, children, ...props }) => {
@@ -943,11 +726,24 @@ function makeComponents(
 		code: ({ className, children }: CodeElementProps) => (
 			<InlineCode className={className}>{children}</InlineCode>
 		),
-		pre: ({ children }: { children?: ReactNode }) => (
-			<MarkdownCodeBlock isDark={dark} accent={theme.accent}>
-				{children}
-			</MarkdownCodeBlock>
-		),
+		pre: ({ node }) => {
+			const { language, value } = readMarkdownCodeBlock(node);
+			if (language === "plot") {
+				return (
+					<div className="not-prose markdown-plot-block">
+						<Plot fn={value.trim()} accent={theme.accent} isDark={dark} />
+					</div>
+				);
+			}
+			return (
+				<CodeBlockFrame
+					language={language}
+					value={value}
+					highlightedHtml={codeHighlights?.[codeHighlightKey(language, value)]}
+					isDark={dark}
+				/>
+			);
+		},
 	};
 }
 
@@ -963,7 +759,7 @@ export function markdownThemeVariables(
 	theme: ThemeColors,
 	dark: boolean,
 ): CSSProperties {
-	const syntax = dark ? HLJS_THEMES.dark : HLJS_THEMES.light;
+	const syntax = dark ? CODE_FRAME_THEMES.dark : CODE_FRAME_THEMES.light;
 	return {
 		"--markdown-accent": theme.accent,
 		"--markdown-inline-border": `${theme.accent}${dark ? "26" : "1F"}`,
@@ -974,31 +770,16 @@ export function markdownThemeVariables(
 		"--syntax-header-bg": syntax.headerBg,
 		"--syntax-text": syntax.text,
 		"--syntax-border": syntax.border,
-		"--syntax-shadow": syntax.shadow,
-		"--syntax-label": syntax.langBar,
-		"--syntax-comment": syntax.comment,
-		"--syntax-keyword": syntax.keyword,
-		"--syntax-string": syntax.string,
-		"--syntax-number": syntax.number,
-		"--syntax-function": syntax.function,
-		"--syntax-class": syntax.class_,
-		"--syntax-type": syntax.type,
-		"--syntax-builtin": syntax.builtIn,
-		"--syntax-variable": syntax.variable,
-		"--syntax-template-variable": syntax.templateVar,
-		"--syntax-attribute": syntax.attr,
-		"--syntax-meta": syntax.meta,
-		"--syntax-meta-keyword": syntax.metaKeyword,
-		"--syntax-meta-string": syntax.metaString,
-		"--syntax-punctuation": syntax.punctuation,
-		"--syntax-bullet": syntax.bullet,
-		"--syntax-deletion": syntax.deletion,
-		"--syntax-addition": syntax.addition,
+		"--syntax-label": syntax.label,
+		"--syntax-accent": syntax.accent,
+		"--syntax-error": syntax.error,
+		"--syntax-success": syntax.success,
 	} as CSSProperties;
 }
 
 export function MarkdownPreview({
 	content,
+	codeHighlights,
 	theme,
 	isDark,
 	resolveNoteHref,
@@ -1010,6 +791,7 @@ export function MarkdownPreview({
 	excerpt,
 }: {
 	content: string;
+	codeHighlights?: NoteBody["codeHighlights"];
 	theme: ThemeColors;
 	isDark?: boolean;
 	excerpt?: NoteExcerptOptions;
@@ -1017,18 +799,24 @@ export function MarkdownPreview({
 	const dark = isDark ?? false;
 	const components = useMemo(
 		() =>
-			makeComponents(dark, theme, {
-				resolveNoteHref,
-				onNoteOpen,
-				onNoteLinkPointerEnter,
-				onNoteLinkPointerLeave,
-				onNoteLinkFocus,
-				onNoteLinkBlur,
-				excerptIdPrefix: excerpt?.idPrefix,
-			}),
+			makeComponents(
+				dark,
+				theme,
+				{
+					resolveNoteHref,
+					onNoteOpen,
+					onNoteLinkPointerEnter,
+					onNoteLinkPointerLeave,
+					onNoteLinkFocus,
+					onNoteLinkBlur,
+					excerptIdPrefix: excerpt?.idPrefix,
+				},
+				codeHighlights,
+			),
 		[
 			dark,
 			theme,
+			codeHighlights,
 			resolveNoteHref,
 			onNoteOpen,
 			onNoteLinkPointerEnter,
@@ -1068,7 +856,7 @@ export function MarkdownPreview({
 				style={markdownStyle}
 			>
 				<ReactMarkdown
-					remarkPlugins={REMARK_PLUGINS}
+					remarkPlugins={noteRemarkPlugins}
 					rehypePlugins={rehypePlugins}
 					components={components}
 				>

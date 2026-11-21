@@ -9,60 +9,74 @@ const vite = await createServer({
 });
 
 try {
-	const { HLJS_THEMES, MarkdownPreview } = await vite.ssrLoadModule(
+	const { MarkdownPreview, markdownThemeVariables } = await vite.ssrLoadModule(
 		"/src/notes-renderer.tsx",
+	);
+	const { prepareNoteBody } = await vite.ssrLoadModule(
+		"/scripts/notes-highlighting.ts",
 	);
 	const title = "Markdown renderer fixture";
 	const cjkStrongMarkdown =
 		"**在这里的 `int` 对象初始化中，新对象取得源对象当时的值，随后彼此独立；赋值只改变已经存在的对象。**这种数值初始化不会在两个对象之间建立自动同步关系。";
 	const cjkStrongHtml =
 		'<strong>在这里的 <code class="markdown-inline-code">int</code> 对象初始化中，新对象取得源对象当时的值，随后彼此独立；赋值只改变已经存在的对象。</strong>这种数值初始化不会在两个对象之间建立自动同步关系。';
-	const html = renderToStaticMarkup(
-		React.createElement(MarkdownPreview, {
-			content: [
-				`# ${title}`,
-				"",
-				"Paragraph with `inline code`.",
-				"",
-				"```js",
-				"// Comments must remain readable and visually distinct.",
-				"const answer = 42;",
-				"```",
-				"",
-				"```",
-				"plain text",
-				"```",
-				"",
-				"| Item | Value |",
-				"| --- | --- |",
-				"| answer | 42 |",
-				"",
-				"$$",
-				"x^2 + y^2",
-				"$$",
-				"",
-				"```plot",
-				"sin(x)",
-				"```",
-				"",
-				cjkStrongMarkdown,
-			].join("\n"),
-			theme: { name: "fixture", accent: "#1B3A5C" },
-			isDark: false,
-		}),
-	);
-
-	const renderMarkdown = (content) =>
+	const fixtureTheme = { name: "fixture", accent: "#1B3A5C" };
+	const renderMarkdown = (body, options = {}) =>
 		renderToStaticMarkup(
 			React.createElement(MarkdownPreview, {
-				content,
-				theme: { name: "fixture", accent: "#1B3A5C" },
+				...(typeof body === "string" ? { content: body } : body),
+				theme: fixtureTheme,
 				isDark: false,
+				...options,
 			}),
 		);
+	const preparedFixture = await prepareNoteBody(
+		[
+			`# ${title}`,
+			"",
+			"Paragraph with `inline code`.",
+			"",
+			"```js",
+			"// Comments must remain readable and visually distinct.",
+			"const answer = 42;",
+			"const markup = '<script></script>';",
+			"```",
+			"",
+			"```",
+			"plain text",
+			"```",
+			"",
+			"| Item | Value |",
+			"| --- | --- |",
+			"| answer | 42 |",
+			"",
+			"$$",
+			"x^2 + y^2",
+			"$$",
+			"",
+			"```plot",
+			"sin(x)",
+			"```",
+			"",
+			cjkStrongMarkdown,
+		].join("\n"),
+	);
+	const html = renderMarkdown(preparedFixture);
+	const darkHtml = renderMarkdown(preparedFixture, { isDark: true });
+	const firstHighlightedCode = (rendered) =>
+		/<code[^>]+data-code-theme="(?:light|dark)"[^>]*>([\s\S]*?)<\/code>/.exec(
+			rendered,
+		)?.[1];
+	const commentStyle =
+		/<span style="([^"]+)">\/\/ Comments must remain readable/.exec(
+			html,
+		)?.[1] ?? "";
 	// Simulate the UI being imported under different URLs after a dev hot update.
 	const { CodeReferenceProvider } = await vite.ssrLoadModule(
 		"/src/code-reference.tsx?context-fixture",
+	);
+	const preparedReference = await prepareNoteBody(
+		"```cpp\nint value = 1;\n```\n\n```\nplain text\n```",
 	);
 	const pinnedCodeHtml = renderToStaticMarkup(
 		React.createElement(
@@ -74,7 +88,7 @@ try {
 				onOpenSource: () => undefined,
 			},
 			React.createElement(MarkdownPreview, {
-				content: "```cpp\nint value = 1;\n```\n\n```\nplain text\n```",
+				...preparedReference,
 				theme: { name: "fixture", accent: "#1B3A5C" },
 				isDark: false,
 			}),
@@ -106,25 +120,27 @@ try {
 		html: renderMarkdown(`> [!${type}]\n> ${type} 的首行正文。`),
 	}));
 	const richCalloutHtml = renderMarkdown(
-		[
-			"> [!IMPORTANT] 记住 **表达式类别** 与 `std::move`",
-			"> 首行正文包含 **粗体** 和 `value`。",
-			">",
-			"> 第二段包含 [标准参考](https://example.com/reference) 与 $x^2$。",
-			">",
-			"> - 保留列表第一项",
-			">   - 保留嵌套列表",
-			">",
-			"> ```cpp",
-			"> auto moved = std::move(value);",
-			"> ```",
-			">",
-			"> $$",
-			"> x^2 + y^2",
-			"> $$",
-			">",
-			"> > 普通嵌套引用。",
-		].join("\n"),
+		await prepareNoteBody(
+			[
+				"> [!IMPORTANT] 记住 **表达式类别** 与 `std::move`",
+				"> 首行正文包含 **粗体** 和 `value`。",
+				">",
+				"> 第二段包含 [标准参考](https://example.com/reference) 与 $x^2$。",
+				">",
+				"> - 保留列表第一项",
+				">   - 保留嵌套列表",
+				">",
+				"> ```cpp",
+				"> auto moved = std::move(value);",
+				"> ```",
+				">",
+				"> $$",
+				"> x^2 + y^2",
+				"> $$",
+				">",
+				"> > 普通嵌套引用。",
+			].join("\n"),
+		),
 	);
 	const ordinaryQuoteHtml = renderMarkdown(
 		[
@@ -190,16 +206,11 @@ try {
 		"",
 		"EXCLUDED_NEXT_SECTION",
 	].join("\n");
-	const renderExcerpt = (content, anchor, idPrefix = ":preview:") =>
-		renderToStaticMarkup(
-			React.createElement(MarkdownPreview, {
-				content,
-				theme: { accent: "#1B3A5C" },
-				excerpt: { anchor, idPrefix },
-			}),
-		);
-	const anchoredExcerpt = renderExcerpt(excerptSource, "repeated-value-1");
-	const fullExcerptSource = renderMarkdown(excerptSource);
+	const renderExcerpt = (body, anchor, idPrefix = ":preview:") =>
+		renderMarkdown(body, { excerpt: { anchor, idPrefix } });
+	const preparedExcerpt = await prepareNoteBody(excerptSource);
+	const anchoredExcerpt = renderExcerpt(preparedExcerpt, "repeated-value-1");
+	const fullExcerptSource = renderMarkdown(preparedExcerpt);
 	const introductorySource = [
 		"# Introduction",
 		"",
@@ -296,6 +307,7 @@ try {
 			name: "code pin controls share note context across independently loaded UI modules",
 			pass:
 				(pinnedCodeHtml.match(/aria-label="固定代码"/g) ?? []).length === 2 &&
+				pinnedCodeHtml.includes('data-code-theme="light"') &&
 				!html.includes('aria-label="固定代码"'),
 		},
 		{
@@ -342,6 +354,9 @@ try {
 				anchoredExcerpt.includes("Following is code, not a heading.") &&
 				anchoredExcerpt.includes("final_line") &&
 				(anchoredExcerpt.match(/<pre\b/g) ?? []).length === 1 &&
+				anchoredExcerpt.includes('data-code-theme="light"') &&
+				firstHighlightedCode(anchoredExcerpt) ===
+					firstHighlightedCode(fullExcerptSource) &&
 				anchoredExcerpt.includes("last_row") &&
 				anchoredExcerpt.includes("</table>") &&
 				anchoredExcerpt.includes("katex-display") &&
@@ -447,15 +462,30 @@ try {
 			pass: html.includes("markdown-code-block") && html.includes("not-prose"),
 		},
 		{
-			name: "fenced code comments retain their syntax hook",
-			pass: html.includes("hljs-comment"),
+			name: "the first render uses the same escaped Shiki output in both themes",
+			pass:
+				html.includes('data-code-theme="light"') &&
+				darkHtml.includes('data-code-theme="dark"') &&
+				firstHighlightedCode(html) === firstHighlightedCode(darkHtml) &&
+				!/<script\b/.test(html) &&
+				commentStyle.includes("--shiki-light:") &&
+				commentStyle.includes("--shiki-dark:"),
 		},
 		{
 			name: "code comments stay readable and chromatically distinct",
-			pass: Object.values(HLJS_THEMES).every(
-				({ bg, comment }) =>
-					contrastRatio(bg, comment) >= 7 && oklabChroma(comment) >= 0.08,
-			),
+			pass: [false, true].every((dark) => {
+				const mode = dark ? "dark" : "light";
+				const color = new RegExp(`--shiki-${mode}:(#[a-f0-9]{6})`, "i").exec(
+					commentStyle,
+				)?.[1];
+				const bg = markdownThemeVariables(fixtureTheme, dark)["--syntax-bg"];
+				return (
+					color &&
+					contrastRatio(bg, color) >= 4.5 &&
+					oklabChroma(color) >= 0.08 &&
+					!commentStyle.includes("font-style")
+				);
+			}),
 		},
 		{
 			name: "wide technical Markdown structures remain distinct",
@@ -519,7 +549,7 @@ try {
 				(richCalloutHtml.match(/<pre\b/g) ?? []).length === 1 &&
 				(richCalloutHtml.match(/class="markdown-code-copy"/g) ?? []).length ===
 					1 &&
-				richCalloutHtml.includes("hljs-keyword") &&
+				richCalloutHtml.includes('data-code-theme="light"') &&
 				!/<pre[^>]*>[\s\S]*?markdown-code-copy[\s\S]*?<\/pre>/.test(
 					richCalloutHtml,
 				),

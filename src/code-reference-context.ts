@@ -8,6 +8,7 @@ export interface CodeReferenceNote {
 export interface CodeReferenceSource {
 	value: string;
 	language: string;
+	highlightedHtml?: string;
 	label: string;
 	file: string;
 	noteTitle: string;

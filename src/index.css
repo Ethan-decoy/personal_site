@@ -866,7 +866,6 @@ body {
 	background: var(--syntax-bg);
 	border: 1px solid var(--syntax-border);
 	border-radius: 8px;
-	box-shadow: var(--syntax-shadow);
 	margin: 1.5rem 0;
 	overflow: hidden;
 }
@@ -890,9 +889,9 @@ body {
 }
 
 .markdown-code-pin[aria-pressed="true"] {
-	color: var(--syntax-function);
-	border-color: var(--syntax-function);
-	background: color-mix(in srgb, var(--syntax-function) 10%, transparent);
+	color: var(--syntax-accent);
+	border-color: var(--syntax-accent);
+	background: color-mix(in srgb, var(--syntax-accent) 10%, transparent);
 }
 
 .markdown-code-language {
@@ -947,20 +946,20 @@ body {
 }
 
 .markdown-code-copy:focus-visible {
-	outline: 2px solid var(--syntax-function);
+	outline: 2px solid var(--syntax-accent);
 	outline-offset: 1px;
 }
 
 .markdown-code-copy[data-copy-state="copied"] {
-	color: var(--syntax-addition);
-	border-color: color-mix(in srgb, var(--syntax-addition) 42%, transparent);
-	background: color-mix(in srgb, var(--syntax-addition) 9%, transparent);
+	color: var(--syntax-success);
+	border-color: color-mix(in srgb, var(--syntax-success) 42%, transparent);
+	background: color-mix(in srgb, var(--syntax-success) 9%, transparent);
 }
 
 .markdown-code-copy[data-copy-state="error"] {
-	color: var(--syntax-deletion);
-	border-color: color-mix(in srgb, var(--syntax-deletion) 42%, transparent);
-	background: color-mix(in srgb, var(--syntax-deletion) 9%, transparent);
+	color: var(--syntax-error);
+	border-color: color-mix(in srgb, var(--syntax-error) 42%, transparent);
+	background: color-mix(in srgb, var(--syntax-error) 9%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -991,73 +990,19 @@ body {
 	font: inherit;
 }
 
-.markdown-code-block :where(.hljs-comment, .hljs-quote) {
-	color: var(--syntax-comment);
-	font-style: normal;
+.markdown-code-block [data-code-theme="light"] span {
+	color: var(--shiki-light, inherit);
+	background-color: var(--shiki-light-bg, transparent);
+	font-style: var(--shiki-light-font-style, inherit);
+	font-weight: var(--shiki-light-font-weight, inherit);
+	text-decoration: var(--shiki-light-text-decoration, inherit);
 }
-.markdown-code-block :where(.hljs-keyword, .hljs-selector-tag) {
-	color: var(--syntax-keyword);
-	font-weight: 500;
-}
-.markdown-code-block :where(.hljs-string, .hljs-template-tag) {
-	color: var(--syntax-string);
-}
-.markdown-code-block :where(.hljs-number, .hljs-literal) {
-	color: var(--syntax-number);
-}
-.markdown-code-block
-	:where(.hljs-title.function_, .hljs-title.function_.invoke) {
-	color: var(--syntax-function);
-}
-.markdown-code-block .hljs-title.class_ {
-	color: var(--syntax-class);
-	font-weight: 500;
-}
-.markdown-code-block .hljs-type {
-	color: var(--syntax-type);
-	font-weight: 500;
-}
-.markdown-code-block :where(.hljs-built_in, .hljs-builtin-name) {
-	color: var(--syntax-builtin);
-}
-.markdown-code-block .hljs-function {
-	color: var(--syntax-function);
-}
-.markdown-code-block .hljs-variable {
-	color: var(--syntax-variable);
-}
-.markdown-code-block .hljs-template-variable {
-	color: var(--syntax-template-variable);
-}
-.markdown-code-block :where(.hljs-attr, .hljs-attribute) {
-	color: var(--syntax-attribute);
-}
-.markdown-code-block .hljs-meta {
-	color: var(--syntax-meta);
-}
-.markdown-code-block .hljs-meta .hljs-keyword {
-	color: var(--syntax-meta-keyword);
-}
-.markdown-code-block .hljs-meta .hljs-string {
-	color: var(--syntax-meta-string);
-}
-.markdown-code-block :where(.hljs-operator, .hljs-punctuation) {
-	color: var(--syntax-punctuation);
-}
-.markdown-code-block :where(.hljs-bullet, .hljs-link) {
-	color: var(--syntax-bullet);
-}
-.markdown-code-block .hljs-emphasis {
-	font-style: italic;
-}
-.markdown-code-block .hljs-strong {
-	font-weight: 600;
-}
-.markdown-code-block .hljs-deletion {
-	color: var(--syntax-deletion);
-}
-.markdown-code-block .hljs-addition {
-	color: var(--syntax-addition);
+.markdown-code-block [data-code-theme="dark"] span {
+	color: var(--shiki-dark, inherit);
+	background-color: var(--shiki-dark-bg, transparent);
+	font-style: var(--shiki-dark-font-style, inherit);
+	font-weight: var(--shiki-dark-font-weight, inherit);
+	text-decoration: var(--shiki-dark-text-decoration, inherit);
 }
 
 .markdown-plot-block {

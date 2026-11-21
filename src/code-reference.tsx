@@ -50,10 +50,12 @@ function sourceLabel(element: HTMLElement): string {
 export function CodeReferencePin({
 	value,
 	language,
+	highlightedHtml,
 	sourceRef,
 }: {
 	value: string;
 	language?: string;
+	highlightedHtml?: string;
 	sourceRef: RefObject<HTMLElement | null>;
 }) {
 	const reference = useContext(CodeReferenceContext);
@@ -83,6 +85,7 @@ export function CodeReferencePin({
 				reference.pin({
 					value,
 					language: language ?? "",
+					highlightedHtml,
 					label: sourceLabel(element),
 					file: note.file,
 					noteTitle: note.title,

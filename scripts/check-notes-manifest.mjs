@@ -44,6 +44,7 @@ const second = {
 	file: "./new-category/新 笔记.md",
 	title: "新增笔记",
 	body: "New article body.",
+	code: "const marker = 1;",
 };
 const draft = {
 	file: "./existing/_drafts/private.md",
@@ -58,12 +59,21 @@ const hidden = {
 const updates = new EventEmitter();
 let server;
 
-async function writeNote({ file, title, body }) {
+function markdownBody({ title, body, code }) {
+	return [
+		`# ${title}`,
+		body,
+		...(code ? [`\`\`\`js\n${code}\n\`\`\``] : []),
+	].join("\n\n");
+}
+
+async function writeNote(note) {
+	const { file, title } = note;
 	const absolutePath = path.join(notesRoot, file);
 	await mkdir(path.dirname(absolutePath), { recursive: true });
 	await writeFile(
 		absolutePath,
-		`---\ntitle: ${title}\ndate: 2026-11-13\n---\n\n# ${title}\n\n${body}\n`,
+		`---\ntitle: ${title}\ndate: 2026-11-13\n---\n\n${markdownBody(note)}\n`,
 	);
 	return absolutePath;
 }
@@ -111,10 +121,18 @@ try {
 		const searchFiles = (await loadSearchIndex()).map(({ file }) => file).sort();
 		assert.deepEqual(searchFiles, files, "The search index uses the public note list");
 
-		for (const { file, title, body } of expected) {
+		for (const entry of expected) {
+			const { file, title, body, code } = entry;
 			const note = await notes.loadNote(file);
 			assert.equal(note?.title, title);
-			assert.equal(note?.content, `# ${title}\n\n${body}`);
+			assert.equal(note?.content, markdownBody(entry));
+			const highlights = note?.codeHighlights;
+			const highlightKey = code ? "js\0" + code : undefined;
+			assert.deepEqual(
+				Object.keys(highlights ?? {}),
+				highlightKey ? [highlightKey] : [],
+			);
+			if (highlightKey) assert.match(highlights[highlightKey], /--shiki-dark:/);
 			const matches = await notes.searchNotes(body);
 			assert.deepEqual(matches.map((match) => match.file), [file]);
 		}
@@ -143,15 +161,18 @@ try {
 		...second,
 		title: "修订后的笔记",
 		body: "Revised article body.",
+		code: "const marker = 2;",
 	};
 	await writeNote(revised);
-	const updated = once(updates, "handled", { signal: AbortSignal.timeout(5_000) });
+	const updated = once(updates, "handled", {
+		signal: AbortSignal.timeout(5_000),
+	});
 	server.watcher.emit("change", addedPath);
 	await updated;
 	const changed = await readNotes();
 	await assertPublicNotes(changed, [first, revised]);
 	assert.deepEqual(await changed.searchNotes(second.body), []);
-	console.log("PASS editing a note updates its title, body, and search results");
+	console.log("PASS editing a note updates its title, body, highlighting, and search");
 
 	reloadedNotes = undefined;
 	await rm(addedPath);

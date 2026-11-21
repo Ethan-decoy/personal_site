@@ -13,7 +13,7 @@ order: 1
 
 class inspection_trace {
   public:
-    explicit inspection_trace(int inspection_number) : inspection_number{inspection_number} {}
+    explicit inspection_trace(const int inspection_number) : inspection_number{inspection_number} {}
 
     ~inspection_trace() {
         std::cout << "finish inspection " << inspection_number << '\n';
@@ -54,14 +54,17 @@ after block
 
 临时类对象同样具有销毁边界。它通常在相应完整表达式结束时销毁；若特定引用初始化延长了临时对象的生命周期，析构函数也随延长后的生命周期边界调用。析构时机来自对象的生命周期规则，不来自对象是否具有程序员提供的名称。
 
-> [!IMPORTANT]
-> 析构函数不决定对象应当存活多久；生命周期规则决定何时开始销毁，析构函数定义类对象进入销毁过程时需要执行的类特定动作。
+> [!IMPORTANT] 生命周期规则与析构函数的分工
+> **生命周期规则决定何时开始销毁，析构函数定义类对象进入销毁过程时需要执行的类特定动作。**析构函数本身不决定对象应当存活多久。
 
 ## 析构开始是类对象生命周期的精确终点
 
-对于类类型，标准把析构函数调用开始规定为相应对象生命周期的结束点。析构函数体随后仍然能够读取 `inspection_number`，并不表示完整对象继续处于普通生命周期中。C++ 对销毁期间的成员访问另有专门规则，而且成员子对象此时还没有完成各自的销毁。
+> [!IMPORTANT] 完整对象与成员的销毁阶段
+> **类对象进入正常析构过程时，析构函数调用开始就结束了该对象的生命周期，但成员子对象还没有随之销毁。**析构函数体先执行，函数体完成后，语言再按成员销毁规则继续处理成员子对象。
+>
+> C++ 对销毁期间的成员访问另有专门规则，析构函数体仍能利用尚未销毁的成员完成类特定动作。完整对象的生命周期已经结束，不等于所有成员在函数体执行前就已经失效。
 
-因此，析构函数体能够利用尚未销毁的成员完成类特定动作；函数体结束后，成员子对象还会按照成员销毁规则继续处理。不能把这个过程简化成“所有成员先消失，再调用一个普通函数”，也不能根据完整对象的生命周期已经结束，反推出析构函数体不能访问成员。
+本例中，`~inspection_trace()` 开始执行时，`current` 的生命周期已经结束；它的 `inspection_number` 成员尚未销毁，所以函数体能够读取数值 `17` 并输出。这个读取发生在销毁过程内，不表示 `current` 的完整对象生命周期被延长。
 
 ## 不把析构函数当作普通清理调用
 
@@ -75,4 +78,5 @@ after block
 
 - [C++23 工作草案：析构函数](https://timsong-cpp.github.io/cppwp/n4950/class.dtor)
 - [C++23 工作草案：对象生命周期](https://timsong-cpp.github.io/cppwp/n4950/basic.life)
+- [C++23 工作草案：构造与销毁期间的成员访问](https://timsong-cpp.github.io/cppwp/n4950/class.cdtor)
 - [C++23 工作草案：声明语句中的控制转移与销毁](https://timsong-cpp.github.io/cppwp/n4950/stmt.dcl)

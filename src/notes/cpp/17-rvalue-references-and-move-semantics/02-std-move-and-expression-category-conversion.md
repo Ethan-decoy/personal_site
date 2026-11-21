@@ -10,7 +10,10 @@ order: 2
 
 ## 一个只改变表达式类别的标准库工具
 
-使用 `std::move` 需要包含标准库头文件 `<utility>`，并保留表示标准库命名空间的 `std::` 前缀。对于普通对象表达式，它返回指向同一个对象的右值引用，保留该对象类型上的 `const` 等限定，不创建新对象，也不执行资源转移。
+使用 `std::move` 需要包含标准库头文件 `<utility>`，并保留表示标准库命名空间的 `std::` 前缀。
+
+> [!IMPORTANT] 类别转换与实际操作分别判断
+> **对于普通对象表达式，`std::move` 返回绑定到同一对象的右值引用，使调用表达式成为将亡值，并保留被引用类型上的 `const` 等限定。**转换不创建新对象，也不自动执行资源转移；后续行为由实际执行的初始化、赋值或函数调用规则决定。
 
 下面是一个完整程序：
 
@@ -33,27 +36,33 @@ int main() {
 
 `alias` 因此绑定到原来的整数对象。初始化 `copy` 时，整数初始化规则从这个对象取得数值 `240`，建立独立的记录；没有任何一步把源整数清零。随后通过引用赋值只改变 `value`，所以程序输出 `245 240`。
 
-> [!IMPORTANT]
-> `std::move` 提供一种允许接收方复用源对象状态的表达式，不负责执行这种复用。真正发生什么，取决于接收表达式的构造函数、赋值运算符或其他函数。
-
 ## 转换不会移除 const
 
-下面的片段同样需要 `<utility>`，放在函数体内：
+下面是另一份独立的完整程序，与前一个程序分别运行。它读取两条访问路径的数值，并比较两者取得的地址，以核对引用实际绑定的目标：
 
 ```cpp
-const int value{240};
-const int&& alias{std::move(value)};
+#include <iostream>
+#include <utility>
 
-// int&& writable{std::move(value)}; // 错误：不能丢弃 const
+int main() {
+    const int value{240};
+    const int&& alias{std::move(value)};
+
+    std::cout << value << ' ' << alias << ' ' << (&value == &alias) << '\n';
+
+    // int&& writable{std::move(value)}; // 错误：不能丢弃 const
+}
 ```
 
-`std::move(value)` 是表示 `const int` 对象的将亡值。它可以绑定到 `const int&&`，但不能让原本只读的对象变得可写。如果接收方需要修改源对象才能完成交接，这个只读来源就不满足相应接口的要求。
+`std::move(value)` 是表示 `const int` 对象的将亡值，可以用来初始化 `const int&&`。程序输出 `240 240 1`：前两项来自 `value` 和 `alias`，最后的 `1` 表示两者取得相同的地址，`alias` 仍绑定到原来的只读整数对象。
+
+若只在这份 `main` 中解除 `writable` 声明的注释，就得到单独考察的错误变体：`int&&` 不能通过这次绑定丢弃目标的 `const` 限定，因此不能通过编译。如果接收方需要修改源对象才能完成交接，这个只读来源就不满足相应接口的要求。
 
 因此，不能只看到调用位置写了 `std::move`，就断言某项资源一定会被转走。源对象的限定和接收方实际提供的操作仍然共同决定结果。
 
 ## 不延长通过函数调用传回的临时对象
 
-> [!WARNING]
+> [!WARNING] 函数返回引用不传递临时对象的生命周期
 > 右值引用的类型本身不保证生命周期延长。`int&& alias{240};` 直接绑定临时对象，临时对象可以一直存活到该局部引用的生命周期结束。
 >
 > 改写为 `int&& alias{std::move(240)};` 就不同了：临时对象先绑定到 `std::move` 的引用形参，再通过返回的引用交给局部引用。绑定到引用形参的临时对象只存活到包含这次调用的完整表达式结束，也就是这条声明的分号处。
@@ -65,4 +74,5 @@ const int&& alias{std::move(value)};
 ## 参考资料
 
 - [C++23 工作草案：forward 与 move](https://timsong-cpp.github.io/cppwp/n4950/utility#forward)
+- [C++23 工作草案：对象初始化](https://timsong-cpp.github.io/cppwp/n4950/dcl.init.general)
 - [C++23 工作草案：临时对象的生命周期](https://timsong-cpp.github.io/cppwp/n4950/class.temporary)

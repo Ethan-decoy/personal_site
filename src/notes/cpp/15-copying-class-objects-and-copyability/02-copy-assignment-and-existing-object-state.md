@@ -6,7 +6,7 @@ order: 2
 
 # 复制赋值与既有对象状态（Copy Assignment and Existing Object State）
 
-显示界面保留着一份轮胎读数记录。取得新读数后，程序需要更新这份已有记录，让先前指向它的访问路径继续有效。
+显示界面已经保留一份轮胎读数记录。取得新读数后，需要更新这份记录，让原先指向它的指针继续访问更新后的状态。
 
 复制赋值运算符（copy assignment operator）定义类怎样用同类型源对象的状态更新已有目标。源对象提供要读取的数据，调用对象接受修改。
 
@@ -60,9 +60,12 @@ int main() {
 }
 ```
 
-`tire_reading& operator=(const tire_reading& source)` 是当前类的复制赋值运算符。复制赋值运算符是非静态成员函数；在 `displayed = measured` 中，`displayed` 是调用对象，`measured` 绑定到 `source` 引用形参，不为这个形参再建立一个 `tire_reading` 对象。
+`tire_reading& operator=(const tire_reading& source)` 是当前类的非静态复制赋值运算符。在本例中，`displayed = measured` 与显式调用 `displayed.operator=(measured)` 选择同一项函数，左右两侧承担不同角色：
 
-函数体中的 `source.pressure_kpa` 和 `source.temperature_c` 读取源对象的成员；左侧未加 `source.` 的成员名则指定调用对象中的对应成员。这两条赋值对 `int` 使用内建赋值，不是再次调用类的 `operator=`。
+- 左侧 `displayed` 是调用对象，函数体中的 `this` 指向它。
+- 右侧 `measured` 绑定到 `source` 引用形参，为函数提供读取路径，不为这个形参再建立一个 `tire_reading` 对象。
+
+函数体中，未加 `source.` 的 `pressure_kpa`、`temperature_c` 指定 `displayed` 的成员；`source.pressure_kpa`、`source.temperature_c` 则读取 `measured` 的成员。两条语句分别把目标的压力从 `210` 更新为 `230`、温度从 `40` 更新为 `20`，对 `int` 使用内建赋值，不是再次调用类的 `operator=`。
 
 程序输出：
 
@@ -73,7 +76,7 @@ int main() {
 1
 ```
 
-前两行显示 `displayed` 从压力 `210`、温度 `40` 更新为 `230`、`20`；第三行是没有被当前实现修改的 `measured`。函数体只给已有成员赋值，没有销毁或重新构造 `displayed`。保存地址的指针继续指向原对象，最后的地址比较为 `true`，默认显示为 `1`。
+前两行分别是赋值前后的 `displayed`，第三行是没有被当前实现修改的 `measured`。该实现只给已有的 `int` 成员赋值，没有销毁或重新构造 `displayed`。保存地址的指针继续指向原对象，最后的地址比较为 `true`，默认显示为 `1`。
 
 > [!IMPORTANT] 复制构造与复制赋值的目标不同
 > **复制构造初始化新的目标对象；复制赋值面对已经存在的目标对象。**本例这样的逐成员赋值让目标及其两个 `int` 成员延续原有身份，用源成员的值更新状态。
@@ -82,7 +85,7 @@ int main() {
 
 ## operator= 的返回值仍然指代左侧对象
 
-更新状态与产生表达式结果是两项关系。当前返回类型 `tire_reading&` 与函数体末尾的 `return *this;`，让赋值表达式的结果继续指代更新后的左侧对象。
+两条成员赋值完成后，`return *this;` 决定本次调用的结果。`this` 指向调用对象，`*this` 是指定该对象的左值（lvalue）；返回类型 `tire_reading&` 使返回引用绑定到它。因此，更新状态之后，赋值表达式的结果仍可用于访问左侧对象。
 
 后面的正常变体均保留开篇的头文件与完整类定义，单独用给出的定义整体替换 `main`，彼此不接续：
 
@@ -98,7 +101,7 @@ int main() {
 }
 ```
 
-这份变体先输出 `1`，再输出 `230 20`。`this` 指向调用对象 `displayed`，`*this` 是指定它的左值（lvalue）；按引用返回后，`updated` 绑定到这个已有对象，没有建立另一份读数记录。
+这份变体先输出 `1`，再输出 `230 20`。`updated` 绑定到更新后的 `displayed`，地址比较确认两者指定同一个对象；随后经 `updated` 读取到的也是这份记录的状态。引用初始化没有建立另一份读数记录。
 
 > [!IMPORTANT] 复制源引用与赋值结果引用
 > 在本例 `T& operator=(const T& source)` 这种接口中，`T` 表示当前类。**参数的 `const T&` 提供读取源对象的路径；返回类型 `T&` 配合 `return *this;`，使赋值结果成为指定左侧对象的 `T` 类型左值。**两个引用承担不同角色。
@@ -121,7 +124,14 @@ int main() {
 }
 ```
 
-两行输出都是 `230 20`。赋值从右向左结合，这条连续赋值按 `displayed = (backup = measured)` 分组。内层先更新 `backup`，结果仍指定 `backup`；外层的 `source` 再绑定到它，用这份已更新的记录修改 `displayed`。
+赋值从右向左结合，这条连续赋值按 `displayed = (backup = measured)` 分组。外层调用使用内层赋值的结果作为源：
+
+| 阶段 | `source` 绑定到 | 更新后的目标与表达式结果 |
+| --- | --- | --- |
+| 内层 `backup = measured` | `measured` | `backup` 保存 `230 20`，结果指代 `backup` |
+| 外层 `displayed = (backup = measured)` | 已更新的 `backup` | `displayed` 保存 `230 20`，结果指代 `displayed` |
+
+内层返回更新后的 `backup` 的引用，外层再从这份记录读取状态。两次赋值分别更新两个已有对象，所以两行输出都是 `230 20`。
 
 C++ 不强制用户定义的 `operator=` 必须返回 `T&`。当前形式延续了内建赋值的结果模型；若把函数改为返回 `void` 并移除 `return *this;`，单独的赋值仍可更新状态，但上面的引用初始化和连续赋值就不再成立。能怎样使用结果，要看选中函数的返回声明与实现。
 
@@ -141,18 +151,26 @@ int main() {
 }
 ```
 
-`alias` 与 `displayed` 指定同一个对象，因此这仍然是自赋值（self-assignment），输出为 `210 40`。当前函数体让两个 `int` 成员分别接收自身的值，每项操作都保持原值，不需要为了识别自赋值额外比较地址。
+`alias` 与 `displayed` 指定同一个对象，因此这仍然是自赋值（self-assignment）。函数内的 `source` 绑定到 `displayed` 本身，两个 `int` 成员分别接收自身的值，输出为 `210 40`。这种直接的整数成员赋值可以正确处理当前自赋值，不需要额外比较地址。
+
+若把实现改成先将目标的两个成员清零，再从 `source` 读取并赋值，同一次自赋值就会得到不同结果：
+
+1. 清零目标时，修改的是 `displayed` 中的两个成员，也是随后经 `source` 读取的两个成员。
+2. 从 `source` 读取时，取得的已经是 `0`、`0`。后续赋值只能把零写回，原来的 `210`、`40` 已经丢失。
 
 > [!WARNING] 源引用不保证与目标具有不同身份
 > 不能因为右侧通过 `const` 引用接收，就把它当成独立且不受目标修改影响的副本。**自赋值时，读取源与修改目标访问的是同一个对象。**
 >
-> 例如，若把实现改成先将目标的两个成员清零，再从 `source` 读取并赋值，那么这次自赋值读取到的源也已经变为零，原来的 `210`、`40` 就会丢失。当前直接的整数成员赋值没有这项问题；是否需要特殊处理，应看实现会不会在读取源状态前破坏它。
+> `const` 限制经 `source` 修改对象，不阻止通过调用对象这条可修改路径改变同一个对象。判断是否需要特殊处理，应检查实现会不会提前改写仍需从源中读取的状态。
 
 ## 可修改性由左右两侧承担不同职责
 
-开篇的 `measured` 是 `const tire_reading`，仍能作为复制源，因为 `source` 只需要提供读取路径。普通可修改对象也能绑定到同一项 `const tire_reading&` 形参。
+对 `displayed = measured`，需要分别核对两项条件：
 
-左侧则由当前成员函数的调用条件约束。`operator=` 没有尾随 `const`，因此不能通过 `const tire_reading` 对象调用。下面是单独考察的错误变体：保留开篇的头文件与完整类定义，只替换 `main`，不与正常变体拼接。
+- 右侧能否初始化源形参：`source` 是 `const tire_reading&`，可修改对象和 `const` 对象都可以绑定到它。
+- 左侧能否调用这项成员函数：当前 `operator=` 没有尾随 `const`，不能通过 `const tire_reading` 对象调用。
+
+开篇的 `measured` 满足第一项条件，`displayed` 满足第二项条件。若只把 `displayed` 也声明为 `const`，赋值就不再合法。下面是单独考察的错误变体：保留开篇的头文件与完整类定义，只替换 `main`，不与正常变体拼接。
 
 ```cpp
 int main() {

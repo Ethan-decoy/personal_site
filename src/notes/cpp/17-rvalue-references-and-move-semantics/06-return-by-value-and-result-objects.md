@@ -6,15 +6,18 @@ order: 6
 
 # 按值返回与结果对象（Return by Value and Result Objects）
 
-函数按值返回类对象时，调用者可以取得自己的结果。但“取得一个结果”不意味着函数必须先建立一个临时对象，再把它移动给调用者。对于同一种类类型的纯右值初始化，结果可以直接在接收它的对象中建立。
-
-这里讨论返回类型为类类型、调用结果用于初始化普通变量的情形。判断的起点是：返回表达式是在描述怎样建立结果，还是在指定一个已经存在的源对象。
+登记对象在构造时增加活动计数，在销毁时解除登记。函数按值交付一项新登记时，哪一个对象负责最后解除它？无论用返回结果初始化新变量，还是用它给已有对象赋值，都要先认出这次调用的结果对象。本文以 C++23 为准。
 
 ## 返回表达式可以直接构造接收对象
 
-纯右值的结果对象（result object），就是由这次求值初始化的对象。它不一定是一个先于接收变量存在的独立临时对象。
+按值返回类类型的函数调用是纯右值。纯右值的结果对象（result object）是由这个表达式初始化的对象。
 
-下面的登记类型在构造时增加活动计数，在销毁时解除登记。为了看清按值返回是否必须依靠复制或移动，这个定义把两种构造接口都明确删除了：
+> [!IMPORTANT] 同类纯右值直接初始化结果对象
+> **返回表达式是与返回类型同类的纯右值时，它直接初始化函数调用的结果对象。** 在 `T result = make();` 中，若 `make()` 按值返回同类结果，`result` 就是这次调用的结果对象。
+>
+> 类型比较忽略顶层 `const` 和 `volatile`。这条初始化路径不要求可用的复制构造或移动构造。
+
+下面的 `registration` 显式删除了复制构造和移动构造。用它来验证直接建立结果时需要哪一项构造操作。
 
 ```cpp
 #include <iostream>
@@ -44,7 +47,7 @@ int main() {
     int count{0};
 
     {
-        const registration entry{begin_registration(count)};
+        const registration entry = begin_registration(count);
         std::cout << count << '\n';
     }
 
@@ -52,34 +55,27 @@ int main() {
 }
 ```
 
-`registration{count}` 是 `registration` 类型的纯右值表达式；`begin_registration(count)` 也按值产生同类型的纯右值结果。这里的 `entry` 就是接收结果的对象：`registration(int&)` 直接初始化它，没有另一项登记先在函数内部建立、再通过复制或移动交给它。
+`registration{count}` 和 `begin_registration(count)` 都是 `registration` 类型的纯右值。目标是 `const registration`，仍满足同类条件，因此 `registration(int&)` 直接初始化调用者的 `entry`。
 
-`entry` 构造后计数为 `1`，离开内层作用域时销毁，计数恢复为 `0`。函数返回时不会先解除这项登记，因为在该次返回中构造的就是调用者的 `entry`。外部计数对象仍须比登记对象活得更久，按值返回没有改变这项借用关系。
-
-> [!IMPORTANT]
-> 用同类纯右值初始化这里的结果对象时，语言规则让初始化直接作用于目标。即使类型不能从已有对象复制或移动，这种按值返回仍然可以成立。
->
-> 这不是“编译器碰巧省去一次移动”的运行结果；示例根本没有可调用的复制或移动构造函数。
-
-这项直接构造规则自 C++17 起成立，本文以 C++23 为准。资料中常把它称为“保证的复制省略（guaranteed copy elision）”，但理解代码时应保留对象模型：此处没有一个必须先存在、随后才能被省略转移的源对象。
+函数返回后，仍然由 `entry` 持有这项登记，第一行输出 `1`。`entry` 离开内层作用域时销毁，第二行输出 `0`。`counter` 借用外层的 `count`，该计数对象必须活到 `entry` 解除登记之后。
 
 ## 初始化形式不等于实际复制
 
-`return` 以复制初始化的规则初始化调用结果；复制初始化（copy-initialization）这个名称并不要求执行复制构造。在上面的同类纯右值情形中，它直接建立结果。
+`return` 用返回表达式对调用的结果对象做复制初始化（copy-initialization）。`main` 中带 `=` 的声明也采用复制初始化，目标 `entry` 正在建立。两处初始化都使用同类纯右值，整个过程只执行一次接收 `int&` 的构造函数。
 
-下面这条声明可以替换程序中 `entry` 的声明：
+将第一个程序中 `entry` 的声明换成下面的圆括号直接初始化，程序同样输出 `1` 和 `0`。
 
 ```cpp
-const registration entry = begin_registration(count);
+const registration entry(begin_registration(count));
 ```
 
-声明中的 `=` 仍然是初始化语法。它没有先默认构造 `entry`，也不会因为采用这种写法而多出一次复制。
+自 C++17 起，这两种接收写法都能由同类纯右值直接构造目标对象。这项规则常称“保证的复制省略（guaranteed copy elision）”。
 
-直接构造保证针对的是这条初始化关系，不代表函数或构造函数内部没有工作。登记仍然要递增计数；如果构造的是采样序列，序列仍然要建立自己的元素。省去额外的对象转交，不能省去结果本身所需要的数据和资源。
+如果写成 `const registration entry{begin_registration(count)};`，接收变量采用列表初始化。C++23 对 `registration` 这样的非聚合类仍须按列表规则考虑构造函数，本例会选中已删除的移动构造。这个规则缺口有编译器实现分歧，见 [CWG 2311](https://cplusplus.github.io/CWG/issues/2311.html)。
 
 ## 赋值面对的是已经存在的目标
 
-如果目标对象已经存在，返回结果就要交给它的赋值操作。下面用已具备移动赋值能力的采样序列作对照：
+下面是独立的采样序列程序。两次调用 `make_samples()` 都按值返回三个读数。第一次调用初始化新变量，第二次调用给已有序列提供赋值来源。
 
 ```cpp
 #include <iostream>
@@ -90,7 +86,7 @@ std::vector<double> make_samples() {
 }
 
 int main() {
-    std::vector<double> created{make_samples()};
+    const std::vector<double> created = make_samples();
 
     std::vector<double> existing{200.0};
     existing = make_samples();
@@ -99,27 +95,38 @@ int main() {
 }
 ```
 
-两次调用都按值产生序列，调用位置却承担不同的任务：
-
-| 调用位置 | 结果对象与接收方的关系 | 后续操作 |
+| 调用位置 | 调用的结果对象 | 接收方的操作 |
 | --- | --- | --- |
-| `std::vector<double> created{make_samples()};` | `created` 自身就是调用的结果对象 | 直接完成 `created` 的初始化 |
-| `existing = make_samples();` | 调用结果物化为临时序列，`existing` 已经存在 | 临时结果绑定到移动赋值的右值引用形参，执行赋值 |
+| `const std::vector<double> created = make_samples();` | `created` | 直接初始化 `created` |
+| `existing = make_samples();` | 物化的临时序列 | 移动赋值的右值引用形参绑定到临时序列，随后更新 `existing` |
 
-第二种情形中，移动赋值还要处理 `existing` 原来的状态。临时结果在整条赋值表达式结束时销毁；`existing` 保持原来的对象身份，并管理赋值后取得的元素。因此程序输出 `3 240`。
+两种用法都要建立结果序列的三个元素。赋值还会替换 `existing` 原有的元素，同时保留它的对象身份。临时序列在包含赋值的完整表达式末尾销毁，本例就是该语句结束时。程序输出 `3 240`，分别是新建序列的长度和更新后序列的首个读数。
 
-同类纯右值的直接构造不能用来绕过赋值接口。对于上一个程序中不可复制、不可移动的 `registration`，结果可以直接初始化一个新变量，不代表它也能替换一个已有变量的状态。
+回到第一个程序，将 `entry` 的声明替换为下面两行，可以单独检查赋值要求。这里让 `entry` 可修改，第一行直接初始化它。
+
+```cpp
+registration entry = begin_registration(count);
+entry = begin_registration(count);
+```
+
+`registration` 自行声明了移动构造，因此编译器不隐式声明移动赋值，隐式声明的复制赋值也被定义为删除。第二行选中已删除的复制赋值，编译失败。相关条件见[移动操作的隐式声明](05-generation-and-selection-of-move-operations.md#什么时候会隐式声明移动操作)和[显式移动声明对复制的影响](05-generation-and-selection-of-move-operations.md#显式要求默认实现)。
 
 ## 直接构造仍有类型与生命周期边界
 
-保证成立的关键是同类纯右值与目标初始化的关系。返回一个已经命名的局部对象，或者让结果参与另一种类型的构造，需要按对应规则判断，不能只看函数签名上写了按值返回就断定没有复制或移动。
+`return result;` 可以指定一个已有的局部对象。此时要按具名返回规则核对可用的构造路径。返回结果用于初始化另一种类型时，应按实际的类型和初始化形式检查转换与构造。具名返回见[返回局部对象与隐式移动](07-returning-local-objects.md#具名返回值优化允许合并对象身份)。
 
-析构也必须合法。结果对象的析构函数在返回处以及需要销毁它的位置都必须可访问，且不能被删除；没有发生中间对象的复制或移动，不等于不再需要处理结果的最终销毁。
+语言规则在返回处将结果对象的析构函数视为可能调用的函数。它必须在返回处可访问且未被删除，调用方销毁结果时也要满足这两个条件。
 
-> [!PRACTICE]
-> 函数要交付一个新结果，且所需状态可以在返回表达式中直接构造时，可以自然地按值返回。不要为了想象中的中间副本改成返回局部引用，也不必给纯右值结果套上 `std::move`。
->
-> 把纯右值传给 `std::move` 时，需要先物化一个临时对象，让它绑定到引用形参；`std::move` 再把这个已有临时对象作为将亡值交给接收方。目标因此可能重新要求可用的移动或复制构造，不能继续套用原来的同类纯右值直接构造关系。
+> [!PRACTICE] 直接按值交付新建的结果
+> 函数负责创建新结果，且所需状态可以在返回表达式中建立时，直接返回同类纯右值。调用方也可以直接使用该按值结果初始化变量。函数内的普通局部对象会在函数退出时销毁，返回它的引用会让调用方得到悬垂引用。
+
+另取第一个程序，在源文件开头加入 `#include <utility>`，再把 `entry` 的声明替换成下面这行。
+
+```cpp
+const registration entry = std::move(begin_registration(count));
+```
+
+`begin_registration(count)` 的纯右值结果先物化为临时对象，以便绑定到 `std::move` 的引用形参。`std::move(...)` 调用表达式是指代这个临时对象的将亡值。现在初始化 `entry` 的来源是将亡值，重载决议选中已删除的移动构造，该声明编译失败。
 
 ## 参考资料
 
@@ -127,3 +134,4 @@ int main() {
 - [C++23 工作草案：同类纯右值初始化](https://timsong-cpp.github.io/cppwp/n4950/dcl.init#general-16.6.1)
 - [C++23 工作草案：返回结果的初始化与析构要求](https://timsong-cpp.github.io/cppwp/n4950/stmt.return)
 - [C++23 工作草案：临时对象物化](https://timsong-cpp.github.io/cppwp/n4950/conv.rval)
+- [C++23 工作草案：临时对象的销毁时机](https://timsong-cpp.github.io/cppwp/n4950/class.temporary#4)

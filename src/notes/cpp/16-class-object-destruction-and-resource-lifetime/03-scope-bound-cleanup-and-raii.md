@@ -10,10 +10,12 @@ order: 3
 
 ## 手动配对容易遗漏退出路径
 
-下面的函数用一个计数表示当前活动的校准登记数量。进入函数后递增计数表示登记开始，正常完成前递减计数表示登记结束：
+下面是独立的完整程序，用计数表示当前活动的校准登记数量。进入检查函数后递增计数表示登记开始，正常完成前递减计数表示登记结束。`main` 分别用两个初值为 `2` 的计数考察提前返回与正常返回，表示每次调用前都已有两项其他登记；两个调用互不影响：
 
 ```cpp
-bool inspect_tire_manually(bool sensor_ready, int& active_registration_count) {
+#include <iostream>
+
+bool inspect_tire_manually(const bool sensor_ready, int& active_registration_count) {
     ++active_registration_count;
 
     if (!sensor_ready) {
@@ -23,17 +25,43 @@ bool inspect_tire_manually(bool sensor_ready, int& active_registration_count) {
     --active_registration_count;
     return true;
 }
+
+int main() {
+    int early_count{2};
+    const bool early_result{inspect_tire_manually(false, early_count)};
+    std::cout << early_result << ' ' << early_count << '\n';
+
+    int normal_count{2};
+    const bool normal_result{inspect_tire_manually(true, normal_count)};
+    std::cout << normal_result << ' ' << normal_count << '\n';
+}
 ```
 
-当 `sensor_ready` 为 `false` 时，函数直接返回，没有执行对应的递减。调用结束后已经没有活动检查，计数却仍然多出一项登记。每次增加提前返回路径时都手动补上清理语句，会让正确性取决于所有控制流分支是否恰好没有遗漏。
+程序输出：
+
+```text
+0 3
+1 2
+```
+
+每行先输出返回值（`0` 表示 `false`，`1` 表示 `true`），再输出返回后的计数。第一行对应 `sensor_ready` 为 `false` 的提前返回：函数漏掉递减，因此计数从 `2` 增到 `3` 后没有恢复。第二行对应正常返回，计数恢复为 `2`。
+
+提前返回的调用结束后，本次检查已经不再活动，计数却仍然多出一项登记。每次增加提前返回路径时都手动补上清理语句，会让正确性取决于所有控制流分支是否恰好没有遗漏。
 
 这里的问题不是 `return` 绕过了对象销毁。当前代码没有把登记责任放进对象，因此语言找不到一项需要随作用域结束而执行的析构动作。
 
 ## 让对象生命周期承载清理责任
 
-资源获取即初始化（Resource Acquisition Is Initialization, RAII）把成对责任封装进对象生命周期：对象初始化时建立有效的资源关系，销毁时完成仍由它承担的清理。
+> [!IMPORTANT] 对象生命周期承载资源责任
+> **资源获取即初始化（Resource Acquisition Is Initialization, RAII）把成对责任绑定到对象生命周期：通过初始化建立有效的资源状态，在对象销毁时完成它仍然承担的清理。**
+>
+> 已经完成构造的自动存储期类对象，在每条正常离开其作用域的控制路径上都会进入析构过程。让清理随这一边界执行，称为作用域绑定清理（scope-bound cleanup）。
+
+下面是另一份独立的完整程序，与手动版本分别运行。`calibration_registration` 在构造时登记、析构时解除，`main` 沿用相同的初始计数与两种调用条件：
 
 ```cpp
+#include <iostream>
+
 class calibration_registration {
   public:
     explicit calibration_registration(int& active_registration_count)
@@ -52,7 +80,7 @@ class calibration_registration {
     int* active_count_target;
 };
 
-bool inspect_tire(bool sensor_ready, int& active_registration_count) {
+bool inspect_tire(const bool sensor_ready, int& active_registration_count) {
     const calibration_registration current_registration{active_registration_count};
 
     if (!sensor_ready) {
@@ -61,13 +89,30 @@ bool inspect_tire(bool sensor_ready, int& active_registration_count) {
 
     return true;
 }
+
+int main() {
+    int early_count{2};
+    const bool early_result{inspect_tire(false, early_count)};
+    std::cout << early_result << ' ' << early_count << '\n';
+
+    int normal_count{2};
+    const bool normal_result{inspect_tire(true, normal_count)};
+    std::cout << normal_result << ' ' << normal_count << '\n';
+}
 ```
 
-本例只在构造时登记、析构时解除。`current_registration` 构造完成后，计数已经递增，登记责任一直由它承担到析构。无论函数选择 `return false;` 还是 `return true;`，返回结果建立后都要离开函数作用域；局部对象随后销毁，其析构函数把计数递减。每条返回路径都不再需要显式执行这项动作。
+程序输出：
+
+```text
+0 2
+1 2
+```
+
+输出列的含义与前一程序相同。两种返回结果仍分别为 `false` 和 `true`，但返回后的计数都恢复为 `2`：本次新增的登记被解除，原有的两项登记保留。
+
+`current_registration` 构造完成时，计数由 `2` 增到 `3`，登记责任一直由它承担到析构。无论函数选择 `return false;` 还是 `return true;`，返回结果建立后都要离开函数作用域；局部对象随后销毁，其析构函数把计数递减为 `2`。每条返回路径都不再需要显式执行这项动作。
 
 RAII 不是一项新的存储期，也不会改变 `return` 的控制流含义。它利用已经存在的构造、析构和自动存储期规则，把“必须执行的清理”变成局部对象销毁过程的一部分。
-
-**作用域绑定清理（scope-bound cleanup）的关键不是少写一条语句，而是让已经完成构造的对象在每条离开其作用域的正常控制路径上承担同一项析构责任。**
 
 ## 一次构造对应一次析构责任
 
@@ -77,15 +122,16 @@ RAII 不是一项新的存储期，也不会改变 `return` 的控制流含义�
 
 ## RAII 不延长外部对象的生命周期
 
-`active_count_target` 保存指向调用者计数对象的非拥有关系。析构函数能够安全递减计数，前提是目标对象仍然处于生命周期内。在当前调用中，计数对象由调用者先建立，`current_registration` 是更内层的函数局部对象，因此后者销毁时目标仍然有效。
+`active_count_target` 保存指向调用者计数对象的非拥有关系，登记对象负责解除本次登记，不负责结束计数对象的生命周期。
 
-把一项清理动作放进析构函数，不会自动延长所有关联对象的生命周期，也不会让悬空指针变得可用。RAII 保证的是自身承担的动作随自身销毁执行；这项动作访问的外部对象仍须满足原有的指针与生命周期约束。
+> [!IMPORTANT] 清理动作访问的外部对象必须仍然有效
+> **RAII 不会自动延长所借用对象的生命周期。**析构中的清理动作通过指针或引用访问外部对象时，目标仍须处于生命周期内；把动作放进析构函数，不会让悬空关系变得可用。
 
-> [!IMPORTANT]
-> RAII 用对象生命周期管理资源责任：对象销毁时，完成它仍然承担的清理动作。具体需要清理什么，取决于对象当时的资源状态；动作访问的外部对象也必须仍然有效。
+在上面的 `main` 中，`early_count` 与 `normal_count` 分别在调用 `inspect_tire` 前建立。函数内的 `current_registration` 先随函数返回而销毁，调用者中的计数对象随后仍然存在，因此析构时能够安全递减目标计数。
 
 ## 参考资料
 
 - [C++23 工作草案：析构函数](https://timsong-cpp.github.io/cppwp/n4950/class.dtor)
 - [C++23 工作草案：声明语句中的控制转移与销毁](https://timsong-cpp.github.io/cppwp/n4950/stmt.dcl)
+- [C++23 工作草案：返回结果与局部对象销毁的顺序](https://timsong-cpp.github.io/cppwp/n4950/stmt.return)
 - [C++ Core Guidelines：使用资源句柄和 RAII 自动管理资源](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rr-raii)

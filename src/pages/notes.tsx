@@ -2,6 +2,7 @@ import {
 	type ReactNode,
 	Suspense,
 	lazy,
+	memo,
 	useCallback,
 	useEffect,
 	useRef,
@@ -47,7 +48,7 @@ const SIDEBAR_BRANCH_UNMOUNT_BUFFER_MS = 80;
 const loadMarkdownRenderer = () => import("../notes-renderer");
 const MarkdownPreview = lazy(() =>
 	loadMarkdownRenderer().then(({ MarkdownPreview: Preview }) => ({
-		default: Preview,
+		default: memo(Preview),
 	})),
 );
 

@@ -410,26 +410,14 @@ function ProjectSection({
 										</div>
 									)}
 									{project.id === "try" && (
-										<div
-											className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-											style={{
-												backgroundColor: theme.bgDeep,
-												color: theme.text,
-											}}
-										>
-											{/* Try's public mark: https://github.com/Ethan-decoy/Try/blob/main/assets/logo.svg */}
-											<svg
-												aria-hidden="true"
-												viewBox="0 0 256 256"
-												className="h-7 w-7"
-												fill={theme.bgCard}
-												stroke="currentColor"
-												strokeWidth="8"
-												strokeLinejoin="round"
-											>
-												<path d="M 207.7668998 36.9719554 A 8 8 0 0 1 219.0280446 48.2331002 L 164.4877097 114.4550895 A 48 48 0 0 0 161.3132815 171.1599365 L 185.6159905 208.4879198 A 8 8 0 0 1 174.5467914 219.5571189 L 137.2188081 195.2544099 A 48 48 0 0 0 84.8400635 195.2544099 L 47.5120802 219.5571189 A 8 8 0 0 1 36.4428811 208.4879198 L 60.7455901 171.1599365 A 48 48 0 0 0 60.7455901 118.7811919 L 36.4428811 81.4532086 A 8 8 0 0 1 47.5120802 70.3840095 L 84.8400635 94.6867185 A 48 48 0 0 0 141.5449105 91.5122903 L 207.7668998 36.9719554 Z" />
-											</svg>
-										</div>
+										<img
+											src={`${import.meta.env.BASE_URL}assets/projects/try-app-icon.svg`}
+											alt=""
+											width={32}
+											height={32}
+											decoding="async"
+											className="h-8 w-8 shrink-0"
+										/>
 									)}
 									<h3
 										id={`project-${project.id}-title`}

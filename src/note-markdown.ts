@@ -1,12 +1,11 @@
 import type { ExtraProps } from "react-markdown";
-import remarkCjkFriendly from "remark-cjk-friendly/parseOnly";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
+import type rehypeRaw from "rehype-raw";
 
-export const noteRemarkPlugins = [remarkMath, remarkGfm, remarkCjkFriendly];
+export type NoteDocument = Parameters<ReturnType<typeof rehypeRaw>>[0];
 
 export interface NoteBody {
 	content: string;
+	documentTree: NoteDocument;
 	codeHighlights: Readonly<Record<string, string>>;
 }
 

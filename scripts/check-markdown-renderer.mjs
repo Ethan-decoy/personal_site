@@ -12,7 +12,7 @@ try {
 	const { MarkdownPreview, markdownThemeVariables } = await vite.ssrLoadModule(
 		"/src/notes-renderer.tsx",
 	);
-	const { prepareNoteBody } = await vite.ssrLoadModule(
+	const { prepareNoteBody, prepareNoteDocument } = await vite.ssrLoadModule(
 		"/scripts/notes-highlighting.ts",
 	);
 	const title = "Markdown renderer fixture";
@@ -24,7 +24,9 @@ try {
 	const renderMarkdown = (body, options = {}) =>
 		renderToStaticMarkup(
 			React.createElement(MarkdownPreview, {
-				...(typeof body === "string" ? { content: body } : body),
+				...(typeof body === "string"
+					? { documentTree: prepareNoteDocument(body) }
+					: body),
 				theme: fixtureTheme,
 				isDark: false,
 				...options,

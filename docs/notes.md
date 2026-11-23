@@ -25,14 +25,14 @@
 | --- | --- |
 | [notes-manifest-plugin.ts](../scripts/notes-manifest-plugin.ts) | `virtual:notes-manifest` 提供元数据与按篇加载函数。`virtual:notes-search-index` 在搜索时并行加载按序列化大小划分的分块 |
 | [notes/index.ts](../src/notes/index.ts) | 从元数据构造目录树，打开文章时调用对应的加载函数。链接检查从同一公开目录确定检查范围 |
-| [notes-renderer.tsx](../src/notes-renderer.tsx) | 使用 React Markdown、GFM、KaTeX 与语法高亮渲染正文 |
-| [notes-highlighting.ts](../scripts/notes-highlighting.ts) | 在构建或开发服务中用 Shiki 为单篇正文生成 Light+ 和 Dark+ 高亮 |
+| [notes-renderer.tsx](../src/notes-renderer.tsx) | 复用预生成的文档树，渲染正文、引用速览和交互组件 |
+| [notes-highlighting.ts](../scripts/notes-highlighting.ts) | 在构建或开发服务中预处理单篇 Markdown、锚点、公式及 Shiki 双主题高亮 |
 
 开发时，修改公开笔记会使清单快照和已加载的搜索分块失效。新增或删除公开文件时，先使这些模块失效，再通知页面刷新。[check-notes-manifest.mjs](../scripts/check-notes-manifest.mjs) 使用实际笔记模块验证目录、正文加载与搜索同步更新。
 
 保留正文按篇加载、搜索索引按需分块的边界，避免把全部 Markdown 重新打入首包。
 
-高亮随当篇正文加载，正文、引用速览和代码参考窗复用同一份结果。代码块继续使用 Markdown 围栏声明语言，空语言或 Shiki 未收录的语言按纯文本呈现。
+文档树、KaTeX 公式和双主题高亮随当篇正文加载。正文与引用速览使用相同的文档树，代码参考窗复用高亮结果。代码块继续使用 Markdown 围栏声明语言，空语言或 Shiki 未收录的语言按纯文本呈现。
 
 ## 渲染与共享交互
 

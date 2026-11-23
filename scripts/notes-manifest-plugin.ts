@@ -1,7 +1,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
-import { prepareNoteBody } from "./notes-highlighting";
+import { prepareNoteBody, warmNoteHighlighting } from "./notes-highlighting";
 
 const NOTES_DIRECTORY = "src/notes";
 const NOTES_MANIFEST_ID = "virtual:notes-manifest";
@@ -219,6 +219,7 @@ function createSearchChunks(notes: NoteManifestRecord[]): string[] {
 
 export function notesManifestPlugin(): Plugin {
 	let notesRoot = "";
+	let isDevServer = false;
 	let snapshot:
 		| Promise<{
 				notes: NoteManifestRecord[];
@@ -263,6 +264,7 @@ export function notesManifestPlugin(): Plugin {
 		name: "notes-manifest",
 		configResolved(config) {
 			notesRoot = path.resolve(config.root, NOTES_DIRECTORY);
+			isDevServer = config.command === "serve";
 		},
 		buildStart() {
 			snapshot = undefined;
@@ -288,7 +290,10 @@ export function notesManifestPlugin(): Plugin {
 				return resolved;
 			}
 		},
-		async load(id) {
+		async load(id, options) {
+			if (isDevServer && !options?.ssr && id === RESOLVED_NOTES_MANIFEST_ID) {
+				void warmNoteHighlighting().catch(() => undefined);
+			}
 			if (id.endsWith(NOTE_BODY_QUERY)) {
 				const file = id.slice(0, -NOTE_BODY_QUERY.length);
 				if (!isPublicNotePath(file)) return;

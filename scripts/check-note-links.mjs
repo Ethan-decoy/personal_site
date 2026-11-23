@@ -71,7 +71,7 @@ export async function checkNoteLinks({
 			if (!note) throw new Error(`Public note could not be loaded: ${file}`);
 			const html = renderToStaticMarkup(
 				React.createElement(MarkdownPreview, {
-					content: note.content,
+					documentTree: note.documentTree,
 					theme: { accent: "#2F5D7C" },
 				}),
 			);

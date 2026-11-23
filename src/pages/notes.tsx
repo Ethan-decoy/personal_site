@@ -1,5 +1,6 @@
 import {
 	type ReactNode,
+	type MemoExoticComponent,
 	Suspense,
 	lazy,
 	memo,
@@ -45,12 +46,20 @@ const SEGMENT_IDS = Array.from(
 const sidebarTree = getSidebarTree();
 const SIDEBAR_BRANCH_TRANSITION_MS = 180;
 const SIDEBAR_BRANCH_UNMOUNT_BUFFER_MS = 80;
-const loadMarkdownRenderer = () => import("../notes-renderer");
-const MarkdownPreview = lazy(() =>
-	loadMarkdownRenderer().then(({ MarkdownPreview: Preview }) => ({
-		default: memo(Preview),
-	})),
-);
+type NoteRenderer = MemoExoticComponent<
+	typeof import("../notes-renderer").MarkdownPreview
+>;
+let noteRendererPromise: Promise<NoteRenderer> | undefined;
+
+function loadMarkdownRenderer(): Promise<NoteRenderer> {
+	noteRendererPromise ??= import("../notes-renderer")
+		.then(({ MarkdownPreview }) => memo(MarkdownPreview))
+		.catch((error) => {
+			noteRendererPromise = undefined;
+			throw error;
+		});
+	return noteRendererPromise;
+}
 
 const loadNotePeek = () => import("../note-peek");
 const NotePeek = lazy(loadNotePeek);
@@ -237,6 +246,7 @@ function SidebarNode({
 	expandedKeys,
 	onToggle,
 	selectedFile,
+	pendingFile,
 	onOpen,
 	onPrefetch,
 }: {
@@ -246,6 +256,7 @@ function SidebarNode({
 	expandedKeys: Set<string>;
 	onToggle: (key: string) => void;
 	selectedFile: string | null;
+	pendingFile: string | null;
 	onOpen: (file: string) => void;
 	onPrefetch: (file: string) => void;
 }) {
@@ -254,9 +265,10 @@ function SidebarNode({
 	const nodeIndent = depth === 0 ? 0 : node.sidebarAfter === undefined ? 8 : 16;
 
 	const hasChildren = node.children.length > 0;
-	const selectedIndex = Boolean(
-		selectedFile && node.indexFile && selectedFile === node.indexFile,
-	);
+	const highlightedFile = pendingFile ?? selectedFile;
+	const selectedIndex =
+		node.indexFile !== null && node.indexFile === highlightedFile;
+	const pendingIndex = pendingFile !== null && node.indexFile === pendingFile;
 	const branchId = `notes-branch-${encodeURIComponent(node.key)
 		.replace(/%/g, "")
 		.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
@@ -283,6 +295,7 @@ function SidebarNode({
 					className="flex min-w-0 flex-1 items-center gap-2 px-2 py-1.5 text-left"
 					aria-expanded={hasChildren ? expanded : undefined}
 					aria-controls={hasChildren ? branchId : undefined}
+					aria-busy={!hasChildren && pendingIndex ? true : undefined}
 					onPointerEnter={() => {
 						if (!hasChildren && node.indexFile) onPrefetch(node.indexFile);
 					}}
@@ -327,6 +340,8 @@ function SidebarNode({
 						type="button"
 						aria-label={`打开“${node.title}”分类概览`}
 						title="打开分类概览"
+						aria-busy={pendingIndex || undefined}
+						aria-current={node.indexFile === selectedFile ? "page" : undefined}
 						className="mr-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-md opacity-50 transition-opacity duration-150 hover:opacity-100"
 						style={{
 							color: theme.accent,
@@ -367,6 +382,7 @@ function SidebarNode({
 									expandedKeys={expandedKeys}
 									onToggle={onToggle}
 									selectedFile={selectedFile}
+									pendingFile={pendingFile}
 									onOpen={onOpen}
 									onPrefetch={onPrefetch}
 								/>
@@ -374,16 +390,22 @@ function SidebarNode({
 								<button
 									type="button"
 									key={child.file}
-									className="w-full rounded-r py-1 pl-3 pr-2 text-left text-xs leading-5 transition-colors duration-150"
+									aria-busy={pendingFile === child.file || undefined}
+									aria-current={
+										selectedFile === child.file ? "page" : undefined
+									}
+									className="w-full rounded-r py-1 pl-3 pr-2 text-left text-xs leading-5 transition-colors duration-150 aria-busy:transition-none"
 									style={{
 										backgroundColor:
-											selectedFile === child.file
+											highlightedFile === child.file
 												? theme.accentLight
 												: hoveredFile === child.file
 													? `${theme.accentLight}60`
 													: "transparent",
 										color:
-											selectedFile === child.file ? theme.text : theme.textSec,
+											highlightedFile === child.file
+												? theme.text
+												: theme.textSec,
 									}}
 									onClick={() => onOpen(child.file)}
 									onPointerEnter={() => {
@@ -414,6 +436,7 @@ export function SidebarCatalog({
 	searchLoading,
 	expandedKeys,
 	selectedFile,
+	pendingFile = null,
 	onSearchQueryChange,
 	onSearchFocusedChange,
 	onToggle,
@@ -428,6 +451,7 @@ export function SidebarCatalog({
 	searchLoading: boolean;
 	expandedKeys: Set<string>;
 	selectedFile: string | null;
+	pendingFile?: string | null;
 	onSearchQueryChange: (query: string) => void;
 	onSearchFocusedChange: (focused: boolean) => void;
 	onToggle: (key: string) => void;
@@ -546,6 +570,7 @@ export function SidebarCatalog({
 					expandedKeys={expandedKeys}
 					onToggle={onToggle}
 					selectedFile={selectedFile}
+					pendingFile={pendingFile}
 					onOpen={onOpen}
 					onPrefetch={onPrefetch}
 				/>
@@ -563,10 +588,19 @@ export default function NotesPage({
 		getInitialExpandedKeys,
 	);
 	const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-	const [selectedNote, setSelectedNote] = useState<NoteContent | null>(null);
+	const [reading, setReading] = useState<{
+		note: NoteContent;
+		Renderer: NoteRenderer;
+	} | null>(null);
+	const selectedNote = reading?.note ?? null;
 	const currentNoteFile = useRef<string | null>(null);
 	const noteRequestRef = useRef(0);
-	const [noteLoading, setNoteLoading] = useState(false);
+	const [pendingFile, setPendingFile] = useState<string | null>(null);
+	const noteLoading = pendingFile !== null;
+
+	useEffect(() => {
+		void loadMarkdownRenderer().catch(() => undefined);
+	}, []);
 	const [readingHistory, setReadingHistory] = useState<
 		{
 			file: string;
@@ -711,14 +745,14 @@ export default function NotesPage({
 			const requestId = ++noteRequestRef.current;
 			const sourceFile = currentNoteFile.current;
 			const sourceScrollY = window.scrollY;
-			setNoteLoading(true);
+			setPendingFile(file);
 			setSearchFocused(false);
 			closePeek();
 			setPendingAnchor(null);
 			setPendingCodeIndex(null);
 
 			void Promise.all([loadNote(file), loadMarkdownRenderer()])
-				.then(([note]) => {
+				.then(([note, Renderer]) => {
 					if (requestId !== noteRequestRef.current || !note) return;
 
 					if (options.restoreScrollY !== undefined) {
@@ -732,7 +766,7 @@ export default function NotesPage({
 						setReadingHistory([]);
 					}
 
-					setSelectedNote(note);
+					setReading({ note, Renderer });
 					setSearchQuery("");
 					if (file !== "./wiki.md" && options.syncSidebar !== false) {
 						setExpandedKeys((previous) =>
@@ -765,7 +799,7 @@ export default function NotesPage({
 				})
 				.catch(() => undefined)
 				.finally(() => {
-					if (requestId === noteRequestRef.current) setNoteLoading(false);
+					if (requestId === noteRequestRef.current) setPendingFile(null);
 				});
 		},
 		[closePeek],
@@ -874,6 +908,7 @@ export default function NotesPage({
 					searchLoading={searchLoading}
 					expandedKeys={expandedKeys}
 					selectedFile={selectedNote?.file ?? null}
+					pendingFile={pendingFile}
 					onSearchQueryChange={setSearchQuery}
 					onSearchFocusedChange={setSearchFocused}
 					onToggle={toggleKey}
@@ -992,6 +1027,7 @@ export default function NotesPage({
 									searchLoading={searchLoading}
 									expandedKeys={expandedKeys}
 									selectedFile={selectedNote?.file ?? null}
+									pendingFile={pendingFile}
 									onSearchQueryChange={setSearchQuery}
 									onSearchFocusedChange={setSearchFocused}
 									onToggle={toggleKey}
@@ -1007,35 +1043,26 @@ export default function NotesPage({
 							note={selectedNote}
 							onOpenSource={openCodeSource}
 						>
-							{selectedNote ? (
+							{reading ? (
 								<div
-									key={selectedNote.file}
+									key={reading.note.file}
 									data-note-content
-									data-note-file={selectedNote.file}
+									data-note-file={reading.note.file}
 									aria-busy={noteLoading}
 									className="notes-reading-content 2xl:relative 2xl:left-10"
 								>
-									<Suspense
-										fallback={
-											<LoadingIndicator
-												theme={theme}
-												label={t("notes.loading")}
-											/>
-										}
-									>
-										<MarkdownPreview
-											content={selectedNote.content}
-											codeHighlights={selectedNote.codeHighlights}
-											theme={theme}
-											isDark={mode === "dark"}
-											resolveNoteHref={resolveMarkdownNoteHref}
-											onNoteOpen={openMarkdownNote}
-											onNoteLinkPointerEnter={onNoteLinkPointerEnter}
-											onNoteLinkPointerLeave={onNoteLinkPointerLeave}
-											onNoteLinkFocus={onNoteLinkFocus}
-											onNoteLinkBlur={onNoteLinkBlur}
-										/>
-									</Suspense>
+									<reading.Renderer
+										documentTree={reading.note.documentTree}
+										codeHighlights={reading.note.codeHighlights}
+										theme={theme}
+										isDark={mode === "dark"}
+										resolveNoteHref={resolveMarkdownNoteHref}
+										onNoteOpen={openMarkdownNote}
+										onNoteLinkPointerEnter={onNoteLinkPointerEnter}
+										onNoteLinkPointerLeave={onNoteLinkPointerLeave}
+										onNoteLinkFocus={onNoteLinkFocus}
+										onNoteLinkBlur={onNoteLinkBlur}
+									/>
 								</div>
 							) : noteLoading ? (
 								<LoadingIndicator theme={theme} label={t("notes.loading")} />

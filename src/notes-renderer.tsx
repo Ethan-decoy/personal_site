@@ -7,18 +7,13 @@ import {
 	useState,
 } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
-import rehypeKatex from "rehype-katex";
-import rehypeRaw from "rehype-raw";
-import rehypeSlug from "rehype-slug";
 import "katex/dist/katex.min.css";
 import { CodeReferencePin } from "./code-reference";
 import "./markdown-answers.css";
-import { rehypeMarkdownBlockquotes } from "./markdown-blockquotes";
 import { type NoteExcerptOptions, rehypeNoteExcerpt } from "./note-excerpt";
 import {
 	type NoteBody,
 	codeHighlightKey,
-	noteRemarkPlugins,
 	readMarkdownCodeBlock,
 } from "./note-markdown";
 import type { NoteLinkTarget } from "./notes";
@@ -564,14 +559,6 @@ function Plot({
 	);
 }
 
-/* ---- Stable plugin arrays (prevents ReactMarkdown re-processing) ---- */
-const REHYPE_PLUGINS = [
-	rehypeRaw,
-	rehypeMarkdownBlockquotes,
-	rehypeSlug,
-	rehypeKatex,
-];
-
 interface NoteLinkAdapter {
 	resolveNoteHref?: (href: string) => NoteLinkTarget | null;
 	onNoteOpen?: (target: NoteLinkTarget, trigger: HTMLAnchorElement) => void;
@@ -599,6 +586,15 @@ function makeComponents(
 	codeHighlights: NoteBody["codeHighlights"] | undefined,
 ): Components {
 	return {
+		span: ({ node, children, ...props }) => {
+			const data = node?.data;
+			const html =
+				data && "noteMathHtml" in data ? data.noteMathHtml : undefined;
+			if (typeof html === "string") {
+				return <span {...props} dangerouslySetInnerHTML={{ __html: html }} />;
+			}
+			return <span {...props}>{children}</span>;
+		},
 		a: ({ node: _node, href, children, ...props }) => {
 			if (!href) return <span>{children}</span>;
 			if (
@@ -778,7 +774,7 @@ export function markdownThemeVariables(
 }
 
 export function MarkdownPreview({
-	content,
+	documentTree,
 	codeHighlights,
 	theme,
 	isDark,
@@ -790,7 +786,7 @@ export function MarkdownPreview({
 	onNoteLinkBlur,
 	excerpt,
 }: {
-	content: string;
+	documentTree: NoteBody["documentTree"];
 	codeHighlights?: NoteBody["codeHighlights"];
 	theme: ThemeColors;
 	isDark?: boolean;
@@ -829,23 +825,20 @@ export function MarkdownPreview({
 
 	const excerptAnchor = excerpt?.anchor;
 	const excerptIdPrefix = excerpt?.idPrefix;
-	const rehypePlugins = useMemo(
-		() =>
-			excerptIdPrefix
-				? [
-						rehypeRaw,
-						rehypeMarkdownBlockquotes,
-						rehypeSlug,
-						() =>
-							rehypeNoteExcerpt({
-								anchor: excerptAnchor ?? null,
-								idPrefix: excerptIdPrefix,
-							}),
-						rehypeKatex,
-					]
-				: REHYPE_PLUGINS,
-		[excerptAnchor, excerptIdPrefix],
-	);
+	const rehypePlugins = useMemo(() => {
+		// The excerpt and URL transforms edit their input tree.
+		const loadDocument = () => () => structuredClone(documentTree);
+		return excerptIdPrefix
+			? [
+					loadDocument,
+					() =>
+						rehypeNoteExcerpt({
+							anchor: excerptAnchor ?? null,
+							idPrefix: excerptIdPrefix,
+						}),
+				]
+			: [loadDocument];
+	}, [documentTree, excerptAnchor, excerptIdPrefix]);
 
 	const markdownStyle = markdownThemeVariables(theme, dark);
 
@@ -855,13 +848,7 @@ export function MarkdownPreview({
 				className={`markdown-prose w-full max-w-none prose prose-ocean${dark ? " dark" : ""}`}
 				style={markdownStyle}
 			>
-				<ReactMarkdown
-					remarkPlugins={noteRemarkPlugins}
-					rehypePlugins={rehypePlugins}
-					components={components}
-				>
-					{content}
-				</ReactMarkdown>
+				<ReactMarkdown rehypePlugins={rehypePlugins} components={components} />
 			</div>
 		</article>
 	);

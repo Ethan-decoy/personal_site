@@ -317,6 +317,14 @@ const PROJECT_TOOLS = [
 		sourceLabelKey: "projects.specSkills.sourceLabel",
 		stack: "Agent Skills / Markdown",
 	},
+	{
+		id: "design-skills",
+		name: "Design Skills",
+		href: "https://github.com/Ethan-decoy/design-skills",
+		descriptionKey: "projects.designSkills.description",
+		sourceLabelKey: "projects.designSkills.sourceLabel",
+		stack: "Agent Skills / Markdown",
+	},
 ] as const;
 
 const PROJECT_TOYS = [

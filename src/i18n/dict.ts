@@ -228,6 +228,14 @@ export const dict = {
 		zh: "在 GitHub 查看 Spec Skills",
 		en: "View Spec Skills on GitHub",
 	},
+	"projects.designSkills.description": {
+		zh: "视觉设计、交互设计与数据可视化技能集",
+		en: "Skills for visual design, interaction design, and data visualization",
+	},
+	"projects.designSkills.sourceLabel": {
+		zh: "在 GitHub 查看 Design Skills",
+		en: "View Design Skills on GitHub",
+	},
 	"projects.sessionWeave.description": {
 		zh: "模型会话持久化与上下文压缩",
 		en: "Persistent sessions and context compaction for model APIs",

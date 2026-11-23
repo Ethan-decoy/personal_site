@@ -613,6 +613,13 @@ body {
 	max-width: none;
 }
 
+/* Start the fade when the rendered article mounts. */
+@media (prefers-reduced-motion: no-preference) {
+	.notes-reading-content > article {
+		animation: fade-in 250ms ease-out;
+	}
+}
+
 @media (min-width: 96rem) {
 	.notes-reading-content {
 		--markdown-text-width: 96ch;

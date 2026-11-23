@@ -8,7 +8,7 @@ order: 5
 
 `span` 让函数能够访问一段连续元素，却不负责维持这些元素的生命周期。视图变量仍在作用域内，只说明视图自身还存在；要继续访问采样值，还要检查原来的元素是否仍然有效，以及视图记录的范围是否仍然适用。
 
-这与[单个对象的借用](../19-dynamic-objects-and-exclusive-ownership/03-borrowing-and-access-validity.md#读取地址没有取得清理责任)遵循同一条关系：保存访问方式，不等于接管目标的生命周期。范围还额外保存了数量，因此需要区分元素的当前状态与视图记录的边界。
+这与[单个对象的借用](../19-dynamic-objects-and-exclusive-ownership/02-transferring-ownership-and-object-identity.md#读取地址没有取得清理责任)遵循同一条关系：保存访问方式，不等于接管目标的生命周期。范围还额外保存了数量，因此需要区分元素的当前状态与视图记录的边界。
 
 ## 元素可以更新，范围数量不会自动跟随
 

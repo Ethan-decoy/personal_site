@@ -1,22 +1,23 @@
 ---
-title: 所有权转移与对象身份（Transferring Ownership and Object Identity）
+title: 所有权转交与借用有效性（Ownership Transfer and Borrowed Access）
 date: 2026-09-14
 order: 2
 ---
 
-# 所有权转移与对象身份（Transferring Ownership and Object Identity）
+# 所有权转交与借用有效性（Ownership Transfer and Borrowed Access）
 
-观察代码已经取得一个传感器的地址，管理方随后要把它交给另一个拥有者。能否继续使用原来的地址，取决于交接改变了传感器本身，还是只改变了谁负责它。
+传感器的地址已经交给观察代码。此后，移出拥有权、更换目标或清空拥有者，都要重新判断观察代码何时还能使用那个地址。
 
-对于 `std::unique_ptr`，移动操作转交的是拥有关系。**移动拥有者不会因此移动它管理的对象；目标仍是原来的对象，清理责任由接收方承担。** 本篇讨论默认销毁方式下，同一种单对象拥有者类型之间的移动。
+## 读取地址没有取得清理责任
+
+`owner.get()` 取得的是拥有者保存的指针。保存这个指针只建立借用，目标须存活到最后一次访问。
+
+> [!IMPORTANT] 顺着目标判断借用是否有效
+> **不同的拥有者交接同一目标时，来源变空，原有借用仍指向那个目标。** 当操作销毁该目标时，对它的借用随之失效。对源拥有者本身的引用仍然引用源，可以观察它交接后的状态。
 
 ## 移动构造转交责任，保留目标对象
 
-`owner.get()` 返回拥有者保存的目标指针；空拥有者返回 `nullptr`。取得这个指针只提供借用，不会改变拥有关系。它适合用来观察目标地址，或者把访问交给需要普通指针的接口。
-
-`std::unique_ptr` 禁用了复制构造和复制赋值，允许通过移动交接。`std::move(source)` 将源表达式转换为可用于移动的形式，真正的交接发生在接收方的构造或赋值操作中。使用 `std::move` 需要直接包含 `<utility>`。
-
-下面的 `pressure_sensor` 保存压力读数。程序先记录它的地址，再把拥有关系交给 `target`：
+下面用同一条借用 `observed` 追踪读数为 `240.0` kPa 的传感器。`source` 先把它交给新建的 `target`，`target` 再把它交给已有传感器的 `receiver`。各自的计数都先于对应的传感器建立，并存活到其析构完成。
 
 ```cpp
 #include <iostream>
@@ -25,113 +26,96 @@ order: 2
 
 class pressure_sensor {
   public:
-    explicit pressure_sensor(double value_kpa) : value{value_kpa} {}
+    pressure_sensor(const double value_kpa, int& count)
+        : value{value_kpa}, destruction_count{count} {}
+
+    ~pressure_sensor() {
+        ++destruction_count;
+    }
 
     double value_kpa() const {
         return value;
     }
 
   private:
-    double value;
+    const double value;
+    int& destruction_count;
 };
 
 int main() {
-    std::unique_ptr<pressure_sensor> source{std::make_unique<pressure_sensor>(240.0)};
-    const pressure_sensor* const observed{source.get()};
+    int transferred_destructions{0};
+    int old_destructions{0};
+    std::unique_ptr<pressure_sensor> receiver =
+        std::make_unique<pressure_sensor>(260.0, old_destructions);
+    const pressure_sensor* observed{nullptr};
 
-    const std::unique_ptr<pressure_sensor> target{std::move(source)};
+    {
+        std::unique_ptr<pressure_sensor> source =
+            std::make_unique<pressure_sensor>(240.0, transferred_destructions);
+        const std::unique_ptr<pressure_sensor>& source_alias{source};
+        observed = source.get();
 
-    std::cout << (source.get() == nullptr) << '\n';
-    std::cout << (target.get() == observed) << '\n';
+        std::unique_ptr<pressure_sensor> target{std::move(source)};
+        std::cout << "source empty: " << !source_alias << '\n';
+        std::cout << "same sensor after construction: " << (target.get() == observed) << '\n';
+
+        receiver = std::move(target);
+        std::cout << "target empty: " << !target << '\n';
+        std::cout << "old sensor destructions: " << old_destructions << '\n';
+    }
+
+    std::cout << "same sensor after assignment: " << (receiver.get() == observed) << '\n';
+    std::cout << "transferred sensor destructions: " << transferred_destructions << '\n';
     std::cout << observed->value_kpa() << '\n';
+
+    receiver.reset();
+    std::cout << "receiver empty: " << !receiver << '\n';
+    std::cout << "transferred sensor destructions: " << transferred_destructions << '\n';
+    observed = nullptr;
 }
 ```
 
-输出依次为 `1`、`1`、`240`。其中 `observed` 是一个指针值不再改变的只读借用；移动后它仍然访问原传感器。
+程序输出如下。
 
-这次构造前后的关系如下：
+```text
+source empty: 1
+same sensor after construction: 1
+target empty: 1
+old sensor destructions: 1
+same sensor after assignment: 1
+transferred sensor destructions: 0
+240
+receiver empty: 1
+transferred sensor destructions: 1
+```
 
-| 对象或访问关系 | 构造前 | 构造后 |
-| --- | --- | --- |
-| `source` | 拥有传感器 | 仍然存在，但为空 |
-| `target` | 尚未构造 | 拥有原传感器 |
-| 动态传感器 | 保存 `240.0` | 仍是同一个对象，地址与读数不变 |
-| `observed` | 借用该传感器 | 保持原来的访问关系 |
+`std::move(source)` 提供将亡值，构造 `target` 时才执行所有权转交。绑定 `source` 的 `source_alias` 读到空状态，指向传感器的 `observed` 则仍指向同一对象。见[表达式类别转换](../17-rvalue-references-and-move-semantics/02-std-move-and-expression-category-conversion.md#一个只改变表达式类别的标准库工具)。
 
-`target` 的移动构造没有调用 `pressure_sensor` 的复制构造或移动构造。即使传感器类型禁止复制和移动，也不妨碍这种拥有者之间的交接：被创建的新对象是 `target`，传感器没有被重新构造。
+## 移动赋值还要结束接收方原有的责任
 
-正常离开作用域时，`target` 负责销毁传感器；已经为空的 `source` 不再清理它。源拥有者本身没有因移动而销毁。
+`receiver = std::move(target)` 先从 `target` 取出指针并使其变空。`receiver` 先保存转入的指针，再用旧指针销毁原来的 `260.0` kPa 传感器。对旧传感器的借用在这时失效。
+
+退出内层作用域时，`source` 和 `target` 都作为空拥有者销毁。`receiver` 继续管理 `240.0` kPa 的传感器，所以它的析构计数仍为 `0`，`observed` 可以继续读取它。
+
+对不同的同类型拥有者，从空源移动赋值也会清理接收方的旧目标，接收方随后为空。同一个 `std::unique_ptr` 自移动赋值后保留原先的指针。本例使用默认删除器，传感器的析构正常完成。
+
+## 重置目标后，结束对它的借用
+
+`receiver.reset()` 使 `receiver` 变空，把 `240.0` kPa 传感器的析构计数增至 `1`。这个目标的存储已归还，程序从此停止经 `observed` 访问它，并直接把 `nullptr` 写入指针变量。
+
+> [!WARNING] 拥有者变空和借用失效分别判断
+> 转交后，源拥有者为空，传感器可由接收方继续管理。无参 `reset()` 也使拥有者变空，但会销毁它原来持有的目标。销毁之后，复制或比较失效的旧指针值也不能作为可移植的有效性检查。给指针直接赋新值时则无需读取旧值。见[空指针、悬空指针与有效性](../07-object-addresses-and-pointers/05-null-dangling-pointers-and-validity.md#指针存在不等于目标存在)。
+
+即使借用通过函数向外传递，也要核对使用期间是否存在重置、替换或销毁目标的路径。
 
 ## 禁止复制的是拥有关系
 
-在上述程序中，如果把 `target` 的声明替换为下面这一行，代码不能编译，因为它要求调用已删除的拥有者复制构造函数：
-
-```cpp
-const std::unique_ptr<pressure_sensor> target{source};
-```
-
-这项限制不等于传感器的值不能复制。是否能复制传感器，由 `pressure_sensor` 自己的接口决定。如果明确需要另一个独立传感器，可以根据业务所需的状态创建它；新的对象有新的身份，原来的观察指针不会改为观察它。
-
-同样，`std::unique_ptr<pressure_sensor>& alias{source};` 只是给原拥有者建立引用，没有创建第二个拥有者，也没有转交责任。
-
-> [!IMPORTANT]
-> 判断移动后的访问关系，要先确认访问的对象：指向传感器的指针仍然指向传感器；绑定 `source` 的引用仍然绑定原拥有者，看到的则是交接后的空状态。移动不会把所有相关指针和引用一起改指接收方。
-
-## 移动赋值还要结束目标原有的责任
-
-接收方如果已经拥有另一个传感器，就必须处理那一项已有责任。对于两个不同的拥有者，移动赋值会销毁目标原先管理的对象、归还其存储，并让目标接管源所管理的对象；源变为空状态。
-
-下面的片段可以替换第一个程序的 `main` 函数体：
-
-```cpp
-std::unique_ptr<pressure_sensor> source{std::make_unique<pressure_sensor>(240.0)};
-std::unique_ptr<pressure_sensor> target{std::make_unique<pressure_sensor>(250.0)};
-const pressure_sensor* const observed{source.get()};
-
-target = std::move(source);
-
-std::cout << (source.get() == nullptr) << '\n';
-std::cout << (target.get() == observed) << '\n';
-std::cout << target->value_kpa() << '\n';
-```
-
-输出仍然依次为 `1`、`1`、`240`，但过程中发生的清理不同：原来保存 `250.0` 的传感器已经销毁，保存 `240.0` 的传感器继续存在。这里没有给旧传感器赋一个新读数，也没有调用传感器的移动赋值。
-
-如果其他代码借用了原来保存 `250.0` 的传感器，这些借用在此次赋值后失效。拥有者 `target` 仍在，不能证明它过去管理的对象仍在。
-
-源拥有者也可以为空。向一个非空目标移动赋值一个空源，会清理目标原来的对象，并让目标变空。对本篇的默认销毁方式，拥有者的移动构造和移动赋值都具有 `noexcept` 承诺；目标原有对象的析构仍须遵守不向外抛出异常的要求。
-
-上述交接分析针对不同拥有者。若给拥有者自身做移动赋值，`unique_ptr` 保留它原来的目标指针，不能套用“源一定变空”来推断自移动结果。
-
-## 创建它的局部拥有者可以先结束
-
-被管理对象的生命可以跨越原拥有者的作用域，条件是责任已经交给仍然有效的接收方。下面仍是替换第一个程序 `main` 函数体的片段：
-
-```cpp
-std::unique_ptr<pressure_sensor> target{};
-const pressure_sensor* observed{nullptr};
-
-{
-    std::unique_ptr<pressure_sensor> source{std::make_unique<pressure_sensor>(240.0)};
-    observed = source.get();
-    target = std::move(source);
-}
-
-std::cout << observed->value_kpa() << '\n';
-```
-
-程序输出 `240`。内层作用域结束时，空的 `source` 被销毁，传感器仍由外层的 `target` 管理。最后销毁 `target` 才结束传感器的生命周期。
-
-如果没有转交责任，内层拥有者结束时就会销毁目标，保存在外面的普通指针不能维持它的生命。能够跨越作用域的是被管理对象，并非原局部拥有者偷偷延长了自己的生命周期。
-
-> [!PRACTICE]
-> 当其他代码必须继续观察同一个对象时，交接拥有者能够保留目标身份。还应同时检查接收方原来管理的对象是否正被借用，以及新的拥有者是否覆盖所有借用所需的有效期。
->
-> 移动拥有者可以省去重建被管理对象的工作，但移动赋值仍可能执行旧目标的析构和存储释放。应当按实际的交接与清理动作判断成本。
+若将主例中的 `target` 声明改为 `std::unique_ptr<pressure_sensor> target{source};`，初始化会选中已删除的复制构造，编译失败。`std::unique_ptr` 的复制赋值也已删除。需要第二个传感器时，可以重新构造独立目标。需要交接同一个传感器时，移动拥有者即可，即使目标类型本身禁止复制和移动。
 
 ## 参考资料
 
-- [C++23 工作草案：unique_ptr 的构造与移动后状态](https://timsong-cpp.github.io/cppwp/n4950/unique.ptr.single.ctor)
-- [C++23 工作草案：unique_ptr 的移动赋值](https://timsong-cpp.github.io/cppwp/n4950/unique.ptr.single.asgn)
-- [C++23 工作草案：get 与目标访问](https://timsong-cpp.github.io/cppwp/n4950/unique.ptr.single.observers)
 - [C++23 工作草案：unique_ptr 的复制操作被删除](https://timsong-cpp.github.io/cppwp/n4950/unique.ptr.single.general)
+- [C++23 工作草案：unique_ptr 的移动构造](https://timsong-cpp.github.io/cppwp/n4950/unique.ptr.single.ctor#18)
+- [C++23 工作草案：unique_ptr 的移动赋值](https://timsong-cpp.github.io/cppwp/n4950/unique.ptr.single.asgn#3)
+- [C++23 工作草案：reset 更新指针与清理旧目标](https://timsong-cpp.github.io/cppwp/n4950/unique.ptr.single.modifiers#3)
+- [C++23 工作草案：存储期结束与无效指针值](https://timsong-cpp.github.io/cppwp/n4950/basic.stc.general#4)

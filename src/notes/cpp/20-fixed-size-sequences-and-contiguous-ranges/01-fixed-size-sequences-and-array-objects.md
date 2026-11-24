@@ -6,19 +6,22 @@ order: 1
 
 # 固定长度序列与数组对象（Fixed-Size Sequences and Array Objects）
 
-一台设备有三个固定的压力采样位置，每次记录都包含三个读数。读数会改变，位置数量却是数据结构的一部分。`std::vector<double>` 能保存这些值，但它的类型也允许追加元素，不能直接表达“这份记录始终有三个元素”。
+一台设备有三个固定的压力采样位置，每次记录都包含三个以千帕（kPa）为单位的读数。读数可以更新，位置数量是记录结构的一部分。怎样让类型本身规定一份记录始终包含三个元素？
 
-固定长度序列（fixed-size sequence）把数量作为对象结构的一部分。标准库在 `<array>` 中提供 `std::array`，让这一组元素能够作为一个完整对象初始化、复制和赋值。
+固定长度序列（fixed-size sequence）把数量作为对象结构的一部分。标准库在 `<array>` 中提供 `std::array`，用一个数组对象保存这组元素。
 
 ## 元素数量写在类型中
 
-`std::array<double, 3>` 是一个具体类型，表示保存三个 `double` 元素的数组对象。尖括号中的第一个模板实参是元素类型，第二个模板实参是数量值。模板实参（template argument）既可以提供类型，也可以像这里一样提供编译时确定的值。
+`std::array<double, 3>` 是一个具体类型，表示保存三个 `double` 元素的数组对象。尖括号中的两个模板实参（template argument）分别提供元素类型和数量。
 
-在 `std::array<T, N>` 这个写法中，`T` 和 `N` 分别代指元素类型与数量；使用时需要换成实际类型和编译时确定的非负整数。例如，`constexpr unsigned int sensor_count{3};` 可以作为数量来源，再声明 `std::array<double, sensor_count>`。运行时读入的数量不能用于决定这个类型的 `N`。
+> [!IMPORTANT] 数组类型决定元素数量
+> 在 `std::array<T, N>` 中，`T` 是元素类型，`N` 是元素数量。每个数组对象都拥有恰好 `N` 个元素，`size()` 始终返回 `N`。改变 `T` 或 `N` 会得到不同类型。能否修改元素还取决于元素类型和访问时的 `const` 限定。
 
-`std::array<double, 3>` 和 `std::array<double, 4>` 是不同类型。数量相同但元素类型不同，也会得到不同类型。
+数量参数的类型是 `std::size_t`。用整数指定长度时，该值须在编译期确定，并且能无窄化地转换为 `std::size_t`。例如，用 `constexpr unsigned int sensor_count{3};` 声明数量后，`std::array<double, sensor_count>` 与 `std::array<double, 3>` 是同一类型。
 
-下面的程序创建三个读数，更新中间一个，再按顺序读取全部元素。`size()` 返回元素数量，`operator[]` 按从零开始的下标访问元素；范围 `for` 可以直接遍历整个数组对象。
+`operator[]` 按从零开始的下标访问元素。有效下标 `i` 须同时满足 `0 <= i` 和 `i < size()`，在三个元素的数组中就是 `0`、`1` 和 `2`。C++23 中，越界使用 `operator[]` 会导致未定义行为。
+
+下面的程序用 `samples[1]` 更新第二个读数，再用范围 `for` 按顺序读取全部元素。
 
 ```cpp
 #include <array>
@@ -36,41 +39,38 @@ int main() {
 }
 ```
 
-程序依次输出 `3`、`240`、`243`、`244`。`samples[1]` 指定第二个元素，赋值改变这个元素的值，不改变数组的长度。
+程序依次输出 `3`、`240`、`243`、`244`。第二个元素的值更新为 `243`，三个采样位置仍各有一个读数。
 
-> [!IMPORTANT]
-> `std::array<T, N>` 拥有恰好 `N` 个元素，`size()` 始终为 `N`。固定的是元素数量；元素能否修改，还取决于对象及访问方式是否具有 `const` 限定。
-
-`std::array` 没有用于追加元素的 `push_back`，也不需要通过 `reserve` 预留容量。`std::vector` 的预留容量只是允许容纳更多元素的存储余量；数组类型中的 `N` 已经是对象实际包含的元素数量。
+需要追加元素时，可以使用 `std::vector` 的 `push_back`。对 `std::vector` 调用 `reserve(3)` 是为至少三个元素预留容量。`std::array<double, 3>` 的长度 `3` 表示对象实际拥有的元素数量。
 
 ## 初始化值不足，不会缩短数组
 
-`std::array` 支持聚合初始化（aggregate initialization）：花括号中的值按顺序初始化元素。对于这里的 `double` 元素，没有显式提供的值会按空初始化列表初始化，得到 `0.0`。
+`std::array` 支持聚合初始化（aggregate initialization）。花括号中的初值按顺序初始化元素。对于这里的 `double` 元素，未显式提供初值的元素按空初始化列表初始化，得到 `0.0`。
 
-下面的片段可以放入包含 `<array>` 和 `<iostream>` 的 `main` 中：
+下面的片段可以放入包含 `<array>` 和 `<iostream>` 的程序的 `main` 函数中。
 
 ```cpp
-const std::array<double, 3> partial{240.0};
+const std::array<double, 3> record{240.0};
 const std::array<double, 3> zeros{};
 
-std::cout << partial.size() << ' ' << partial[0] << ' ' << partial[1] << ' ' << partial[2] << '\n';
+std::cout << record.size() << ' ' << record[0] << ' ' << record[1] << ' ' << record[2] << '\n';
 std::cout << zeros.size() << ' ' << zeros[0] << '\n';
 ```
 
-输出为 `3 240 0 0` 和 `3 0`。`partial` 仍然有三个元素，`zeros` 也有三个元素；空花括号表示这里没有逐项给出初值，不表示数组没有元素。提供超过三个初值则无法编译。
+输出依次为 `3 240 0 0` 和 `3 0`。`record` 的第一个元素使用给出的初值，其余两个元素补足为零。`zeros` 的三个元素都按空初始化列表初始化。两个数组的元素数量都由类型中的 `3` 决定，给出超过三个初值会编译失败。
 
 > [!WARNING]
-> 对普通局部对象，`std::array<double, 3> samples;` 省略初始化器后，三个 `double` 元素没有确定的初值。在赋值前读取它们的值具有未定义行为。需要初始零值时使用 `samples{}`；其他元素类型的初始化效果应按该类型的规则判断。
+> 对自动存储期的局部数组，写成 `std::array<double, 3> samples;` 时，三个 `double` 元素的值不确定。在 C++23 中，给某个元素写入值之前读取它的值会导致未定义行为。需要从三个零值开始时，使用 `std::array<double, 3> samples{};`。其他元素类型的初始化效果由各自的规则决定。
 
 ## 元素随数组对象一起存在
 
-数组对象自身保存这些元素，元素的存储属于数组对象的一部分。局部数组离开作用域时，其元素也被销毁；数组作为类成员时，元素随这个数组成员一起管理。
+元素按下标顺序连续存放，它们的存储是数组对象的一部分。销毁数组对象时，它的元素也随之销毁。
 
-这与 `std::vector` 的存储关系不同：`vector` 对象管理另外取得的元素存储。`std::array` 为自身的这组元素提供存储，不需要再为它们单独进行动态分配。元素自身是否另管资源，则取决于元素类型。
+`std::vector` 对象管理另外取得的元素存储。`std::array` 对象自身提供元素的存储，元素是否另外管理资源取决于元素类型。
 
-数组对象也可以是动态对象或其他对象的成员。因此，`std::array` 表达的是固定数量和元素归属，不能用“它一定在栈上”代替这个模型。
+数组对象可以是局部对象、动态对象或其他对象的成员。元素存放的位置随数组对象的位置而定。
 
-完整对象的复制与赋值，作用于对应元素：
+对于非空数组，复制构造用源数组的对应元素初始化目标元素，复制赋值用源元素给已经存在的目标元素赋值。这两项操作分别要求元素支持相应的复制操作。下面用 `double` 元素演示先复制一份读数快照，再用原记录更新这份快照。
 
 ```cpp
 #include <array>
@@ -88,15 +88,17 @@ int main() {
 }
 ```
 
-程序先输出 `240 250`，再输出 `240 240`。复制构造为 `snapshot` 建立独立的三个元素；之后的赋值把 `source` 的各个元素值赋给 `snapshot` 中已经存在的对应元素。整个过程没有让两个数组共用同一组 `double` 元素。
+程序先输出 `240 250`。两个数组各有自己的元素，修改 `snapshot[0]` 只更新快照的第一个读数。随后赋值把 `source` 的读数写入 `snapshot` 中已有的元素，程序输出 `240 240`。
 
-数组的移动也依照[成员逐项移动](../17-rvalue-references-and-move-semantics/05-generation-and-selection-of-move-operations.md#默认移动把成员分别交给相应操作)的关系进行。它不会像接管 `vector` 的独立存储那样，把这一整组元素的存储从源对象转交给目标对象；具体可用性与成本取决于元素类型和数量。对 `double` 数组使用 `std::move`，不能因此省去传递各个元素值的工作。
+上例的 `source` 带有 `const`。若包含 `<utility>` 后改用 `std::move(source)` 初始化 `snapshot`，所得将亡值仍[保留 `const` 限定](../17-rvalue-references-and-move-semantics/02-std-move-and-expression-category-conversion.md#转换不会移除-const)。这里可以绑定到复制构造函数的 `const` 左值引用形参，因此选中复制构造。
+
+实际调用数组的移动构造时，也按[成员逐项移动的规则](../17-rvalue-references-and-move-semantics/05-generation-and-selection-of-move-operations.md#默认移动把成员分别交给相应操作)从源数组的对应元素初始化目标元素。源、目标两组元素各自位于所属的数组对象中。对 `double`，目标元素从对应的源元素取得读数值。
+
+例如，`std::array<std::unique_ptr<int>, 1>` 支持移动构造和移动赋值。当源元素拥有动态对象时，移动会把所有权转交给目标元素，两个数组仍各有一个所有者元素。由于元素的复制操作已删除，这个数组的复制构造和复制赋值也不可用。
 
 ## 空数组与下标边界
 
-`std::array<double, 0>` 是合法类型，表示不含元素的数组对象。它的 `size()` 为零，`empty()` 为 `true`，范围 `for` 不执行循环体。`empty()` 查询的就是元素数量是否为零。
-
-对于任意长度 `N`，有效下标都必须小于 `N`。`N == 0` 时没有任何有效下标；不能因为数组对象本身存在，就读取 `samples[0]`。C++23 中 `operator[]` 不提供越界抛异常的保证，越界访问具有未定义行为。
+`std::array<double, 0> empty_samples{};` 创建一个合法的空数组对象。它的 `size()` 为零，`empty()` 为 `true`，范围 `for` 不执行循环体。空数组没有任何有效下标，使用 `empty_samples[0]` 也会越界。
 
 > [!PRACTICE]
 > 如果元素数量在编译时确定，并且这个数量就是数据结构的一部分，`std::array` 能直接表达约束。数量来自运行时或需要增减时，`std::vector` 更符合需求，即使某个具体对象创建后恰好不再改变长度。
@@ -106,6 +108,8 @@ int main() {
 ## 参考资料
 
 - [C++23 工作草案：array 的固定长度与聚合性质](https://timsong-cpp.github.io/cppwp/n4950/array.overview)
+- [C++23 工作草案：非类型模板实参](https://timsong-cpp.github.io/cppwp/n4950/temp.arg.nontype#2)
+- [C++23 工作草案：序列容器的下标访问条件](https://timsong-cpp.github.io/cppwp/n4950/sequence.reqmts)
 - [C++23 工作草案：array 的构造、复制与赋值](https://timsong-cpp.github.io/cppwp/n4950/array.cons)
 - [C++23 工作草案：聚合初始化](https://timsong-cpp.github.io/cppwp/n4950/dcl.init.aggr)
 - [C++23 工作草案：零长度的 array](https://timsong-cpp.github.io/cppwp/n4950/array.zero)

@@ -6,19 +6,18 @@ order: 5
 
 # 文本借用的有效期与接口边界（Text Lifetimes and Interface Boundaries）
 
-`string_view` 让函数能够读取现有文本，也让子串无需复制就能传递。代价是字符仍由原来的对象维持：视图自身还存在，不代表它借用的字符仍然有效。
+`std::string_view` 可以在函数之间传递已有文本的访问范围。修改字符串、保存子视图或把视图返回给调用方时，都须判断借用的字符在读取时是否仍然有效。
 
-拥有者负责字符存储，视图只记录借用范围。因此，判断视图能否继续访问，需要同时考虑字符的生命周期与字符串发生过的存储变化。
-
-视图也不保存内容快照。通过有效下标原位修改已有字符，视图能够[观察到新值](03-string-views-and-borrowed-text.md#视图保存范围字符由来源维持)，记录的长度却不会主动跟随拥有者变化。字符串追加时，既要考虑需要读取的范围是否改变，还要先判断旧访问关系是否仍然有效。
+> [!IMPORTANT] 字符借用的有效条件
+> 视图保存借用的起点和长度。继续读取前，先确认所借字符的生命周期覆盖这次访问，再核对拥有者发生过的操作是否使原访问关系失效。访问范围以视图记录的长度为准。
 
 ## 修改字符串后，不沿用旧借用的有效性假设
 
-`string` 在[增长与重新分配](02-text-comparison-and-composition.md#字符串增长与存储变化)中可能更换字符存储。`string_view` 保存的是建立时的起点与长度，不会重新向拥有者查询字符位置；原字符访问关系失效后，旧视图也就不能继续用于读取。字符串对象仍然存在，并不能维持原来的字符位置。
+通过有效下标原位改写已有字符时，原来的访问关系保持有效，视图会读到新值。视图仍保留建立时记录的长度。[原位修改与视图读取](03-string-views-and-borrowed-text.md#视图保存范围字符由来源维持)
 
-重新分配是其中一种明确的失效原因。`string` 的追加、整串赋值等操作还允许更广泛的访问失效，不能仅凭“还有容量”就认定旧视图可用；预先调用 `reserve` 也不提供类似 `vector` 容量内追加的借用保证。通过有效下标修改已有字符则保留访问关系。
+字符串重新分配存储会使旧字符访问失效。即使容量足够，追加、整串赋值等操作仍允许使原有的字符指针和引用失效。预先调用 `reserve` 后，追加仍适用字符串自身的失效规则。[字符串增长与存储变化](02-text-comparison-and-composition.md#字符串增长与存储变化)
 
-修改后还要读取当前文本时，可以从仍然有效的拥有者重新建立视图：
+下面的程序在追加后用当前的 `field` 重新建立视图，再读取文本。
 
 ```cpp
 #include <iostream>
@@ -36,34 +35,34 @@ int main() {
 }
 ```
 
-程序输出 `sensor=front-left 17` 和 `sensor=front-left;unit=kPa 26`。追加之后的赋值用新的起点与长度替换视图记录，不读取旧视图所指向的字符。之后 `view` 描述整个新字符串；若需要的仍是其中某个字段，应根据新文本重新确定它的范围。这个示例展示修改后重建视图的用法，不依赖本次追加是否实际发生了重新分配。
+程序输出 `sensor=front-left 17` 和 `sensor=front-left;unit=kPa 26`。追加后的赋值直接用当前 `field` 的起点和长度覆盖旧记录，之后 `view` 描述整个新字符串。若只需要其中某个字段，应从当前文本重新确定它的范围。
 
-失效也不会把视图自动置空。`empty()` 和 `size()` 只能报告视图保存的长度，不能检测字符是否已经销毁或换了存储。
+字符访问失效后，尚未更新的视图仍保留原来的长度记录。`size()` 返回这个长度，`empty()` 判断它是否为零。
 
 > [!WARNING]
-> 借用是否有效，要同时检查字符的生命周期和拥有者发生过的操作。`const string_view`、非空长度，以及拥有者尚未离开作用域，都不能单独证明字符访问安全。
+> 即使视图是 `const`、记录的长度非零，且字符串仍在作用域内，字符串的修改也可能已经使旧字符访问失效。
 
 ## 临时子串也可能成为已经消失的拥有者
 
-`string::substr` 返回拥有字符的新字符串，`string_view::substr` 返回借用原字符的子视图。这个返回类型差别直接影响下面的声明：
+`std::string::substr` 返回拥有字符的新字符串，`std::string_view::substr` 返回借用原字符的子视图。下面的声明从前一种结果建立视图。
 
 ```cpp
 const std::string field{"sensor=front-left"};
 const std::string_view name{field.substr(7)};
 ```
 
-这是包含 `<string>` 与 `<string_view>` 后可放入函数体的错误用法。`field.substr(7)` 先产生临时 `string`，`name` 借用的是临时字符串中的字符。临时拥有者在这条声明的完整表达式结束时销毁，此后通过 `name` 读取字符具有未定义行为；原来的 `field` 仍然存在，也不能维持另一份字符。
+这两行可放入已包含 `<string>` 与 `<string_view>` 的函数体。`field.substr(7)` 产生临时字符串，`name` 借用它拥有的字符。临时字符串在这条声明的完整表达式结束时销毁，此后通过 `name` 读取字符是未定义行为。
 
-如果要借用 `field`，先从 `field` 建立视图，再从这份视图取得子串。第二行可改为 `const std::string_view name{std::string_view{field}.substr(7)};`。这里的临时视图在声明结束时销毁，却没有销毁字符；留下的 `name` 仍然借用 `field`。
+如果要借用 `field`，先从 `field` 建立视图，再从这份视图取得子串。第二行可改为 `const std::string_view name{std::string_view{field}.substr(7)};`。临时视图在语句结束时销毁，`name` 继续借用由 `field` 维持的字符。
 
 如果要保存独立的子串，则使用 `const std::string name{field.substr(7)};`。这时接收结果的对象本身就是拥有者，字符的有效期不再依赖 `field`。
 
-> [!IMPORTANT]
-> 临时对象是否危险，取决于它承担什么职责。临时视图的销毁不销毁字符；临时字符串的销毁会结束它所拥有字符的生命周期。把结果接收到视图中，不会延长临时拥有者的生命周期。
+> [!IMPORTANT] 临时字符串与临时视图
+> 从临时视图取得的子视图仍借用原来的字符，读取取决于这些字符的有效期。借用来自临时字符串时，字符串销毁会结束这些字符的生命周期，此后通过视图读取它们是未定义行为。
 
 ## 返回视图时，明确字符留在哪里
 
-按值返回视图，只交付范围记录。下面是一个独立的错误函数；返回的视图借用局部字符串，函数退出后就不能再通过它访问字符：
+按值返回视图，只交付范围记录。下面的独立函数返回了借用局部字符串的视图，函数退出后，通过这个视图读取字符是未定义行为。
 
 ```cpp
 #include <string>
@@ -75,24 +74,25 @@ std::string_view make_sensor_view() {
 }
 ```
 
-局部字符串依据字面量的内容建立，但它拥有的是自己的字符。字面量具有静态存储期，不会把这一性质传给局部 `string`。如果函数直接返回 `std::string_view{"front-left"}`，视图借用的才是字面量的字符数组，可以在函数退出后继续读取。
+局部 `name` 由字面量初始化，返回的视图借用的是 `name` 所拥有的字符。若直接返回 `std::string_view{"front-left"}`，视图借用具有静态存储期的字面量，函数退出后仍可读取这些字符。
 
-返回输入文本的子视图则适合表达“从现有文本中选出一段”。下面的 `field_value` 返回第一个 `=` 后面的范围。它只负责选择范围，不校验字段名称；没有 `=` 和 `=` 后没有字符时，都返回空视图，因此不能仅凭结果的 `empty()` 区分这两种情况。
+`field_value` 负责选取第一个 `=` 之后的全部内容。找到分隔符时，函数返回借用输入字符的子视图，调用者须让所借字符保持有效直至最后一次读取。找不到分隔符时，函数直接返回默认空视图。如果分隔符恰好在末尾，返回的子视图也为空。这两种结果的 `empty()` 都是 `true`。[查找分隔符与选取范围](04-searching-and-selecting-text.md#先确认位置再建立两侧范围)
 
-`make_sensor_name` 则创建独立结果，因此返回 `string`：
+`make_sensor_name` 在源字符仍然有效时复制选中的内容，按值返回独立的 `std::string`。
 
 ```cpp
 #include <iostream>
 #include <string>
 #include <string_view>
 
-std::string_view field_value(std::string_view field) {
+std::string_view field_value(const std::string_view field) {
     const std::string_view::size_type separator{field.find('=')};
     if (separator == std::string_view::npos) {
         return std::string_view{};
     }
 
-    return field.substr(separator + 1);
+    constexpr std::string_view::size_type separator_width{1};
+    return field.substr(separator + separator_width);
 }
 
 std::string make_sensor_name() {
@@ -110,20 +110,18 @@ int main() {
 }
 ```
 
-程序输出 `rear-right` 和 `front-left`。`borrowed` 的字符由 `main` 中的 `field` 维持；`owned` 则从函数内仍然有效的范围复制字符，形成返回结果，再销毁局部拥有者。返回结果的构造遵循[按值返回规则](../17-rvalue-references-and-move-semantics/06-return-by-value-and-result-objects.md#返回表达式可以直接构造接收对象)，不需要为了离开函数而改成视图。
+程序输出 `rear-right` 和 `front-left`。`borrowed` 的字符由 `main` 中的 `field` 维持。构造 `owned` 的字符复制在 `make_sensor_name` 的局部字符串销毁前完成。[按值返回与结果对象](../17-rvalue-references-and-move-semantics/06-return-by-value-and-result-objects.md#返回表达式可以直接构造接收对象)
 
-若把临时 `string` 所建立的视图传给 `field_value`，调用过程中字符可以有效，但把返回视图保存到下一条语句并不安全：临时字符串仍会在调用所在的完整表达式结束时销毁。
+在 `field_value` 的实参中直接构造临时字符串并传入它的视图时，若结果借用这段文本，可以在调用所在的完整表达式内读取字符。临时字符串在该完整表达式结束时销毁，此后再通过返回的子视图读取字符是未定义行为。若未找到分隔符，函数返回长度为零、数据指针为空的默认空视图。
 
 > [!PRACTICE]
-> 函数只在调用期间读取文本时，按值接收 `string_view` 可以表达借用；返回子视图或保存视图供之后使用时，还应说明借用来源及所需的有效期。调用方难以维持原文本，或结果本来就应独立保存时，返回 `string` 更直接。
->
-> 借用期间保持拥有者的存储与范围稳定，能简化有效性判断。需要修改字符串时，完成修改后再从拥有者建立当前所需的视图。
+> 函数只在调用期间读取文本时，可以按值接收 `std::string_view`。返回子视图或保存视图供之后使用时，说明它借用哪一段文本，以及源字符须保持有效到何时。需要独立保存结果时，在借用仍有效时复制字符，按值返回 `std::string`。
 
 ## 移动字符串也不能保证旧视图跟随目标
 
-移动构造 `string` 后，目标取得源原来的文本值，源保持有效但状态未指定，不能假定源必然为空。字符的旧访问方式也没有“自动跟随目标”的保证：字符串可能采用不同的[存储方案](deep-dives/02-string-storage-and-move-boundaries.md#短文本可以直接放进拥有者对象)，移动并不总是转交同一块外部存储。
+移动构造 `std::string` 后，目标取得源原来的文本值，源保持有效，状态未指定。C++23 允许把字符串传给接收非 `const` 引用的标准库函数时使旧字符指针和引用失效。移动构造的源参数是 `std::string&&`，适用这条规则。[C++23 字符串失效规则](https://timsong-cpp.github.io/cppwp/n4950/string.require#4)
 
-因此，移动字符串后需要访问目标文本时，应从目标重新建立视图。不能根据移动前的字符内容，或某次运行中看似没有变化的地址，推断旧视图已经借用目标。
+例如，采用内嵌存储的实现可以把短文本保存在目标对象内部，旧视图的记录仍是移动前的起点和长度。需要读取移动后的目标文本时，应从目标重新建立视图。[字符串的存储选择与移动边界](deep-dives/02-string-storage-and-move-boundaries.md#短文本可以直接放进拥有者对象)
 
 ## 参考资料
 

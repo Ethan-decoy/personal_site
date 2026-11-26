@@ -198,6 +198,19 @@ try {
 	const searchCatalogHtml = renderToStaticMarkup(
 		React.createElement(SidebarCatalog, searchCatalogProps),
 	);
+	const manyMatches = Array.from({ length: 12 }, (_, index) => ({
+		file: `./search-fixture/${index}.md`,
+		title: `搜索结果 ${index + 1}`,
+		date: "",
+		category: "测试",
+	}));
+	const manyMatchesHtml = renderToStaticMarkup(
+		React.createElement(SidebarCatalog, {
+			...searchCatalogProps,
+			suggestions: [],
+			searchResults: manyMatches,
+		}),
+	);
 	const searchCatalogTree = SidebarCatalog(searchCatalogProps);
 	const searchHeader = findElement(
 		searchCatalogTree,
@@ -944,6 +957,12 @@ try {
 		{
 			name: "one search query mounts exactly one result surface",
 			pass: searchResultSurfaceCount === 1,
+		},
+		{
+			name: "every search match is available when more than eight notes match",
+			pass: manyMatches.every(({ file }) =>
+				manyMatchesHtml.includes(`data-notes-search-result="${file}"`),
+			),
 		},
 		{
 			name: "overlapping title and full-text matches mount one result row",

@@ -465,7 +465,6 @@ export function SidebarCatalog({
 				!searchResults.some((result) => result.file === suggestion.file),
 		),
 	];
-	const visibleSearchItems = mergedSearchItems.slice(0, 8);
 	const showSearchResults = searchFocused && Boolean(searchQuery.trim());
 
 	return (
@@ -475,7 +474,18 @@ export function SidebarCatalog({
 				className="notes-sidebar-search-header -mx-1 px-1 pb-3 motion-safe:transition-colors motion-safe:duration-300 motion-safe:ease-out"
 				style={{ backgroundColor: theme.bg }}
 			>
-				<div className="relative">
+				<div
+					className="relative"
+					onFocus={() => onSearchFocusedChange(true)}
+					onBlur={(event) => {
+						if (event.currentTarget.contains(event.relatedTarget)) return;
+						window.setTimeout(() => {
+							if (!document.activeElement?.closest("[data-notes-search-header]")) {
+								onSearchFocusedChange(false);
+							}
+						}, 200);
+					}}
+				>
 					<input
 						type="search"
 						aria-label="搜索笔记"
@@ -488,8 +498,6 @@ export function SidebarCatalog({
 						}}
 						value={searchQuery}
 						onChange={(event) => onSearchQueryChange(event.target.value)}
-						onFocus={() => onSearchFocusedChange(true)}
-						onBlur={() => setTimeout(() => onSearchFocusedChange(false), 200)}
 					/>
 					{showSearchResults && (
 						<div
@@ -509,38 +517,45 @@ export function SidebarCatalog({
 									? "搜索中…"
 									: `${mergedSearchItems.length} 条结果`}
 							</p>
-							{visibleSearchItems.length > 0 ? (
-								visibleSearchItems.map((result, index) => (
-									<button
-										type="button"
-										key={result.file}
-										data-notes-search-result={result.file}
-										className="block w-full px-3 py-2 text-left transition-colors duration-100"
-										style={{
-											backgroundColor:
-												index === 0 ? theme.accentLight : "transparent",
-											color: theme.textSec,
-										}}
-										onPointerEnter={() => onPrefetch(result.file)}
-										onFocus={() => onPrefetch(result.file)}
-										onTouchStart={() => onPrefetch(result.file)}
-										onClick={() => onOpen(result.file, { query: searchQuery })}
-										onMouseEnter={(event) => {
-											event.currentTarget.style.backgroundColor =
-												theme.accentLight;
-										}}
-										onMouseLeave={(event) => {
-											event.currentTarget.style.backgroundColor = "transparent";
-										}}
-									>
-										<span className="block text-sm">{result.title}</span>
-										{result.category && (
-											<span className="block truncate text-[10px] opacity-50">
-												{result.category}
-											</span>
-										)}
-									</button>
-								))
+							{mergedSearchItems.length > 0 ? (
+								<ul
+									key={searchQuery}
+									aria-label="搜索结果"
+									className="max-h-[min(24rem,50dvh)] overflow-y-auto overscroll-y-contain"
+								>
+									{mergedSearchItems.map((result, index) => (
+										<li key={result.file}>
+											<button
+												type="button"
+												data-notes-search-result={result.file}
+												className="block w-full px-3 py-2 text-left transition-colors duration-100"
+												style={{
+													backgroundColor:
+														index === 0 ? theme.accentLight : "transparent",
+													color: theme.textSec,
+												}}
+												onPointerEnter={() => onPrefetch(result.file)}
+												onFocus={() => onPrefetch(result.file)}
+												onTouchStart={() => onPrefetch(result.file)}
+												onClick={() => onOpen(result.file, { query: searchQuery })}
+												onMouseEnter={(event) => {
+													event.currentTarget.style.backgroundColor =
+														theme.accentLight;
+												}}
+												onMouseLeave={(event) => {
+													event.currentTarget.style.backgroundColor = "transparent";
+												}}
+											>
+												<span className="block text-sm">{result.title}</span>
+												{result.category && (
+													<span className="block truncate text-[10px] opacity-50">
+														{result.category}
+													</span>
+												)}
+											</button>
+										</li>
+									))}
+								</ul>
 							) : searchLoading ? (
 								<p
 									className="px-3 pb-3 text-xs"

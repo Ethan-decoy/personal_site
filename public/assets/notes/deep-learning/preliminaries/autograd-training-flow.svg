@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="448" height="208" viewBox="0 0 448 208" role="img" aria-labelledby="title description">
+  <title id="title">单参数模型的正向计算与反向传播</title>
+  <desc id="description">预测等于参数 w 乘 2。用预测与 3 的差的平方作为损失。实线向右表示正向计算，虚线从损失向左表示反向求导。两个视图展示不同参数取值下的计算结果。</desc>
+  <style>
+    :root {
+      --ink: #243b49;
+      --muted: #546577;
+      --node: #e0e9f0;
+      --border: #8fa5b5;
+      --edge: #3f5360;
+      --gradient: #137e77;
+      --gradient-node: #d5e9e6;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #d3dfe5;
+        --muted: #adb9c4;
+        --node: #151e27;
+        --border: #536879;
+        --edge: #a2b6c1;
+        --gradient: #7cc6b8;
+        --gradient-node: #203e39;
+      }
+    }
+    text {
+      font: 18px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      text-anchor: middle;
+      dominant-baseline: middle;
+      fill: var(--ink);
+    }
+    .heading { font-size: 19px; font-weight: 600; text-anchor: start; }
+    .operation { fill: var(--muted); }
+    .value { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .node { fill: var(--node); stroke: var(--border); stroke-width: 1.4px; }
+    .gradient-node { fill: var(--gradient-node); stroke: var(--gradient); }
+    .arrow { fill: none; stroke: var(--edge); stroke-width: 1.7px; marker-end: url(#forward-head); }
+    .gradient-arrow { stroke: var(--gradient); stroke-dasharray: 5 4; marker-end: url(#backward-head); }
+  </style>
+  <defs>
+    <marker id="forward-head" viewBox="0 0 8 8" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="var(--edge)" stroke-width="1.4"/>
+    </marker>
+    <marker id="backward-head" viewBox="0 0 8 8" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="var(--gradient)" stroke-width="1.4"/>
+    </marker>
+    <g id="flow-layout">
+      <text x="8" y="16" class="heading">正向计算</text>
+      <text x="8" y="121" class="heading">反向传播</text>
+
+      <path d="M 104 78 H 176" class="arrow"/>
+      <path d="M 272 78 H 344" class="arrow"/>
+      <path d="M 344 181 H 272" class="arrow gradient-arrow"/>
+      <path d="M 176 181 H 104" class="arrow gradient-arrow"/>
+
+      <rect x="8" y="36" width="96" height="62" rx="5" class="node"/>
+      <rect x="176" y="36" width="96" height="62" rx="5" class="node"/>
+      <rect x="344" y="36" width="96" height="62" rx="5" class="node"/>
+      <rect x="8" y="141" width="96" height="62" rx="5" class="node gradient-node"/>
+      <rect x="176" y="141" width="96" height="62" rx="5" class="node gradient-node"/>
+      <rect x="344" y="141" width="96" height="62" rx="5" class="node"/>
+
+      <text x="56" y="53">参数 w</text>
+      <text x="224" y="53">预测 p</text>
+      <text x="392" y="53">损失 L</text>
+      <text x="140" y="53" class="operation">× 2</text>
+      <text x="308" y="53" class="operation">(p − 3)²</text>
+
+      <text x="56" y="157">w 的梯度</text>
+      <text x="224" y="157">p 的梯度</text>
+      <text x="392" y="172">求导起点</text>
+      <text x="140" y="157" class="operation">× 2</text>
+      <text x="308" y="157" class="operation">平方求导</text>
+    </g>
+  </defs>
+
+  <view id="raised-weight" viewBox="480 0 448 208"/>
+
+  <g id="initial-values">
+    <use href="#flow-layout"/>
+    <text x="56" y="81" class="value">1</text>
+    <text x="224" y="81" class="value">2</text>
+    <text x="392" y="81" class="value">1</text>
+    <text x="56" y="185" class="value">−4</text>
+    <text x="224" y="185" class="value">−2</text>
+  </g>
+  <g id="raised-values" transform="translate(480 0)">
+    <use href="#flow-layout"/>
+    <text x="56" y="81" class="value">1.01</text>
+    <text x="224" y="81" class="value">2.02</text>
+    <text x="392" y="81" class="value">0.9604</text>
+    <text x="56" y="185" class="value">−3.92</text>
+    <text x="224" y="185" class="value">−1.96</text>
+  </g>
+</svg>

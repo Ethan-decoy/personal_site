@@ -1,0 +1,782 @@
+{
+  "source": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/index.md",
+  "sourceGitBlob": "c49c3746acd8eb8072a1816262dd3747a655b0d9",
+  "sourceSha256": "991aae911d3501d1a0bd6ceb35b93649946daf3a88e2153151a611864036f509",
+  "originalPage": "https://zh.d2l.ai/chapter_preliminaries/index.html",
+  "commit": "e6b18ccea71451a55fcd861d7b96fddf2587b09a",
+  "checkedOn": "2026-11-20",
+  "originalCopyright": "2022, All authors. Licensed under CC-BY-SA-4.0 and MIT-0.",
+  "copyrightSource": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/config.ini",
+  "importedContentLicense": "CC-BY-SA-4.0",
+  "frameworkOrder": [
+    "MXNet",
+    "PyTorch",
+    "TensorFlow",
+    "Paddle"
+  ],
+  "adaptations": [
+    "章引言及七节按原书顺序迁移。原文段落、小结、练习、代码和公式保留，D2LBook 的目录与专用标记转换为站内可渲染的格式。",
+    "框架代码和专属段落使用原生折叠区，默认展开 PyTorch。共享代码保留原书的各框架输出。",
+    "原书公式、图表编号与局部引用沿用官网对应编号。站内文字引用转换为实际页面和锚点，文献链接指向原书参考文献。",
+    "示例输出及绘图匹配官网相同代码单元后迁入。比较代码时忽略构建格式化造成的空白、导入顺序和警告过滤差异。迁移验证覆盖渲染与来源对应，未重新运行原书示例。",
+    "讨论区入口略去。原书、固定快照、许可和改编说明由分类索引集中维护。",
+    "独立公式区在窄屏支持横向滚动，原书编号跟随对应公式。"
+  ],
+  "revisions": [
+    {
+      "adaptedOn": "2026-11-20",
+      "checkedOn": "2026-11-20",
+      "record": "preliminaries-data-manipulation.json",
+      "scope": "重排《数据操作》的框架示例，补足形状和状态判断，校正 TensorFlow 梯度及 PyTorch 与 NumPy 的转换说明。"
+    },
+    {
+      "adaptedOn": "2026-11-20",
+      "scope": "预备知识七篇的框架示例统一采用笔记系统标签页。框架顺序沿用原书，各篇默认选中 PyTorch 并在篇内联动。",
+      "verification": {
+        "tabGroups": 73,
+        "panels": 292,
+        "sourceComparison": "逐篇对照各框架的执行顺序、代码、文本输出、图表和显示公式。矩阵与向量相乘的专属说明并入对应示例，查阅文档的专属引言并入首次查找示例。",
+        "site": "隔离生产构建通过。浏览器逐篇核对四框架默认项和联动，共渲染 40 个显示公式，10 张图片可加载。数据操作的键盘切换、阅读位置、搜索、固定代码跳转和 320 像素布局通过。"
+      }
+    },
+    {
+      "adaptedOn": "2026-11-21",
+      "checkedOn": "2026-11-21",
+      "note": "02-preliminaries/_index.md",
+      "scope": "缩短章首页导读，提前呈现七节目录，按数据与张量、梯度训练、概率及接口查询整理学习目标，并补上英文数学附录入口。",
+      "sources": [
+        {
+          "title": "预备知识 — 动手学深度学习",
+          "url": "https://zh.d2l.ai/chapter_preliminaries/index.html",
+          "version": "中文版 2.0.0",
+          "supports": "核对章导读的主题范围及七节的阅读顺序。"
+        },
+        {
+          "title": "Introduction to gradients and automatic differentiation — TensorFlow Core",
+          "url": "https://www.tensorflow.org/guide/autodiff",
+          "version": "2026-11-21 在线指南",
+          "supports": "框架计算目标对指定变量的梯度，导读统一使用自动微分指称这类求导机制。"
+        },
+        {
+          "title": "查阅文档 — 动手学深度学习",
+          "url": "https://zh.d2l.ai/chapter_preliminaries/lookup-api.html",
+          "version": "中文版 2.0.0",
+          "supports": "对应本章实际使用 dir 查模块名称及 help 查接口用法的示例。"
+        },
+        {
+          "title": "Appendix: Mathematics for Deep Learning — Dive into Deep Learning",
+          "url": "https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/index.html",
+          "version": "英文版 1.0.3",
+          "supports": "提供线性代数、微积分和概率等数学主题的进阶阅读入口。"
+        }
+      ],
+      "verification": {
+        "site": "隔离运行深度学习笔记链接检查。浏览器逐一打开七节，核对英文附录的链接及暗色窄屏排版。390 × 844 和 320 × 844 两种视口下，七节目录均在首屏内。"
+      }
+    },
+    {
+      "adaptedOn": "2026-11-21",
+      "checkedOn": "2026-11-21",
+      "note": "02-preliminaries/02-data-preprocessing.md",
+      "scope": "保留原书四条房价记录，改用临时 CSV 并按列名划分特征与目标。数值列单独计算均值，类别编码显式保留缺失指示，四个框架共用同一组 float32 数组。公共输出按实跑重录，框架专属构造代码保留在标签页中，两道练习补充条件与参考解答。",
+      "sources": [
+        {
+          "title": "数据预处理 — 动手学深度学习",
+          "url": "https://zh.d2l.ai/chapter_preliminaries/pandas.html",
+          "version": "中文版 2.0.0",
+          "supports": "核对 CSV 样本、缺失值处理、四套框架的转换入口与原练习。"
+        },
+        {
+          "title": "pandas 2.0.0 release notes",
+          "url": "https://pandas.pydata.org/docs/whatsnew/v2.0.0.html",
+          "version": "pandas 2.0.0",
+          "supports": "混合类型数据框归约与 get_dummies 默认输出类型的变化。"
+        },
+        {
+          "title": "pandas.DataFrame.to_numpy",
+          "url": "https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_numpy.html",
+          "version": "在线 API 参考（2026-11-21）",
+          "supports": "为转换后的 NumPy 数组显式指定数值 dtype。"
+        },
+        {
+          "title": "paddle.to_tensor",
+          "url": "https://www.paddlepaddle.org.cn/documentation/docs/en/api/paddle/to_tensor_en.html",
+          "version": "在线 API 参考（2026-11-21）",
+          "supports": "接收 NumPy 数组并推断张量的数值 dtype。"
+        },
+        {
+          "title": "Apache MXNet 1.7.0.post2",
+          "url": "https://pypi.org/project/mxnet/1.7.0.post2/#files",
+          "version": "Windows x86-64 安装包",
+          "supports": "保留原书的 MXNet 转换示例，并在与该安装包匹配的旧版环境核对。"
+        }
+      ],
+      "verification": {
+        "environment": "Windows x64 CPU。PyTorch 2.10.0+cpu、TensorFlow 2.21.0、Paddle 3.3.1 使用 Python 3.13.14、pandas 3.0.6 与 NumPy 2.5.5。MXNet 1.7.0.post2 使用 Python 3.7.9、pandas 1.0.5 与 NumPy 1.16.6。Paddle 导入检查使用临时缓存目录。",
+        "examples": "两套 pandas 环境均核对四段公共输出与临时 CSV 清理。四个框架实跑得到相同的特征值和房价，形状分别为 (4, 3) 与 (4,)，数据类型均为 float32。两道参考解答用三组扩充数据核对，覆盖数值列删除、类别列删除及缺失数并列。",
+        "site": "隔离运行 pnpm build 通过。浏览器从章目录打开第二节，核对默认 PyTorch、四个标签切换、两题参考解答独立收起及数据操作的速览与全文。桌面与 320 像素暗色视口均完成检查。"
+      }
+    },
+    {
+      "adaptedOn": "2026-11-21",
+      "checkedOn": "2026-11-21",
+      "note": "02-preliminaries/03-linear-algebra.md",
+      "scope": "保留原书小样本、17 个编号公式及其锚点和 8 道练习。按对象与形状、逐元素与按轴运算、点积与矩阵乘法、范数组织正文，将 30 组框架标签归并为 16 组。对齐零维标量、向量形状、归约与广播规则，补足范数的定义条件和练习的输入条件。八道练习使用共享的折叠解答。",
+      "sources": [
+        {
+          "title": "线性代数 — 动手学深度学习",
+          "url": "https://zh.d2l.ai/chapter_preliminaries/linear-algebra.html",
+          "version": "中文版 2.0.0",
+          "supports": "原书的例子、公式和练习顺序。"
+        },
+        {
+          "title": "Convex Optimization I, Lecture 3",
+          "url": "https://see.stanford.edu/materials/lsocoee364a/transcripts/ConvexOptimizationI-Lecture03.html",
+          "version": "Stanford Engineering Everywhere",
+          "supports": "有限 p 范数的定义范围与 0 < p < 1 时的限制。"
+        },
+        {
+          "title": "paddle.to_tensor",
+          "url": "https://www.paddlepaddle.org.cn/documentation/docs/en/api/paddle/to_tensor_en.html",
+          "version": "在线 API 参考（2026-11-21 核对）",
+          "supports": "用 Python 标量构造零维张量。"
+        },
+        {
+          "title": "torch.linalg.vector_norm",
+          "url": "https://docs.pytorch.org/docs/stable/generated/torch.linalg.vector_norm.html",
+          "version": "在线 API 参考（2026-11-21 核对）",
+          "supports": "向量范数、浮点输入以及对全张量展平归约。"
+        },
+        {
+          "title": "torch.linalg.matrix_norm",
+          "url": "https://docs.pytorch.org/docs/stable/generated/torch.linalg.matrix_norm.html",
+          "version": "在线 API 参考（2026-11-21 核对）",
+          "supports": "Frobenius 范数与按两个矩阵轴归约。"
+        },
+        {
+          "title": "tf.norm",
+          "url": "https://www.tensorflow.org/api_docs/python/tf/norm",
+          "version": "TensorFlow 2.21.0 API 参考",
+          "supports": "区分向量的 L2 范数与指定两个轴的 Frobenius 范数。"
+        }
+      ],
+      "verification": {
+        "environment": "Windows x64 CPU。PyTorch 2.10.0+cpu、TensorFlow 2.21.0、Paddle 3.3.1 使用 Python 3.13.14 与 NumPy 2.5.5。MXNet 1.7.0.post2 使用 Python 3.7.9 与 NumPy 1.16.6。Paddle 导入检查使用临时缓存目录。",
+        "examples": "四套框架分别按顺序执行 16 个代码单元，核对标量阶数、各轴归约、广播、矩阵运算和范数的数值或形状。面板输出来自该次执行。PyTorch 另外核对八题的可执行结果与边界，包括零维长度、非方阵广播失败、方阵的分母方向和三轴张量的两种求范数方式。",
+        "site": "隔离 pnpm build 通过。浏览器从章目录打开第三节，核对 17 个编号公式及其锚点、16 组标签联动、8 个解答默认收起及归一化题与范数题的独立展开。桌面浅色与 320 像素暗色视口均通过检查，宽公式在各自容器滚动。"
+      }
+    },
+    {
+      "adaptedOn": "2026-11-23",
+      "checkedOn": "2026-11-23",
+      "note": "02-preliminaries/03-linear-algebra.md",
+      "scope": "细化标量的实数记号和 PyTorch 运算解读，新增零维张量与长度为 1 的一维张量的形状、轴数和元素个数对照。在向量、矩阵、按轴归约、广播、矩阵乘法与范数处补充读代码的步骤和可手算的示例位置。",
+      "sources": [
+        {
+          "title": "torch.tensor",
+          "url": "https://docs.pytorch.org/docs/2.10/generated/torch.tensor.html",
+          "version": "PyTorch 2.10",
+          "supports": "从数值和列表构造张量，核对标量输入对应的零维张量。"
+        },
+        {
+          "title": "torch.Tensor.ndim",
+          "url": "https://docs.pytorch.org/docs/2.10/generated/torch.Tensor.ndim.html",
+          "version": "PyTorch 2.10",
+          "supports": "查询张量的轴数。"
+        },
+        {
+          "title": "torch.Tensor.numel",
+          "url": "https://docs.pytorch.org/docs/2.10/generated/torch.Tensor.numel.html",
+          "version": "PyTorch 2.10",
+          "supports": "查询张量的元素总数。"
+        },
+        {
+          "title": "Broadcasting semantics",
+          "url": "https://docs.pytorch.org/docs/2.10/notes/broadcasting.html",
+          "version": "PyTorch 2.10",
+          "supports": "从末轴对齐及长度为 1 的轴的广播规则。"
+        }
+      ],
+      "verification": {
+        "content": "对比本轮前后的正文，原有 64 段框架示例及输出、17 个编号公式、8 道练习和参考解答均一致。新增的索引、求和、归一化、乘法和范数数值用 Python 3.13.14 与 NumPy 2.5.4 在 CPU 上独立核对。",
+        "site": "隔离运行 pnpm check:deep-learning-links 通过。浏览器核对章目录入口、标量的三步说明和形状对照表、16 组标签联动、17 个编号公式及 8 题解答的默认状态。桌面和 320 像素暗色视口均可阅读，对照表在各自容器内滚动。"
+      }
+    },
+    {
+      "adaptedOn": "2026-11-23",
+      "checkedOn": "2026-11-23",
+      "note": "02-preliminaries/01-data-manipulation.md",
+      "scope": "在《数据操作》开头用同一组六个数讲解张量、形状和逐元素计算。补充 CPU Notebook 的含义与运行顺序，并用一个独立的 PyTorch 实例连接后续的四框架示例。",
+      "sources": [
+        {
+          "title": "torch.tensor",
+          "url": "https://docs.pytorch.org/docs/2.10/generated/torch.tensor.html",
+          "version": "PyTorch 2.10",
+          "supports": "使用 Python 列表构造张量。"
+        },
+        {
+          "title": "torch.Tensor.shape",
+          "url": "https://docs.pytorch.org/docs/2.10/generated/torch.Tensor.shape.html",
+          "version": "PyTorch 2.10",
+          "supports": "读取张量的形状。"
+        },
+        {
+          "title": "Running Code",
+          "url": "https://jupyter-notebook.readthedocs.io/en/stable/examples/Notebook/Running%20Code.html#managing-the-kernel",
+          "version": "Jupyter Notebook 在线用户文档（2026-11-23）",
+          "supports": "代码以单元运行，并由 Python 内核承载一次会话的状态。"
+        }
+      ],
+      "verification": {
+        "examples": "在 Windows CPU 上使用 Python 3.13.14、PyTorch 2.10.0+cpu 与 NumPy 2.5.5 从正文提取并执行新示例。核对形状 (2, 3) 与 (6,)、两种摆法同为六个元素及逐元素乘以 2 的结果。接着运行第一组 PyTorch 单元，确认 x 重新赋值为形状 (12,) 的张量。",
+        "site": "隔离运行 pnpm check:deep-learning-links 通过。在桌面和 320 像素暗色视口核对三段新讲解及代码显示，确认章目录入口和后续 16 组框架标签联动。"
+      }
+    },
+    {
+      "adaptedOn": "2026-11-23",
+      "checkedOn": "2026-11-23",
+      "note": "02-preliminaries/01-data-manipulation.md",
+      "scope": "用原书从 0 到 11 的例子依次解释张量的创建、形状和变形。将 CPU Notebook 的运行说明放到第一组代码前，随机采样和对象身份提示移到各自的示例旁。",
+      "sources": [
+        {
+          "title": "torch.Tensor.shape",
+          "url": "https://docs.pytorch.org/docs/2.10/generated/torch.Tensor.shape.html",
+          "version": "PyTorch 2.10",
+          "supports": "读取张量的形状。"
+        },
+        {
+          "title": "Running Code",
+          "url": "https://jupyter-notebook.readthedocs.io/en/stable/examples/Notebook/Running%20Code.html#managing-the-kernel",
+          "version": "Jupyter Notebook 在线用户文档（2026-11-23）",
+          "supports": "代码以单元运行，并由 Python 内核承载一次会话的状态。"
+        }
+      ],
+      "verification": {
+        "examples": "比对修改前后的 191 个代码与输出块。用 NumPy 核对数值顺序、逐元素乘以 2、形状 (12,) 与 (3, 4)，以及用 -1 推断轴长的结果。",
+        "site": "隔离运行 pnpm check:deep-learning-links 通过。在桌面和 320 像素暗色视口确认目录入口、开头的阅读顺序与 16 组框架标签的联动。"
+      }
+    },
+    {
+      "adaptedOn": "2026-11-23",
+      "checkedOn": "2026-11-23",
+      "note": "02-preliminaries/02-data-preprocessing.md",
+      "scope": "在读取代码前用现有房屋记录解释 CSV 的文本表示、逗号和列名，在输出旁对应文件中的 NA 与表格中的 NaN。",
+      "sources": [
+        {
+          "title": "Common Format and MIME Type for Comma-Separated Values (CSV) Files",
+          "url": "https://www.rfc-editor.org/rfc/rfc4180.html#section-2",
+          "version": "RFC 4180 第 2 节（2005-10）",
+          "supports": "CSV 用逗号分隔各字段，首行可以提供字段名称。"
+        },
+        {
+          "title": "pandas.read_csv",
+          "url": "https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html",
+          "version": "pandas 3.1.1 文档（2026-11-23）",
+          "supports": "读取 CSV 时可推断列名，并识别缺失值标记。"
+        }
+      ],
+      "verification": {
+        "examples": "在 Windows CPU 上用 Python 3.13.14 和 pandas 3.0.6 执行原有首段代码，核对列名、示例行的字段、显示的 NaN 和临时文件清理。比对确认原有的 14 个代码与输出块一致。",
+        "site": "用站点 Markdown 渲染器生成明暗两种主题的 HTML，核对 CSV 定义和示例在代码前，缺失值说明紧随输出。"
+      }
+    },
+    {
+      "adaptedOn": "2026-11-23",
+      "checkedOn": "2026-11-23",
+      "note": "02-preliminaries/03-linear-algebra.md",
+      "scope": "在「求和与均值」用原书矩阵 A 连接行列索引、沿轴求和与输出形状，重绘两个方向的求和示意图。",
+      "sources": [
+        {
+          "title": "线性代数 — 动手学深度学习",
+          "url": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/linear-algebra.md",
+          "version": "中文版固定快照 e6b18cc",
+          "supports": "矩阵 A、沿轴 0 与轴 1 求和的示例和数据。"
+        }
+      ],
+      "verification": {
+        "examples": "用 NumPy 2.5.4 核对图中的矩阵、列和与行和、两种默认输出形状、保留轴的形状及标量总和。逐块比对确认 129 个代码与输出块一致。",
+        "site": "从章目录打开《线性代数》，在 1728 与 320 像素视口分别核对浅色和深色站内主题。页面主题与系统偏好相反时，SVG 仍正确切色。确认图在首组求和代码前，按比例缩到窄屏，无图内横向滚动。"
+      }
+    },
+    {
+      "adaptedOn": "2026-11-24",
+      "checkedOn": "2026-11-24",
+      "note": "02-preliminaries/04-calculus.md",
+      "scope": "区分优化目标和泛化表现，保留 11 个编号公式及其锚点。用原书二次函数手算差商、导数与切线，注明幂函数、对数和商法则的成立条件。复用两变量例解释偏导数、梯度与链式法则，交代向量输出的导数排列和 L2 范数。合并通用 Python 演示，重绘两张主题图，为四道原练习补充计算过程和折叠参考解答。",
+      "sources": [
+        {
+          "title": "微积分 — 动手学深度学习",
+          "url": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/calculus.md",
+          "version": "中文版固定快照 e6b18cc",
+          "supports": "原有编号公式、二次函数、内接正多边形示意与四道练习。"
+        },
+        {
+          "title": "Derivatives of Exponential and Logarithmic Functions",
+          "url": "https://openstax.org/books/calculus-volume-1/pages/3-9-derivatives-of-exponential-and-logarithmic-functions",
+          "version": "OpenStax Calculus Volume 1 §3.9",
+          "supports": "任意实数指数的幂函数与自然对数的求导条件。"
+        },
+        {
+          "title": "Differentiation Rules",
+          "url": "https://openstax.org/books/calculus-volume-1/pages/3-3-differentiation-rules",
+          "version": "OpenStax Calculus Volume 1 §3.3",
+          "supports": "常数倍、和、积与商的求导规则。"
+        },
+        {
+          "title": "Matrix Calculus for Machine Learning and Beyond",
+          "url": "https://ocw.mit.edu/courses/18-s096-matrix-calculus-for-machine-learning-and-beyond-january-iap-2023/mit18_s096iap23_lec_full.pdf",
+          "version": "MIT 18.S096 讲义 §2.4",
+          "supports": "向量值函数导数矩阵的输入与输出形状。正文保留原书按列组织各分量梯度的约定。"
+        },
+        {
+          "title": "Generalization — Dive into Deep Learning",
+          "url": "https://d2l.ai/chapter_linear-regression/generalization.html",
+          "version": "英文版 1.0.3",
+          "supports": "训练目标和泛化表现的区别。"
+        }
+      ],
+      "verification": {
+        "examples": "在 Windows x64 CPU 上用 Python 3.13.14、NumPy 2.5.5、Matplotlib 3.10.8 从笔记提取三个 Python 代码块运行。核对五行差商输出，用有理数验证两侧差商，实际绘制正文和练习的两幅切线图，核对两变量梯度、链式法则及四道练习。检验 SVG 曲线、切点、切线方程与同半径内接多边形的顶点和面积顺序。",
+        "site": "隔离运行 pnpm check:deep-learning-links。在 1728 与 320 像素视口检查浅色和深色主题，反转系统偏好并核对 SVG 配色与标签范围。确认 11 个编号公式可渲染，四道题默认收起并可独立展开，从引用速览可打开下一节《自动微分》。"
+      }
+    },
+    {
+      "adaptedOn": "2026-11-25",
+      "checkedOn": "2026-11-25",
+      "note": "02-preliminaries/05-automatic-differentiation.md",
+      "scope": "将十二组框架标签合为五组。沿用原例的输入，展开点积求值与各项偏导数，比较四个框架的梯度存放方式。明确向量求和与完整导数矩阵的关系，用图和标量算例说明分离计算。用固定输入讲解控制流，并注明零输入和分支切换点。为五道原练习补充折叠解答。",
+      "sources": [
+        {
+          "title": "自动微分 — 动手学深度学习",
+          "url": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/autograd.md",
+          "version": "中文版固定快照 e6b18cc",
+          "supports": "二次函数、梯度累积、非标量求导、分离计算、Python 控制流和五道练习。"
+        },
+        {
+          "title": "torch.Tensor.backward",
+          "url": "https://docs.pytorch.org/docs/2.10/generated/torch.Tensor.backward.html",
+          "version": "PyTorch 2.10",
+          "supports": "叶子张量上的梯度累积、清理梯度和计算高阶导数。"
+        },
+        {
+          "title": "torch.Tensor.detach",
+          "url": "https://docs.pytorch.org/docs/2.10/generated/torch.Tensor.detach.html",
+          "version": "PyTorch 2.10",
+          "supports": "分离计算图与共享底层存储。"
+        },
+        {
+          "title": "tf.GradientTape",
+          "url": "https://www.tensorflow.org/api_docs/python/tf/GradientTape",
+          "version": "TensorFlow 2.21 实测",
+          "supports": "跟踪可训练变量、返回梯度张量与持久记录的生命周期。"
+        },
+        {
+          "title": "Introduction to gradients and automatic differentiation",
+          "url": "https://www.tensorflow.org/guide/autodiff#gradients_of_non-scalar_targets",
+          "version": "TensorFlow 官方指南",
+          "supports": "以非标量输出作为求导目标时的求和行为。"
+        },
+        {
+          "title": "NDArray API",
+          "url": "https://mxnet.apache.org/versions/1.9.1/api/python/docs/api/ndarray/ndarray.html",
+          "version": "MXNet 1.9.1 归档文档",
+          "supports": "attach_grad 的梯度槽和 grad_req=\"write\" 写入模式。"
+        },
+        {
+          "title": "paddle.dot",
+          "url": "https://www.paddlepaddle.org.cn/documentation/docs/en/api/paddle/dot_en.html",
+          "version": "Paddle 3.3.1 实测",
+          "supports": "两个一维输入点积返回标量张量。"
+        }
+      ],
+      "verification": {
+        "examples": "在 Windows x64 CPU 上用 Python 3.13.14 核对 PyTorch 2.10.0+cpu、TensorFlow 2.21.0 和 Paddle 3.3.1。MXNet 1.7.0.post2 使用 Python 3.7.9 与 NumPy 1.16.6。逐套提取并按顺序运行正文代码，精确比对二十组输出。另测正值、负值、分界及相邻输入和零输入保护。核对五道 PyTorch 参考解答，使用 Matplotlib 3.10.8 实际绘制正弦及其导数。",
+        "site": "隔离运行 pnpm check:deep-learning-links。从章目录进入本站笔记，核对五组框架标签的点击与键盘同步、KaTeX 渲染、五个默认收起的答案和上一节引用。分别用 1728 与 320 像素视口检查两种主题，确认在系统配色相反时分支图仍随站点主题切换，文字无碰撞，窄屏无横向溢出，答案可独立展开和合上。"
+      }
+    },
+    {
+      "adaptedOn": "2026-11-25",
+      "checkedOn": "2026-11-25",
+      "note": "02-preliminaries/05-automatic-differentiation.md",
+      "scope": "在开头用单参数模型说明求梯度的训练动机。固定输入为 2、答案为 3，展示正向计算与反向传播经过的三处量，以及 w 从 1 调到 1.01 时损失与梯度的变化。用同一份图示的两个视图接入笔记已有标签页。",
+      "sources": [
+        {
+          "title": "自动微分 — 动手学深度学习",
+          "url": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/autograd.md",
+          "version": "中文版固定快照 e6b18cc",
+          "supports": "计算图、正向记录运算与反向计算梯度。单参数损失示例为本站增补。"
+        },
+        {
+          "title": "Linking into SVG content — SVG 2",
+          "url": "https://www.w3.org/TR/SVG2/linking.html",
+          "version": "SVG 2 §16.3.3",
+          "supports": "在同一份 SVG 中声明两个视图，并以链接片段显示相应的取值。"
+        }
+      ],
+      "verification": {
+        "examples": "按预测等于 2w、损失为 (p−3)² 的关系，以整数分数核对两个状态的十项数值。图中的损失分别为 1 和 0.9604，对 w 的梯度分别为 −4 和 −3.92。",
+        "site": "在隔离站点运行 pnpm check:deep-learning-links，并从预备知识目录打开笔记。通过鼠标及键盘切换、返回两个状态，比对画面读数和替代说明。用 1728 和 320 像素视口核对实际显示，反转系统明暗偏好验证图面随站点主题切换。核对 17 项文字的画布范围和相互位置，检查四条箭头和窄屏宽度。"
+      }
+    },
+    {
+      "adaptedOn": "2026-11-26",
+      "checkedOn": "2026-11-26",
+      "note": "02-preliminaries/04-calculus.md",
+      "scope": "在正式推导前加入两列用途表，说明微分、导数、积分与微积分在深度学习中的作用。明确微分估计可微损失的局部变化，区分偏导数与梯度下降使用的方向，并限定密度积分及分布上的期望损失。",
+      "sources": [
+        {
+          "title": "Tangent Planes and Linear Approximations",
+          "url": "https://openstax.org/books/calculus-volume-3/pages/4-4-tangent-planes-and-linear-approximations",
+          "version": "OpenStax Calculus Volume 3 §4.4",
+          "supports": "在可微点用微分近似函数的小幅变化。"
+        },
+        {
+          "title": "Landscapes and Gradient Descent — Dive into Deep Learning",
+          "url": "https://d2l.ai/chapter_optimization/gd.html",
+          "version": "英文在线版 §9.1",
+          "supports": "偏导数组成梯度，梯度下降沿负梯度更新参数。"
+        },
+        {
+          "title": "Probability and Statistics — Dive into Deep Learning",
+          "url": "https://d2l.ai/chapter_preliminaries/probability.html",
+          "version": "英文在线版 §1.6.2.2",
+          "supports": "带概率密度的连续随机变量在区间内的概率由密度积分得到。"
+        },
+        {
+          "title": "Generalization — Dive into Deep Learning",
+          "url": "https://d2l.ai/chapter_linear-regression/generalization.html",
+          "version": "英文在线版 §2.6.1",
+          "supports": "期望损失是对数据分布积分，有限训练集上的经验损失是样本损失的平均值。"
+        }
+      ],
+      "verification": {
+        "concepts": "核对可微条件、参数小幅改动与一阶近似的关系。把期望损失公式用于有密度的情形，得到对损失按密度加权的积分。",
+        "site": "隔离运行 pnpm check:deep-learning-links，并使用本站预览渲染器核对小节锚点、两列表头、四行概念及原有的 11 个编号公式锚点。"
+      }
+    },
+    {
+      "adaptedOn": "2026-11-26",
+      "checkedOn": "2026-11-26",
+      "note": "02-preliminaries/06-probability.md",
+      "scope": "用骰子串起事件、计数、累计频率和期望方差。五组框架标签合为两组并共用一个绘图单元。为 TensorFlow Probability 显式指定 probs。补充密度、条件概率、独立性和大数定律的成立条件。把贝叶斯算例限定为题设并校正 HIV 感染的术语。保留十二个编号公式，增加四题折叠解答和单一主题频率图，原书四个绘图输出转入来源归档。",
+      "sources": [
+        {
+          "title": "概率 — 动手学深度学习",
+          "url": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/probability.md",
+          "version": "中文版固定快照 e6b18cc",
+          "supports": "原书六面骰子、编号公式、概率与检测案例及四道练习。"
+        },
+        {
+          "title": "Probability and Statistics — Dive into Deep Learning",
+          "url": "https://d2l.ai/chapter_preliminaries/probability.html",
+          "version": "英文在线版 §1.6，2026-11-26 核对",
+          "supports": "独立重复抽样、频率估计、概率密度、条件概率、期望和方差。"
+        },
+        {
+          "title": "tfp.distributions.Multinomial",
+          "url": "https://www.tensorflow.org/probability/api_docs/python/tfp/distributions/Multinomial",
+          "version": "TensorFlow Probability 0.25.0 实测",
+          "supports": "logits 与 probs 的参数顺序与含义。显式指定 probs 时保留原概率。"
+        },
+        {
+          "title": "TensorFlow Probability 0.25.0 Release Notes",
+          "url": "https://github.com/tensorflow/probability/releases/tag/v0.25.0",
+          "version": "v0.25.0",
+          "supports": "示例选择 TensorFlow 2.18 和对应的 tf-keras。"
+        },
+        {
+          "title": "About HIV",
+          "url": "https://www.cdc.gov/hiv/about/index.html",
+          "version": "CDC，2025-01-14",
+          "supports": "HIV 感染与艾滋病术语校正。算例的检测率为题设。"
+        }
+      ],
+      "verification": {
+        "examples": "在 Windows x64 CPU 上逐套执行正文采样和累计频率单元，核对八组显示输出及所有 500 组计数与累计分母，用公共单元实际绘图。Python 3.12.11 下使用 PyTorch 2.10.0+cpu、TensorFlow 2.18.0 与 TensorFlow Probability 0.25.0 和 tf-keras 2.18.0，以及 Paddle 3.3.1，绘图使用 Matplotlib 3.10.8。MXNet 1.7.0.post2 使用 Python 3.7.9、NumPy 1.16.6 和 Matplotlib 3.3.4。另用不均匀的概率向量验证 TensorFlow Probability 的 probs 与 logits 行为。",
+        "math": "复算一次阳性、两个不同检测阳性和重复第一种检测阳性的后验。核对公平骰子的期望与方差、用同一批记录重新分组、交并集边界与离散链的因子分解。主题图用固定种子 42 的 PyTorch 实跑数据生成，包括从 10 到 5000 次的 500 个频率点，最终 3 点累计 829 次。",
+        "site": "隔离运行 pnpm check:deep-learning-links，核对十二个公式锚点和正文渲染。从章目录在 1728 和 320 像素视口打开笔记，检验两组框架标签点击与键盘联动、四题独立折叠。反转系统配色与站点主题，读取渲染后的曲线颜色，检查十三项图内标注及窄屏显示。"
+      }
+    },
+    {
+      "adaptedOn": "2026-11-26",
+      "checkedOn": "2026-11-26",
+      "note": "02-preliminaries/07-reading-documentation.md",
+      "scope": "从本站《预备知识》移除《查阅文档》，同步更新公开目录、学习目标和章节范围说明。",
+      "verification": {
+        "site": "隔离运行 pnpm build。核对《预备知识》的六节公开正文、目录链接及搜索清单，确认《查阅文档》已从正文加载器与生产构建移除。"
+      }
+    }
+  ],
+  "sections": [
+    {
+      "order": 1,
+      "title": "数据操作",
+      "file": "02-preliminaries/01-data-manipulation.md",
+      "source": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/ndarray.md",
+      "sourceGitBlob": "bce0c7ff5fa1d8dfea6e5e41b38e28a4390a1c98",
+      "sourceSha256": "3755c96ce9a2c625398460d1025e335bc957cc87a7b8e8a85b550c458e9c7351",
+      "originalPage": "https://zh.d2l.ai/chapter_preliminaries/ndarray.html",
+      "sourceCodeCells": 72,
+      "publishedCodeInputs": 96,
+      "publishedOutputs": 93,
+      "displayEquations": 0
+    },
+    {
+      "order": 2,
+      "title": "数据预处理",
+      "file": "02-preliminaries/02-data-preprocessing.md",
+      "source": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/pandas.md",
+      "sourceGitBlob": "49e006295ebe52ef1ddaa921781cf99d492e5482",
+      "sourceSha256": "0d9e0d95193380ce6260591fab76a651cf4cc9c287886e883d94efc067d8f5a8",
+      "originalPage": "https://zh.d2l.ai/chapter_preliminaries/pandas.html",
+      "sourceCodeCells": 8,
+      "publishedCodeInputs": 17,
+      "publishedOutputs": 17,
+      "displayEquations": 0
+    },
+    {
+      "order": 3,
+      "title": "线性代数",
+      "file": "02-preliminaries/03-linear-algebra.md",
+      "source": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/linear-algebra.md",
+      "sourceGitBlob": "8eb3697868f269ffadb7545a65b12e5047854482",
+      "sourceSha256": "ee341ac1c6c050238360e8f0ac3f592209e52497792cd0dec669d79edee8f6ef",
+      "originalPage": "https://zh.d2l.ai/chapter_preliminaries/linear-algebra.html",
+      "sourceCodeCells": 120,
+      "publishedCodeInputs": 120,
+      "publishedOutputs": 121,
+      "displayEquations": 17
+    },
+    {
+      "order": 4,
+      "title": "微积分",
+      "file": "02-preliminaries/04-calculus.md",
+      "source": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/calculus.md",
+      "sourceGitBlob": "181a1b30a00e44bbc29486f2c433fae7c1249abb",
+      "sourceSha256": "afbb49d0908ae9d23f12572e83044ed736d6aa4fc4a6754d76c183f24334a87d",
+      "originalPage": "https://zh.d2l.ai/chapter_preliminaries/calculus.html",
+      "sourceCodeCells": 10,
+      "publishedCodeInputs": 16,
+      "publishedOutputs": 9,
+      "displayEquations": 11
+    },
+    {
+      "order": 5,
+      "title": "自动微分",
+      "file": "02-preliminaries/05-automatic-differentiation.md",
+      "source": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/autograd.md",
+      "sourceGitBlob": "1ce57cc4f016dadad31bdf4712c6ac7460a6531c",
+      "sourceSha256": "76cf9deb47500edb7b3c97af09a1e41dface5e5671658b2e68909fdbf60c53ec",
+      "originalPage": "https://zh.d2l.ai/chapter_preliminaries/autograd.html",
+      "sourceCodeCells": 48,
+      "publishedCodeInputs": 48,
+      "publishedOutputs": 40,
+      "displayEquations": 0
+    },
+    {
+      "order": 6,
+      "title": "概率",
+      "file": "02-preliminaries/06-probability.md",
+      "source": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/probability.md",
+      "sourceGitBlob": "f5f9f49c1cac3b58e09939c1869e936bee976833",
+      "sourceSha256": "4be0c0ea1e801bc346480d373dae628259b650b640f46d6cea610a83a3f0c5cd",
+      "originalPage": "https://zh.d2l.ai/chapter_preliminaries/probability.html",
+      "sourceCodeCells": 20,
+      "publishedCodeInputs": 20,
+      "publishedOutputs": 18,
+      "displayEquations": 12
+    },
+    {
+      "order": 7,
+      "title": "查阅文档",
+      "file": "02-preliminaries/07-reading-documentation.md",
+      "source": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/lookup-api.md",
+      "sourceGitBlob": "e79217a6fef139d75cade10d654995305d8cacdd",
+      "sourceSha256": "1b08e7b551339a270e6668bf201259cc4f26c87cb37c0533552fc715d35d9f05",
+      "originalPage": "https://zh.d2l.ai/chapter_preliminaries/lookup-api.html",
+      "sourceCodeCells": 12,
+      "publishedCodeInputs": 12,
+      "publishedOutputs": 13,
+      "displayEquations": 0
+    }
+  ],
+  "assets": [
+    {
+      "source": "https://zh.d2l.ai/_images/polygon-circle.svg",
+      "originalArchive": "preliminaries-images/polygon-circle.svg",
+      "sha256": "5b358c09a01382f6e1448c55105f4c4172b483cdab983debe8dcb3db7ca4b953",
+      "width": 525,
+      "height": 119,
+      "alt": "用逼近法求圆的面积",
+      "section": "calculus",
+      "kind": "original-figure"
+    },
+    {
+      "source": "https://zh.d2l.ai/_images/output_calculus_7e7694_41_1.svg",
+      "originalArchive": "preliminaries-images/calculus-mxnet.svg",
+      "sha256": "4f5bc3f8d78a46844a422a751cb50fcba129da5fc21f7ba8ac1cc9771e44ac53",
+      "width": 325,
+      "height": 244,
+      "alt": "MXNet示例的函数曲线与切线",
+      "section": "calculus",
+      "framework": "mxnet",
+      "kind": "published-output"
+    },
+    {
+      "source": "https://zh.d2l.ai/_images/output_calculus_7e7694_44_0.svg",
+      "originalArchive": "preliminaries-images/calculus-pytorch.svg",
+      "sha256": "8550884aeb47935f1cb25d504252d86c6064c570d1925d4877e4cbbc78d1d91f",
+      "width": 325,
+      "height": 241,
+      "alt": "PyTorch示例的函数曲线与切线",
+      "section": "calculus",
+      "framework": "pytorch",
+      "kind": "published-output"
+    },
+    {
+      "source": "https://zh.d2l.ai/_images/output_calculus_7e7694_47_0.svg",
+      "originalArchive": "preliminaries-images/calculus-tensorflow.svg",
+      "sha256": "fcb32c3fa05846549df55720dc958478f9260507c4d1377a4b31d3940cf9bce2",
+      "width": 325,
+      "height": 244,
+      "alt": "TensorFlow示例的函数曲线与切线",
+      "section": "calculus",
+      "framework": "tensorflow",
+      "kind": "published-output"
+    },
+    {
+      "source": "https://zh.d2l.ai/_images/output_calculus_7e7694_50_0.svg",
+      "originalArchive": "preliminaries-images/calculus-paddle.svg",
+      "sha256": "fcb32c3fa05846549df55720dc958478f9260507c4d1377a4b31d3940cf9bce2",
+      "width": 325,
+      "height": 244,
+      "alt": "Paddle示例的函数曲线与切线",
+      "section": "calculus",
+      "framework": "paddle",
+      "kind": "published-output"
+    },
+    {
+      "source": "https://zh.d2l.ai/_images/cat-dog-pixels.png",
+      "currentAsset": "/assets/notes/deep-learning/preliminaries/cat-dog-pixels.png",
+      "sha256": "686a9f60b471787f3122737f128b620f48185af4d38268195c420433e2304add",
+      "width": 355,
+      "height": 349,
+      "alt": "不同分辨率的图像 (10 × 10, 20 × 20, 40 × 40, 80 × 80, 和 160 × 160 pixels)",
+      "section": "probability",
+      "kind": "original-figure"
+    },
+    {
+      "source": "https://zh.d2l.ai/_images/output_probability_245b7d_63_0.svg",
+      "originalArchive": "preliminaries-images/dice-frequency-mxnet.svg",
+      "sha256": "47eb7d1303f9b3be69ecff73dbc50760cbf993b20a148e4649b971b7964d75ae",
+      "width": 523,
+      "height": 392,
+      "alt": "MXNet示例的六面骰子各点数的频率变化",
+      "section": "probability",
+      "framework": "mxnet",
+      "kind": "published-output"
+    },
+    {
+      "source": "https://zh.d2l.ai/_images/output_probability_245b7d_66_0.svg",
+      "originalArchive": "preliminaries-images/dice-frequency-pytorch.svg",
+      "sha256": "5533f86602c79e3bf5ca40164d3b94ad69e0386bc651768f3bc304d7cbe40e09",
+      "width": 531,
+      "height": 391,
+      "alt": "PyTorch示例的六面骰子各点数的频率变化",
+      "section": "probability",
+      "framework": "pytorch",
+      "kind": "published-output"
+    },
+    {
+      "source": "https://zh.d2l.ai/_images/output_probability_245b7d_69_0.svg",
+      "originalArchive": "preliminaries-images/dice-frequency-tensorflow.svg",
+      "sha256": "726215e08a5f68bcf626140b7044b979665876eb357d76e142d0e30d6d9750dc",
+      "width": 523,
+      "height": 392,
+      "alt": "TensorFlow示例的六面骰子各点数的频率变化",
+      "section": "probability",
+      "framework": "tensorflow",
+      "kind": "published-output"
+    },
+    {
+      "source": "https://zh.d2l.ai/_images/output_probability_245b7d_72_1.svg",
+      "originalArchive": "preliminaries-images/dice-frequency-paddle.svg",
+      "sha256": "1038f02ffd5a6857d9b658fde8b0adcefe20f63f1b2270174f36559b56519181",
+      "width": 523,
+      "height": 392,
+      "alt": "Paddle示例的六面骰子各点数的频率变化",
+      "section": "probability",
+      "framework": "paddle",
+      "kind": "published-output"
+    },
+    {
+      "source": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/linear-algebra.md",
+      "currentAsset": "/assets/notes/deep-learning/preliminaries/matrix-axis-sums.svg",
+      "sha256": "9b70d45b374590d290b7b70a6240b3211b229caee2ae7c1239d95f89aa6d268d",
+      "width": 376,
+      "height": 308,
+      "alt": "沿轴 0 向下得到每列的和，沿轴 1 向右得到每行的和。",
+      "section": "linear-algebra",
+      "kind": "adapted-figure"
+    },
+    {
+      "source": "https://zh.d2l.ai/_images/polygon-circle.svg",
+      "currentAsset": "/assets/notes/deep-learning/preliminaries/calculus-polygon-approximation.svg",
+      "sha256": "720bc47a2efa0de67775af8627c3cecc832b0428cd6dd0695f12ff94d96eebe6",
+      "width": 448,
+      "height": 120,
+      "alt": "4、5、6、8 边的内接正多边形依次逼近同半径圆的面积。",
+      "section": "calculus",
+      "kind": "adapted-figure"
+    },
+    {
+      "source": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/calculus.md",
+      "currentAsset": "/assets/notes/deep-learning/preliminaries/calculus-tangent.svg",
+      "sha256": "b0eeee6092e262c0bdc2c280347ca9c4d36365b4681f997befa425818e674115",
+      "width": 448,
+      "height": 300,
+      "alt": "二次函数在 (1, −1) 处和斜率为 2 的直线相切。",
+      "section": "calculus",
+      "kind": "adapted-figure"
+    },
+    {
+      "source": "https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/chapter_preliminaries/autograd.md",
+      "currentAsset": "/assets/notes/deep-learning/preliminaries/autograd-detach-path.svg",
+      "sha256": "cddd07d757cefbf3abb0262cea8126d62ce5bc968ff999ee1ac84d71da845241",
+      "width": 448,
+      "height": 220,
+      "alt": "同一个输入经过平方后的分离步骤和直接路径进入乘法，分离步骤截断反向梯度。",
+      "section": "autograd",
+      "kind": "adapted-figure"
+    },
+    {
+      "source": "../02-preliminaries/05-automatic-differentiation.md#从损失回到参数",
+      "currentAsset": "/assets/notes/deep-learning/preliminaries/autograd-training-flow.svg",
+      "sha256": "013b70cbd405f48721244fe1664e653991ffb244500a36fe09eae7d37540e3a7",
+      "width": 448,
+      "height": 208,
+      "alt": "单参数模型的两个取值视图。上行从参数求预测和损失，下行从损失沿相反方向求梯度。",
+      "section": "autograd",
+      "kind": "authored-figure"
+    },
+    {
+      "source": "../02-preliminaries/06-probability.md#累计频率",
+      "currentAsset": "/assets/notes/deep-learning/preliminaries/dice-frequency.svg",
+      "sha256": "6a4e9f0dd20a3f677089bf89f8b8bca58540547b74e02cbc6a1eee380c9a09c6",
+      "width": 448,
+      "height": 254,
+      "alt": "掷出 3 点的累计频率。5000 次投掷中出现 829 次，虚线对应公平骰子的真实概率 1/6。",
+      "section": "probability",
+      "framework": "pytorch",
+      "kind": "authored-figure"
+    }
+  ],
+  "totals": {
+    "sections": 7,
+    "sourceCodeCells": 290,
+    "publishedOutputs": 311,
+    "displayEquations": 40,
+    "originalFigures": 2,
+    "publishedOutputFigures": 8
+  }
+}

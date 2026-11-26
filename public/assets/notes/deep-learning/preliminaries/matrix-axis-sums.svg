@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="376" height="308" viewBox="0 0 376 308" role="img" aria-labelledby="title description">
+  <title id="title">同一个矩阵沿两条轴求和</title>
+  <desc id="description">矩阵 A 有 5 行 4 列。沿轴 0 向下相加，每列得到一个和，输出形状为 (4,)。沿轴 1 向右相加，每行得到一个和，输出形状为 (5,)。</desc>
+  <style>
+    :root {
+      --ink: #172436;
+      --muted: #546577;
+      --cell: #e0e9f0;
+      --group: #ccdfe9;
+      --line: #96aab8;
+      --arrow: #546577;
+      --accent: #2f5d7c;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #d8dee5;
+        --muted: #adb9c4;
+        --cell: #151e27;
+        --group: #254052;
+        --line: #536879;
+        --arrow: #adb9c4;
+        --accent: #8cbbd2;
+      }
+    }
+    text { fill: var(--ink); font-family: "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; dominant-baseline: middle; }
+    .label { fill: var(--muted); font-size: 17px; }
+    .direction { fill: var(--accent); font-size: 18px; font-weight: 600; }
+    .value { font-size: 20px; font-variant-numeric: tabular-nums; }
+    .strong { font-weight: 600; }
+    .cells { fill: var(--cell); }
+    .group { fill: var(--group); }
+    .grid { fill: none; stroke: var(--line); stroke-width: 1; }
+    .arrow { fill: none; stroke: var(--arrow); stroke-width: 1.45; marker-end: url(#arrow); }
+    .first-arrow { stroke: var(--accent); stroke-width: 1.8; marker-end: url(#first-arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="var(--arrow)" stroke-width="1.3" />
+    </marker>
+    <marker id="first-arrow" viewBox="0 0 8 8" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="var(--accent)" stroke-width="1.6" />
+    </marker>
+  </defs>
+
+  <text x="56" y="15" class="direction">矩阵 A（5 行 4 列）</text>
+  <text x="330" y="15" class="direction" text-anchor="middle">沿轴 1</text>
+  <g class="label" text-anchor="middle">
+    <text x="81" y="41">列 0</text>
+    <text x="131" y="41">列 1</text>
+    <text x="181" y="41">列 2</text>
+    <text x="231" y="41">列 3</text>
+    <text x="330" y="41">行和 (5,)</text>
+  </g>
+
+  <rect x="56" y="57" width="200" height="170" class="cells" />
+  <path d="M 56 57 H 256 V 91 H 106 V 227 H 56 Z" class="group" />
+  <rect x="56" y="57" width="200" height="170" class="grid" />
+  <path d="M 106 57 V 227 M 156 57 V 227 M 206 57 V 227 M 56 91 H 256 M 56 125 H 256 M 56 159 H 256 M 56 193 H 256" class="grid" />
+  <g class="label">
+    <text x="3" y="74">行 0</text>
+    <text x="3" y="108">行 1</text>
+    <text x="3" y="142">行 2</text>
+    <text x="3" y="176">行 3</text>
+    <text x="3" y="210">行 4</text>
+  </g>
+  <g class="value" text-anchor="middle">
+    <g class="input-row">
+      <text x="81" y="74">0</text><text x="131" y="74">1</text><text x="181" y="74">2</text><text x="231" y="74">3</text>
+    </g>
+    <g class="input-row">
+      <text x="81" y="108">4</text><text x="131" y="108">5</text><text x="181" y="108">6</text><text x="231" y="108">7</text>
+    </g>
+    <g class="input-row">
+      <text x="81" y="142">8</text><text x="131" y="142">9</text><text x="181" y="142">10</text><text x="231" y="142">11</text>
+    </g>
+    <g class="input-row">
+      <text x="81" y="176">12</text><text x="131" y="176">13</text><text x="181" y="176">14</text><text x="231" y="176">15</text>
+    </g>
+    <g class="input-row">
+      <text x="81" y="210">16</text><text x="131" y="210">17</text><text x="181" y="210">18</text><text x="231" y="210">19</text>
+    </g>
+  </g>
+
+  <g class="row-arrows">
+    <path d="M 265 74 H 303" class="arrow first-arrow" />
+    <path d="M 265 108 H 303" class="arrow" />
+    <path d="M 265 142 H 303" class="arrow" />
+    <path d="M 265 176 H 303" class="arrow" />
+    <path d="M 265 210 H 303" class="arrow" />
+  </g>
+  <rect x="312" y="60" width="36" height="28" rx="4" class="group" />
+  <g class="value row-sums" text-anchor="middle">
+    <text x="330" y="74" class="strong">6</text>
+    <text x="330" y="108">22</text>
+    <text x="330" y="142">38</text>
+    <text x="330" y="176">54</text>
+    <text x="330" y="210">70</text>
+  </g>
+
+  <text x="3" y="246" class="direction">沿轴 0</text>
+  <text x="3" y="283" class="label">列和</text>
+  <g class="column-arrows">
+    <path d="M 81 235 V 257" class="arrow first-arrow" />
+    <path d="M 131 235 V 257" class="arrow" />
+    <path d="M 181 235 V 257" class="arrow" />
+    <path d="M 231 235 V 257" class="arrow" />
+  </g>
+  <rect x="63" y="269" width="36" height="28" rx="4" class="group" />
+  <g class="value column-sums" text-anchor="middle">
+    <text x="81" y="283" class="strong">40</text>
+    <text x="131" y="283">45</text>
+    <text x="181" y="283">50</text>
+    <text x="231" y="283">55</text>
+  </g>
+  <text x="265" y="283" class="label">(4,)</text>
+</svg>

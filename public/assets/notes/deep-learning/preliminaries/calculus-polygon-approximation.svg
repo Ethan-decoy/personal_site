@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="448" height="120" viewBox="0 0 448 120" role="img" aria-labelledby="title description">
+  <title id="title">用内接正多边形逼近圆的面积</title>
+  <desc id="description">相同大小的圆依次内接 4、5、6、8 边的正多边形，随着边数增加，圆内未覆盖的部分逐渐缩小。</desc>
+  <style>
+    :root {
+      --ink: #172436;
+      --edge: #637a85;
+      --area: #ccdfe9;
+      --polygon: #2f5d7c;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #d8dee5;
+        --edge: #9aafb9;
+        --area: #254052;
+        --polygon: #8cbbd2;
+      }
+    }
+    circle { fill: none; stroke: var(--edge); stroke-width: 1.4; }
+    polygon { fill: var(--area); stroke: var(--polygon); stroke-width: 1.4; }
+    text { text-anchor: middle; dominant-baseline: middle; font: 18px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: var(--ink); }
+  </style>
+
+  <g aria-label="内接正4边形">
+    <circle cx="56" cy="47" r="39" />
+    <polygon points="28.423,19.423 83.577,19.423 83.577,74.577 28.423,74.577" />
+    <text x="56" y="108">4 边</text>
+  </g>
+  <g aria-label="内接正5边形">
+    <circle cx="168" cy="47" r="39" />
+    <polygon points="168.000,8.000 205.091,34.948 190.924,78.552 145.076,78.552 130.909,34.948" />
+    <text x="168" y="108">5 边</text>
+  </g>
+  <g aria-label="内接正6边形">
+    <circle cx="280" cy="47" r="39" />
+    <polygon points="280.000,8.000 313.775,27.500 313.775,66.500 280.000,86.000 246.225,66.500 246.225,27.500" />
+    <text x="280" y="108">6 边</text>
+  </g>
+  <g aria-label="内接正8边形">
+    <circle cx="392" cy="47" r="39" />
+    <polygon points="392.000,8.000 419.577,19.423 431.000,47.000 419.577,74.577 392.000,86.000 364.423,74.577 353.000,47.000 364.423,19.423" />
+    <text x="392" y="108">8 边</text>
+  </g>
+</svg>

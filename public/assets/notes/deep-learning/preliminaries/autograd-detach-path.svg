@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="448" height="220" viewBox="0 0 448 220" role="img" aria-labelledby="title description">
+  <title id="title">分离中间值时的两条计算路径</title>
+  <desc id="description">输入 x=2 平方得到 y=4，经过分离得到数值相同的 u=4。x 也直接传入乘法。z 取两路的数值相乘，得到 8。反向传播在分离边停止，直接传入 x 的路径仍参与求导。</desc>
+  <style>
+    :root {
+      --ink: #172436;
+      --muted: #546577;
+      --node: #e0e9f0;
+      --border: #8fa5b5;
+      --edge: #546577;
+      --stop: #137e77;
+      --stop-node: #d5e9e6;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #d8dee5;
+        --muted: #adb9c4;
+        --node: #151e27;
+        --border: #536879;
+        --edge: #adb9c4;
+        --stop: #7cc6b8;
+        --stop-node: #203e39;
+      }
+    }
+    text { font: 19px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; text-anchor: middle; dominant-baseline: middle; fill: var(--ink); }
+    .label { font-size: 18px; fill: var(--muted); }
+    .node { fill: var(--node); stroke: var(--border); stroke-width: 1.4; }
+    .constant { fill: var(--stop-node); stroke: var(--stop); }
+    .flow { fill: none; stroke: var(--edge); stroke-width: 1.7; marker-end: url(#flow-head); }
+    .stopped { stroke: var(--stop); stroke-dasharray: 5 4; marker-end: url(#stopped-head); }
+    .stopped-label { fill: var(--stop); font-weight: 600; }
+  </style>
+  <defs>
+    <marker id="flow-head" viewBox="0 0 8 8" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="var(--edge)" stroke-width="1.4" />
+    </marker>
+    <marker id="stopped-head" viewBox="0 0 8 8" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 7 4 L 1 7" fill="none" stroke="var(--stop)" stroke-width="1.4" />
+    </marker>
+  </defs>
+
+  <text x="223" y="38" class="stopped-label">保留数值，截断梯度</text>
+  <text x="223" y="78" class="label">分离</text>
+
+  <path d="M 80 112 H 105" class="flow" />
+  <path d="M 190 112 H 256" class="flow stopped" />
+  <path d="M 323 112 H 347" class="flow" />
+  <path d="M 44 141 V 181 H 394 V 141" class="flow" />
+
+  <rect x="8" y="83" width="72" height="58" rx="5" class="node" />
+  <rect x="105" y="83" width="85" height="58" rx="5" class="node" />
+  <rect x="256" y="83" width="67" height="58" rx="5" class="node constant" />
+  <rect x="347" y="83" width="94" height="58" rx="5" class="node" />
+
+  <text x="44" y="112">x = 2</text>
+  <text x="147.5" y="98">y = x²</text>
+  <text x="147.5" y="126">= 4</text>
+  <text x="289.5" y="112">u = 4</text>
+  <text x="394" y="98">z = u × x</text>
+  <text x="394" y="126">= 8</text>
+  <text x="219" y="203" class="label">x 直接参与乘法</text>
+</svg>

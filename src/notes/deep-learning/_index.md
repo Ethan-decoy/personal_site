@@ -10,10 +10,11 @@ date: 2026-11-13
 ## 阅读顺序
 
 - [引言](01-introduction/_index.md)
+- [预备知识](02-preliminaries/_index.md)
 
 ## 来源与许可
 
-引言迁移自[《动手学深度学习》中文版第二版](https://zh.d2l.ai/chapter_introduction/index.html)。原作者为 Aston Zhang、Zachary C. Lipton、Mu Li 和 Alexander J. Smola，中文版由原作者与社区贡献者共同维护。来源固定于 [d2l-ai/d2l-zh 源码快照](https://github.com/d2l-ai/d2l-zh/tree/e6b18ccea71451a55fcd861d7b96fddf2587b09a)，提交为 `e6b18ccea71451a55fcd861d7b96fddf2587b09a`，核对日期为 2026-11-13。
+笔记迁移自《动手学深度学习》中文版第二版。原书章节为[引言](https://zh.d2l.ai/chapter_introduction/index.html)和[预备知识](https://zh.d2l.ai/chapter_preliminaries/index.html)。原作者为 Aston Zhang、Zachary C. Lipton、Mu Li 和 Alexander J. Smola，中文版由原作者与社区贡献者共同维护。来源固定于 [d2l-ai/d2l-zh 源码快照](https://github.com/d2l-ai/d2l-zh/tree/e6b18ccea71451a55fcd861d7b96fddf2587b09a)，提交为 `e6b18ccea71451a55fcd861d7b96fddf2587b09a`。引言于 2026-11-13 核对，预备知识于 2026-11-20 核对。
 
 引言首次按原文迁移，再按学习主题分节。正文标题使用主题名，Sphinx 标签与引用转换为本站可用的链接。配图按解释需要保留、重绘或移除，移除和替换的原始素材保存在内部来源归档；训练过程、监督学习、语音对应、数据采集与环境交互示意图已适配页面明暗主题。
 
@@ -24,5 +25,17 @@ date: 2026-11-13
 成功案例部分校正了 MNIST 的来源，补足语音转写、图像分类与游戏案例的评测条件和方法，明确生成、多模态实验与现实部署各自的适用范围。
 
 特点部分用图像分类说明多层表示与联合训练，补明检索增强生成的参数更新范围，并区分模型结构、训练结果与泛化评估。章末小结串起学习系统的关键关系，四道练习保留原书主旨和顺序，并补充作答条件与本站编写的参考解答。
+
+预备知识按原书顺序组织六节正文、小结与练习。章首页将阅读目录放在简短导读之后，明确梯度训练各环节的作用，并链接原书英文版数学附录。多框架示例沿用原书的标签顺序，篇内同组标签联动。迁移时的示例输出与绘图取自原书网页。
+
+《数据操作》用同一组十二个数串起张量的创建、形状和重新排列，把 Notebook 的运行说明放在首组示例前。正文按概念组织，补充形状判断与练习条件，并依据官方文档校正变量梯度、原地写入与 NumPy 转换的说明。《数据预处理》沿用原书的四条房价记录，更新缺失值处理和张量转换代码，重新核对公共输出，并补充练习参考解答。
+
+《线性代数》按形状、归约、乘法与范数整理阅读顺序，保留原书的编号公式，合并相关框架示例并更新实跑输出。主要示例逐步解释数学符号、参数及输出，练习附有作答条件和参考解答。
+
+《微积分》补充微分、导数与积分在梯度训练和连续概率建模中的用途对照。用原书的二次函数串起差商、导数和切线，再用同一个两变量函数手算偏导数、梯度和链式法则。差商用纯 Python 演示，绘图沿用同一函数。配图适配页面明暗，原书图像转入内部来源归档。四道练习附有参考解答。
+
+《自动微分》先用单参数模型和主题示意图走一遍正向计算与反向传播，再用同一组向量串起求导、梯度累积、向量输出的求和目标和分离中间值。四种框架按算例分组，控制流使用固定输入说明分支条件。分离步骤配有明暗示意图，五道练习附有参考解答。
+
+《概率》用同一颗骰子解释计数、频率和期望，实跑核对四种框架的抽样与绘图。累计频率图随页面主题切换，原书绘图输出转入内部来源归档。条件概率和检测算例交代成立条件，四道练习附有参考解答。
 
 上游[构建配置](https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/config.ini)保留如下版权声明：`2022, All authors. Licensed under CC-BY-SA-4.0 and MIT-0.` 本站迁移的原书内容沿用 [Creative Commons Attribution-ShareAlike 4.0 International（CC BY-SA 4.0）](https://creativecommons.org/licenses/by-sa/4.0/)。原仓库根目录另附 [Apache License 2.0](https://github.com/d2l-ai/d2l-zh/blob/e6b18ccea71451a55fcd861d7b96fddf2587b09a/LICENSE)，本站同时保留[该许可的完整副本](/assets/notes/deep-learning/LICENSE-D2L-ZH.txt)。

@@ -1,0 +1,136 @@
+{
+  "title": "数据操作的阅读编排与示例校正",
+  "adaptedOn": "2026-11-20",
+  "checkedOn": "2026-11-20",
+  "sourceSnapshotRecord": "preliminaries.json",
+  "note": "02-preliminaries/01-data-manipulation.md",
+  "scope": "以原书数据操作为主线，校正形状、索引、比较、广播、写入与转换的解释和示例条件。",
+  "sources": [
+    {
+      "id": "d2l-framework-tabs",
+      "title": "数据操作 — 动手学深度学习",
+      "url": "https://zh.d2l.ai/chapter_preliminaries/ndarray.html",
+      "version": "2026-11-20 核对的在线中文版 2.0.0 及配套标签脚本",
+      "supports": "同一示例以 MXNet、PyTorch、TensorFlow、Paddle 顺序呈现横向标签，各示例同步显示当前选中的框架。"
+    },
+    {
+      "id": "pytorch-views",
+      "title": "PyTorch Tensor Views",
+      "url": "https://docs.pytorch.org/docs/2.15/tensor_view.html",
+      "version": "PyTorch 2.15",
+      "supports": "reshape 的返回结果可能为视图或副本，取决于输入布局。"
+    },
+    {
+      "id": "pytorch-cat",
+      "title": "PyTorch torch.cat",
+      "url": "https://docs.pytorch.org/docs/2.15/generated/torch.cat.html",
+      "version": "PyTorch 2.15",
+      "supports": "矩阵沿已有轴拼接，其他轴的长度须一致。"
+    },
+    {
+      "id": "pytorch-broadcast",
+      "title": "PyTorch Broadcasting semantics",
+      "url": "https://docs.pytorch.org/docs/2.15/notes/broadcasting.html",
+      "version": "PyTorch 2.15",
+      "supports": "从末轴判断形状相容性，支持广播的运算可扩展输入而无需复制数据。"
+    },
+    {
+      "id": "python-identity",
+      "title": "Python Built-in Functions · id",
+      "url": "https://docs.python.org/3/library/functions.html#id",
+      "version": "Python 3，核对时在线文档",
+      "supports": "id 返回对象身份值，CPython 将对象地址用作实现。张量存储与临时分配另需框架证据。"
+    },
+    {
+      "id": "pytorch-numpy",
+      "title": "PyTorch Tensor.numpy",
+      "url": "https://docs.pytorch.org/docs/2.15/generated/torch.Tensor.numpy.html",
+      "version": "PyTorch 2.15",
+      "supports": "默认转换的设备、梯度、共轭状态、类型和布局条件，以及共享存储的行为。"
+    },
+    {
+      "id": "pytorch-tensor",
+      "title": "PyTorch torch.tensor",
+      "url": "https://docs.pytorch.org/docs/2.15/generated/torch.tensor.html",
+      "version": "PyTorch 2.15",
+      "supports": "torch.tensor 从输入复制数据。"
+    },
+    {
+      "id": "pytorch-from-numpy",
+      "title": "PyTorch torch.from_numpy",
+      "url": "https://docs.pytorch.org/docs/stable/generated/torch.from_numpy.html",
+      "version": "核对时稳定文档为 PyTorch 2.15",
+      "supports": "兼容的 NumPy 数组与张量共享数据，写入可以传播。"
+    },
+    {
+      "id": "tensorflow-autodiff",
+      "title": "TensorFlow Introduction to gradients and automatic differentiation",
+      "url": "https://www.tensorflow.org/guide/autodiff",
+      "version": "2026-11-20 在线指南",
+      "supports": "默认记录可训练变量在可微计算中的使用。通过变量读取取得的当前状态会截断此前写入历史的梯度路径。"
+    },
+    {
+      "id": "tensorflow-graphs",
+      "title": "TensorFlow Introduction to graphs and tf.function",
+      "url": "https://www.tensorflow.org/guide/intro_to_graphs",
+      "version": "2026-11-20 在线指南",
+      "supports": "tf.function 将计算转换为图，图优化可消除无关节点。示例的数值输出展示图计算结果。"
+    },
+    {
+      "id": "numpy-scalar-casts",
+      "title": "NumPy 2.4.0 Release Notes",
+      "url": "https://numpy.org/doc/2.4/release/2.4.0-notes.html",
+      "version": "NumPy 2.4.0",
+      "supports": "从一维等非零维数组直接转为 Python 标量会抛出 TypeError。先提取单个值后可以转换。"
+    }
+  ],
+  "changes": [
+    "按操作组织专属说明、代码与输出，沿用原书的四框架标签顺序和篇内联动方式，默认显示 PyTorch。",
+    "区分各轴长度与元素总数，补充变形、拼接、比较、索引和广播的适用条件。保留两道练习并明确输入状态与预测任务。",
+    "区分名称重新绑定、对象身份、已有目标上的写入与存储复用，保留 Paddle 原书输出的历史运行语境。",
+    "说明 TensorFlow 可训练变量梯度与赋值历史的差异，将图优化的注释限于计算依赖。",
+    "新增 PyTorch 与 NumPy 的复制和共享对照，统一先用 item 提取单元素，再执行 Python 数值转换。"
+  ],
+  "verification": {
+    "sourceComparison": {
+      "originalOutputsRetained": 93,
+      "description": "按框架与执行顺序比较标签调整前后的代码及输出，各框架的 97 个 Python 单元与 94 项显示结果完全一致，其中保有 93 项原书发布输出。"
+    },
+    "syntax": {
+      "runtime": "CPython 3.13.14",
+      "platform": "Windows",
+      "pythonCells": 97
+    },
+    "execution": [
+      {
+        "runtime": "CPython 3.13.14",
+        "framework": "PyTorch 2.15.0+cpu",
+        "numpy": "2.5.5",
+        "device": "Windows CPU",
+        "pythonCells": 25,
+        "scope": "顺序执行全部 PyTorch 单元，核对形状、数值、布尔比较、广播练习、切片写入、原地修改和 NumPy 共享。"
+      },
+      {
+        "runtime": "CPython 3.13.14",
+        "framework": "TensorFlow 2.21.0",
+        "numpy": "2.5.5",
+        "device": "Windows CPU",
+        "pythonCells": 24,
+        "scope": "顺序执行全部 TensorFlow 单元，核对切片赋值、图计算结果与单元素转换。从赋值后的当前变量可得梯度 6，赋值输入的梯度为 None。"
+      }
+    ],
+    "numpyScalarCast": {
+      "runtime": "CPython 3.13.14",
+      "numpy": "2.5.4",
+      "scope": "一维单元素数组直接经 float 和 int 转换时均抛出 TypeError。先调用 item 后，两种转换均得到文中数值。"
+    },
+    "site": [
+      "在隔离的项目与依赖副本中完成 pnpm build，包含 Markdown、目录、链接与锚点、生产分包和性能预算检查。",
+      "在隔离的 Edge 中核对生产预览的 16 组框架标签和 64 个面板，覆盖鼠标和键盘全篇联动、保持当前阅读位置、搜索及代码参考窗跳转、明暗主题、320 像素窄屏显示。"
+    ]
+  },
+  "limits": [
+    "MXNet 与 Paddle 的证据覆盖原书输出对照与 Python 语法检查，当前版本的运行结果待验证。",
+    "内存示例核对对象身份、写入与共享存储，峰值内存属于不同的测量任务。"
+  ]
+}

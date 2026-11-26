@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="448" height="300" viewBox="0 0 448 300" role="img" aria-labelledby="title description">
+  <title id="title">二次函数及其在 x=1 处的切线</title>
+  <desc id="description">实线为 f(x)=3x²−4x，虚线为 y=2x−3。曲线与切线在 (1, −1) 相切。沿切线向右移动 1，向上移动 2，斜率为 2。</desc>
+  <style>
+    :root {
+      --ink: #172436;
+      --muted: #546577;
+      --grid: #b4c7d3;
+      --axis: #718797;
+      --curve: #2f5d7c;
+      --tangent: #137e77;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #d8dee5;
+        --muted: #adb9c4;
+        --grid: #324650;
+        --axis: #8299a8;
+        --curve: #8cbbd2;
+        --tangent: #7cc6b8;
+      }
+    }
+    text { font: 18px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; dominant-baseline: middle; fill: var(--ink); }
+    .tick { fill: var(--muted); }
+    .grid { fill: none; stroke: var(--grid); stroke-width: 1; }
+    .axis { fill: none; stroke: var(--axis); stroke-width: 1.2; }
+    .curve { fill: none; stroke: var(--curve); stroke-width: 2.7; }
+    .tangent { fill: none; stroke: var(--tangent); stroke-width: 2.4; stroke-dasharray: 8 5; }
+    .slope { fill: none; stroke: var(--tangent); stroke-width: 1.2; }
+    .point { fill: var(--tangent); }
+  </style>
+
+  <path d="M 58 16 H 86" class="curve" />
+  <text x="94" y="16">f(x)</text>
+  <path d="M 203 16 H 239" class="tangent" />
+  <text x="248" y="16">切线（斜率 2）</text>
+
+  <path d="M 58 40 H 394 M 58 120 H 394 M 58 200 H 394 M 198 40 V 260 M 338 40 V 260" class="grid" />
+  <path d="M 58 40 V 260 H 394" class="axis" />
+  <path d="M 53 40 H 58 M 53 120 H 58 M 53 200 H 58 M 53 260 H 58 M 58 260 V 265 M 198 260 V 265 M 338 260 V 265" class="axis" />
+  <g text-anchor="end">
+    <text x="45" y="40" class="tick">8</text>
+    <text x="45" y="120" class="tick">4</text>
+    <text x="45" y="200" class="tick">0</text>
+    <text x="45" y="260" class="tick">−3</text>
+    <text x="45" y="16">y</text>
+  </g>
+  <g text-anchor="middle">
+    <text x="58" y="281" class="tick">0</text>
+    <text x="198" y="281" class="tick">1</text>
+    <text x="338" y="281" class="tick">2</text>
+    <text x="416" y="281">x</text>
+  </g>
+
+  <path d="M 198 220 H 338 V 180" class="slope" />
+  <path id="function-curve" d="M 58 200 Q 226 296 394 46.4" class="curve" />
+  <path id="tangent-line" d="M 58 260 L 394 164" class="tangent" />
+  <circle id="tangent-point" cx="198" cy="220" r="4.5" class="point" />
+  <text x="190" y="244" text-anchor="end">(1, −1)</text>
+  <text x="267" y="239" text-anchor="middle">Δx=1</text>
+  <text x="346" y="216">Δy=2</text>
+</svg>

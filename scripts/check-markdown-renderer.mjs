@@ -274,8 +274,72 @@ try {
 		renderMarkdown(exerciseSource),
 		renderExcerpt(exerciseSource, "practice"),
 	];
+	const tabDefault = ' data-note-tabs-default="二分查找"';
+	const tabSource = [
+		"## Search example",
+		"",
+		`<div data-note-tabs="查找方式"${tabDefault}>`,
+		"",
+		'<div data-note-tab="线性扫描">',
+		"",
+		"```python",
+		"items.index(target)",
+		"```",
+		"",
+		"</div>",
+		"",
+		'<div data-note-tab="二分查找">',
+		"",
+		"```python",
+		"from bisect import bisect_left",
+		"```",
+		"",
+		"</div>",
+		"",
+		"</div>",
+	].join("\n");
+	const tabRenders = [
+		{ html: renderMarkdown(tabSource), selected: 1 },
+		{ html: renderExcerpt(tabSource, "search-example"), selected: 1 },
+		{ html: renderMarkdown(tabSource.replace(tabDefault, "")), selected: 0 },
+	];
 
 	const checks = [
+		{
+			name: "note tabs use author-defined labels and defaults in both notes and excerpts",
+			pass: tabRenders.every(({ html, selected }) => {
+				const panels = [
+					...html.matchAll(/<div\b([^>]*\brole="tabpanel"[^>]*)>/g),
+				];
+				const tabs = [
+					...html.matchAll(
+						/<button\b([^>]*\brole="tab"[^>]*)>([^<]+)<\/button>/g,
+					),
+				];
+				return (
+					html.includes('role="tablist" aria-label="查找方式"') &&
+					tabs.length === 2 &&
+					panels.length === 2 &&
+					tabs[0][2] === "线性扫描" &&
+					tabs[1][2] === "二分查找" &&
+					(html.match(/<pre\b/g) ?? []).length === 2 &&
+					tabs.every(([, attributes, label], index) => {
+						const id = /\bid="([^"]+)"/.exec(attributes)?.[1];
+						const panelId = /aria-controls="([^"]+)"/.exec(attributes)?.[1];
+						const active = index === selected;
+						return (
+							id &&
+							panelId &&
+							attributes.includes(`aria-selected="${active}"`) &&
+							panels[index][1].includes('hidden=""') === !active &&
+							panels[index][1].includes(`data-note-tab-panel="${label}"`) &&
+							panels[index][1].includes(`id="${panelId}"`) &&
+							panels[index][1].includes(`aria-labelledby="${id}"`)
+						);
+					})
+				);
+			}),
+		},
 		{
 			name: "notes and excerpts render answers immediately after their own question, closed and independent",
 			pass: exerciseRenders.every((rendered) => {

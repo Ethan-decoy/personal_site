@@ -12,9 +12,11 @@ import {
 import {
 	CodeReferenceProvider,
 	findCodeReferenceBlock,
+	scrollToCodeReferenceBlock,
 } from "../code-reference";
 import { LoadingIndicator, SectionTitle } from "../components";
 import { useI18n } from "../i18n";
+import { hiddenNoteTabPanel, revealNoteTab } from "../markdown-tabs";
 import {
 	type NestedTreeNode,
 	type NoteContent,
@@ -700,7 +702,9 @@ export default function NotesPage({
 			(element) => element.id === pendingAnchor,
 		);
 		if (el) {
-			el.scrollIntoView({ behavior: "instant", block: "start" });
+			revealNoteTab(el, () =>
+				el.scrollIntoView({ behavior: "instant", block: "start" }),
+			);
 			setPendingAnchor(null);
 			return;
 		}
@@ -712,18 +716,25 @@ export default function NotesPage({
 				return;
 			}
 			const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT);
+			const query = pendingAnchor.toLowerCase();
+			let match: HTMLElement | null = null;
 			let node = walker.nextNode();
 			while (node) {
-				if (
-					node.textContent?.toLowerCase().includes(pendingAnchor.toLowerCase())
-				) {
-					const parent = node.parentElement;
-					if (parent) {
-						parent.scrollIntoView({ behavior: "smooth", block: "center" });
+				const parent = node.parentElement;
+				if (parent && node.textContent?.toLowerCase().includes(query)) {
+					match ??= parent;
+					if (!hiddenNoteTabPanel(parent)) {
+						match = parent;
+						break;
 					}
-					break;
 				}
 				node = walker.nextNode();
+			}
+			if (match) {
+				const target = match;
+				revealNoteTab(target, () =>
+					target.scrollIntoView({ behavior: "smooth", block: "center" }),
+				);
 			}
 			setPendingAnchor(null);
 		}, 100);
@@ -734,10 +745,7 @@ export default function NotesPage({
 		if (pendingCodeIndex === null || !selectedNote) return;
 		const element = findCodeReferenceBlock(selectedNote.file, pendingCodeIndex);
 		if (!element) return;
-		element.scrollIntoView({ block: "center", behavior: "instant" });
-		element
-			.querySelector<HTMLButtonElement>(".markdown-code-pin")
-			?.focus({ preventScroll: true });
+		scrollToCodeReferenceBlock(element, "instant");
 		setPendingCodeIndex(null);
 	}, [pendingCodeIndex, selectedNote]);
 

@@ -16,6 +16,7 @@ import {
 	type CodeReferenceNote,
 	type CodeReferenceSource,
 } from "./code-reference-context";
+import { revealNoteTab } from "./markdown-tabs";
 import type { Theme } from "./themes";
 
 export type {
@@ -31,6 +32,18 @@ export function findCodeReferenceBlock(file: string, blockIndex: number) {
 	return article
 		.querySelectorAll<HTMLElement>(".markdown-code-block")
 		.item(blockIndex);
+}
+
+export function scrollToCodeReferenceBlock(
+	element: HTMLElement,
+	behavior: ScrollBehavior,
+) {
+	revealNoteTab(element, () => {
+		element.scrollIntoView({ block: "center", behavior });
+		element
+			.querySelector<HTMLButtonElement>(".markdown-code-pin")
+			?.focus({ preventScroll: true });
+	});
 }
 
 function sourceLabel(element: HTMLElement): string {
@@ -141,11 +154,10 @@ export function CodeReferenceProvider({
 		const current = currentSource.current;
 		if (!current) return;
 		const element = findCodeReferenceBlock(current.file, current.blockIndex);
-		close();
-		if (element)
-			element.scrollIntoView({ block: "center", behavior: "smooth" });
+		setSource(null);
+		if (element) scrollToCodeReferenceBlock(element, "smooth");
 		else onOpenSource(current.file, current.blockIndex);
-	}, [close, onOpenSource]);
+	}, [onOpenSource]);
 	const context = useMemo(
 		() => ({ note, source, pin: setSource }),
 		[note, source],

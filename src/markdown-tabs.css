@@ -1,0 +1,62 @@
+.markdown-tabs {
+	min-width: 0;
+	margin: 1em 0 1.5em;
+}
+
+.markdown-tablist {
+	display: flex;
+	gap: clamp(2px, 0.7vw, 6px);
+	max-width: 100%;
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	border-bottom: 1px solid var(--tw-prose-hr);
+}
+
+.markdown-tab {
+	flex: 0 0 auto;
+	min-height: 44px;
+	padding: 0.45rem clamp(0.45rem, 1.6vw, 0.95rem);
+	border-bottom: 2px solid transparent;
+	border-radius: 6px 6px 0 0;
+	color: var(--tw-prose-body);
+	font-size: clamp(0.8rem, 2vw, 0.875rem);
+	font-weight: 500;
+	line-height: 1.4;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.markdown-tab[aria-selected="true"] {
+	border-bottom-color: var(--markdown-accent);
+	background: var(--markdown-inline-bg);
+	color: var(--tw-prose-headings);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.markdown-tab:hover {
+		background: var(--markdown-inline-bg);
+	}
+}
+
+.markdown-tab:focus-visible,
+.markdown-tab-panel:focus-visible {
+	outline: 2px solid var(--markdown-accent);
+	outline-offset: -2px;
+}
+
+.markdown-tab-panel {
+	min-width: 0;
+	padding-top: 0.85rem;
+}
+
+.markdown-tab-panel > :where(p, ul, ol) {
+	max-width: min(var(--markdown-text-width, 80ch), 100%);
+}
+
+.markdown-tab-panel > :first-child {
+	margin-top: 0;
+}
+
+.markdown-tab-panel > :last-child {
+	margin-bottom: 0;
+}

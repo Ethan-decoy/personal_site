@@ -10,6 +10,12 @@ import ReactMarkdown, { type Components } from "react-markdown";
 import "katex/dist/katex.min.css";
 import { CodeReferencePin } from "./code-reference";
 import "./markdown-answers.css";
+import "./markdown-tabs.css";
+import {
+	MarkdownTabs,
+	MarkdownTabsProvider,
+	revealNoteTab,
+} from "./markdown-tabs";
 import { type NoteExcerptOptions, rehypeNoteExcerpt } from "./note-excerpt";
 import {
 	type NoteBody,
@@ -611,15 +617,20 @@ function makeComponents(
 							const target = Array.from(
 								article?.querySelectorAll("[id]") ?? [],
 							).find((element) => element.id === href.slice(1));
-							const scrollRoot = article?.closest("[data-note-preview-scroll]");
-							if (target && scrollRoot) {
-								const offset =
-									target.getBoundingClientRect().top -
-									scrollRoot.getBoundingClientRect().top;
-								scrollRoot.scrollTop += offset;
-							} else {
-								target?.scrollIntoView({ block: "nearest" });
-							}
+							if (!target) return;
+							revealNoteTab(target, () => {
+								const scrollRoot = article?.closest(
+									"[data-note-preview-scroll]",
+								);
+								if (scrollRoot) {
+									const offset =
+										target.getBoundingClientRect().top -
+										scrollRoot.getBoundingClientRect().top;
+									scrollRoot.scrollTop += offset;
+								} else {
+									target.scrollIntoView({ block: "nearest" });
+								}
+							});
 						}}
 					>
 						{children}
@@ -714,6 +725,27 @@ function makeComponents(
 				decoding={props.decoding ?? "async"}
 			/>
 		),
+		div: ({ node, children, ...props }) => {
+			const label = node?.properties.dataNoteTabs;
+			if (typeof label === "string" && label.trim()) {
+				const defaultTab = node?.properties.dataNoteTabsDefault;
+				const syncGroup = node?.properties.dataNoteTabsSync;
+				return (
+					<MarkdownTabs
+						label={label.trim()}
+						defaultTab={
+							typeof defaultTab === "string" ? defaultTab.trim() : undefined
+						}
+						syncGroup={
+							typeof syncGroup === "string" ? syncGroup.trim() : undefined
+						}
+					>
+						{children}
+					</MarkdownTabs>
+				);
+			}
+			return <div {...props}>{children}</div>;
+		},
 		table: ({ node: _node, children, ...props }) => (
 			<div className="markdown-table-scroll">
 				<table {...props}>{children}</table>
@@ -848,7 +880,12 @@ export function MarkdownPreview({
 				className={`markdown-prose w-full max-w-none prose prose-ocean${dark ? " dark" : ""}`}
 				style={markdownStyle}
 			>
-				<ReactMarkdown rehypePlugins={rehypePlugins} components={components} />
+				<MarkdownTabsProvider>
+					<ReactMarkdown
+						rehypePlugins={rehypePlugins}
+						components={components}
+					/>
+				</MarkdownTabsProvider>
 			</div>
 		</article>
 	);

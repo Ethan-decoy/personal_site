@@ -55,7 +55,7 @@ int main() {
         ++current;
     }
 
-    std::vector<double> empty{};
+    const std::vector<double> empty{};
     std::cout << (empty.begin() == empty.end()) << '\n';
 }
 ```
@@ -64,23 +64,25 @@ int main() {
 
 ## 两个位置组成半开区间
 
-用起点 `first` 和终点 `last` 描述的区间写作 **`[first, last)`**：包括 `first` 指定的元素，不包括 `last` 指定的位置。这与[用偏移和数量选取子范围](../20-fixed-size-sequences-and-contiguous-ranges/04-subranges-and-interval-boundaries.md#用起点偏移与数量选出一段元素)描述的是同一类边界关系，只是这里直接保存两端位置。
+用起点 `first` 和终点 `last` 描述的半开区间写作 **`[first, last)`**。对这里的迭代器，两端必须是同一序列中的有效位置，并且从 `first` 出发，经过有限次合法递增能够到达 `last`。
 
-`[samples.begin(), samples.end())` 覆盖全部元素。起点与终点相等时，`[first, first)` 是空区间；它可以位于容器开头、中间或尾后。用于结束一个子区间的 `last`，也可以指向整个容器中仍然存在的某个元素，只是该元素不属于当前区间。
+如果 `first == last`，零次递增就已到达终点，区间为空。否则，区间包含从 `first` 所指的元素开始、位于 `last` 之前的所有元素。同一段元素也可以用起点偏移和数量来表示。[用偏移和数量选取子范围](../20-fixed-size-sequences-and-contiguous-ranges/04-subranges-and-interval-boundaries.md#用起点偏移与数量选出一段元素)
 
-合法区间要求：两端关系正确，而且从 `first` 出发，经过有限次合法递增能够到达 `last`。例如，把第二个元素的位置作为起点、第三个元素的位置作为终点，区间只包含第二个元素。反过来组合这两个位置，不能靠持续递增走回前面的终点。
+`[samples.begin(), samples.end())` 覆盖全部采样值。如果用 `245.0` 的位置作为 `first`，用 `250.0` 的位置作为 `last`，区间只包含 `245.0`。访问这个值后递增一次就到达 `last`，遍历在读取 `250.0` 前停止。若两个端点都取 `245.0` 的位置，就得到位于容器中间的空区间。
 
-> [!IMPORTANT]
-> 区间的终点负责说明“在哪里停止”，不属于本次处理的元素。先判断当前位置是否到达终点，再访问元素；空区间沿用同一条规则，不需要制造一个虚假的首元素。
+> [!IMPORTANT] 半开区间的停止边界
+> 遍历有效的 `[first, last)` 时，从 `first` 开始。**每次先比较当前位置与 `last`，尚未到达时才访问元素并递增。** 如果起点就等于终点，循环体一次也不执行。
 
 > [!WARNING]
-> 同一种迭代器类型不保证两个值能组成合法区间。颠倒顺序，或把两个独立容器的边界拼在一起，再交给要求有效区间的标准算法，具有未定义行为。算法不会自动检查来源并修复这两个位置。
+> 如果用 `250.0` 的位置作为起点、`245.0` 的位置作为终点，递增无法到达终点。把两个独立容器的边界配成一对也违反端点要求。将这样的无效区间交给要求有效区间的标准库算法，会导致未定义行为。
 
 ## 位置仍然依赖原数据
 
 迭代器表示访问关系，不拥有元素。容器销毁或某次操作使旧位置失效后，保存下来的迭代器不能继续用于访问、推进或判断原区间是否结束。仅仅写了 `current != finish`，不能证明参与比较的位置本身仍然有效。
 
-`vector` 的[重新分配](../11-sequences-and-data-access/04-sequence-storage-and-reference-validity.md#追加元素怎样影响引用)会让旧元素位置失效；即使没有重新分配，改变数量也可能破坏原来的结束边界。这些操作需要依据[容器修改与迭代器有效性](04-container-mutation-and-iterator-validity.md#修改数值与改变序列结构)判断。
+`vector` 重新分配时，旧元素迭代器和旧尾后迭代器都会失效。[追加元素怎样影响引用](../11-sequences-and-data-access/04-sequence-storage-and-reference-validity.md#追加元素怎样影响引用)
+
+用 `samples.push_back(255.0)` 成功追加一个值后，先前保存的 `finish` 会失效。若追加后的数量仍在原容量内，指向原有元素的迭代器保持有效。再次遍历时应取得当前的 `end()`，并确认起点仍然有效。[容器修改与迭代器有效性](04-container-mutation-and-iterator-validity.md#修改数值与改变序列结构)
 
 > [!PRACTICE]
 > 只需依次处理全部元素时，范围 `for` 更直接。需要保存某个位置、限定一段区间，或接收操作返回的位置时，再显式使用迭代器。选择取决于要表达的关系，不必为了使用迭代器而改写已有的简单循环。
@@ -90,3 +92,4 @@ int main() {
 - [C++23 工作草案：迭代器、尾后位置与合法区间](https://timsong-cpp.github.io/cppwp/n4950/iterator.requirements.general)
 - [C++23 工作草案：容器的迭代器类型及 begin、end](https://timsong-cpp.github.io/cppwp/n4950/container.reqmts)
 - [C++23 工作草案：vector 的接口与连续存储](https://timsong-cpp.github.io/cppwp/n4950/vector.overview)
+- [C++23 工作草案：vector 追加与迭代器失效](https://timsong-cpp.github.io/cppwp/n4950/vector.modifiers#2)

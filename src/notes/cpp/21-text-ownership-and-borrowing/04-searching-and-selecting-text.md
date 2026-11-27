@@ -95,12 +95,12 @@ front=left
 
 此时 `key` 恰好是 `"sensor"`，`value` 也非空，后续的字段检查都会通过。`print_sensor_field` 因此误把这条记录判为有效，打印 `sensor` 并返回 `true`。
 
-> [!WARNING]
+> [!WARNING] 先处理 npos，再计算字段范围
 > 先识别并处理 `npos`，再计算起点和选取字段。回绕后的起点和截短后的数量可能让两次 `substr` 都成功，使缺少分隔符的输入通过字段检查。
 
 这套下标仍以 `char` 为单位。当前示例的名称与分隔符均由基本字符组成；对多字节编码的文本，任意数字位置不一定落在完整字符的边界，`substr` 也不会自动修复被截断的编码。
 
-> [!PRACTICE]
+> [!PRACTICE] 按字段的保存需求选择借用或复制
 > 调用期间源字符可读、函数只需查看字段时，可用 `std::string_view` 在原文本中完成查找、比较和选取，省去字段复制。需要独立保存名称时，可以在 `print_sensor_field` 的字段检查通过后、`value` 仍在作用域内且源字符可读时，用 `std::string{value}` [建立拥有副本](03-string-views-and-borrowed-text.md#需要独立文本时建立拥有值)。
 
 ## 参考资料

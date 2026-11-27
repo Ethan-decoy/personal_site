@@ -97,7 +97,7 @@ writable = std::span<double>{samples}; // 错误：不能给 const 视图对象�
 observed[0] = 315.0;                   // 错误：不能通过 const double& 修改元素
 ```
 
-> [!WARNING]
+> [!WARNING] 只读视图仍可读到源元素的更新
 > `std::span<const double>` 的只读限制只作用于这份访问入口。其他合法入口仍可修改可写的源元素。只要借用继续有效，从视图读到的就是元素的当前值，把视图当成读数快照可能读到后来更新的值。
 
 ## 参数类型表达哪一层限制

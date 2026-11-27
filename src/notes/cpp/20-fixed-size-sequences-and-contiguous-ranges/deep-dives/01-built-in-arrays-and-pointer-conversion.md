@@ -105,7 +105,7 @@ const std::span<const double> view{samples};
 
 `view.size()` 返回 `3`。这里的 `std::span<const double>` 把 `3` 记为视图的长度，并提供对这三个元素的只读访问。接口只取得 `const double*` 时，建立同样的借用范围还需要可靠的元素数量。
 
-> [!PRACTICE]
+> [!PRACTICE] 按拥有和借用选择 array 或 span
 > 需要拥有固定数量的元素时，可以用 [std::array](../01-fixed-size-sequences-and-array-objects.md#元素随数组对象一起存在) 表达完整的值；函数只需借用连续数据时，可以用 [std::span](../02-borrowing-contiguous-ranges-with-span.md#将连续元素作为一段范围交给函数) 同时传递访问位置与数量。接触内置数组或指针接口时，先确认长度在哪个环节仍然可知，避免在形参方括号中写一个数字就把它当作保证。
 
 ## 参考资料

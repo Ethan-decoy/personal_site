@@ -10,6 +10,8 @@
       "id": "d2l-linear-regression",
       "title": "Linear Regression — Dive into Deep Learning",
       "url": "https://d2l.ai/chapter_linear-regression/linear-regression.html",
+      "editionReleasedOn": "2023-08-18",
+      "snapshotUrl": "https://github.com/d2l-ai/d2l-en/blob/v1.0.3/chapter_linear-regression/linear-regression.md",
       "version": "核对时在线英文版1.0.3，第3.1.1节与第3.1.4节",
       "supports": "单样本特征向量的维数与数据集的样本数量分别表示；模型、训练损失、参数优化及未见数据表现具有不同职责。"
     },
@@ -17,6 +19,8 @@
       "id": "d2l-iid",
       "title": "模型选择、欠拟合和过拟合 — 统计学习理论",
       "url": "https://zh.d2l.ai/chapter_multilayer-perceptrons/underfit-overfit.html",
+      "editionReleasedOn": "2022-12-08",
+      "snapshotUrl": "https://github.com/d2l-ai/d2l-zh/blob/v2.0.0/chapter_multilayer-perceptrons/underfit-overfit.md",
       "version": "核对时在线中文版2.0.0，第4.4.1.1节",
       "supports": "独立同分布作为对采样过程的假设；训练与测试分布、泛化判断的前提，不把所有实际样本自动视为独立同分布。"
     },
@@ -24,6 +28,8 @@
       "id": "d2l-fine-tuning",
       "title": "微调 — 动手学深度学习",
       "url": "https://zh.d2l.ai/chapter_computer-vision/fine-tuning.html",
+      "editionReleasedOn": "2022-12-08",
+      "snapshotUrl": "https://github.com/d2l-ai/d2l-zh/blob/v2.0.0/chapter_computer-vision/fine-tuning.md",
       "version": "核对时在线中文版2.0.0，第13.2.1节与第13.2.2节",
       "supports": "目标数据集较小时可利用源模型的结构与预训练参数进行适配；不能把小型目标数据集直接等同于深度学习无效。正文未复制原书实验数字或声称本站复现实验。"
     },
@@ -31,6 +37,8 @@
       "id": "d2l-sequences",
       "title": "序列模型 — 动手学深度学习",
       "url": "https://zh.d2l.ai/chapter_recurrent-neural-networks/sequence.html",
+      "editionReleasedOn": "2022-12-08",
+      "snapshotUrl": "https://github.com/d2l-ai/d2l-zh/blob/v2.0.0/chapter_recurrent-neural-networks/sequence.md",
       "version": "核对时在线中文版2.0.0，第8.1.1节与第8.1.2节",
       "supports": "序列观测间可以存在依赖，输入表示与模型组织需要根据任务选择；不把变长输入处理描述成所有深度模型天然具有的能力。"
     },
@@ -38,6 +46,8 @@
       "id": "d2l-mlp",
       "title": "多层感知机 — 动手学深度学习",
       "url": "https://zh.d2l.ai/chapter_multilayer-perceptrons/mlp.html",
+      "editionReleasedOn": "2022-12-08",
+      "snapshotUrl": "https://github.com/d2l-ai/d2l-zh/blob/v2.0.0/chapter_multilayer-perceptrons/mlp.md",
       "version": "核对时在线中文版2.0.0，第4.1.1节",
       "supports": "以逐层连接的网络说明中间表示及其与预测器的联合学习；不把所有神经网络限制为单一串联结构，也不保证复杂模型一定更好。"
     },
@@ -65,5 +75,37 @@
     "本次是概念与表达修订，没有新增模型排行榜、硬件规格或工具版本结论。",
     "图片维数为手算示例；对照表只定义任务与数据的对应，没有构造实际患者数据或训练实验。",
     "没有重新训练或复现所引用论文与原书的实验；文献结果仅用于相应解释边界。"
+  ],
+  "revisions": [
+    {
+      "adaptedOn": "2026-11-28",
+      "checkedOn": "2026-11-28",
+      "changes": [
+        "沿用猫狗图片区分输入像素与中间表示，用同一张图片比较联合训练和只训练分类器时哪些量可能改变。",
+        "将代表性不足的提示放回皮肤图像例之后，用历史录用标签说明各人群即使有充分记录，先前的偏差仍可能延续。",
+        "将无监督学习、序列学习和多层表示的跨篇引用定位到相应小节。补充五条教材来源的版次发布日期和对应章节的固定版本。"
+      ],
+      "editionReleaseUrls": [
+        "https://github.com/d2l-ai/d2l-en/releases/tag/v1.0.3",
+        "https://github.com/d2l-ai/d2l-zh/releases/tag/v2.0.0"
+      ],
+      "sources": [
+        {
+          "title": "Transfer Learning for Computer Vision Tutorial",
+          "url": "https://docs.pytorch.org/tutorials/beginner/transfer_learning_tutorial.html#convnet-as-fixed-feature-extractor",
+          "firstPublishedOn": "2017-03-24",
+          "version": "PyTorch 官方教程，页面标注更新于 2025-01-27。核对了微调和固定特征提取器两种训练设置。",
+          "supports": "预训练网络可作为固定特征提取器，只训练新分类器。正文用预先算好的同一组特征说明分类器参数更新的范围。"
+        },
+        {
+          "title": "A Framework for Understanding Sources of Harm throughout the Machine Learning Life Cycle",
+          "url": "https://arxiv.org/html/1901.10002v5#S3.SS1",
+          "doi": "10.1145/3465416.3483305",
+          "firstPublishedOn": "2019-01-28",
+          "version": "arXiv v5，2021-12-01，第 3.1 节和第 3.2 节。",
+          "supports": "历史偏差可以存在于准确且有代表性的数据中。代表性偏差关乎采样与覆盖，招聘例关乎录用标签反映的历史判断。"
+        }
+      ]
+    }
   ]
 }
